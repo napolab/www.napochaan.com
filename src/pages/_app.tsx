@@ -1,6 +1,7 @@
+/* eslint-disable react/jsx-no-bind */
 // eslint-disable-next-line camelcase
 import { Noto_Sans, Noto_Sans_JP } from "next/font/google";
-import { memo, Suspense, useCallback, useState } from "react";
+import { memo, Suspense, useState } from "react";
 
 import { ThemeProvider, useWatchSystemTheme } from "@theme";
 import { clsx } from "@utils/clsx";
@@ -21,24 +22,25 @@ const notosansjp = Noto_Sans_JP({
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   const systemTheme = useWatchSystemTheme();
   const [theme, setTheme] = useState<Theme>();
-  const toggleTheme = useCallback(() => {
-    setTheme((t) => (t === "light" ? "dark" : "light"));
-  }, []);
+  const currentTheme = theme ?? systemTheme;
 
   return (
-    <ThemeProvider theme={theme ?? systemTheme}>
-      <header>
-        <input type="checkbox" checked={(theme ?? systemTheme) === "light"} onChange={toggleTheme} />
-      </header>
+    <div className={clsx(notosans.className, notosansjp.className)}>
+      <ThemeProvider theme={currentTheme}>
+        <header>
+          <button onClick={() => setTheme("light")}>light</button>
+          <button onClick={() => setTheme("dark")}>dark</button>
+        </header>
 
-      <main className={clsx(notosans.className, notosansjp.className)}>
-        <Suspense>
-          <Component {...pageProps} />
-        </Suspense>
-      </main>
+        <main>
+          <Suspense>
+            <Component {...pageProps} />
+          </Suspense>
+        </main>
 
-      <footer></footer>
-    </ThemeProvider>
+        <footer></footer>
+      </ThemeProvider>
+    </div>
   );
 };
 
