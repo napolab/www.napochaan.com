@@ -1,0 +1,40 @@
+{
+  "name": "www.napochaan.com",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "prebuild": "rimraf dist",
+    "build": "next build",
+    "lint": "npm-run-all -s 'lint:*'",
+    "lint:eslint": "eslint src",
+    "lint:prettier": "prettier --check src",
+    "lint:markup": "markuplint -p src/**/*.tsx",
+    "fmt": "npm-run-all -s 'fmt:*'",
+    "fmt:eslint": "eslint src --fix",
+    "fmt:prettier": "prettier --write src"
+  },
+  "dependencies": {
+    "@react-spring/web": "^9.7.1",
+    "@vanilla-extract/css": "^1.9.5",
+    "next": "^13.2.3",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@markuplint/jsx-parser": "^3.3.0",
+    "@markuplint/react-spec": "^3.3.0",
+    "@naporin0624/eslint-config": "^0.7.1",
+    "@types/eslint": "^8.21.1",
+    "@types/node": "^18.11.18",
+    "@types/prettier": "^2.7.2",
+    "@types/react": "^18.0.27",
+    "@types/react-dom": "^18.0.10",
+    "@vanilla-extract/next-plugin": "^2.1.1",
+    "eslint": "^8.35.0",
+    "markuplint": "^3.3.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.8.4",
+    "rimraf": "^4.3.0",
+    "typescript": "^4.9.5"
+  }
+}

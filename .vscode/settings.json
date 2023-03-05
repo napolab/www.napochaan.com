@@ -1,0 +1,6 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "markuplint.debug": true,
+  "markuplint.enable": true,
+}
