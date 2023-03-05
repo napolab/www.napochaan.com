@@ -24,6 +24,7 @@
     "@markuplint/jsx-parser": "^3.3.0",
     "@markuplint/react-spec": "^3.3.0",
     "@naporin0624/eslint-config": "^0.7.1",
+    "@next/eslint-plugin-next": "^13.2.3",
     "@types/eslint": "^8.21.1",
     "@types/node": "^18.11.18",
     "@types/prettier": "^2.7.2",

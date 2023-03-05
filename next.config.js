@@ -9,9 +9,7 @@ const nextConfig = {
   experimental: {
     runtime: "experimental-edge",
   },
-  pageExtensions: ["tsx"]
+  pageExtensions: ["tsx"],
 };
 
-
 export default withVanillaExtract(nextConfig);
-
