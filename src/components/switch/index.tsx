@@ -12,8 +12,8 @@ import type { AriaSwitchProps } from "react-aria";
 
 export type SwitchProps = Readonly<{
   id?: string;
-  "aria-label": string
-  "aria-describedby"?: string
+  "aria-label": string;
+  "aria-describedby"?: string;
   label?: ReactNode;
   name?: string;
   checked?: boolean;
@@ -52,7 +52,11 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>((props, forward) => {
           <div className={styles.thumb} />
         </div>
       </label>
-      {props.label ? <label className={styles.label} htmlFor={id}>{props.label}</label> : null}
+      {props.label ? (
+        <label className={styles.label} htmlFor={id}>
+          {props.label}
+        </label>
+      ) : null}
     </div>
   );
 });

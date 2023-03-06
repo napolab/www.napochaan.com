@@ -7,7 +7,7 @@ import { vars } from "@theme/css";
  */
 export const container = style({
   display: "flex",
-  gap: "0.5rem"
+  gap: "0.5rem",
 });
 
 /**
@@ -29,9 +29,7 @@ export const input = style({
 /**
  * @package
  */
-export const trackWrapper = style({
-
-});
+export const trackWrapper = style({});
 
 /**
  * @package
@@ -63,5 +61,5 @@ export const thumb = style({});
  * @package
  */
 export const label = style({
-  // 
+  //
 });

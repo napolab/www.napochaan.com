@@ -19,5 +19,5 @@ export const Default: ComponentStory<typeof Switch> = (props) => {
   return <Switch {...props} onChange={action("change")} />;
 };
 Default.args = {
-  "aria-label": "switch"
+  "aria-label": "switch",
 };
