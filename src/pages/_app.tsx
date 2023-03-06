@@ -3,6 +3,7 @@
 import { Noto_Sans, Noto_Sans_JP } from "next/font/google";
 import { memo, Suspense, useState } from "react";
 
+import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider, useWatchSystemTheme } from "@theme";
 import { clsx } from "@utils/clsx";
 
@@ -27,18 +28,20 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <div className={clsx(notosans.className, notosansjp.className)}>
       <ThemeProvider theme={currentTheme}>
-        <header>
-          <button onClick={() => setTheme("light")}>light</button>
-          <button onClick={() => setTheme("dark")}>dark</button>
-        </header>
+        <HeadingLevelProvider>
+          <header>
+            <button onClick={() => setTheme("light")}>light</button>
+            <button onClick={() => setTheme("dark")}>dark</button>
+          </header>
 
-        <main>
-          <Suspense>
-            <Component {...pageProps} />
-          </Suspense>
-        </main>
+          <main>
+            <Suspense>
+              <Component {...pageProps} />
+            </Suspense>
+          </main>
 
-        <footer></footer>
+          <footer></footer>
+        </HeadingLevelProvider>
       </ThemeProvider>
     </div>
   );

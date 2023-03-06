@@ -6,9 +6,12 @@ export const vars = createGlobalThemeContract(
       text: {
         primary: null,
       },
-
       background: {
         primary: null,
+      },
+      border: {
+        primary: null,
+        focus: null,
       },
     },
     space: {

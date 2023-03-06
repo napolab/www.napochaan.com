@@ -10,5 +10,31 @@
   },
   "specs": {
     ".tsx$": "@markuplint/react-spec"
-  }
+  },
+  "pretenders": [
+    {
+      "selector": "Section",
+      "as": {
+        "element": "section"
+      }
+    },
+    {
+      "selector": "Article",
+      "as": {
+        "element": "article"
+      }
+    },
+    {
+      "selector": "Heading",
+      "as": {
+        "element": "h1"
+      }
+    },
+    {
+      "selector": "Switch",
+      "as": {
+        "element": "input"
+      }
+    }
+  ]
 }

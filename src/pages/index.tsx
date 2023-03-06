@@ -1,11 +1,14 @@
 import Link from "next/link";
 
+import Heading from "@components/heading";
+import Section from "@components/section";
+
 import type { NextPage } from "next";
 
 const Page: NextPage = () => {
   return (
-    <section>
-      <h1>Hello World</h1>
+    <Section>
+      <Heading>aaa</Heading>
       <p>www.napochaan.com</p>
       <p>
         ここは
@@ -14,7 +17,7 @@ const Page: NextPage = () => {
         </Link>
         の WebSite です。
       </p>
-    </section>
+    </Section>
   );
 };
 

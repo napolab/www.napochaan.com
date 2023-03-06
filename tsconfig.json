@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES2018",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -25,12 +25,10 @@
       "@theme/css": ["src/theme/css.ts"],
       "@theme/utils": ["src/theme/utils.ts"],
       "@hooks/*": ["src/hooks/*"],
-      "@styles/*": ["src/styles/*"],
       "@components/*": ["src/components/*"],
-      "@config/*": ["src/config/*"],
       "@utils/*": ["src/utils/*"]
     }
   },
-  "include": [".next/types/**/*.ts", "src", "next.config.js", "next-env.d.ts", ".eslintrc.cjs", "types"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "**/*.cjs", "**/*.mjs"],
   "exclude": ["node_modules"]
 }
