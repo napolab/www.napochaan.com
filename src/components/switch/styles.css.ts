@@ -1,5 +1,5 @@
 import { createVar, style } from "@vanilla-extract/css";
-import { calc } from '@vanilla-extract/css-utils';
+import { calc } from "@vanilla-extract/css-utils";
 
 import { focusRing, vars, visibilityHidden } from "@theme/css";
 
@@ -9,7 +9,7 @@ import { focusRing, vars, visibilityHidden } from "@theme/css";
 export const container = style({
   display: "inline-flex",
   gap: "0.5rem",
-  alignItems: "center"
+  alignItems: "center",
 });
 
 /**
@@ -31,7 +31,7 @@ const borderWidth = createVar();
 export const track = style({
   vars: {
     [height]: "1.5rem",
-    [borderWidth]: "1px"
+    [borderWidth]: "1px",
   },
   position: "relative",
   isolation: "isolate",
@@ -49,7 +49,6 @@ export const trackChecked = style({
   background: vars.pallets.background.primary,
 });
 
-
 const thumbSize = createVar();
 const thumbOffset = createVar();
 /**
@@ -58,7 +57,7 @@ const thumbOffset = createVar();
 export const thumb = style({
   vars: {
     [thumbSize]: calc.subtract(calc.multiply(height, 0.8), calc.multiply(borderWidth, 2)),
-    [thumbOffset]: calc.divide(calc.subtract(height, thumbSize, calc.multiply(borderWidth, 2)), 2)
+    [thumbOffset]: calc.divide(calc.subtract(height, thumbSize, calc.multiply(borderWidth, 2)), 2),
   },
   position: "absolute",
   height: thumbSize,
@@ -69,12 +68,12 @@ export const thumb = style({
   top: thumbOffset,
   left: thumbOffset,
   transition: "left 0.1s ease-in-out",
-  background: vars.pallets.text.main
+  background: vars.pallets.text.main,
 });
 
 /**
  * @package
  */
 export const thumbChecked = style({
-  left: calc.subtract("100%", thumbSize, thumbOffset)
+  left: calc.subtract("100%", thumbSize, thumbOffset),
 });

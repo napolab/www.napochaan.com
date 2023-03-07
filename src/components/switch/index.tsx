@@ -20,8 +20,11 @@ export type SwitchProps = Readonly<{
   defaultChecked?: boolean;
   disabled?: boolean;
   readonly?: boolean;
+  autoFocus?: boolean;
 
   onChange?: (value: boolean) => void;
+  onBlur?: (e: React.FocusEvent) => void;
+  onFocus?: (e: React.FocusEvent) => void;
 }>;
 const Switch = forwardRef<HTMLInputElement, SwitchProps>((props, forward) => {
   const ref = useObjectRef(forward);

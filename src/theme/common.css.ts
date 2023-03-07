@@ -19,7 +19,7 @@ export const focusRing = style({
   outlineStyle: "solid",
   outlineWidth: 2,
   outlineColor: vars.pallets.border.focus,
-  outlineOffset: "0.125rem"
+  outlineOffset: "0.125rem",
 });
 
 export const border = style({

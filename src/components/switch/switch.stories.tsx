@@ -1,4 +1,5 @@
 import { action } from "@storybook/addon-actions";
+import React, { useCallback } from "react";
 
 import Switch from "@components/switch";
 
@@ -16,8 +17,43 @@ const meta: ComponentMeta<typeof Switch> = {
 export default meta;
 
 export const Default: ComponentStory<typeof Switch> = (props) => {
-  return <Switch {...props} onChange={action("change")} />;
+  return <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} />;
 };
 Default.args = {
   "aria-label": "switch",
+};
+
+export const WithLabel: ComponentStory<typeof Switch> = (props) => {
+  return <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} />;
+};
+WithLabel.args = {
+  "aria-label": "switch",
+  label: <p style={{ color: "red" }}>with label</p>,
+};
+
+export const UseForm: ComponentStory<typeof Switch> = (props) => {
+  const handleSubmit = useCallback(
+    (e: React.FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      action("submit", { clearOnStoryChange: true })({
+        [props.name ?? ""]: e.currentTarget[props.name ?? ""].checked,
+      });
+    },
+    [props.name],
+  );
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <Switch {...props} />
+
+      <div>
+        <button type="submit">submit</button>
+      </div>
+    </form>
+  );
+};
+
+UseForm.args = {
+  "aria-label": "switch",
+  name: "switch",
 };
