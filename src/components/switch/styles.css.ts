@@ -1,65 +1,80 @@
-import { style } from "@vanilla-extract/css";
+import { createVar, style } from "@vanilla-extract/css";
+import { calc } from '@vanilla-extract/css-utils';
 
-import { vars } from "@theme/css";
+import { focusRing, vars, visibilityHidden } from "@theme/css";
 
 /**
  * @package
  */
 export const container = style({
-  display: "flex",
+  display: "inline-flex",
   gap: "0.5rem",
+  alignItems: "center"
 });
 
 /**
  * @package
  */
-export const input = style({
-  border: 0,
-  clip: "rect(0px, 0px, 0px, 0px)",
-  clipPath: "inset(50%)",
-  height: 1,
-  margin: "0px -1px -1px 0px",
-  overflow: "hidden",
-  padding: 0,
-  position: "absolute",
-  width: 1,
-  whiteSpace: "nowrap",
-});
+export const input = style([visibilityHidden]);
 
 /**
  * @package
  */
-export const trackWrapper = style({});
+export const focus = style([focusRing]);
 
-/**
- * @package
- */
-export const focus = style({
-  outlineStyle: "solid",
-  outlineOffset: "0.125rem",
-  outlineColor: vars.pallets.border.focus,
-});
+const height = createVar();
+const borderWidth = createVar();
 
 /**
  * @package
  */
 export const track = style({
+  vars: {
+    [height]: "1.5rem",
+    [borderWidth]: "1px"
+  },
+  position: "relative",
+  isolation: "isolate",
   display: "flex",
-  width: "3rem",
-  height: "1.5rem",
-  borderRadius: "10rem",
-  border: "solid",
-  borderColor: vars.pallets.border.primary,
+  height,
+  width: calc.multiply(height, 2),
+  border: `solid ${borderWidth} ${vars.pallets.border.main}`,
+  borderRadius: calc.multiply(height, 2),
 });
 
 /**
  * @package
  */
-export const thumb = style({});
+export const trackChecked = style({
+  background: vars.pallets.background.primary,
+});
+
+
+const thumbSize = createVar();
+const thumbOffset = createVar();
+/**
+ * @package
+ */
+export const thumb = style({
+  vars: {
+    [thumbSize]: calc.subtract(calc.multiply(height, 0.8), calc.multiply(borderWidth, 2)),
+    [thumbOffset]: calc.divide(calc.subtract(height, thumbSize, calc.multiply(borderWidth, 2)), 2)
+  },
+  position: "absolute",
+  height: thumbSize,
+  width: thumbSize,
+
+  borderRadius: "100%",
+
+  top: thumbOffset,
+  left: thumbOffset,
+  transition: "left 0.1s ease-in-out",
+  background: vars.pallets.text.main
+});
 
 /**
  * @package
  */
-export const label = style({
-  //
+export const thumbChecked = style({
+  left: calc.subtract("100%", thumbSize, thumbOffset)
 });

@@ -44,20 +44,21 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>((props, forward) => {
   const { isFocusVisible, focusProps } = useFocusRing();
 
   return (
-    <div className={styles.container}>
+    <label className={styles.container}>
       <input {...mergeProps(inputProps, focusProps)} className={styles.input} />
 
-      <label htmlFor={id}>
-        <div className={clsx(styles.track, isFocusVisible ? styles.focus : "")}>
-          <div className={styles.thumb} />
-        </div>
-      </label>
-      {props.label ? (
-        <label className={styles.label} htmlFor={id}>
-          {props.label}
-        </label>
-      ) : null}
-    </div>
+      <div
+        className={clsx(
+          styles.track,
+          isFocusVisible ? styles.focus : undefined,
+          state.isSelected ? styles.trackChecked : undefined,
+        )}
+      >
+        <div className={clsx(styles.thumb, state.isSelected ? styles.thumbChecked : undefined)} />
+      </div>
+
+      {props.label ? props.label : null}
+    </label>
   );
 });
 

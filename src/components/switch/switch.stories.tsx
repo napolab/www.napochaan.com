@@ -5,7 +5,7 @@ import Switch from "@components/switch";
 import type { ComponentMeta, ComponentStory } from "@storybook/react";
 
 const meta: ComponentMeta<typeof Switch> = {
-  title: "components/switch",
+  title: "components/Switch",
   component: Switch,
   argTypes: {
     label: {

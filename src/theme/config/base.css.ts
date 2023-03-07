@@ -5,12 +5,15 @@ export const vars = createGlobalThemeContract(
     pallets: {
       text: {
         primary: null,
+        main: null,
       },
       background: {
         primary: null,
+        secondary: null,
+        main: null,
       },
       border: {
-        primary: null,
+        main: null,
         focus: null,
       },
     },

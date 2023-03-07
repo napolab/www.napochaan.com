@@ -4,13 +4,17 @@ import { vars } from "./base.css";
 
 createGlobalTheme("html.dark", vars.pallets, {
   text: {
+    main: "#efefef",
     primary: "#efefef",
   },
   background: {
-    primary: "#2d2d2d",
+    main: "#2d2d2d",
+
+    primary: "rgb(25, 113, 194)",
+    secondary: "#efefef",
   },
   border: {
-    primary: "#efefef",
+    main: "rgba(239, 239, 239, 0.6)",
     focus: "rgb(25, 113, 194)",
   },
 });

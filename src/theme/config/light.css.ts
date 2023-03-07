@@ -4,13 +4,17 @@ import { vars } from "./base.css";
 
 createGlobalTheme(":host, html.light", vars.pallets, {
   text: {
+    main: "#2d2d2d",
     primary: "#2d2d2d",
   },
   background: {
-    primary: "#f1f1f1",
+    main: "#f1f1f1",
+
+    primary: "rgb(25, 113, 194)",
+    secondary: "#5c5c5c",
   },
   border: {
-    primary: "#2d2d2d",
+    main: "rgba(33, 33, 33, 0.6)",
     focus: "rgb(25, 113, 194)",
   },
 });
