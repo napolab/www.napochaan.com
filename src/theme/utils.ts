@@ -1,7 +1,7 @@
 import type { Theme } from "./provider";
 
-export const getSystemTheme = (): Theme => {
-  if (typeof window === "undefined") return "light";
+export const getSystemTheme = (fallback: Theme): Theme => {
+  if (typeof window === "undefined") return fallback;
 
   return matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 };

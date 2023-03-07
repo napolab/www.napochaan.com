@@ -2,7 +2,7 @@ import { createGlobalTheme } from "@vanilla-extract/css";
 
 import { vars } from "./base.css";
 
-createGlobalTheme(":host, html.light", vars.pallets, {
+createGlobalTheme("html, html.light", vars.pallets, {
   text: {
     main: "#2d2d2d",
     primary: "#2d2d2d",
