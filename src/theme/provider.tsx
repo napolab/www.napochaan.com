@@ -1,10 +1,13 @@
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
+
+import { useIsomorphicLayoutEffect } from "@hooks/isomorphic-effect";
 
 import type { FC, PropsWithChildren } from "react";
 
-import "./global.css";
+
 import "./config/dark.css";
 import "./config/light.css";
+import "./global.css";
 
 /**
  * @package
@@ -22,7 +25,7 @@ export type ThemeProviderProps = {
  * @package
  */
 export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ theme, children }) => {
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = document.querySelector("html");
     if (!el || !theme) return;
 

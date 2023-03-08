@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
+
+import { useIsomorphicLayoutEffect } from "@hooks/isomorphic-effect";
 
 import { getSystemTheme } from "./utils";
 
@@ -9,7 +11,7 @@ export const useWatchSystemTheme = (): Theme => {
   const onChange = useCallback(() => {
     setTheme(getSystemTheme);
   }, []);
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const mediaQueryList = matchMedia("(prefers-color-scheme: dark)");
     mediaQueryList.addEventListener("change", onChange);
     onChange();
