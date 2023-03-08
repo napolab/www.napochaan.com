@@ -1,5 +1,9 @@
 import type { Theme } from "./provider";
 
+export const isTheme = (value: unknown): value is Theme => {
+  return typeof value === "string" && ["dark", "light"].includes(value);
+};
+
 export const getSystemTheme = (fallback: Theme): Theme => {
   if (typeof window === "undefined") return fallback;
 
