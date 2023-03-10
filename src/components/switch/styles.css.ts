@@ -3,7 +3,6 @@ import { calc } from "@vanilla-extract/css-utils";
 
 import { focusRing, vars, visibilityHidden } from "@theme/css";
 
-const height = createVar();
 
 /**
  * @package
@@ -19,26 +18,27 @@ export const container = style({
  */
 export const input = style([visibilityHidden]);
 
+const trackHeight = createVar();
 const baseTrack = style({
   vars: {
-    [height]: "1.5rem",
+    [trackHeight]: "1.5rem",
   },
   position: "relative",
   isolation: "isolate",
-  height,
+  height: trackHeight,
   display: "inline-flex",
   alignItems: "center",
-  width: calc.multiply(height, 2),
-  borderRadius: calc.multiply(height, 2),
+  width: calc.multiply(trackHeight, 2),
+  borderRadius: calc.multiply(trackHeight, 2),
 
   background: vars.pallets.background.secondary,
-  boxShadow: `inset 0px ${calc.multiply(height, 0.085)} ${calc.multiply(height, 0.085)} rgba(0, 0, 0, 0.25)`,
+  boxShadow: `inset 0px ${calc.multiply(trackHeight, 0.085)} ${calc.multiply(trackHeight, 0.085)} rgba(0, 0, 0, 0.25)`,
 });
 
 export const track = styleVariants({
-  small: [baseTrack, { vars: { [height]: "1.25rem" } }],
-  medium: [baseTrack],
-  large: [baseTrack, { vars: { [height]: "2rem" } }],
+  small: [baseTrack, { vars: { [trackHeight]: "1.25rem" } }],
+  medium: [baseTrack, { vars: { [trackHeight]: "1.5rem" } }],
+  large: [baseTrack, { vars: { [trackHeight]: "2rem" } }],
   checked: [baseTrack, { background: vars.pallets.accent1 }],
   focus: [baseTrack, focusRing],
   disabled: [baseTrack, { background: vars.pallets.background.tertiary }],
@@ -48,20 +48,20 @@ const thumbSize = createVar();
 const thumbOffset = createVar();
 const baseThumb = style({
   vars: {
-    [thumbSize]: calc.multiply(height, 0.8),
-    [thumbOffset]: calc.divide(calc.subtract(height, thumbSize), 2),
+    [thumbSize]: calc.multiply(trackHeight, 0.8),
+    [thumbOffset]: calc.divide(calc.subtract(trackHeight, thumbSize), 2),
   },
   position: "absolute",
   height: thumbSize,
   width: thumbSize,
 
   borderRadius: "100%",
+  background: vars.pallets.white,
+  boxShadow: `0px ${calc.multiply(trackHeight, 0.085)} ${calc.multiply(trackHeight, 0.085)} rgba(0, 0, 0, 0.25)`,
 
   top: thumbOffset,
   left: thumbOffset,
   transition: "left 0.1s ease-in-out",
-  background: vars.pallets.white,
-  boxShadow: `0px ${calc.multiply(height, 0.085)} ${calc.multiply(height, 0.085)} rgba(0, 0, 0, 0.25)`,
 });
 
 export const thumb = styleVariants({

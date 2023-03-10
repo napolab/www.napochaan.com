@@ -2,6 +2,8 @@ import { style } from "@vanilla-extract/css";
 
 import { vars } from "./config/base.css";
 
+import type { StyleRule } from "@vanilla-extract/css";
+
 export const visibilityHidden = style({
   border: 0,
   clip: "rect(0px, 0px, 0px, 0px)",
@@ -15,14 +17,18 @@ export const visibilityHidden = style({
   whiteSpace: "nowrap",
 });
 
-export const focusRing = style({
+export const focusRing: StyleRule = {
   outlineStyle: "solid",
-  outlineWidth: 4,
+  outlineWidth: 2,
   outlineColor: vars.pallets.border.focus,
-});
+  outlineOffset: -2,
+};
 
-export const border = style({
-  border: "solid",
-  borderWidth: 1,
-  borderColor: vars.pallets.accent1,
+export const link = style({
+  color: vars.pallets.link.main,
+  textDecoration: "none",
+  ":hover": {
+    color: vars.pallets.link.hover,
+  },
+  ":focus-visible": focusRing,
 });

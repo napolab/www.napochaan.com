@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import Heading from "@components/heading";
 import Section from "@components/section";
+import { link } from "@theme/css";
 
 import * as styles from "./styles.css";
 
@@ -13,18 +14,12 @@ const Page: NextPage = () => {
       <Heading>aaa</Heading>
       <Section className={styles.section}>
         <Heading>bbb</Heading>
-
-        <ul>
-          <li>
-            <div />
-          </li>
-        </ul>
       </Section>
 
       <p>www.napochaan.com</p>
       <p>
         ここは
-        <Link href="https://twitter.com/naporin24690" target="_blank">
+        <Link href="https://twitter.com/naporin24690" target="_blank" className={link}>
           @naporin24690
         </Link>
         の WebSite です。

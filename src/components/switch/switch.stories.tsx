@@ -12,11 +12,25 @@ const meta: ComponentMeta<typeof Switch> = {
 export default meta;
 
 export const Default: ComponentStory<typeof Switch> = (props) => {
-  return <div style={{ display: "flex", flexDirection: "column", gap: "1em" }}>
-    <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} />
-    <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} label="with label" />
-    <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} label="ラベル付き" />
-    </div>;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1em" }}>
+      <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} />
+      <Switch
+        {...props}
+        onChange={action("change")}
+        onBlur={action("blur")}
+        onFocus={action("focus")}
+        label="with label"
+      />
+      <Switch
+        {...props}
+        onChange={action("change")}
+        onBlur={action("blur")}
+        onFocus={action("focus")}
+        label="ラベル付き"
+      />
+    </div>
+  );
 };
 Default.args = {
   "aria-label": "switch",
