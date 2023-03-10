@@ -17,6 +17,7 @@ module.exports = {
 
     return mergeConfig(config, {
       ...userConfig,
+      base: process.env.STORYBOOK_BASE ?? "/",
     });
   },
 };
