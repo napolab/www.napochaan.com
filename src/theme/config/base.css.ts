@@ -3,19 +3,29 @@ import { createGlobalTheme, createGlobalThemeContract } from "@vanilla-extract/c
 export const vars = createGlobalThemeContract(
   {
     pallets: {
-      text: {
-        primary: null,
-        main: null,
-      },
       background: {
-        primary: null,
-        secondary: null,
         main: null,
+        secondary: null,
+        tertiary: null,
+      },
+      text: {
+        main: null,
+        secondary: null,
+      },
+      link: {
+        main: null,
+        hover: null,
       },
       border: {
         main: null,
         focus: null,
       },
+      warning: null,
+      accent1: null,
+      accent2: null,
+      accent3: null,
+      disabled: null,
+      white: null,
     },
     space: {
       small: null,
@@ -26,8 +36,8 @@ export const vars = createGlobalThemeContract(
   (_, path) => path.join("-"),
 );
 
-createGlobalTheme(":host", vars.space, {
-  small: "0.25rem",
-  medium: "0.25rem",
-  large: "0.75rem",
+createGlobalTheme("html", vars.space, {
+  small: "1rem",
+  medium: "2rem",
+  large: "4rem",
 });

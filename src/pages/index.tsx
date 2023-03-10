@@ -3,12 +3,24 @@ import Link from "next/link";
 import Heading from "@components/heading";
 import Section from "@components/section";
 
+import * as styles from "./styles.css";
+
 import type { NextPage } from "next";
 
 const Page: NextPage = () => {
   return (
-    <Section>
+    <Section className={styles.container}>
       <Heading>aaa</Heading>
+      <Section className={styles.section}>
+        <Heading>bbb</Heading>
+
+        <ul>
+          <li>
+            <div />
+          </li>
+        </ul>
+      </Section>
+
       <p>www.napochaan.com</p>
       <p>
         ここは

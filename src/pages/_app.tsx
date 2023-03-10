@@ -8,6 +8,8 @@ import Switch from "@components/switch";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
 
+import * as styles from "./layout.css";
+
 import type { Theme } from "@theme";
 import type { AppProps } from "next/app";
 import type { FC, PropsWithChildren } from "react";
@@ -52,7 +54,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
           <Switch aria-label="toggle website theme" checked={theme === "dark"} onChange={handleChangeTheme} />
         </header>
 
-        <main>{children}</main>
+        <main className={styles.container}>{children}</main>
 
         <footer></footer>
       </HeadingLevelProvider>

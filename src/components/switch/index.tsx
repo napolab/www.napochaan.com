@@ -21,12 +21,14 @@ export type SwitchProps = Readonly<{
   disabled?: boolean;
   readonly?: boolean;
   autoFocus?: boolean;
+  size?: "small" | "medium" | "large";
+  labelPosition?: "left" | "right"
 
   onChange?: (value: boolean) => void;
   onBlur?: (e: React.FocusEvent) => void;
   onFocus?: (e: React.FocusEvent) => void;
 }>;
-const Switch = forwardRef<HTMLInputElement, SwitchProps>((props, forward) => {
+const Switch = forwardRef<HTMLInputElement, SwitchProps>(({ size = "medium", labelPosition = "right", ...props }, forward) => {
   const ref = useObjectRef(forward);
   const cid = useId();
   const id = props.id ?? cid;
@@ -48,19 +50,27 @@ const Switch = forwardRef<HTMLInputElement, SwitchProps>((props, forward) => {
 
   return (
     <label className={styles.container}>
-      <input {...mergeProps(inputProps, focusProps)} className={styles.input} />
+      {labelPosition === "left" &&  props.label ? props.label : null}
 
+      <input {...mergeProps(inputProps, focusProps)} className={styles.input} />
       <div
         className={clsx(
-          styles.track,
-          isFocusVisible ? styles.focus : undefined,
-          state.isSelected ? styles.trackChecked : undefined,
+          styles.track[size],
+          isFocusVisible ? styles.track.focus : undefined,
+          state.isSelected ? styles.track.checked : undefined,
+          inputProps.disabled ? styles.track.disabled : undefined,
         )}
       >
-        <div className={clsx(styles.thumb, state.isSelected ? styles.thumbChecked : undefined)} />
+        <div
+          className={clsx(
+            styles.thumb.default,
+            state.isSelected ? styles.thumb.checked : undefined,
+            inputProps.disabled ? styles.thumb.disabled : undefined,
+          )}
+        />
       </div>
 
-      {props.label ? props.label : null}
+      {labelPosition === "right" &&  props.label ? props.label : null}
     </label>
   );
 });

@@ -17,13 +17,12 @@ export const visibilityHidden = style({
 
 export const focusRing = style({
   outlineStyle: "solid",
-  outlineWidth: 2,
+  outlineWidth: 4,
   outlineColor: vars.pallets.border.focus,
-  outlineOffset: "0.125rem",
 });
 
 export const border = style({
   border: "solid",
   borderWidth: 1,
-  borderColor: vars.pallets.border.main,
+  borderColor: vars.pallets.accent1,
 });

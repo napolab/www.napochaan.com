@@ -13,3 +13,17 @@ globalStyle("html, body", {
     },
   },
 });
+
+globalStyle("a", {
+  color: vars.pallets.link.main
+});
+globalStyle("a:hover", {
+  color: vars.pallets.link.hover
+});
+
+globalStyle("html.light", {
+  colorScheme: "light"
+});
+globalStyle("html.dark", {
+  colorScheme: "dark"
+});

@@ -1,9 +1,8 @@
-import { Fragment } from "react";
+import { SSRProvider } from "react-aria";
 
 import { useIsomorphicLayoutEffect } from "@hooks/isomorphic-effect";
 
 import type { FC, PropsWithChildren } from "react";
-
 
 import "./config/dark.css";
 import "./config/light.css";
@@ -36,5 +35,5 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ theme
     };
   }, [theme]);
 
-  return <Fragment>{children}</Fragment>;
+  return <SSRProvider>{children}</SSRProvider>;
 };

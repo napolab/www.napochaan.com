@@ -8,16 +8,15 @@ import type { ComponentMeta, ComponentStory } from "@storybook/react";
 const meta: ComponentMeta<typeof Switch> = {
   title: "components/Switch",
   component: Switch,
-  argTypes: {
-    label: {
-      type: "string",
-    },
-  },
 };
 export default meta;
 
 export const Default: ComponentStory<typeof Switch> = (props) => {
-  return <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} />;
+  return <div style={{ display: "flex", flexDirection: "column", gap: "1em" }}>
+    <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} />
+    <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} label="with label" />
+    <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} label="ラベル付き" />
+    </div>;
 };
 Default.args = {
   "aria-label": "switch",
