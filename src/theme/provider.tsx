@@ -27,14 +27,14 @@ export type ThemeProviderProps = {
  */
 export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ theme, children }) => {
   useIsomorphicLayoutEffect(() => {
-      const el = document.querySelector("html");
-      if(!theme) return;
+    const el = document.querySelector("html");
+    if (!theme) return;
 
-      el?.classList.add(theme);
+    el?.classList.add(theme);
 
-      return () => {
-        el?.classList.remove(theme);
-      };
+    return () => {
+      el?.classList.remove(theme);
+    };
   }, [theme]);
 
   return (

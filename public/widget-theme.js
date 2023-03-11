@@ -1,13 +1,13 @@
 (function () {
-  const storageKey = 'theme';
-  const classNameDark = 'dark';
+  const storageKey = "theme";
+  const classNameDark = "dark";
 
   function setClassOnDocumentBody() {
-    const html = document.getElementsByTagName('html')[0];
+    const html = document.getElementsByTagName("html")[0];
     html.classList.add(classNameDark);
   }
 
-  const preferDarkQuery = '(prefers-color-scheme: dark)';
+  const preferDarkQuery = "(prefers-color-scheme: dark)";
   const mql = window.matchMedia(preferDarkQuery);
   const supportsColorSchemeQuery = mql.media === preferDarkQuery;
   let localStorageTheme = null;

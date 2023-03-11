@@ -10,9 +10,9 @@ const meta: ComponentMeta<typeof Switch> = {
   component: Switch,
   argTypes: {
     label: {
-      type: "string"
-    }
-  }
+      type: "string",
+    },
+  },
 };
 export default meta;
 
