@@ -23,6 +23,8 @@ const config = {
     });
   },
   managerHead(head) {
+    console.log(head, baseURL)
+
     return `
       ${head}
       <link rel="icon" href="${baseURL}/favicon.ico" />
