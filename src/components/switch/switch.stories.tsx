@@ -8,6 +8,11 @@ import type { ComponentMeta, ComponentStory } from "@storybook/react";
 const meta: ComponentMeta<typeof Switch> = {
   title: "components/Switch",
   component: Switch,
+  argTypes: {
+    label: {
+      type: "string"
+    }
+  }
 };
 export default meta;
 
