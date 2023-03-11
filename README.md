@@ -1,19 +1,30 @@
 # www.napochaan.com
 
-This is the repository for the website of [@naporin0624](https://github.com/naporin0624). The website can be accessed at [www.napochaan.com](https://www.napochaan.com/).
+[![www.napochaan.com](https://github.com/napolab/www.napochaan.com/raw/main/public/ogp.png)](https://napochaan.com)
 
-## UI Design
+Welcome to the repository of www.napochaan.com! This is the home page of @naporin0624, where you can find her portfolio and blog. 
 
-The UI design for the website was created using [Figma](https://www.figma.com/). The design includes both a dark and light theme, and a color palette. You can view the UI design and website mockup on Figma [here](https://www.figma.com/file/JZ24VUuy639Kf29oiB32FX/www.napochaan.com?node-id=0%3A1).
+## UI Design and Color Palette
 
-The color palette used in the design was converted into code using [vanilla-extract](https://github.com/seek-oss/vanilla-extract), and can be found in the [`src/theme/config`](https://github.com/napolab/www.napochaan.com/tree/main/src/theme/config) directory.
+The UI design and color palette of the website can be found on Figma [here](https://www.figma.com/file/JZ24VUuy639Kf29oiB32FX/www.napochaan.com?node-id=0%3A1). The design includes both light and dark themes, as well as a color palette that is also available in the vanilla-extract format [here](https://github.com/napolab/www.napochaan.com/tree/main/src/theme/config). 
 
-## Components
+## Component Library
 
-The components used in the website were created using [React](https://reactjs.org/) and [TypeScript](https://www.typescriptlang.org/), and organized using [Storybook](https://storybook.js.org/). You can view the component library on the website [here](https://napolab.github.io/www.napochaan.com/main/).
+The component library used to build the website can be found on Storybook [here](https://napolab.github.io/www.napochaan.com/main/). It is designed to be compatible with the Figma design. 
 
-The website also uses [Next.js](https://nextjs.org/), [react-aria](https://react-spectrum.adobe.com/react-aria/index.html), [jotai](https://github.com/pmndrs/jotai), and [react-spring](https://www.react-spring.io/) to create a smooth user experience.
+## Technologies Used
+
+The website is built using the following technologies:
+
+- TypeScript
+- Next.js
+- vanilla-extract
+- react-aria
+- jotai
+- react-spring 
 
 ## Deployment
 
-The website is deployed using [Cloudflare Pages](https://pages.cloudflare.com/).
+The website is deployed using Cloudflare Pages. 
+
+Thank you for visiting www.napochaan.com!
