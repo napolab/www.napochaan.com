@@ -10,7 +10,7 @@ import type { NextPage } from "next";
 
 const Page: NextPage = () => {
   return (
-    <Section className={styles.container}>
+    <Section className={styles.pageRoot}>
       <Heading>aaa</Heading>
       <Section className={styles.section}>
         <Heading>bbb</Heading>

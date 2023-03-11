@@ -9,8 +9,7 @@ function widgetTheme() {
 
       m.media !== t || m.matches ? d.add("dark") : d.add("light");
     } else if (e) {
-      const x = { light: "light", dark: "dark" };
-      d.add(x[e]);
+      d.add(JSON.parse(e));
     }
   } catch (e) {}
 }

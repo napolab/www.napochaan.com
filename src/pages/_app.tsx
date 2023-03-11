@@ -2,6 +2,7 @@ import { Provider, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 // eslint-disable-next-line camelcase
 import { Noto_Sans_JP } from "next/font/google";
+import Head from "next/head";
 import { memo, Suspense, useCallback } from "react";
 
 import PageTitle from "@components/page-title";
@@ -18,14 +19,18 @@ import type { FC, PropsWithChildren } from "react";
 const font = Noto_Sans_JP({
   weight: ["300", "400", "500"],
   subsets: ["latin"],
+  variable: "--noto-sans-jp",
 });
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
-      <PageTitle />
+      <Head>
+        <PageTitle />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </Head>
 
-      <div style={font.style}>
+      <div className={font.variable}>
         <Provider>
           <Layout>
             <Suspense>

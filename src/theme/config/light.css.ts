@@ -1,4 +1,4 @@
-import { createGlobalTheme } from "@vanilla-extract/css";
+import { createGlobalTheme, globalStyle } from "@vanilla-extract/css";
 
 import { vars } from "./base.css";
 
@@ -26,4 +26,8 @@ createGlobalTheme("html, html.light", vars.pallets, {
     main: "#CCCCCC",
     focus: "#336699",
   },
+});
+
+globalStyle("html, html.light", {
+  colorScheme: "light",
 });

@@ -1,10 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
+import { vars } from "@theme/css";
+
 /**
  * @package
  */
-export const container = style({
-  //
+export const pageRoot = style({
+  fontFamily: vars.font.notoSansJP,
 });
 
 /**

@@ -1,4 +1,4 @@
-import { createGlobalTheme, createGlobalThemeContract } from "@vanilla-extract/css";
+import { createGlobalTheme, createGlobalThemeContract, globalStyle } from "@vanilla-extract/css";
 
 export const vars = createGlobalThemeContract(
   {
@@ -32,12 +32,25 @@ export const vars = createGlobalThemeContract(
       medium: null,
       large: null,
     },
+    font: {
+      notoSansJP: "noto-sans-jp",
+    },
   },
-  (_, path) => path.join("-"),
+  (value, path) => value ?? path.join("-"),
 );
 
 createGlobalTheme("html", vars.space, {
   small: "1rem",
   medium: "2rem",
   large: "4rem",
+});
+
+createGlobalTheme("html", vars.font, {
+  notoSansJP: "'Noto Sans JP', sans-serif",
+});
+
+globalStyle("html, body", {
+  color: vars.pallets.text.main,
+  backgroundColor: vars.pallets.background.main,
+  fontFamily: vars.font.notoSansJP,
 });
