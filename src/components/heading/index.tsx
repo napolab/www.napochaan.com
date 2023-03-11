@@ -13,7 +13,7 @@ export type HeadingProps = Omit<
 
 const Heading: FC<HeadingProps> = forwardRef<HTMLHeadingElement, HeadingProps>(({ children, ...props }, ref) => {
   const level = useHeadingLevel();
-  const _props = useMemo(() => ({ ...props, className: styles.container, ref }), [props, ref]);
+  const _props = useMemo(() => ({ ...props, className: styles.headingRoot, ref }), [props, ref]);
   if (level === null) throw new Error('The heading must be enclosed in a "section" or "article" element.');
 
   return createElement(`h${level}`, _props, children);

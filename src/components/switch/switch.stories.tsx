@@ -34,6 +34,8 @@ export const Default: ComponentStory<typeof Switch> = (props) => {
 };
 Default.args = {
   "aria-label": "switch",
+  size: "medium",
+  labelPosition: "right",
 };
 
 export const WithLabel: ComponentStory<typeof Switch> = (props) => {
@@ -45,15 +47,10 @@ WithLabel.args = {
 };
 
 export const UseForm: ComponentStory<typeof Switch> = (props) => {
-  const handleSubmit = useCallback(
-    (e: React.FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      action("submit", { clearOnStoryChange: true })({
-        [props.name ?? ""]: e.currentTarget[props.name ?? ""].checked,
-      });
-    },
-    [props.name],
-  );
+  const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    action("submit")(e);
+  }, []);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -69,4 +66,5 @@ export const UseForm: ComponentStory<typeof Switch> = (props) => {
 UseForm.args = {
   "aria-label": "switch",
   name: "switch",
+  value: "on",
 };

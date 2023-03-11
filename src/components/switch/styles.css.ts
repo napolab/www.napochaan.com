@@ -3,11 +3,10 @@ import { calc } from "@vanilla-extract/css-utils";
 
 import { focusRing, vars, visibilityHidden } from "@theme/css";
 
-
 /**
  * @package
  */
-export const container = style({
+export const switchRoot = style({
   display: "inline-flex",
   gap: "0.5rem",
   alignItems: "center",
@@ -32,7 +31,7 @@ const baseTrack = style({
   borderRadius: calc.multiply(trackHeight, 2),
 
   background: vars.pallets.background.secondary,
-  boxShadow: `inset 0px ${calc.multiply(trackHeight, 0.085)} ${calc.multiply(trackHeight, 0.085)} rgba(0, 0, 0, 0.25)`,
+  boxShadow: `inset 0px 4px 4px rgba(0, 0, 0, 0.25)`,
 });
 
 export const track = styleVariants({
@@ -57,7 +56,7 @@ const baseThumb = style({
 
   borderRadius: "100%",
   background: vars.pallets.white,
-  boxShadow: `0px ${calc.multiply(trackHeight, 0.085)} ${calc.multiply(trackHeight, 0.085)} rgba(0, 0, 0, 0.25)`,
+  boxShadow: `0px 4px 4px rgba(0, 0, 0, 0.25)`,
 
   top: thumbOffset,
   left: thumbOffset,
@@ -79,4 +78,13 @@ export const thumb = styleVariants({
       background: vars.pallets.disabled,
     },
   ],
+});
+
+export const label = styleVariants({
+  default: {
+    color: "inherit",
+  },
+  disabled: {
+    color: vars.pallets.disabled,
+  },
 });

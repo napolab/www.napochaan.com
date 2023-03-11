@@ -3,7 +3,7 @@ import { style } from "@vanilla-extract/css";
 /**
  * @package
  */
-export const container = style({
+export const headingRoot = style({
   marginBottom: "1em",
 
   selectors: {
