@@ -1,17 +1,27 @@
-function widgetTheme() {
+(function () {
+  const storageKey = 'theme';
+  const classNameDark = 'dark';
+
+  function setClassOnDocumentBody() {
+    const html = document.getElementsByTagName('html')[0];
+    html.classList.add(classNameDark);
+  }
+
+  const preferDarkQuery = '(prefers-color-scheme: dark)';
+  const mql = window.matchMedia(preferDarkQuery);
+  const supportsColorSchemeQuery = mql.media === preferDarkQuery;
+  let localStorageTheme = null;
   try {
-    const d = document.documentElement.classList;
-    d.remove("light", "dark");
-    const e = window.localStorage.getItem("theme");
-    if (e === "system" || !e) {
-      const t = "(prefers-color-scheme: dark)";
-      const m = window.matchMedia(t);
+    localStorageTheme = JSON.parse(window.localStorage.getItem(storageKey));
+  } catch (err) {}
+  const localStorageExists = localStorageTheme !== null;
 
-      m.media !== t || m.matches ? d.add("dark") : d.add("light");
-    } else if (e) {
-      d.add(JSON.parse(e));
+  if (localStorageExists) {
+    if (localStorageTheme === classNameDark) {
+      setClassOnDocumentBody();
     }
-  } catch (e) {}
-}
-
-widgetTheme();
+  } else if (supportsColorSchemeQuery) {
+    setClassOnDocumentBody();
+    window.localStorage.setItem(storageKey, JSON.stringify(classNameDark));
+  }
+})();
