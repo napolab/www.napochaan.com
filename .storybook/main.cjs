@@ -1,7 +1,9 @@
 const path = require("path");
 const { loadConfigFromFile, mergeConfig } = require("vite");
+const baseURL = process.env.STORYBOOK_BASE ?? "/"
 
-module.exports = {
+/** @type {import("@storybook/react/types").StorybookConfig} */
+const config = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: ["@storybook/addon-links", "@storybook/addon-essentials", "storybook-dark-mode", "@storybook/addon-a11y"],
   framework: "@storybook/react",
@@ -17,7 +19,19 @@ module.exports = {
 
     return mergeConfig(config, {
       ...userConfig,
-      base: process.env.STORYBOOK_BASE ?? "/",
+      base: baseURL,
     });
   },
+  managerHead(head) {
+    return `
+      ${head}
+      <link rel="icon" href="${baseURL}/favicon.ico" />
+      <link rel="apple-touch-icon" sizes="180x180" href="${baseURL}/apple-touch-icon.png" />
+      <link rel="icon" type="image/png" sizes="32x32" href="${baseURL}/favicon-32x32.png" />
+      <link rel="icon" type="image/png" sizes="16x16" href="${baseURL}/favicon-16x16.png" />
+      <link rel="manifest" href="${baseURL}/site.webmanifest" />
+    `
+  }
 };
+
+module.exports = config;
