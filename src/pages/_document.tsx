@@ -32,7 +32,7 @@ const Document: FC<DocumentProps> = () => {
         <meta property="og:type" content="website" />
         <meta property="og:title" content="@naporin24690 official website" />
         <meta property="og:url" content="https://www.napochaan.com/" />
-        <meta property="og:image" content="https://www.napochaan.com/images/ogp.jpg" />
+        <meta property="og:image" content="https://www.napochaan.com/ogp.png" />
         <meta property="og:description" content={description} />
 
         <meta name="twitter:card" content="summary_large_image" />
