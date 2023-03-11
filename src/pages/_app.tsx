@@ -4,6 +4,7 @@ import { atomWithStorage } from "jotai/utils";
 import { Noto_Sans_JP } from "next/font/google";
 import { memo, Suspense, useCallback } from "react";
 
+import PageTitle from "@components/page-title";
 import Switch from "@components/switch";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
@@ -21,15 +22,19 @@ const font = Noto_Sans_JP({
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
-    <div style={font.style}>
-      <Provider>
-        <Layout>
-          <Suspense>
-            <Component {...pageProps} />
-          </Suspense>
-        </Layout>
-      </Provider>
-    </div>
+    <>
+      <PageTitle />
+
+      <div style={font.style}>
+        <Provider>
+          <Layout>
+            <Suspense>
+              <Component {...pageProps} />
+            </Suspense>
+          </Layout>
+        </Provider>
+      </div>
+    </>
   );
 };
 
