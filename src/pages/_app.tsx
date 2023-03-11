@@ -45,7 +45,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
 
 export default memo(App);
 
-const themeAtom = atomWithStorage<Theme>("theme", "light");
+const themeAtom = atomWithStorage<Theme | undefined>("theme", undefined);
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
   const [theme, setTheme] = useAtom(themeAtom);
