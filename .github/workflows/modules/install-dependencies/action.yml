@@ -13,7 +13,9 @@ runs:
         path: "**/node_modules"
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
     - run: echo '${{ toJSON(steps.node_modules_cache_id.outputs) }}'
+      shell: bash
 
     - name: Install Dependencies
       if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
       run: npm install
+      shell: bash
