@@ -3,10 +3,6 @@ name: Lighthouse
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    # paths:
-    #   - "**/*.tsx"
-    #   - "**/*.ts"
-    #   - "next.config.js"
 
 jobs:
   lighthouse:
