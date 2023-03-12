@@ -39,7 +39,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const result = ${{ steps.lighthouse_audit.outputs.manifest }}[0].summary
-            const links = ${{ steps.lighthouse_audit.outputs.links }
+            const links = ${{ steps.lighthouse_audit.outputs.links }}
 
             const comment = [
               `[Lighthouse分析結果](${Object.values(links)[0]}):`,
