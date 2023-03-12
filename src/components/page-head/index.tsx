@@ -3,7 +3,7 @@ import { memo } from "react";
 
 import type { FC, PropsWithChildren } from "react";
 
-const site = "www.napochaan.com";
+// const site = "www.napochaan.com";
 
 export type PageTitleProps = PropsWithChildren<{
   title?: string;
