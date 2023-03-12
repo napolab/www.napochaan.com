@@ -5,4 +5,4 @@ storybook-static
 tsconfig.tsbuildinfo
 out
 .lighthouseci
-
+.vercel
