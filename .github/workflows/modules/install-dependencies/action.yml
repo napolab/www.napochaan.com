@@ -14,7 +14,7 @@ runs:
         restore-keys: |
           ${{ runner.os }}-node-
 
-    - run: echo '${{ toJSON(steps.node_modules_cache_id.outputs) }}'
+    - run: echo '${{ toJSON(steps.npm-cache.outputs) }}'
       shell: bash
 
     - name: Install Dependencies
