@@ -15,7 +15,7 @@
     "fmt:prettier": "prettier --write .",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public",
-    "test": "vitest",
+    "test": "vitest --passWithNoTests",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -71,5 +71,10 @@
     "vite": "^4.1.4",
     "vite-tsconfig-paths": "^4.0.5",
     "vitest": "^0.29.2"
+  },
+  "nextBundleAnalysis": {
+    "budget": 358400,
+    "budgetPercentIncreaseRed": 20,
+    "showDetails": true
   }
 }
