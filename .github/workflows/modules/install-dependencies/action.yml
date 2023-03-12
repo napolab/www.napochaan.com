@@ -1,5 +1,7 @@
 name: install dependencies
-description: Install dependencies and create node_modules; if package.json has not been modified, create cached node_modules.
+description:
+  Install dependencies and create node_modules;
+  if package.json has not been modified, create cached node_modules.
 
 runs:
   using: composite
@@ -13,7 +15,6 @@ runs:
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: |
           ${{ runner.os }}-node-
-
     - run: echo '${{ toJSON(steps.npm-cache.outputs) }}'
       shell: bash
 
