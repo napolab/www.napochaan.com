@@ -5,10 +5,9 @@ runs:
   using: composite
   steps:
     - uses: ./.github/workflows/modules/setup-node
+
     - uses: actions/cache@v3
       id: npm-cache
-      env:
-        cache-name: cache-node-modules
       with:
         path: ${{ steps.npm-cache-dir.outputs.dir }}
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -19,6 +18,6 @@ runs:
       shell: bash
 
     - name: Install Dependencies
-      if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
+      if: ${{ steps.npm-cache.outputs.cache-hit != 'true' }}
       run: npm install
       shell: bash
