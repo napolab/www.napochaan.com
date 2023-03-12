@@ -2,10 +2,9 @@ import { Provider, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 // eslint-disable-next-line camelcase
 import { Noto_Sans_JP } from "next/font/google";
-import Head from "next/head";
 import { memo, Suspense, useCallback } from "react";
 
-import PageTitle from "@components/page-title";
+import PageHead from "@components/page-head";
 import Switch from "@components/switch";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
@@ -25,10 +24,9 @@ const font = Noto_Sans_JP({
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
-      <Head>
-        <PageTitle />
+      <PageHead>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      </Head>
+      </PageHead>
 
       <div className={font.variable}>
         <Provider>
