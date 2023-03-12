@@ -49,12 +49,12 @@ jobs:
             })
             const score = res => res >= 90 ? '🟢' : res >= 50 ? '🟠' : '🔴'
             const comment = [
-              `[report lighthouse](${Object.values(links)[0]}):`,
+              `[Report Lighthouse](${Object.values(links)[0]}):`,
               '| performance | accessibility | best-practices | SEO | PWA |',
               '| --- | --- | --- | --- | --- |',
-              `| ${result.performance} (${score(result.performance)}) | ${result.accessibility} (${score(result.accessibility)}) | ${result['best-practices']} (${score(result['best-practices'])}) | ${result.seo} (${score(result.seo)}) | ${result.pwa} (${score(result.pwa)}) |`,
+              `| ${result.performance} ${score(result.performance)} | ${result.accessibility} ${score(result.accessibility)} | ${result['best-practices']} ${score(result['best-practices'])} | ${result.seo} ${score(result.seo)} | ${result.pwa} ${score(result.pwa)} |`,
               ' ',
-              `*report URL: [${Object.keys(links)[0]}](${Object.keys(links)[0]})*`
+              `*Report URL: [${Object.keys(links)[0]}](${Object.keys(links)[0]})*`
             ].join('\n')
 
             core.setOutput("comment", comment);
