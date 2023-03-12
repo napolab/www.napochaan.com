@@ -1,9 +1,8 @@
 name: check code
 
 on:
-  push:
-    branches-ignore:
-      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
     paths:
       - src/**/*.tsx
       - src/**/*.ts
