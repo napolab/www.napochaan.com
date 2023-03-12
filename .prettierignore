@@ -1,4 +1,5 @@
 .next
+.vercel
 node_modules
 out
 build

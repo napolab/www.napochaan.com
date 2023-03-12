@@ -1,11 +1,6 @@
 {
   "ci": {
-    "assert": {
-      "preset": "lighthouse:no-pwa",
-      "assertions": {
-        "uses-text-compression": "off"
-      }
-    },
+    "preset": "lighthouse:no-pwa",
     "collect": {
       "numberOfRuns": 1,
       "startServerCommand": "npm run start",
