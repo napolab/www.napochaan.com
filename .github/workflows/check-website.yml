@@ -1,15 +1,8 @@
 name: check web site
 
 on:
-  push:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches-ignore:
-      - main
-    # paths:
-    #   - src/**/*.tsx
-    #   - src/**/*.ts
-    #   - next.config.js
 
 jobs:
   lighthouse:
