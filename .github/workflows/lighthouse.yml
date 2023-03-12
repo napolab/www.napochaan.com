@@ -49,16 +49,12 @@ jobs:
             })
             const score = res => res >= 90 ? '🟢' : res >= 50 ? '🟠' : '🔴'
             const comment = [
-              `[Lighthouse分析結果](${Object.values(links)[0]}):`,
-              '| 項目 | スコア |',
-              '| --- | --- |',
-              `| ${score(result.performance)} パフォーマンス | ${result.performance} |`,
-              `| ${score(result.accessibility)} アクセシビリティ | ${result.accessibility} |`,
-              `| ${score(result['best-practices'])} ベストプラクティス | ${result['best-practices']} |`,
-              `| ${score(result.seo)} SEO | ${result.seo} |`,
-              `| ${score(result.pwa)} PWA | ${result.pwa} |`,
+              `[report lighthouse](${Object.values(links)[0]}):`,
+              '| performance | accessibility | best-practices | SEO | PWA |',
+              '| --- | --- | --- | --- | --- |',
+              `| ${result.performance} (${score(result.performance)}) | ${result.accessibility} (${score(result.accessibility)}) | ${result['best-practices']} (${score(result['best-practices'])}) | ${result.seo} (${score(result.seo)}) | ${result.pwa} (${score(result.pwa)}) |`,
               ' ',
-              `*分析したURL: [${Object.values(links)[0]}](${Object.values(links)[0]})*`
+              `*report URL: [${Object.keys(links)[0]}](${Object.keys(links)[0]})*`
             ].join('\n')
 
             core.setOutput("comment", comment);
