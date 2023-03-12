@@ -1,0 +1,59 @@
+name: check web site
+
+on:
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches-ignore:
+      - main
+    # paths:
+    #   - src/**/*.tsx
+    #   - src/**/*.ts
+    #   - next.config.js
+
+jobs:
+  lighthouse:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/modules/setup-node
+
+      - name: Build Application
+        run: npm run build
+
+      - name: push comment
+        id: loading_comment_to_pr
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.issue.number }}
+          header: lighthouse
+          message: |
+            Analyzing in lighthouse...
+
+      - name: run lighthouse ci
+        id: lighthouse_audit
+        uses: treosh/lighthouse-ci-action@v3
+        with:
+          configPath: ./.lighthouserc.json
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: format lighthouse score
+        id: format_lighthouse_score
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const comment = JSON.stringify(${{ steps.lighthouse_audit.outputs }}, null, 2);
+            core.setOutput("comment", comment);
+
+      - name: comment lighthouse result
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.issue.number }}
+          header: lighthouse
+          message: |
+            ${{ steps.format_lighthouse_score.outputs.comment }}

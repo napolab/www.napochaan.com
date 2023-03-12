@@ -1,6 +1,6 @@
 const path = require("path");
 const { loadConfigFromFile, mergeConfig } = require("vite");
-const baseURL = process.env.STORYBOOK_BASE ?? "/"
+const baseURL = process.env.STORYBOOK_BASE ?? "/";
 
 /** @type {import("@storybook/react/types").StorybookConfig} */
 const config = {
@@ -30,8 +30,8 @@ const config = {
       <link rel="icon" type="image/png" sizes="32x32" href="${baseURL}/favicon-32x32.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="${baseURL}/favicon-16x16.png" />
       <link rel="manifest" href="${baseURL}/site.webmanifest" />
-    `
-  }
+    `;
+  },
 };
 
 module.exports = config;

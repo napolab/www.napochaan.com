@@ -1,0 +1,26 @@
+name: check code
+
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - src/**/*.tsx
+      - src/**/*.ts
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/modules/setup-node
+
+      - run: npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/modules/setup-node
+
+      - run: npm run test

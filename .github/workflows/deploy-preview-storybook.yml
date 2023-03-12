@@ -3,28 +3,25 @@ name: Deploy PR to Preview Storybook
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
+    paths:
+      - ".storybook/**"
+      - "components/**"
 
 jobs:
   deploy-preview:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+      - uses: ./.github/workflows/modules/setup-node
 
       - id: repository
         run: echo "name=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_OUTPUT
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-          cache: "npm"
+      - name: Build Storybook
+        run: npm run build-storybook
+        env:
+          STORYBOOK_BASE: "/${{ steps.repository.outputs.name }}/pr-preview/pr-${{ github.event.number }}"
 
-      - name: Install & Build
-        run: |
-          export STORYBOOK_BASE="/${{ steps.repository.outputs.name }}/pr-preview/pr-${{ github.event.number }}"
-          npm install
-          npm run build-storybook
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
