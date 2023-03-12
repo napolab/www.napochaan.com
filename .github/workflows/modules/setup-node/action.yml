@@ -21,8 +21,11 @@ runs:
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: ${{ runner.os }}-node-
 
-    - run: |
-        echo '${{ toJSON(steps.npm-cache.outputs) }}'
+    - run: echo '${{ toJSON(steps.npm-cache.outputs) }}'
+      shell: bash
+    
+    - if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
+      run:
         npm ls --depth=0
       shell: bash
 
