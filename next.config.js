@@ -5,8 +5,9 @@ const withVanillaExtract = createVanillaExtractPlugin();
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  swcMinify: true,
   experimental: {
-    runtime: "edge",
+    runtime: "experimental-edge",
   },
   pageExtensions: ["tsx"],
 };
