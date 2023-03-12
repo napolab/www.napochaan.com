@@ -1,8 +1,16 @@
 name: check web site
 
-on: [push]
+on:
+  push:
+    branches-ignore:
+      - main
+    paths:
+      - src/**/*.tsx
+      - src/**/*.ts
+      - next.config.js
+
 jobs:
-  lhci:
+  lighthouse:
     name: Lighthouse
     runs-on: ubuntu-latest
     steps:
@@ -14,9 +22,38 @@ jobs:
       - name: Build Application
         run: npm run build
 
-      - name: run Lighthouse CI
+      - name: push comment
+        id: loading_comment_to_pr
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.issue.number }}
+          header: lighthouse
+          message: |
+            Analyzing in lighthouse...
+
+      - name: run lighthouse ci
+        id: lighthouse_audit
         run: |
           npm install -g @lhci/cli
-          npx lhci autorun
+          lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+      - name: format lighthouse score
+        id: format_lighthouse_score
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            const comment = JSON.stringify(${{ steps.lighthouse_audit.outputs }}, null, 2);
+            core.setOutput("comment", comment);
+
+      - name: comment lighthouse result
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ github.event.issue.number }}
+          header: lighthouse
+          message: |
+            ${{ steps.format_lighthouse_score.outputs.comment }}
