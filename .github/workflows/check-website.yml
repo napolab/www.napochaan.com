@@ -4,10 +4,10 @@ on:
   push:
     branches-ignore:
       - main
-    paths:
-      - src/**/*.tsx
-      - src/**/*.ts
-      - next.config.js
+    # paths:
+    #   - src/**/*.tsx
+    #   - src/**/*.ts
+    #   - next.config.js
 
 jobs:
   lighthouse:
