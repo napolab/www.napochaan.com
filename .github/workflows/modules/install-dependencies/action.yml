@@ -11,10 +11,10 @@ runs:
     - uses: actions/cache@v3
       id: npm-cache
       with:
-        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        path: node_modules
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+        restore-keys: ${{ runner.os }}-node-
+
     - run: echo '${{ toJSON(steps.npm-cache.outputs) }}'
       shell: bash
 
