@@ -16,6 +16,8 @@ import type { Theme } from "@theme";
 import type { AppProps } from "next/app";
 import type { FC, PropsWithChildren } from "react";
 
+import "@acab/reset.css";
+
 const font = Noto_Sans_JP({
   weight: ["300", "400", "500"],
   subsets: ["latin"],
