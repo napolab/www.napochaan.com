@@ -3,6 +3,9 @@ name: Deploy PR to Preview Storybook
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
+    paths:
+      - ".storybook/**"
+      - "components/**"
 
 jobs:
   deploy-preview:
@@ -17,14 +20,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version-file: ./.node-version
           cache: "npm"
 
-      - name: Install & Build
-        run: |
-          export STORYBOOK_BASE="/${{ steps.repository.outputs.name }}/pr-preview/pr-${{ github.event.number }}"
-          npm install
-          npm run build-storybook
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Storybook
+        run: npm run build-storybook
+        env:
+          STORYBOOK_BASE: "/${{ steps.repository.outputs.name }}/pr-preview/pr-${{ github.event.number }}"
+
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:

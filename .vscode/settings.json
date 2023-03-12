@@ -2,5 +2,13 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "markuplint.debug": true,
-  "markuplint.enable": true
+  "markuplint.enable": true,
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/bower_components": true,
+    "**/*.code-search": true,
+    "storybook-static": true,
+    ".lighthouseci": true,
+    ".next": true
+  }
 }

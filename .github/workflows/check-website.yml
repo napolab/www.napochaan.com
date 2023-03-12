@@ -1,0 +1,26 @@
+name: check web site
+
+on: [push]
+jobs:
+  lhci:
+    name: Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ./.node-version
+          cache: npm
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Application
+        run: npm run build
+
+      - name: run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          npx lhci autorun

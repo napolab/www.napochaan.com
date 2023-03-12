@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main
+    paths:
+      - ".storybook/**"
+      - "components/**"
 
 jobs:
   deploy:
@@ -19,14 +22,17 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version-file: ./.node-version
           cache: "npm"
 
-      - name: Install & Build
-        run: |
-          export STORYBOOK_BASE="/${{ steps.repository.outputs.name }}/main"
-          npm install
-          npm run build-storybook
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Storybook
+        run: npm run build-storybook
+        env:
+          STORYBOOK_BASE: "/${{ steps.repository.outputs.name }}/main"
+
       - name: deploy storybook
         uses: JamesIves/github-pages-deploy-action@4.1.0
         with:
