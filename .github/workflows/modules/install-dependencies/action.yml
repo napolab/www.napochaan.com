@@ -1,6 +1,5 @@
 name: install dependencies
-description:
-  Install dependencies and create node_modules;
+description: Install dependencies and create node_modules;
   if package.json has not been modified, create cached node_modules.
 
 runs:

@@ -36,9 +36,7 @@ jobs:
         id: lighthouse_audit
         uses: treosh/lighthouse-ci-action@v3
         with:
-          temporaryPublicStorage: true
-          uploadArtifacts: true
-          configPath: ./lighthouserc.cjs
+          configPath: ./.lighthouserc.json
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
