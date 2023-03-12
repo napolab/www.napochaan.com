@@ -11,9 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install Dependencies
-        uses: ./.github/workflows/modules/install-dependencies
+      - uses: ./.github/workflows/modules/setup-node
 
       - run: npm run lint
 
@@ -21,8 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install Dependencies
-        uses: ./.github/workflows/modules/install-dependencies
+      - uses: ./.github/workflows/modules/setup-node
 
       - run: npm run test

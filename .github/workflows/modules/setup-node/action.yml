@@ -4,7 +4,26 @@ description: setup node
 runs:
   using: composite
   steps:
+    - name: Cancel Previous Runs
+      uses: styfle/cancel-workflow-action@0.8.0
+      with:
+        access_token: ${{ github.token }}
+
     - uses: actions/setup-node@v3
       with:
         node-version-file: ./.node-version
         cache: npm
+
+    - uses: actions/cache@v3
+      id: npm-cache
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: ${{ runner.os }}-node-
+
+    - run: echo '${{ toJSON(steps.npm-cache.outputs) }}'
+      shell: bash
+
+    - name: Install Dependencies
+      run: npm install
+      shell: bash

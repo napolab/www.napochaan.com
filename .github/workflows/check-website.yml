@@ -16,9 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install Dependencies
-        uses: ./.github/workflows/modules/install-dependencies
+      - uses: ./.github/workflows/modules/setup-node
 
       - name: Build Application
         run: npm run build
