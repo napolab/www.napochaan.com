@@ -24,10 +24,6 @@ runs:
     - run: echo '${{ toJSON(steps.npm-cache.outputs) }}'
       shell: bash
 
-    - if: ${{ steps.npm-cache.outputs.cache-hit == 'true' }}
-      run: npm ls --depth=0
-      shell: bash
-
     - name: Install Dependencies
       if: ${{ steps.npm-cache.outputs.cache-hit != 'true' }}
       run: npm install

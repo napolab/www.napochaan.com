@@ -39,10 +39,10 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             const result = ${{ steps.lighthouse_audit.outputs.manifest }}[0].summary
-            const links = ${{ steps.lighthouse_audit.outputs.links }}
-            const comment = ""
+            const links = `${{ steps.lighthouse_audit.outputs.links }}`
+            console.log(result, links)
 
-            core.setOutput("comment", comment)
+            core.setOutput("comment", "");
 
       - name: comment lighthouse result
         uses: marocchino/sticky-pull-request-comment@v2
