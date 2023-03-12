@@ -14,13 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/workflows/modules/setup-node
+      - name: install lighthouse cli
+        run: npm install -g @lhci/cli
 
       - name: Build Application
         run: npm run build
 
-      - name: run lighthouse ci
-        run: |
-          npm install -g @lhci/cli
-          lhci autorun
+      - name: Lighthouse CI
+        run: lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}

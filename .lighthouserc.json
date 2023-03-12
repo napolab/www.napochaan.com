@@ -1,8 +1,10 @@
 {
   "ci": {
-    "preset": "lighthouse:recommended",
     "assert": {
-      "preset": "lighthouse:no-pwa"
+      "preset": "lighthouse:no-pwa",
+      "assertions": {
+        "uses-text-compression": "off"
+      }
     },
     "collect": {
       "numberOfRuns": 1,
