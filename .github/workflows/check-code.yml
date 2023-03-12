@@ -1,7 +1,9 @@
 name: check code
 
 on:
-  pull_request:
+  push:
+    branches-ignore:
+      - main
     paths:
       - src/**/*.tsx
       - src/**/*.ts
