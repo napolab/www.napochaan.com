@@ -34,9 +34,11 @@ jobs:
 
       - name: run lighthouse ci
         id: lighthouse_audit
-        run: |
-          npm install -g @lhci/cli
-          lhci autorun
+        uses: treosh/lighthouse-ci-action@v3
+        with:
+          temporaryPublicStorage: true
+          uploadArtifacts: true
+          configPath: ./lighthouserc.json
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 

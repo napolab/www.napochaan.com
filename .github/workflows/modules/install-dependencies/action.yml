@@ -6,12 +6,15 @@ runs:
   steps:
     - uses: ./.github/workflows/modules/setup-node
     - uses: actions/cache@v3
-      id: node_modules_cache_id
+      id: npm-cache
       env:
         cache-name: cache-node-modules
       with:
-        path: "**/node_modules"
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+        path: ${{ steps.npm-cache-dir.outputs.dir }}
+        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-
+
     - run: echo '${{ toJSON(steps.node_modules_cache_id.outputs) }}'
       shell: bash
 
