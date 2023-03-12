@@ -1,4 +1,4 @@
-name: check web site
+name: Lighthouse
 
 on:
   pull_request:
@@ -6,7 +6,6 @@ on:
 
 jobs:
   lighthouse:
-    name: Lighthouse
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -59,7 +58,7 @@ jobs:
               `| ${score(result.seo)} SEO | ${result.seo} |`,
               `| ${score(result.pwa)} PWA | ${result.pwa} |`,
               ' ',
-              `*分析したURL: [${Object.keys(links)[0]}](${Object.keys(links)[0]})*`
+              `*分析したURL: [${Object.values(links)[0]}](${Object.values(links)[0]})*`
             ].join('\n')
 
             core.setOutput("comment", comment);
