@@ -1,6 +1,7 @@
 name: check web site
 
 on:
+  push:
   pull_request:
     types: [opened, synchronize, reopened]
     branches-ignore:
