@@ -29,6 +29,8 @@ jobs:
         uses: treosh/lighthouse-ci-action@v3
         with:
           configPath: ./.lighthouserc.json
+          uploadArtifacts: true
+          temporaryPublicStorage: true
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
 
@@ -42,7 +44,7 @@ jobs:
             const links = `${{ steps.lighthouse_audit.outputs.links }}`
             console.log(result, links)
 
-            core.setOutput("comment", "");
+            core.setOutput("comment", "aaa");
 
       - name: comment lighthouse result
         uses: marocchino/sticky-pull-request-comment@v2
