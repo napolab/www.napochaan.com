@@ -7,6 +7,7 @@ export function middleware() {
   response.headers.set("X-XSS-Protection", "1; mode=block");
   response.headers.set("X-Frame-Options", "SAMEORIGIN");
   response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Content-Security-Policy", "default-src, 'self'");
 
   return response;
 }
