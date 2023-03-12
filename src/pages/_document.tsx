@@ -12,7 +12,6 @@ const Document: FC<DocumentProps> = () => {
     <Html lang="ja">
       <Head>
         <meta charSet="utf-8" />
-        <link rel="stylesheet" href="https://unpkg.com/@acab/reset.css" />
         <meta name="color-scheme" content="light dark" />
         <meta name="theme-color" content="#FCD799" />
 
