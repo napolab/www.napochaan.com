@@ -1,6 +1,6 @@
 {
   "ci": {
-    "preset": "lighthouse:no-pwa",
+    "preset": "lighthouse:recommended",
     "collect": {
       "numberOfRuns": 1,
       "startServerCommand": "npm run start",
