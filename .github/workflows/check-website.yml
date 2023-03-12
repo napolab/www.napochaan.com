@@ -26,7 +26,6 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ github.event.issue.number }}
           header: lighthouse
           message: |
             Analyzing in lighthouse...
@@ -52,7 +51,6 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          number: ${{ github.event.issue.number }}
           header: lighthouse
           message: |
             ${{ steps.format_lighthouse_score.outputs.comment }}
