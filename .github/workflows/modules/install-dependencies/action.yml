@@ -1,0 +1,19 @@
+name: install dependencies
+description: Install dependencies and create node_modules; if package.json has not been modified, create cached node_modules.
+
+runs:
+  using: composite
+  steps:
+    - uses: ./.github/workflows/modules/setup-node
+    - uses: actions/cache@v3
+      id: node_modules_cache_id
+      env:
+        cache-name: cache-node-modules
+      with:
+        path: "**/node_modules"
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+    - run: echo '${{ toJSON(steps.node_modules_cache_id.outputs) }}'
+
+    - name: Install Dependencies
+      if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
+      run: npm install

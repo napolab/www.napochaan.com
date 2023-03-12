@@ -19,14 +19,8 @@ jobs:
       - id: repository
         run: echo "name=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}" >> $GITHUB_OUTPUT
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: ./.node-version
-          cache: "npm"
-
       - name: Install Dependencies
-        run: npm install
+        uses: ./.github/workflows/modules/install-dependencies
 
       - name: Build Storybook
         run: npm run build-storybook
