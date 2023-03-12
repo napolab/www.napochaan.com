@@ -17,13 +17,16 @@ runs:
     - uses: actions/cache@v3
       id: npm-cache
       with:
-        path: ~/.npm
+        path: '**/node_modules'
         key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
         restore-keys: ${{ runner.os }}-node-
 
-    - run: echo '${{ toJSON(steps.npm-cache.outputs) }}'
+    - run: |
+        echo '${{ toJSON(steps.npm-cache.outputs) }}'
+        npm ls --depth=0
       shell: bash
 
     - name: Install Dependencies
+      if: ${{ steps.node_modules_cache_id.outputs.cache-hit != 'true' }}
       run: npm install
       shell: bash
