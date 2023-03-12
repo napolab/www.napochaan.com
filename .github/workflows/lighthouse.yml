@@ -10,59 +10,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/workflows/modules/setup-node
+      - name: install lighthouse cli
+        run: npm install -g @lhci/cli
 
       - name: Build Application
         run: npm run build
 
-      - name: push comment
-        id: loading_comment_to_pr
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          header: lighthouse
-          message: |
-            Analyzing in lighthouse...
-
-      - name: run lighthouse ci
-        id: lighthouse_audit
-        uses: treosh/lighthouse-ci-action@v3
-        with:
-          configPath: ./.lighthouserc.json
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+      - name: Lighthouse CI
+        run: lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
-
-      - name: format lighthouse score
-        id: format_lighthouse_score
-        uses: actions/github-script@v3
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const result = ${{ steps.lighthouse_audit.outputs.manifest }}[0].summary
-            const links = ${{ steps.lighthouse_audit.outputs.links }}
-            console.log(result, links)
-
-            const formatResult = (res) => Math.round((res * 100))
-            Object.keys(result).forEach(key => {
-              result[key] = formatResult(result[key])
-            })
-            const score = res => res >= 90 ? '🟢' : res >= 50 ? '🟠' : '🔴'
-            const comment = [
-              `[Report Lighthouse](${Object.values(links)[0]}):`,
-              '| performance | accessibility | best-practices | SEO | PWA |',
-              '| --- | --- | --- | --- | --- |',
-              `| ${result.performance} ${score(result.performance)} | ${result.accessibility} ${score(result.accessibility)} | ${result['best-practices']} ${score(result['best-practices'])} | ${result.seo} ${score(result.seo)} | ${result.pwa} ${score(result.pwa)} |`,
-              ' ',
-              `*Report URL: [${Object.keys(links)[0]}](${Object.keys(links)[0]})*`
-            ].join('\n')
-
-            core.setOutput("comment", comment);
-
-      - name: comment lighthouse result
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          header: lighthouse
-          message: |
-            ${{ steps.format_lighthouse_score.outputs.comment }}
