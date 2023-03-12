@@ -38,23 +38,11 @@ jobs:
         with:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
-            const result = ${{ steps.lighthouse_audit.outputs.manifest }}[0].summary;
-            const links = ${{ steps.lighthouse_audit.outputs.links }};
+            const result = ${{ steps.lighthouse_audit.outputs.manifest }}[0].summary
+            const links = ${{ steps.lighthouse_audit.outputs.links }}
+            const comment = ""
 
-            const comment = [
-              `[Lighthouse分析結果](${Object.values(links)[0]}):`,
-              '| 項目 | スコア |',
-              '| --- | --- |',
-              `| ${score(result.performance)} パフォーマンス | ${result.performance} |`,
-              `| ${score(result.accessibility)} アクセシビリティ | ${result.accessibility} |`,
-              `| ${score(result['best-practices'])} ベストプラクティス | ${result['best-practices']} |`,
-              `| ${score(result.seo)} SEO | ${result.seo} |`,
-              `| ${score(result.pwa)} PWA | ${result.pwa} |`,
-              ' ',
-              `*分析したURL: [${Object.keys(links)[0]}](${Object.keys(links)[0]})*`
-            ].join('\n');
-
-            core.setOutput("comment", comment);
+            core.setOutput("comment", comment)
 
       - name: comment lighthouse result
         uses: marocchino/sticky-pull-request-comment@v2
