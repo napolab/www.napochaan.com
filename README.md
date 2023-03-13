@@ -2,16 +2,13 @@
 
 [![www.napochaan.com](https://github.com/napolab/www.napochaan.com/raw/main/public/ogp.png)](https://napochaan.com)
 
+## Current Website Status
+
 [![performance score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_performance.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-
 [![accessibility score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_accessibility.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-
 [![best-practices score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_best-practices.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-
 [![seo score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_seo.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-
 [![pwa score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_seo.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-
 
 Welcome to the repository of www.napochaan.com! This is the home page of @naporin0624, where you can find her portfolio and blog.
 
