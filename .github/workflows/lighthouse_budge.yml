@@ -1,0 +1,27 @@
+on:
+  push:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 15 * * *'
+
+jobs:
+  budge:
+    runs-on: ubuntu-latest
+    env:
+      output-folder: lightouse
+    concurrency:
+      github: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: create lightouse budge
+        run: |
+          npx lighthouse-badges \
+            --urls https://www.napochaan.com \
+            --save-report \
+            --output-path=${{ env.output-folder }}
+      - name: deploy lighthouse status
+        uses: JamesIves/github-pages-deploy-action@4.1.0
+        with:
+          branch: gh-pages
+          folder: ${{ env.output-folder }}
+          target-folder: ${{ env.output-folder }}
