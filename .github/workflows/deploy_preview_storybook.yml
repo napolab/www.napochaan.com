@@ -5,10 +5,10 @@ on:
     types: [opened, synchronize, reopened, closed]
     paths:
       - ".storybook/**"
-      - "components/**/*.tsx"
-      - "components/**/*.stories.tsx"
-      - "components/**/*.css.ts"
-      - "public/**"
+      - "**/components/**/*.tsx"
+      - "**/components/**/*.stories.tsx"
+      - "**/components/**/*.css.ts"
+      # - "public/**"
 
 jobs:
   deploy-preview:
