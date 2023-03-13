@@ -18,17 +18,19 @@ export const switchRoot = style({
 export const input = style([visibilityHidden]);
 
 const trackHeight = createVar();
+const trackWidth = createVar();
 const baseTrack = style({
   vars: {
     [trackHeight]: "1.5rem",
+    [trackWidth]: calc.multiply(trackHeight, 2),
   },
   position: "relative",
   isolation: "isolate",
   height: trackHeight,
   display: "inline-flex",
   alignItems: "center",
-  width: calc.multiply(trackHeight, 2),
-  borderRadius: calc.multiply(trackHeight, 2),
+  width: trackWidth,
+  borderRadius: trackWidth,
 
   background: vars.pallets.background.secondary,
   boxShadow: `inset 0px 4px 4px rgba(0, 0, 0, 0.25)`,
@@ -59,8 +61,9 @@ const baseThumb = style({
   boxShadow: `0px 4px 4px rgba(0, 0, 0, 0.25)`,
 
   top: thumbOffset,
-  left: thumbOffset,
-  transition: "left 0.1s ease-in-out",
+  willChange: "transform",
+  transform: `translateX(${thumbOffset})`,
+  transition: "transform 0.1s ease-in-out",
 });
 
 export const thumb = styleVariants({
@@ -68,7 +71,7 @@ export const thumb = styleVariants({
   checked: [
     baseThumb,
     {
-      left: calc.subtract("100%", thumbSize, thumbOffset),
+      transform: `translateX(${calc.subtract(trackWidth, thumbSize, thumbOffset)})`,
     },
   ],
   disabled: [

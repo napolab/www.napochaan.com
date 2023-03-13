@@ -9,12 +9,13 @@ on:
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/workflows/modules/setup-node
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
-      - name: Build Application
-        run: npm run build
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/workflows/modules/setup-node
 
       - name: run Lighthouse CI
         run: |
@@ -22,3 +23,4 @@ jobs:
           lhci autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

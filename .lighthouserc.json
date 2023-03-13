@@ -3,7 +3,7 @@
     "preset": "lighthouse:no-pwa",
     "collect": {
       "numberOfRuns": 1,
-      "startServerCommand": "npm run start",
+      "startServerCommand": "npm run wrangler:dev",
       "url": ["http://localhost:3000"]
     },
     "upload": {
