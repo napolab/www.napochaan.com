@@ -5,7 +5,7 @@ import type { DocumentProps } from "next/document";
 import type { FC } from "react";
 
 const description =
-  "こんにちは、 naporitan です。僕はアプリケーション開発や React, TypeScript を得意とし、新しい技術に触れたり、音楽を聴いたり、FPSをすることが好きです。特に TypeScript と Haskell がお気に入りの言語で、JavaScript, Python, Ruby, Swift, Haskellを触れています。";
+  "こんにちは、 naporitan です！僕はアプリケーション開発や React, TypeScript が得意で、新しい技術に触れたり、音楽を聴いたり、FPS をすることが好きです。特に TypeScript と Haskell がお気に入りの言語で、JavaScript, Python, Ruby, Swift, Rust もたまに書きます。";
 
 const Document: FC<DocumentProps> = () => {
   return (
@@ -30,21 +30,21 @@ const Document: FC<DocumentProps> = () => {
 
         <meta
           name="keywords"
-          content="naporitan,アプリケーション開発,React,TypeScript,フロントエンド,状態管理,JavaScript,Python,Ruby,Swift,Haskell"
+          content="naporitan,WebApplicationDeveloper,React,TypeScript,FrontEnd,StateManagement,JavaScript,Python,Ruby,Swift,Haskell"
         />
         <meta name="auhor" content="naporitan" />
         <meta name="description" content={description} />
 
         <meta property="og:type" content="website" />
-        <meta property="og:title" content="@naporin24690 official website" />
-        <meta property="og:url" content="https://www.napochaan.com/" />
-        <meta property="og:image" content="https://www.napochaan.com/ogp.png" />
+        <meta property="og:title" content="naporitan official website" />
+        <meta property="og:url" content="https://napochaan.com/" />
+        <meta property="og:image" content="https://napochaan.com/ogp.png" />
         <meta property="og:description" content={description} />
 
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="@naporin24690 official website" />
-        <meta name="twitter:image" content="https://www.napochaan.com/ogp.png" />
-        <meta name="twitter:description" content={"React と TypeScript のオタクだったりオタクじゃなかったりします。"} />
+        <meta name="twitter:image" content="https://napochaan.com/ogp.png" />
+        <meta name="twitter:description" content="React と TypeScript のオタクだったりオタクじゃなかったりします。" />
         <meta name="twitter:site" content="@naporin24690" />
         <meta name="twitter:creator" content="@naporin24690" />
 
