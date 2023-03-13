@@ -27,26 +27,49 @@ export const vars = createGlobalThemeContract(
       disabled: null,
       white: null,
     },
+    borderRadius: {
+      sx: null,
+      sm: null,
+      md: null,
+      lg: null,
+      xl: null,
+    },
     space: {
-      small: null,
-      medium: null,
-      large: null,
+      sx: null,
+      sm: null,
+      md: null,
+      lg: null,
+      xl: null,
     },
     font: {
+      body: null,
       notoSansJP: "noto-sans-jp",
+      poppins: "poppins",
     },
   },
   (value, path) => value ?? path.join("-"),
 );
 
 createGlobalTheme("html", vars.space, {
-  small: "1rem",
-  medium: "2rem",
-  large: "4rem",
+  sx: "calc(1rem / 4)",
+  sm: "calc(1rem / 2)",
+  md: "1rem",
+  lg: "calc(1rem * 2)",
+  xl: "calc(1rem * 4)",
 });
 
 createGlobalTheme("html", vars.font, {
-  notoSansJP: "'Noto Sans JP', sans-serif",
+  notoSansJP: "'Noto Sans JP'",
+  poppins: "'Poppins'",
+  body: `${vars.font.poppins}, ${vars.font.notoSansJP}, sans-serif`,
+});
+
+createGlobalTheme("html", vars.borderRadius, {
+  sx: "calc(1rem / 4)",
+  sm: "calc(1rem / 2)",
+  md: "1rem",
+  lg: "calc(1rem * 2)",
+  xl: "calc(1rem * 4)",
 });
 
 globalStyle("html, body", {

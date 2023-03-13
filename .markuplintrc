@@ -35,6 +35,18 @@
       "as": {
         "element": "input"
       }
+    },
+    {
+      "selector": "Budoux",
+      "as": {
+        "element": "span"
+      }
+    },
+    {
+      "selector": "SquareImage",
+      "as": {
+        "element": "figure"
+      }
     }
   ]
 }

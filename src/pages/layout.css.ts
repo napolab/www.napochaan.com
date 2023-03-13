@@ -6,5 +6,5 @@ import { vars } from "@theme/css";
  * @package
  */
 export const container = style({
-  padding: `0 ${vars.space.medium}`,
+  padding: `0 ${vars.space.md}`,
 });
