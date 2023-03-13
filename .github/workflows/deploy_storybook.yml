@@ -28,7 +28,7 @@ jobs:
           STORYBOOK_BASE: "/${{ steps.repository.outputs.name }}/main"
 
       - name: deploy storybook
-        uses: JamesIves/github-pages-deploy-action@4.4.1
+        uses: JamesIves/github-pages-deploy-action@4
         with:
           branch: gh-pages
           folder: storybook-static

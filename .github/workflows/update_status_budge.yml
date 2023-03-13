@@ -30,7 +30,7 @@ jobs:
             --output-path=${{ env.output-folder }}
 
       - name: deploy lighthouse status
-        uses: JamesIves/github-pages-deploy-action@4.4.1
+        uses: JamesIves/github-pages-deploy-action@4
         with:
           branch: gh-pages
           folder: ${{ env.output-folder }}
