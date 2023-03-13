@@ -5,7 +5,9 @@ on:
     types: [opened, synchronize, reopened, closed]
     paths:
       - ".storybook/**"
-      - "components/**"
+      - "components/**/*.tsx"
+      - "components/**/*.stories.tsx"
+      - "components/**/*.css.ts"
 
 jobs:
   deploy-preview:
