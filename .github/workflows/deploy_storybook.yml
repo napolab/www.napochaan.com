@@ -6,7 +6,10 @@ on:
       - main
     paths:
       - ".storybook/**"
-      - "components/**"
+      - "**/components/**/*.tsx"
+      - "**/components/**/*.stories.tsx"
+      - "**/components/**/*.css.ts"
+      - "public/**"
 
 jobs:
   deploy:

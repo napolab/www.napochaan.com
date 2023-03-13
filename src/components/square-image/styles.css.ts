@@ -10,8 +10,6 @@ export const squareImageRoot = style({
   flexDirection: "column",
   alignItems: "center",
   gap: vars.space.sm,
-  borderRadius: `${vars.borderRadius.sm} ${vars.borderRadius.sm} 0 0`,
-  overflow: "hidden",
   width: "10rem",
 });
 
@@ -20,6 +18,7 @@ export const squareImageRoot = style({
  */
 export const imageRoot = style({
   overflow: "hidden",
+  borderRadius: vars.borderRadius.sm,
 });
 
 /**
