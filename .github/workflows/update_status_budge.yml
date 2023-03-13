@@ -1,6 +1,7 @@
 name: update status budge
 
 on:
+  push:
   workflow_dispatch:
   schedule:
     - cron: "0 15 * * *"
@@ -24,7 +25,7 @@ jobs:
       - name: create lightouse budge
         run: |
           npx lighthouse-badges \
-            --urls https://www.napochaan.com \
+            --urls https://napochaan.com \
             --save-report \
             --output-path=${{ env.output-folder }}
 
