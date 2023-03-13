@@ -3,6 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "wrangler:dev": "npx @cloudflare/next-on-pages && npx wrangler pages dev --port 3000 .vercel/output/static",
     "prebuild": "rimraf dist",
     "build": "next build",
     "start": "next start",
