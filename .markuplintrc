@@ -41,6 +41,12 @@
       "as": {
         "element": "span"
       }
+    },
+    {
+      "selector": "SquareImage",
+      "as": {
+        "element": "figure"
+      }
     }
   ]
 }
