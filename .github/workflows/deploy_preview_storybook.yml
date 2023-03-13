@@ -8,7 +8,7 @@ on:
       - "components/**/*.tsx"
       - "components/**/*.stories.tsx"
       - "components/**/*.css.ts"
-      - "public"
+      - "public/**"
 
 jobs:
   deploy-preview:
