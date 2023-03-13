@@ -11,7 +11,7 @@ export default meta;
 
 export const Default: ComponentStory<typeof SquareImage> = (props) => {
   return (
-    <div style={{ display: "flex", gap: "1rem" }}>
+    <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
       <SquareImage {...props} />
       <SquareImage
         {...props}
@@ -28,6 +28,6 @@ export const Default: ComponentStory<typeof SquareImage> = (props) => {
 };
 
 Default.args = {
-  src: "http://placekitten.com/200/300",
-  caption: "かわいい猫の画像",
+  src: "https://lgtm.napochaan.com",
+  caption: "かわいい猫の LGTM 画像",
 };

@@ -19,8 +19,6 @@ export const squareImageRoot = style({
  * @package
  */
 export const imageRoot = style({
-  width: "100%",
-  aspectRatio: "1 / 1",
   overflow: "hidden",
 });
 
@@ -29,6 +27,7 @@ export const imageRoot = style({
  */
 export const image = style({
   width: "100%",
+  aspectRatio: "1 / 1",
   objectFit: "cover",
 });
 
