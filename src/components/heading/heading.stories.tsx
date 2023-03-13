@@ -12,8 +12,8 @@ export default meta;
 
 export const Default: ComponentStory<typeof Heading> = ({ children, ...props }) => {
   return (
-    <Section>
-      <Heading {...props}>{children} | Level1 </Heading>
+    <Section style={{ padding: "1rem" }}>
+      <Heading {...props}>{children} | Level1</Heading>
       <Section>
         <Heading {...props}>{children} | Level2 </Heading>
         <Section>

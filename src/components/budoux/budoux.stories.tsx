@@ -30,7 +30,7 @@ export const Default: ComponentStory<typeof Budoux> = (props) => {
   const resize2 = useResizeObserver(ref2);
 
   return (
-    <Section style={{ padding: "2rem" }}>
+    <Section style={{ padding: "1rem" }}>
       <Heading>Budoux vs Paragraph</Heading>
       <Article style={{ marginBottom: "2rem" }}>
         <Heading>Budoux</Heading>
