@@ -4,13 +4,13 @@ on:
   push:
   workflow_dispatch:
   schedule:
-    - cron: '0 15 * * *'
+    - cron: "0 15 * * *"
 
 jobs:
   update-lighthouse-budge:
     runs-on: ubuntu-latest
     env:
-      output-folder: lightouse
+      output-folder: lighthouse
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
