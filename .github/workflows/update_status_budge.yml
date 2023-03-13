@@ -1,0 +1,36 @@
+name: update status budge
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 15 * * *"
+
+jobs:
+  update-lighthouse-budge:
+    runs-on: ubuntu-latest
+    env:
+      output-folder: lighthouse
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: ./.node-version
+          cache: npm
+
+      - name: create lightouse budge
+        run: |
+          npx lighthouse-badges \
+            --urls https://www.napochaan.com \
+            --save-report \
+            --output-path=${{ env.output-folder }}
+
+      - name: deploy lighthouse status
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: ${{ env.output-folder }}
+          target-folder: ${{ env.output-folder }}

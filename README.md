@@ -4,6 +4,14 @@
 
 Welcome to the repository of www.napochaan.com! This is the home page of @naporin0624, where you can find her portfolio and blog.
 
+## Current Website Status
+
+[![performance score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_performance.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
+[![accessibility score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_accessibility.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
+[![best-practices score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_best-practices.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
+[![seo score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_seo.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
+[![pwa score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_seo.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
+
 ## UI Design and Color Palette
 
 The UI design and color palette of the website can be found on Figma [here](https://www.figma.com/file/JZ24VUuy639Kf29oiB32FX/www.napochaan.com?node-id=0%3A1). The design includes both light and dark themes, as well as a color palette that is also available in the vanilla-extract format [here](https://github.com/napolab/www.napochaan.com/tree/main/src/theme/config).
