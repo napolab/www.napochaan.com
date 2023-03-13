@@ -10,7 +10,7 @@ jobs:
     env:
       output-folder: lightouse
     concurrency:
-      github: ${{ github.workflow }}-${{ github.ref }}
+      group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
     steps:
       - name: create lightouse budge
