@@ -30,6 +30,19 @@ const config = {
       <link rel="icon" type="image/png" sizes="32x32" href="${baseURL}/favicon-32x32.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="${baseURL}/favicon-16x16.png" />
       <link rel="manifest" href="${baseURL}/site.webmanifest" />
+
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content="napochaan's storybook" />
+      <meta property="og:url" content="${baseURL}" />
+      <meta property="og:image" content="${baseURL}/storybook-ogp.png" />
+      <meta property="og:description" content="UI catalog created by @naporin24690." />
+
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content="napochaan storybook" />
+      <meta name="twitter:image" content="${baseURL}/storybook-ogp.png" />
+      <meta name="twitter:description" content="@naporin24690 が作った UI カタログ" />
+      <meta name="twitter:site" content="@naporin24690" />
+      <meta name="twitter:creator" content="@naporin24690" />
     `;
   },
 };
