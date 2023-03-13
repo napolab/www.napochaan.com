@@ -18,7 +18,9 @@ import "@acab/reset.css";
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
-      <PageHead />
+      <PageHead>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      </PageHead>
 
       <Provider>
         <Layout>

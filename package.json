@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "wrangler:dev": "npx @cloudflare/next-on-pages && npx wrangler pages dev --port 3000 .vercel/output/static",
+    "wrangler:dev": "next-on-pages && wrangler pages dev --port 3000 .vercel/output/static",
     "prebuild": "rimraf dist",
     "build": "next build",
     "start": "next start",
@@ -34,6 +34,7 @@
     "react-stately": "^3.21.0"
   },
   "devDependencies": {
+    "@cloudflare/next-on-pages": "^0.3.0",
     "@markuplint/jsx-parser": "^3.3.0",
     "@markuplint/react-spec": "^3.3.0",
     "@naporin0624/eslint-config": "^0.7.1",
@@ -71,7 +72,8 @@
     "typescript": "^4.9.5",
     "vite": "^4.1.4",
     "vite-tsconfig-paths": "^4.0.5",
-    "vitest": "^0.29.2"
+    "vitest": "^0.29.2",
+    "wrangler": "^2.12.2"
   },
   "nextBundleAnalysis": {
     "budget": 358400,
