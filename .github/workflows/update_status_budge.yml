@@ -1,7 +1,6 @@
 name: update status budge
 
 on:
-  push:
   workflow_dispatch:
   schedule:
     - cron: "0 15 * * *"
