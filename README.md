@@ -6,11 +6,11 @@ Welcome to the repository of www.napochaan.com! This is the home page of @napori
 
 ## Current Website Status
 
-[![performance score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_performance.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-[![accessibility score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_accessibility.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-[![best-practices score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_best-practices.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-[![seo score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_seo.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
-[![pwa score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_seo.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/www_napochaan_com)
+[![performance score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_performance.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/napochaan_com#performance)
+[![accessibility score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_accessibility.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/napochaan_com#accessibility)
+[![best-practices score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_best-practices.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/napochaan_com#best-practices)
+[![seo score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_seo.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/napochaan_com#seo)
+[![pwa score budge](https://napolab.github.io/www.napochaan.com/lighthouse/lighthouse_pwa.svg)](https://napolab.github.io/www.napochaan.com/lighthouse/napochaan_com#pwa)
 
 ## UI Design and Color Palette
 
