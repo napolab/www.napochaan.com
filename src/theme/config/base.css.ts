@@ -1,31 +1,39 @@
 import { createGlobalTheme, createGlobalThemeContract, globalStyle } from "@vanilla-extract/css";
 
+import type { MapLeafNodes } from "@theme/utils";
+
+const pallets = {
+  background: {
+    main: null,
+    secondary: null,
+    tertiary: null,
+  },
+  text: {
+    main: null,
+    secondary: null,
+  },
+  link: {
+    main: null,
+    hover: null,
+  },
+  border: {
+    main: null,
+    focus: null,
+  },
+  warning: null,
+  accent1: null,
+  accent2: null,
+  accent3: null,
+  disabled: null,
+  white: null,
+};
+
+export type Pallets = MapLeafNodes<typeof pallets, string>;
 export const vars = createGlobalThemeContract(
   {
     pallets: {
-      background: {
-        main: null,
-        secondary: null,
-        tertiary: null,
-      },
-      text: {
-        main: null,
-        secondary: null,
-      },
-      link: {
-        main: null,
-        hover: null,
-      },
-      border: {
-        main: null,
-        focus: null,
-      },
-      warning: null,
-      accent1: null,
-      accent2: null,
-      accent3: null,
-      disabled: null,
-      white: null,
+      ...pallets,
+      rgb: pallets,
     },
     borderRadius: {
       sx: null,
@@ -46,9 +54,16 @@ export const vars = createGlobalThemeContract(
       notoSansJP: "noto-sans-jp",
       poppins: "poppins",
     },
+    easing: {
+      easeInOutCirc: null,
+    },
   },
   (value, path) => value ?? path.join("-"),
 );
+
+createGlobalTheme("html", vars.easing, {
+  easeInOutCirc: "cubic-bezier(0.79,0.14,0.15,0.86)",
+});
 
 createGlobalTheme("html", vars.space, {
   sx: "calc(1rem / 4)",
