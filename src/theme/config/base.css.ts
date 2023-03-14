@@ -56,13 +56,13 @@ export const vars = createGlobalThemeContract(
     },
     easing: {
       easeInOutCirc: null,
-    }
+    },
   },
   (value, path) => value ?? path.join("-"),
 );
 
 createGlobalTheme("html", vars.easing, {
-  easeInOutCirc: "cubic-bezier(0.79,0.14,0.15,0.86)"
+  easeInOutCirc: "cubic-bezier(0.79,0.14,0.15,0.86)",
 });
 
 createGlobalTheme("html", vars.space, {
