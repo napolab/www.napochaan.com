@@ -1,8 +1,12 @@
 import { createGlobalTheme, globalStyle } from "@vanilla-extract/css";
 
+import { convertHex2Rgb } from "@theme/utils";
+
 import { vars } from "./base.css";
 
-createGlobalTheme("html.dark", vars.pallets, {
+import type { Pallets } from "./base.css";
+
+export const pallets = {
   background: {
     main: "#333333",
     secondary: "#4F4F4F",
@@ -26,6 +30,11 @@ createGlobalTheme("html.dark", vars.pallets, {
     main: "#CCCCCC",
     focus: "#66B2FF",
   },
+} satisfies Pallets;
+
+createGlobalTheme("html.dark", vars.pallets, {
+  ...pallets,
+  rgb: convertHex2Rgb(pallets),
 });
 
 globalStyle("html.dark", {

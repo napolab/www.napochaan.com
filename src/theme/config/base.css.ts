@@ -1,31 +1,39 @@
 import { createGlobalTheme, createGlobalThemeContract, globalStyle } from "@vanilla-extract/css";
 
+import type { MapLeafNodes } from "@theme/utils";
+
+const pallets = {
+  background: {
+    main: null,
+    secondary: null,
+    tertiary: null,
+  },
+  text: {
+    main: null,
+    secondary: null,
+  },
+  link: {
+    main: null,
+    hover: null,
+  },
+  border: {
+    main: null,
+    focus: null,
+  },
+  warning: null,
+  accent1: null,
+  accent2: null,
+  accent3: null,
+  disabled: null,
+  white: null,
+};
+
+export type Pallets = MapLeafNodes<typeof pallets, string>;
 export const vars = createGlobalThemeContract(
   {
     pallets: {
-      background: {
-        main: null,
-        secondary: null,
-        tertiary: null,
-      },
-      text: {
-        main: null,
-        secondary: null,
-      },
-      link: {
-        main: null,
-        hover: null,
-      },
-      border: {
-        main: null,
-        focus: null,
-      },
-      warning: null,
-      accent1: null,
-      accent2: null,
-      accent3: null,
-      disabled: null,
-      white: null,
+      ...pallets,
+      rgb: pallets,
     },
     borderRadius: {
       sx: null,
