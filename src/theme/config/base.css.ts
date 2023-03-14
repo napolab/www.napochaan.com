@@ -54,9 +54,16 @@ export const vars = createGlobalThemeContract(
       notoSansJP: "noto-sans-jp",
       poppins: "poppins",
     },
+    easing: {
+      easeInOutCirc: null,
+    }
   },
   (value, path) => value ?? path.join("-"),
 );
+
+createGlobalTheme("html", vars.easing, {
+  easeInOutCirc: "cubic-bezier(0.79,0.14,0.15,0.86)"
+});
 
 createGlobalTheme("html", vars.space, {
   sx: "calc(1rem / 4)",
