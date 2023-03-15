@@ -1,8 +1,14 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 
 import { vars } from "./config/base.css";
 
 import type { StyleRule } from "@vanilla-extract/css";
+
+globalStyle("html, body", {
+  color: vars.pallets.text.main,
+  backgroundColor: vars.pallets.background.main,
+  fontFamily: vars.font.body,
+});
 
 export const visibilityHidden = style({
   border: 0,

@@ -1,4 +1,4 @@
-import { createGlobalTheme, createGlobalThemeContract, globalStyle } from "@vanilla-extract/css";
+import { createGlobalTheme, createGlobalThemeContract } from "@vanilla-extract/css";
 
 import type { MapLeafNodes } from "@theme/utils";
 
@@ -85,10 +85,4 @@ createGlobalTheme("html", vars.borderRadius, {
   md: "1rem",
   lg: "calc(1rem * 2)",
   xl: "calc(1rem * 4)",
-});
-
-globalStyle("html, body", {
-  color: vars.pallets.text.main,
-  backgroundColor: vars.pallets.background.main,
-  fontFamily: vars.font.notoSansJP,
 });
