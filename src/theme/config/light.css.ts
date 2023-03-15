@@ -6,7 +6,7 @@ import { vars } from "./base.css";
 
 import type { Pallets } from "./base.css";
 
-export const pallets = {
+export const pallets = ({
   background: {
     main: "#FFFFFF",
     secondary: "#F5F5F5",
@@ -30,7 +30,7 @@ export const pallets = {
     main: "#CCCCCC",
     focus: "#336699",
   },
-} satisfies Pallets;
+} as const) satisfies Pallets;
 
 createGlobalTheme("html, html.light", vars.pallets, {
   ...pallets,
