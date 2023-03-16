@@ -1,8 +1,9 @@
-import { Provider } from "jotai";
+import { Provider, useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import React, { memo, Suspense } from "react";
+import React, { memo, Suspense, useCallback } from "react";
 
 import PageHead from "@components/page-head";
+import Switch from "@components/switch";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
 import reportAccessibility from "@utils/report-accessibility";
