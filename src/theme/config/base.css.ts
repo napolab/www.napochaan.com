@@ -1,6 +1,8 @@
 import { createGlobalTheme, createGlobalThemeContract, createVar, globalStyle } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
+import { mediaQueries } from "@theme/utils";
+
 import type { MapLeafNodes } from "@theme/utils";
 
 const pallets = {
@@ -107,7 +109,7 @@ globalStyle(":root", {
     [heading3]: calc.multiply(vars.typography.body, 1.5),
   },
   "@media": {
-    "screen and (max-width: 639px)": {
+    [mediaQueries.sp]: {
       vars: {
         [body]: "16px",
         [heading1]: calc.multiply(vars.typography.body, 2),
