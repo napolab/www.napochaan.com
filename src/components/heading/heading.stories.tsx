@@ -47,3 +47,59 @@ export const Default: ComponentStory<typeof Heading> = ({ children, ...props }) 
 Default.args = {
   children: "napochaan.com",
 };
+
+export const Unstyled: ComponentStory<typeof Heading> = ({ children, ...props }) => {
+  return (
+    <Section style={{ padding: "1rem" }}>
+      <Heading {...props} unstyled>
+        {children}
+      </Heading>
+      <Section>
+        <Heading {...props} unstyled>
+          {children}
+        </Heading>
+        <Section>
+          <Heading {...props} unstyled>
+            {children}
+          </Heading>
+          <Section>
+            <Heading {...props} unstyled>
+              {children}
+            </Heading>
+            <Section>
+              <Heading {...props} unstyled>
+                {children}
+              </Heading>
+              <Section>
+                <Heading {...props} unstyled>
+                  {children}
+                </Heading>
+              </Section>
+            </Section>
+          </Section>
+        </Section>
+      </Section>
+
+      <Section>
+        <Heading {...props} unstyled>
+          {children}
+        </Heading>
+        <Article>
+          <Heading {...props} unstyled>
+            {children}
+          </Heading>
+        </Article>
+
+        <Article>
+          <Heading {...props} unstyled>
+            {children}
+          </Heading>
+        </Article>
+      </Section>
+    </Section>
+  );
+};
+
+Unstyled.args = {
+  children: "napochaan.com",
+};

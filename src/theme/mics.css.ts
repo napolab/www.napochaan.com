@@ -9,6 +9,7 @@ globalStyle("html, body", {
   backgroundColor: vars.pallets.background.main,
   fontFamily: vars.font.body,
   fontSize: "16px",
+  fontWeight: 400,
 });
 
 export const visibilityHidden = style({
