@@ -1,16 +1,21 @@
-import { style } from "@vanilla-extract/css";
+import { createVar, style } from "@vanilla-extract/css";
 
 import { vars } from "@theme/css";
+
+const width = createVar();
 
 /**
  * @package
  */
 export const squareImageRoot = style({
+  vars: {
+    [width]: "10rem"
+  },
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
   gap: vars.space.sm,
-  width: "10rem",
+  width,
 });
 
 /**
@@ -25,7 +30,7 @@ export const imageRoot = style({
  * @package
  */
 export const image = style({
-  width: "100%",
+  width,
   aspectRatio: "1 / 1",
   objectFit: "cover",
 });

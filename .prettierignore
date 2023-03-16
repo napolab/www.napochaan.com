@@ -1,7 +1,9 @@
 .next
 .vercel
+.lighthouseci
 node_modules
 out
 build
 dist
 storybook-static
+coverage

@@ -6,3 +6,4 @@ tsconfig.tsbuildinfo
 out
 .lighthouseci
 .vercel
+coverage

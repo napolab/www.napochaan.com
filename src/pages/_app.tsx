@@ -1,11 +1,10 @@
-import { Provider, useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import { memo, Suspense, useCallback } from "react";
+import { Provider } from "jotai";
+import React, { memo, Suspense } from "react";
 
 import PageHead from "@components/page-head";
-import Switch from "@components/switch";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
+import reportAccessibility from "@utils/report-accessibility";
 
 import * as styles from "./layout.css";
 
@@ -33,6 +32,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
   );
 };
 
+void reportAccessibility(React);
 export default memo(App);
 
 const themeAtom = atomWithStorage<Theme | undefined>("theme", undefined);

@@ -32,7 +32,6 @@ export const focusRing: StyleRule = {
 
 export const link = style({
   color: vars.pallets.link.main,
-  textDecoration: "none",
   ":hover": {
     color: vars.pallets.link.hover,
   },

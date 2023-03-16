@@ -3,6 +3,7 @@ import Link from "next/link";
 import Heading from "@components/heading";
 import PageHead from "@components/page-head";
 import Section from "@components/section";
+import Switch from "@components/switch";
 import { link } from "@theme/css";
 
 import * as styles from "./styles.css";
@@ -18,6 +19,7 @@ const Page: NextPage = () => {
         <Heading>aaa</Heading>
         <Section className={styles.section}>
           <Heading>bbb</Heading>
+          <Switch aria-label="switch" defaultChecked />
         </Section>
 
         <p>www.napochaan.com</p>

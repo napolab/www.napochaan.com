@@ -29,10 +29,19 @@ export const Default: ComponentStory<typeof Switch> = (props) => {
       />
       <Switch
         {...props}
+        disabled
         onChange={action("change")}
         onBlur={action("blur")}
         onFocus={action("focus")}
-        label="ラベル付き"
+        label="disabled"
+      />
+      <Switch
+        {...props}
+        readonly
+        onChange={action("change")}
+        onBlur={action("blur")}
+        onFocus={action("focus")}
+        label="readonly"
       />
     </div>
   );
@@ -48,7 +57,7 @@ export const WithLabel: ComponentStory<typeof Switch> = (props) => {
 };
 WithLabel.args = {
   "aria-label": "switch",
-  label: <p style={{ color: "red" }}>with label</p>,
+  label: <p>with label</p>,
 };
 
 export const UseForm: ComponentStory<typeof Switch> = (props) => {
