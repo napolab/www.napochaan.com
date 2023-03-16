@@ -27,7 +27,8 @@
       "@theme/utils": ["src/theme/utils/index.ts"],
       "@hooks/*": ["src/hooks/*"],
       "@components/*": ["src/components/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@atoms/*": ["src/atoms/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx", "vitest-setup.ts", "next.config.js", ".eslintrc.cjs"],
