@@ -11,8 +11,6 @@ import "./config/base.css";
 import "./config/dark.css";
 import "./config/light.css";
 
-
-
 /**
  * @package
  */
