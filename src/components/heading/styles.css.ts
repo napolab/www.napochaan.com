@@ -1,26 +1,54 @@
-import { style } from "@vanilla-extract/css";
+import { style, styleVariants } from "@vanilla-extract/css";
+
+import { mediaQueries, vars } from "@theme/css";
+
+const baseHeadingRoot = style({
+  display: "inline-flex",
+  gap: vars.space.sm,
+  alignItems: "center",
+  fontFamily: vars.font.poppins,
+  letterSpacing: "0.03em",
+  lineHeight: 1,
+  fontSize: vars.typography.body,
+});
 
 /**
  * @package
  */
-export const headingRoot = style({
-  marginBottom: "1em",
-
-  selectors: {
-    "&:where(h1, h2, h3)": {
+export const headingRoot = styleVariants(
+  {
+    h1: {
+      fontSize: vars.typography.heading1,
+      fontWeight: 700,
+      padding: `${vars.space.sm} 0`,
+      "@media": {
+        [mediaQueries.pc]: {
+          letterSpacing: "0.1em",
+        },
+      },
+    },
+    h2: {
+      fontSize: vars.typography.heading2,
+      fontWeight: 600,
+      padding: `${vars.space.sm} 0`,
+    },
+    h3: {
+      fontSize: vars.typography.heading3,
       fontWeight: 500,
+      padding: `${vars.space.sx} 0`,
     },
-    "&:where(h1)": {
-      fontSize: "2rem",
+    h4: {
+      fontWeight: 400,
+      padding: `${vars.space.sx} 0`,
     },
-    "&:where(h2)": {
-      fontSize: "1.75rem",
+    h5: {
+      fontWeight: 400,
+      padding: `${vars.space.sx} 0`,
     },
-    "&:where(h3)": {
-      fontSize: "1.5rem",
-    },
-    "&:where(h4, h5, h6)": {
-      fontSize: "1.25rem",
+    h6: {
+      fontWeight: 400,
+      padding: `${vars.space.sx} 0`,
     },
   },
-});
+  (override) => [baseHeadingRoot, override],
+);

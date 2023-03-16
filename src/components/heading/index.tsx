@@ -1,4 +1,4 @@
-import { createElement, forwardRef, memo, useMemo } from "react";
+import { forwardRef, memo } from "react";
 
 import { useHeadingLevel } from "@hooks/heading-level";
 
@@ -13,10 +13,17 @@ export type HeadingProps = Omit<
 
 const Heading: FC<HeadingProps> = forwardRef<HTMLHeadingElement, HeadingProps>(({ children, ...props }, ref) => {
   const level = useHeadingLevel();
-  const _props = useMemo(() => ({ ...props, className: styles.headingRoot, ref }), [props, ref]);
+  const type = `h${level ?? 6}` as const;
+  const Component = type;
+
   if (level === null) throw new Error('The heading must be enclosed in a "section" or "article" element.');
 
-  return createElement(`h${level}`, _props, children);
+  return (
+    <Component className={styles.headingRoot[type]} ref={ref} {...props}>
+      <span>{"#".repeat(level)}</span>
+      <span>{children}</span>
+    </Component>
+  );
 });
 
 export default memo(Heading);
