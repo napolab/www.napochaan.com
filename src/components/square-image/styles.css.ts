@@ -9,7 +9,7 @@ const width = createVar();
  */
 export const squareImageRoot = style({
   vars: {
-    [width]: "10rem"
+    [width]: "10rem",
   },
   display: "flex",
   flexDirection: "column",

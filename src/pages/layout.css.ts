@@ -5,6 +5,11 @@ import { vars } from "@theme/css";
 /**
  * @package
  */
-export const container = style({
-  padding: `0 ${vars.space.md}`,
+export const mainRoot = style({
+  padding: `${vars.space.lg} ${vars.space.md} ${vars.space.md}`,
+  "@media": {
+    "screen and (min-width: 500px)": {
+      padding: `${vars.space.lg} ${vars.space.md} ${vars.space.md}`,
+    },
+  },
 });
