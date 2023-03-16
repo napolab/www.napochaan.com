@@ -1,6 +1,6 @@
 const path = require("path");
 const { loadConfigFromFile, mergeConfig } = require("vite");
-const baseURL = process.env.STORYBOOK_BASE ?? "/";
+const baseURL = process.env.STORYBOOK_BASE ?? "";
 
 /** @type {import("@storybook/react/types").StorybookConfig} */
 const config = {
