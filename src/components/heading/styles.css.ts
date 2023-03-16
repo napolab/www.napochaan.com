@@ -3,7 +3,7 @@ import { style, styleVariants } from "@vanilla-extract/css";
 import { mediaQueries, vars } from "@theme/css";
 
 const baseHeadingRoot = style({
-  display: "inline-flex",
+  display: "flex",
   gap: vars.space.sm,
   alignItems: "center",
   fontFamily: vars.font.poppins,
