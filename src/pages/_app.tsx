@@ -1,4 +1,5 @@
 import { Provider } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 import React, { memo, Suspense } from "react";
 
 import PageHead from "@components/page-head";
