@@ -29,7 +29,7 @@ module.exports = {
   overrides: [
     {
       files: ["**/__tests__/**/*.[t]s?(x)", "**/?(*.)+(spec|test).[t]s?(x)"],
-      extends: ["plugin:testing-library/react"],
+      extends: ["plugin:jest-dom/recommended", "plugin:testing-library/react"],
       rules: {
         "react/jsx-no-bind": "off",
         "no-restricted-imports": "off",
