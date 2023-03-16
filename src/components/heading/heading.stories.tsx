@@ -13,17 +13,17 @@ export default meta;
 export const Default: ComponentStory<typeof Heading> = ({ children, ...props }) => {
   return (
     <Section style={{ padding: "1rem" }}>
-      <Heading {...props}>{children} | Level1</Heading>
+      <Heading {...props}>{children}</Heading>
       <Section>
-        <Heading {...props}>{children} | Level2 </Heading>
+        <Heading {...props}>{children}</Heading>
         <Section>
-          <Heading {...props}>{children} | Level3</Heading>
+          <Heading {...props}>{children}</Heading>
           <Section>
-            <Heading {...props}>{children} | Level4</Heading>
+            <Heading {...props}>{children}</Heading>
             <Section>
-              <Heading {...props}>{children} | Level5</Heading>
+              <Heading {...props}>{children}</Heading>
               <Section>
-                <Heading {...props}>{children} | Level6</Heading>
+                <Heading {...props}>{children}</Heading>
               </Section>
             </Section>
           </Section>
@@ -31,13 +31,13 @@ export const Default: ComponentStory<typeof Heading> = ({ children, ...props }) 
       </Section>
 
       <Section>
-        <Heading {...props}>{children} | Level2</Heading>
+        <Heading {...props}>{children}</Heading>
         <Article>
-          <Heading {...props}>{children} | Level3</Heading>
+          <Heading {...props}>{children}</Heading>
         </Article>
 
         <Article>
-          <Heading {...props}>{children} | Level3</Heading>
+          <Heading {...props}>{children}</Heading>
         </Article>
       </Section>
     </Section>
@@ -45,5 +45,61 @@ export const Default: ComponentStory<typeof Heading> = ({ children, ...props }) 
 };
 
 Default.args = {
-  children: "Heading",
+  children: "napochaan.com",
+};
+
+export const Unstyled: ComponentStory<typeof Heading> = ({ children, ...props }) => {
+  return (
+    <Section style={{ padding: "1rem" }}>
+      <Heading {...props} unstyled>
+        {children}
+      </Heading>
+      <Section>
+        <Heading {...props} unstyled>
+          {children}
+        </Heading>
+        <Section>
+          <Heading {...props} unstyled>
+            {children}
+          </Heading>
+          <Section>
+            <Heading {...props} unstyled>
+              {children}
+            </Heading>
+            <Section>
+              <Heading {...props} unstyled>
+                {children}
+              </Heading>
+              <Section>
+                <Heading {...props} unstyled>
+                  {children}
+                </Heading>
+              </Section>
+            </Section>
+          </Section>
+        </Section>
+      </Section>
+
+      <Section>
+        <Heading {...props} unstyled>
+          {children}
+        </Heading>
+        <Article>
+          <Heading {...props} unstyled>
+            {children}
+          </Heading>
+        </Article>
+
+        <Article>
+          <Heading {...props} unstyled>
+            {children}
+          </Heading>
+        </Article>
+      </Section>
+    </Section>
+  );
+};
+
+Unstyled.args = {
+  children: "napochaan.com",
 };

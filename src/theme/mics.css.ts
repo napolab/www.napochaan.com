@@ -8,6 +8,8 @@ globalStyle("html, body", {
   color: vars.pallets.text.main,
   backgroundColor: vars.pallets.background.main,
   fontFamily: vars.font.body,
+  fontSize: "16px",
+  fontWeight: 400,
 });
 
 export const visibilityHidden = style({

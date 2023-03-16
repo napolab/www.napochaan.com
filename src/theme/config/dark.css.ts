@@ -32,11 +32,11 @@ export const pallets = {
   },
 } satisfies Pallets;
 
-createGlobalTheme("html.dark", vars.pallets, {
+createGlobalTheme(":root.dark", vars.pallets, {
   ...pallets,
   rgb: convertHex2Rgb(pallets),
 });
 
-globalStyle("html.dark", {
+globalStyle(":root.dark", {
   colorScheme: "dark",
 });

@@ -9,7 +9,6 @@
 
   const preferDarkQuery = "(prefers-color-scheme: dark)";
   const mql = window.matchMedia(preferDarkQuery);
-  const supportsColorSchemeQuery = mql.media === preferDarkQuery;
   let localStorageTheme = null;
   try {
     localStorageTheme = JSON.parse(window.localStorage.getItem(storageKey));
@@ -20,7 +19,7 @@
     if (localStorageTheme === classNameDark) {
       setClassOnDocumentBody();
     }
-  } else if (supportsColorSchemeQuery) {
+  } else if (mql.matches) {
     setClassOnDocumentBody();
     window.localStorage.setItem(storageKey, JSON.stringify(classNameDark));
   }

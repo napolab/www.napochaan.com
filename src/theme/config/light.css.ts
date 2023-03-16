@@ -32,11 +32,11 @@ export const pallets = {
   },
 } as const satisfies Pallets;
 
-createGlobalTheme("html, html.light", vars.pallets, {
+createGlobalTheme(":root", vars.pallets, {
   ...pallets,
   rgb: convertHex2Rgb(pallets),
 });
 
-globalStyle("html, html.light", {
+globalStyle(":root", {
   colorScheme: "light",
 });

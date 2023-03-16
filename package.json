@@ -66,6 +66,7 @@
     "@vitest/coverage-c8": "^0.29.3",
     "babel-loader": "^8.3.0",
     "eslint": "^8.35.0",
+    "eslint-plugin-jest-dom": "^4.0.3",
     "eslint-plugin-storybook": "^0.6.10",
     "eslint-plugin-testing-library": "^5.10.2",
     "jest-extended": "^3.2.4",

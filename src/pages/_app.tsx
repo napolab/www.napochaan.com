@@ -1,16 +1,14 @@
 import { Provider, useAtom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
-import React, { memo, Suspense, useCallback } from "react";
+import React, { memo, Suspense } from "react";
 
+import { themeAtom } from "@atoms/theme";
 import PageHead from "@components/page-head";
-import Switch from "@components/switch";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
 import reportAccessibility from "@utils/report-accessibility";
 
 import * as styles from "./layout.css";
 
-import type { Theme } from "@theme";
 import type { AppProps } from "next/app";
 import type { FC, PropsWithChildren } from "react";
 
@@ -37,28 +35,15 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
 void reportAccessibility(React);
 export default memo(App);
 
-const themeAtom = atomWithStorage<Theme | undefined>("theme", undefined);
-
 const Layout: FC<PropsWithChildren> = ({ children }) => {
-  const [theme, setTheme] = useAtom(themeAtom);
-  const handleChangeTheme = useCallback(
-    (isSelected: boolean) => {
-      const next: Theme = isSelected ? "dark" : "light";
-      setTheme(next);
-    },
-    [setTheme],
-  );
+  const [theme] = useAtom(themeAtom);
 
   return (
     <ThemeProvider theme={theme}>
       <HeadingLevelProvider>
-        <header>
-          <Switch aria-label="toggle website theme" checked={theme === "dark"} onChange={handleChangeTheme} />
-        </header>
+        <main className={styles.mainRoot}>{children}</main>
 
-        <main className={styles.container}>{children}</main>
-
-        <footer></footer>
+        <footer className={styles.footerRoot}>© 2023 naporitan</footer>
       </HeadingLevelProvider>
     </ThemeProvider>
   );
