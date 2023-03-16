@@ -37,6 +37,6 @@ createGlobalTheme(":root.dark", vars.pallets, {
   rgb: convertHex2Rgb(pallets),
 });
 
-globalStyle("html.dark", {
+globalStyle(":root.dark", {
   colorScheme: "dark",
 });

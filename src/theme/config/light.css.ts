@@ -37,6 +37,6 @@ createGlobalTheme(":root", vars.pallets, {
   rgb: convertHex2Rgb(pallets),
 });
 
-globalStyle("html, html.light", {
+globalStyle(":root", {
   colorScheme: "light",
 });

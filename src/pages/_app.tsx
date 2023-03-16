@@ -56,7 +56,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
           <Switch aria-label="toggle website theme" checked={theme === "dark"} onChange={handleChangeTheme} />
         </header>
 
-        <main className={styles.container}>{children}</main>
+        <main className={styles.mainRoot}>{children}</main>
 
         <footer></footer>
       </HeadingLevelProvider>
