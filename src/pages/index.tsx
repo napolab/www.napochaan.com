@@ -1,11 +1,8 @@
-import Image from "next/image";
-
 import Article from "@components/article";
 import Budoux from "@components/budoux";
 import Heading from "@components/heading";
 import PageHead from "@components/page-head";
 import Section from "@components/section";
-import characterImage from "public/napochaan.png";
 import Title from "public/title.svg";
 
 import * as styles from "./styles.css";
@@ -28,10 +25,11 @@ const Page: NextPage = () => {
               <Heading className={styles.spHeading}>napochaan.com</Heading>
             </div>
 
-            <Image
-              loading="lazy"
+            <img
               className={styles.characterImage}
-              src={characterImage}
+              loading="lazy"
+              decoding="async"
+              src={"https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c161150a-80cb-4783-4bda-870c85e5de00/square"}
               alt="naporitan のオリジナルキャラクター"
               width={800}
               height={800}
