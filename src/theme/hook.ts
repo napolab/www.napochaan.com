@@ -2,9 +2,9 @@ import { useCallback, useState } from "react";
 
 import { useIsomorphicLayoutEffect } from "@hooks/isomorphic-effect";
 
-import { getSystemTheme } from "./utils";
+import { getSystemTheme } from ".";
 
-import type { Theme } from "./provider";
+import type { Theme } from ".";
 
 export const useWatchSystemTheme = (): Theme => {
   const [theme, setTheme] = useState<Theme>("light");
