@@ -11,6 +11,7 @@ module.exports = {
     "react/react-in-jsx-scope": "off",
     "no-restricted-imports": ["error", { patterns: ["../"] }], // 相対 path で親をたどるのを禁止する
     "@next/next/no-img-element": "off",
+    camelcase: ["error", { ignoreImports: true }],
     "import/no-extraneous-dependencies": [
       "error",
       {

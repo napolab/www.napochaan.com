@@ -1,5 +1,4 @@
 import { Provider, useAtom } from "jotai";
-// eslint-disable-next-line camelcase
 import { Noto_Sans_JP, Poppins } from "next/font/google";
 import React, { memo, Suspense } from "react";
 
@@ -18,7 +17,7 @@ import type { FC, PropsWithChildren } from "react";
 import "@acab/reset.css";
 
 const notoSansJP = Noto_Sans_JP({
-  weight: ["400", "500"],
+  weight: ["400"],
   preload: true,
   subsets: ["latin"],
   variable: "--noto-sans-jp",
@@ -35,6 +34,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
     <>
       <PageHead>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>{JSON.stringify(poppins.style, null, 2)}</style>
       </PageHead>
 
       <div className={clsx(notoSansJP.className, notoSansJP.variable, poppins.className, poppins.variable)}>
