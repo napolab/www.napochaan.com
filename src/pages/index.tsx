@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import Link from "next/link";
 
 import Article from "@components/article";
@@ -5,7 +6,7 @@ import Budoux from "@components/budoux";
 import Heading from "@components/heading";
 import PageHead from "@components/page-head";
 import Section from "@components/section";
-import { clsx } from "@utils/clsx";
+import SquareImage from "@components/square-image";
 
 import * as styles from "./styles.css";
 
@@ -40,9 +41,9 @@ const Page: NextPage = () => {
             </div>
           </div>
 
-          <div className={clsx(styles.sectionRoot, styles.aboutMeWrapper)}>
+          <div className={styles.aboutMeWrapper}>
             <Article className={styles.aboutMeRoot} id="about">
-              <Link href="/#about" scroll className={styles.link}>
+              <Link href="/#about" scroll className={styles.anchorLink}>
                 <Heading>About me</Heading>
               </Link>
               <div className={styles.aboutMe}>
@@ -75,6 +76,41 @@ const Page: NextPage = () => {
             </Article>
           </div>
         </div>
+
+        <Article id="works" className={styles.worksRoot}>
+          <Link href="/#work" className={styles.anchorLink}>
+            <Heading>Works</Heading>
+          </Link>
+          <Article id="application">
+            <Link href="/#application" className={styles.anchorLink}>
+              <Heading>Application</Heading>
+            </Link>
+            <ul className={styles.horizontalScroll} tabIndex={0}>
+              {new Array(6).fill(null).map((_, index) => (
+                <li key={`application__${index}`}>
+                  <Link href="#" className={styles.optionLink}>
+                    <SquareImage src="https://lgtm.napochaan.com" caption="flatkobo.shop の UI 改善" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Article>
+
+          <Article id="library">
+            <Link href="/#library" className={styles.anchorLink}>
+              <Heading>Library</Heading>
+            </Link>
+            <ul className={styles.horizontalScroll} tabIndex={0}>
+              {new Array(6).fill(null).map((_, index) => (
+                <li key={`library__${index}`}>
+                  <Link href="#" className={styles.optionLink}>
+                    <SquareImage src="https://lgtm.napochaan.com" caption="flatkobo.shop の UI 改善" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Article>
+        </Article>
       </Section>
     </>
   );

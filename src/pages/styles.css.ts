@@ -1,7 +1,7 @@
 import { createContainer, createVar, globalStyle, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
-import { link as commonLink, mediaQueries, vars } from "@theme/css";
+import { focusRing, link as commonLink, link, mediaQueries, vars } from "@theme/css";
 
 const characterLayer = createVar();
 const firstViewContainer = createContainer();
@@ -22,6 +22,7 @@ export const pageRoot = style({
       margin: "0 auto",
       background: vars.pallets.background.tertiary,
       borderRadius: vars.borderRadius.lg,
+      paddingBottom: vars.space.xl,
     },
   },
 });
@@ -165,6 +166,7 @@ export const characterImage = style({
   width: "100%",
 });
 
+const firstViewMinHeight = createVar();
 /**
  * @package
  */
@@ -177,11 +179,15 @@ export const firstView = style({
 
   "@media": {
     [mediaQueries.xl]: {
+      vars: {
+        [firstViewMinHeight]: "63.5rem",
+      },
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
       alignItems: "flex-end",
       aspectRatio: "1376 / 1043", // 1440 x 1080 から padding を引いたもの
+      minHeight: firstViewMinHeight,
       maxHeight: calc.subtract("100vh", calc.multiply(vars.space.lg, 2)),
 
       "@supports": {
@@ -191,11 +197,14 @@ export const firstView = style({
       },
     },
     [mediaQueries.lg]: {
-      minHeight: calc.subtract("100vh", calc.multiply(vars.space.lg, 2)),
+      vars: {
+        [firstViewMinHeight]: "79.375rem",
+      },
+      minHeight: `max(${firstViewMinHeight}, ${calc.subtract("100vh", calc.multiply(vars.space.lg, 2))})`,
 
       "@supports": {
         "(height: 100svh)": {
-          minHeight: calc.subtract("100svh", calc.multiply(vars.space.lg, 2)),
+          minHeight: `max(${firstViewMinHeight}, ${calc.subtract("100svh", calc.multiply(vars.space.lg, 2))})`,
         },
       },
     },
@@ -242,15 +251,16 @@ export const heading1 = style({
 /**
  * @package
  */
-export const link = style([
+export const anchorLink = style([
   commonLink,
   {
+    display: "inline-block",
     color: vars.pallets.text.main,
   },
 ]);
 
-globalStyle(`${link} > *`, {
-  display: "inline-block",
+globalStyle(`${anchorLink} > *`, {
+  display: "inline-flex",
 });
 
 /**
@@ -266,17 +276,6 @@ export const section1 = style({
           minHeight: calc.subtract("100svh", calc.multiply(vars.space.md, 2)),
         },
       },
-    },
-  },
-});
-
-/**
- * @package
- */
-export const sectionRoot = style({
-  "@media": {
-    [mediaQueries.xl]: {
-      overflowX: "hidden",
     },
   },
 });
@@ -371,3 +370,101 @@ export const aboutMe = style({
     },
   },
 });
+
+/**
+ * @package
+ */
+export const worksRoot = style([
+  tileRoot,
+  {
+    "@media": {
+      [mediaQueries.xl]: {
+        marginTop: vars.space.xl,
+        width: "58.875rem",
+        borderRadius: `0px ${vars.space.md} ${vars.space.md} 0px`,
+        display: "flex",
+        flexDirection: "column",
+        gap: calc.multiply(vars.space.md, 1.5),
+      },
+      [mediaQueries.lg]: {
+        marginTop: vars.space.xl,
+        display: "flex",
+        flexDirection: "column",
+        gap: vars.space.md,
+      },
+      [mediaQueries.md]: {
+        marginTop: vars.space.lg,
+        display: "flex",
+        flexDirection: "column",
+        gap: vars.space.md,
+      },
+      [mediaQueries.sm]: {
+        marginTop: vars.space.lg,
+        display: "flex",
+        flexDirection: "column",
+        gap: vars.space.md,
+      },
+    },
+  },
+]);
+
+/**
+ * @package
+ */
+export const horizontalScroll = style([
+  {
+    overflowX: "scroll",
+    display: "flex",
+
+    scrollbarWidth: "none",
+    "::-webkit-scrollbar": {
+      display: "none",
+    },
+    ":focus-visible": focusRing,
+
+    "@media": {
+      [mediaQueries.xl]: {
+        width: calc.add("100%", calc.multiply(vars.space.lg, 2)),
+        margin: `0 ${calc.multiply(vars.space.lg, -1)}`,
+        padding: `0 ${vars.space.lg}`,
+        gap: vars.space.md,
+        marginTop: vars.space.md,
+      },
+      [mediaQueries.lg]: {
+        width: calc.add("100%", calc.multiply(vars.space.lg, 2)),
+        margin: `0 ${calc.multiply(vars.space.lg, -1)}`,
+        padding: `0 ${vars.space.lg}`,
+        gap: vars.space.md,
+        marginTop: vars.space.md,
+      },
+      [mediaQueries.md]: {
+        width: calc.add("100%", calc.multiply(vars.space.md, 3)),
+        margin: `0 ${calc.multiply(vars.space.md, -1.5)}`,
+        padding: `0 ${calc.multiply(vars.space.md, 1.5)}`,
+        gap: vars.space.md,
+        marginTop: vars.space.md,
+      },
+      [mediaQueries.sm]: {
+        width: calc.add("100%", calc.multiply(vars.space.sm, 2)),
+        margin: `0 ${calc.multiply(vars.space.sm, -1)}`,
+        padding: `0 ${calc.multiply(vars.space.sm, 1)}`,
+        gap: vars.space.sm,
+        marginTop: vars.space.md,
+      },
+    },
+  },
+]);
+
+globalStyle(`${horizontalScroll} > *`, {
+  flexShrink: 0,
+});
+
+/**
+ * @package
+ */
+export const optionLink = style([
+  link,
+  {
+    color: vars.pallets.text.main,
+  },
+]);
