@@ -1,10 +1,12 @@
 import { Provider, useAtom } from "jotai";
+import { Noto_Sans_JP, Poppins } from "next/font/google";
 import React, { memo, Suspense } from "react";
 
 import { themeAtom } from "@atoms/theme";
 import PageHead from "@components/page-head";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
+import { clsx } from "@utils/clsx";
 import reportAccessibility from "@utils/report-accessibility";
 
 import * as styles from "./layout.css";
@@ -14,20 +16,36 @@ import type { FC, PropsWithChildren } from "react";
 
 import "@acab/reset.css";
 
+const notoSansJP = Noto_Sans_JP({
+  weight: ["400"],
+  preload: true,
+  subsets: ["latin"],
+  variable: "--noto-sans-jp",
+});
+const poppins = Poppins({
+  weight: ["400", "500", "600", "700"],
+  preload: true,
+  subsets: ["latin"],
+  variable: "--poppins",
+});
+
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
       <PageHead>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>{JSON.stringify(poppins.style, null, 2)}</style>
       </PageHead>
 
-      <Provider>
-        <Layout>
-          <Suspense>
-            <Component {...pageProps} />
-          </Suspense>
-        </Layout>
-      </Provider>
+      <div className={clsx(notoSansJP.className, notoSansJP.variable, poppins.className, poppins.variable)}>
+        <Provider>
+          <Layout>
+            <Suspense>
+              <Component {...pageProps} />
+            </Suspense>
+          </Layout>
+        </Provider>
+      </div>
     </>
   );
 };

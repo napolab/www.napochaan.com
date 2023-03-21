@@ -5,11 +5,22 @@ import { vars } from "./config/base.css";
 import type { StyleRule } from "@vanilla-extract/css";
 
 globalStyle("html, body", {
+  scrollBehavior: "smooth",
+});
+globalStyle("body", {
   color: vars.pallets.text.main,
   backgroundColor: vars.pallets.background.main,
   fontFamily: vars.font.body,
   fontSize: "16px",
   fontWeight: 400,
+});
+
+globalStyle("body::-webkit-scrollbar", {
+  display: "none",
+});
+globalStyle("*::selection", {
+  color: vars.pallets.background.main,
+  background: vars.pallets.accent1,
 });
 
 export const visibilityHidden = style({
@@ -26,6 +37,7 @@ export const visibilityHidden = style({
 });
 
 export const focusRing: StyleRule = {
+  display: "inline-block",
   outlineStyle: "solid",
   outlineWidth: 2,
   outlineColor: vars.pallets.border.focus,
@@ -33,6 +45,7 @@ export const focusRing: StyleRule = {
 };
 
 export const link = style({
+  display: "inline-block",
   color: vars.pallets.link.main,
   ":hover": {
     color: vars.pallets.link.hover,

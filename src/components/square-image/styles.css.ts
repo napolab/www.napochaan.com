@@ -44,7 +44,7 @@ export const captionRoot = style({
   color: vars.pallets.text.main,
   fontFamily: vars.font.body,
   fontWeight: 400,
-  fontSize: "1rem",
+  fontSize: vars.typography.body,
   lineHeight: 1.5,
   letterSpacing: "0.01em",
 });
