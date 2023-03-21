@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
 import Article from "@components/article";
@@ -78,17 +79,19 @@ const Page: NextPage = () => {
         </div>
 
         <Article id="works" className={styles.worksRoot}>
-          <Link href="/#work" className={styles.anchorLink}>
-            <Heading>Works</Heading>
-          </Link>
+          <div>
+            <Link href="/#work" className={styles.anchorLink}>
+              <Heading>Works</Heading>
+            </Link>
+          </div>
           <Article id="application">
             <Link href="/#application" className={styles.anchorLink}>
               <Heading>Application</Heading>
             </Link>
-            <ul className={styles.horizontalScroll} tabIndex={0}>
+            <ul className={styles.scrollArea} tabIndex={0}>
               {new Array(6).fill(null).map((_, index) => (
                 <li key={`application__${index}`}>
-                  <Link href="#" className={styles.optionLink}>
+                  <Link href="#" className={styles.link}>
                     <SquareImage src="https://lgtm.napochaan.com" caption="flatkobo.shop の UI 改善" />
                   </Link>
                 </li>
@@ -100,10 +103,10 @@ const Page: NextPage = () => {
             <Link href="/#library" className={styles.anchorLink}>
               <Heading>Library</Heading>
             </Link>
-            <ul className={styles.horizontalScroll} tabIndex={0}>
+            <ul className={styles.scrollArea} tabIndex={0}>
               {new Array(6).fill(null).map((_, index) => (
                 <li key={`library__${index}`}>
-                  <Link href="#" className={styles.optionLink}>
+                  <Link href="#" className={styles.link}>
                     <SquareImage src="https://lgtm.napochaan.com" caption="flatkobo.shop の UI 改善" />
                   </Link>
                 </li>
@@ -111,6 +114,30 @@ const Page: NextPage = () => {
             </ul>
           </Article>
         </Article>
+
+        <div className={styles.contactWrapper}>
+          <Article id="contact" className={styles.contactRoot}>
+            <Link href="/#contact" className={styles.anchorLink}>
+              <Heading>SNS&nbsp;&amp;&nbsp;Contact</Heading>
+            </Link>
+            <p>
+              <Budoux>連絡は twitter の DM が一番つながりやすいです。</Budoux>
+            </p>
+
+            <div className={styles.contactList}>
+              <Link href="https://github.com/naporin0624" target="_blank" className={styles.link}>
+                <IconBrandGithubFilled className={styles.icon} />
+              </Link>
+
+              <Link href="https://twitter.com/naporin24690" target="_blank" className={styles.link}>
+                <IconBrandTwitterFilled className={styles.icon} />
+              </Link>
+              <Link href="mailto:contact@napochaan.com" target="_blank" className={styles.link}>
+                <IconAt className={styles.icon} />
+              </Link>
+            </div>
+          </Article>
+        </div>
       </Section>
     </>
   );

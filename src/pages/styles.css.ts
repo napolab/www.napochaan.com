@@ -1,10 +1,20 @@
 import { createContainer, createVar, globalStyle, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
-import { focusRing, link as commonLink, link, mediaQueries, vars } from "@theme/css";
+import { focusRing, link as commonLink, mediaQueries, vars } from "@theme/css";
 
 const characterLayer = createVar();
 const firstViewContainer = createContainer();
+
+/**
+ * @package
+ */
+export const link = style([
+  commonLink,
+  {
+    color: vars.pallets.text.main,
+  },
+]);
 
 /**
  * @package
@@ -411,7 +421,7 @@ export const worksRoot = style([
 /**
  * @package
  */
-export const horizontalScroll = style([
+export const scrollArea = style([
   {
     overflowX: "scroll",
     display: "flex",
@@ -455,16 +465,93 @@ export const horizontalScroll = style([
   },
 ]);
 
-globalStyle(`${horizontalScroll} > *`, {
+globalStyle(`${scrollArea} > *`, {
   flexShrink: 0,
 });
 
 /**
  * @package
  */
-export const optionLink = style([
-  link,
+export const contactWrapper = style({
+  "@media": {
+    [mediaQueries.xl]: {
+      display: "flex",
+      justifyContent: "flex-end",
+    },
+    [mediaQueries.lg]: {
+      display: "flex",
+      justifyContent: "flex-end",
+    },
+  },
+});
+
+/**
+ * @package
+ */
+export const contactRoot = style([
+  tileRoot,
   {
-    color: vars.pallets.text.main,
+    "@media": {
+      [mediaQueries.xl]: {
+        marginTop: vars.space.xl,
+        display: "flex",
+        flexDirection: "column",
+        gap: calc.multiply(vars.space.md, 1.5),
+        width: "40rem",
+        borderRadius: `${vars.borderRadius.md} 0px 0px ${vars.borderRadius.md}`,
+      },
+      [mediaQueries.lg]: {
+        marginTop: vars.space.xl,
+        display: "flex",
+        flexDirection: "column",
+        gap: calc.multiply(vars.space.md, 1.5),
+        width: "41.5rem",
+      },
+      [mediaQueries.md]: {
+        marginTop: vars.space.xl,
+        display: "flex",
+        flexDirection: "column",
+        gap: vars.space.md,
+      },
+      [mediaQueries.sm]: {
+        marginTop: vars.space.xl,
+        display: "flex",
+        flexDirection: "column",
+        gap: vars.space.md,
+      },
+    },
   },
 ]);
+
+/**
+ * @package
+ */
+export const contactList = style({
+  display: "flex",
+  justifyContent: "flex-end",
+  gap: calc.multiply(vars.space.md, 1.5),
+});
+
+/**
+ * @package
+ */
+export const icon = style({
+  "@media": {
+    [mediaQueries.xl]: {
+      width: 44,
+      height: 44,
+    },
+    [mediaQueries.lg]: {
+      width: 44,
+      height: 44,
+    },
+    [mediaQueries.md]: {
+      width: 36,
+      height: 36,
+    },
+    [mediaQueries.sm]: {
+      width: 36,
+      height: 36,
+    },
+  },
+});
