@@ -117,23 +117,43 @@ const Page: NextPage = () => {
 
         <div className={styles.contactWrapper}>
           <Article id="contact" className={styles.contactRoot}>
-            <Link href="/#contact" className={styles.anchorLink}>
-              <Heading>SNS&nbsp;&amp;&nbsp;Contact</Heading>
-            </Link>
+            <div>
+              <Link href="/#contact" className={styles.anchorLink}>
+                <Heading>SNS&nbsp;&amp;&nbsp;Contact</Heading>
+              </Link>
+            </div>
             <p>
               <Budoux>連絡は twitter の DM が一番つながりやすいです。</Budoux>
             </p>
 
             <div className={styles.contactList}>
-              <Link href="https://github.com/naporin0624" target="_blank" className={styles.link}>
-                <IconBrandGithubFilled className={styles.icon} />
+              <Link
+                href="https://github.com/naporin0624"
+                target="_blank"
+                className={styles.link}
+                aria-label="github link"
+                title="github のリンク"
+              >
+                <IconBrandGithubFilled className={styles.icon} aria-hidden="true" />
               </Link>
 
-              <Link href="https://twitter.com/naporin24690" target="_blank" className={styles.link}>
-                <IconBrandTwitterFilled className={styles.icon} />
+              <Link
+                href="https://twitter.com/naporin24690"
+                target="_blank"
+                className={styles.link}
+                aria-label="twitter link"
+                title="twitter のリンク"
+              >
+                <IconBrandTwitterFilled className={styles.icon} aria-hidden="true" />
               </Link>
-              <Link href="mailto:contact@napochaan.com" target="_blank" className={styles.link}>
-                <IconAt className={styles.icon} />
+              <Link
+                href="mailto:contact@napochaan.com"
+                target="_blank"
+                className={styles.link}
+                aria-label="email link"
+                title="email のリンク"
+              >
+                <IconAt className={styles.icon} aria-hidden="true" />
               </Link>
             </div>
           </Article>
