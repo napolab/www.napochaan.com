@@ -22,14 +22,18 @@ export const headingRoot = styleVariants(
       padding: `${vars.space.sm} 0`,
       letterSpacing: "0.03em",
       "@media": {
-        [mediaQueries.large]: {
+        [mediaQueries.xl]: {
           fontSize: calc.multiply(vars.typography.body, 3),
           letterSpacing: "0.1em",
         },
-        [mediaQueries.medium]: {
+        [mediaQueries.lg]: {
+          fontSize: calc.multiply(vars.typography.body, 3),
+          letterSpacing: "0.1em",
+        },
+        [mediaQueries.md]: {
           fontSize: calc.multiply(vars.typography.body, 2.25),
         },
-        [mediaQueries.small]: {
+        [mediaQueries.sm]: {
           fontSize: calc.multiply(vars.typography.body, 2),
         },
       },
@@ -39,13 +43,16 @@ export const headingRoot = styleVariants(
       padding: `${vars.space.sm} 0`,
       letterSpacing: "0.03em",
       "@media": {
-        [mediaQueries.large]: {
+        [mediaQueries.xl]: {
           fontSize: calc.multiply(vars.typography.body, 2),
         },
-        [mediaQueries.medium]: {
+        [mediaQueries.lg]: {
+          fontSize: calc.multiply(vars.typography.body, 2),
+        },
+        [mediaQueries.md]: {
           fontSize: calc.multiply(vars.typography.body, 1.75),
         },
-        [mediaQueries.small]: {
+        [mediaQueries.sm]: {
           fontSize: calc.multiply(vars.typography.body, 1.5),
         },
       },
@@ -55,13 +62,16 @@ export const headingRoot = styleVariants(
       padding: `${vars.space.sx} 0`,
       letterSpacing: "0.03em",
       "@media": {
-        [mediaQueries.large]: {
+        [mediaQueries.xl]: {
           fontSize: calc.multiply(vars.typography.body, 1.5),
         },
-        [mediaQueries.medium]: {
+        [mediaQueries.lg]: {
+          fontSize: calc.multiply(vars.typography.body, 1.5),
+        },
+        [mediaQueries.md]: {
           fontSize: calc.multiply(vars.typography.body, 1.25),
         },
-        [mediaQueries.small]: {
+        [mediaQueries.sm]: {
           fontSize: calc.multiply(vars.typography.body, 1),
         },
       },

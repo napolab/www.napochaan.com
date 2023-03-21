@@ -7,13 +7,16 @@ import { vars, mediaQueries } from "@theme/css";
  */
 export const mainRoot = style({
   "@media": {
-    [mediaQueries.large]: {
+    [mediaQueries.xl]: {
       padding: vars.space.lg,
     },
-    [mediaQueries.medium]: {
+    [mediaQueries.lg]: {
       padding: vars.space.lg,
     },
-    [mediaQueries.small]: {
+    [mediaQueries.md]: {
+      padding: vars.space.lg,
+    },
+    [mediaQueries.sm]: {
       padding: vars.space.md,
     },
   },
@@ -31,10 +34,13 @@ export const footerRoot = style({
   padding: vars.space.md,
 
   "@media": {
-    [mediaQueries.large]: {
+    [mediaQueries.xl]: {
       fontSize: "1.5rem",
     },
-    [mediaQueries.medium]: {
+    [mediaQueries.lg]: {
+      fontSize: "1.5rem",
+    },
+    [mediaQueries.md]: {
       fontSize: "1.5rem",
     },
   },

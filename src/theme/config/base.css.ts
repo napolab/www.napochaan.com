@@ -99,7 +99,7 @@ globalStyle(":root", {
     [body]: "18px",
   },
   "@media": {
-    [mediaQueries.small]: {
+    [mediaQueries.sm]: {
       vars: {
         [body]: "16px",
       },
