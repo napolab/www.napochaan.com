@@ -159,13 +159,13 @@ export const decorationImage = style({
       width: "56.25rem",
       transform: "rotate(-97deg)",
     },
-  [mediaQueries.sm]: {
+    [mediaQueries.sm]: {
       left: -213,
       bottom: 851,
       width: "42.75rem",
       transform: "rotate(-128deg)",
     },
-  }
+  },
 });
 
 /**
