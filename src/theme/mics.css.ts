@@ -4,12 +4,18 @@ import { vars } from "./config/base.css";
 
 import type { StyleRule } from "@vanilla-extract/css";
 
-globalStyle("html, body", {
+globalStyle("body", {
   color: vars.pallets.text.main,
   backgroundColor: vars.pallets.background.main,
   fontFamily: vars.font.body,
   fontSize: "16px",
   fontWeight: 400,
+  overflowY: "scroll",
+  scrollbarWidth: "none",
+});
+
+globalStyle("body::-webkit-scrollbar", {
+  display: "none"
 });
 
 export const visibilityHidden = style({

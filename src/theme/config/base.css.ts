@@ -1,5 +1,4 @@
 import { createGlobalTheme, createGlobalThemeContract, createVar, globalStyle } from "@vanilla-extract/css";
-import { calc } from "@vanilla-extract/css-utils";
 
 import { mediaQueries } from "@theme/utils";
 
@@ -46,9 +45,6 @@ export const vars = createGlobalThemeContract(
       xl: null,
     },
     typography: {
-      heading1: null,
-      heading2: null,
-      heading3: null,
       body: null,
     },
     space: {
@@ -97,24 +93,15 @@ createGlobalTheme(":root", vars.borderRadius, {
 });
 
 const body = createVar();
-const heading1 = createVar();
-const heading2 = createVar();
-const heading3 = createVar();
 
 globalStyle(":root", {
   vars: {
     [body]: "18px",
-    [heading1]: calc.multiply(vars.typography.body, 3),
-    [heading2]: calc.multiply(vars.typography.body, 2),
-    [heading3]: calc.multiply(vars.typography.body, 1.5),
   },
   "@media": {
-    [mediaQueries.sp]: {
+    [mediaQueries.small]: {
       vars: {
         [body]: "16px",
-        [heading1]: calc.multiply(vars.typography.body, 2),
-        [heading2]: calc.multiply(vars.typography.body, 1.5),
-        [heading3]: vars.typography.body,
       },
     },
   },
@@ -122,7 +109,4 @@ globalStyle(":root", {
 
 createGlobalTheme(`:root`, vars.typography, {
   body,
-  heading1,
-  heading2,
-  heading3,
 });
