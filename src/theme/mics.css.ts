@@ -37,7 +37,6 @@ export const visibilityHidden = style({
 });
 
 export const focusRing: StyleRule = {
-  display: "inline-block",
   outlineStyle: "solid",
   outlineWidth: 2,
   outlineColor: vars.pallets.border.focus,
