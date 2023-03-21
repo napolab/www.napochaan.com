@@ -40,7 +40,6 @@ export const image = style({
  */
 export const captionRoot = style({
   width: "100%",
-  background: vars.pallets.background.main,
   color: vars.pallets.text.main,
   fontFamily: vars.font.body,
   fontWeight: 400,
