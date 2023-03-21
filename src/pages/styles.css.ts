@@ -28,7 +28,7 @@ export const pageRoot = style({
 
   "@media": {
     [mediaQueries.xl]: {
-      maxWidth: 1920,
+      maxWidth: 1440,
       margin: "0 auto",
       background: vars.pallets.background.tertiary,
       borderRadius: vars.borderRadius.lg,
@@ -128,6 +128,44 @@ export const decoration2 = style({
       display: "none",
     },
   },
+});
+
+/**
+ * @package
+ */
+export const decorationImage = style({
+  position: "absolute",
+  zIndex: 0,
+  transformOrigin: "bottom right",
+  userSelect: "none",
+  pointerEvents: "none",
+
+  "@media": {
+    [mediaQueries.xl]: {
+      bottom: 1425,
+      right: -50,
+      width: "56.25rem",
+      transform: "rotate(-144deg)",
+    },
+    [mediaQueries.lg]: {
+      left: 35,
+      bottom: 621,
+      width: "56.25rem",
+      transform: "rotate(-97deg)",
+    },
+    [mediaQueries.md]: {
+      left: 146,
+      bottom: 772,
+      width: "56.25rem",
+      transform: "rotate(-97deg)",
+    },
+  [mediaQueries.sm]: {
+      left: -213,
+      bottom: 851,
+      width: "42.75rem",
+      transform: "rotate(-128deg)",
+    },
+  }
 });
 
 /**
@@ -514,7 +552,7 @@ export const contactRoot = style([
         gap: vars.space.md,
       },
       [mediaQueries.sm]: {
-        marginTop: vars.space.xl,
+        marginTop: vars.space.lg,
         display: "flex",
         flexDirection: "column",
         gap: vars.space.md,

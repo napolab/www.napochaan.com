@@ -19,9 +19,21 @@ const Page: NextPage = () => {
       <PageHead title="Home" />
 
       <Section className={styles.pageRoot}>
-        <div aria-hidden="true" className={styles.decorationRoot}>
+        <div className={styles.decorationRoot}>
           <div aria-hidden="true" className={styles.decoration1} />
           <div aria-hidden="true" className={styles.decoration2} />
+          <div className={styles.decorationImage} aria-hidden="true">
+            <img
+              className={styles.characterImage}
+              decoding="async"
+              srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
+              src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
+              sizes="(max-width: 1080px) 100vw, 1080px"
+              alt="naporitan のオリジナルキャラクター"
+              width={800}
+              height={800}
+            />
+          </div>
         </div>
 
         <div className={styles.firstView}>
