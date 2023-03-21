@@ -85,7 +85,7 @@ export const decoration1 = style({
       transform: "rotate(-50deg)",
     },
     [mediaQueries.sm]: {
-      top: 1855,
+      top: 1826,
       left: -533,
       height: "12.8125rem",
       transform: "rotate(-53deg)",
@@ -149,9 +149,9 @@ export const characterImageRoot = style({
       transform: `rotate(-19deg)`,
     },
     [mediaQueries.sm]: {
-      top: 165,
-      left: -250,
-      width: "41rem",
+      top: 168,
+      left: -251,
+      width: "41.5rem",
       transform: `rotate(-19deg)`,
     },
   },
