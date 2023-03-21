@@ -47,6 +47,13 @@ export const decorationRoot = style({
       width: "100%",
       height: "100%",
     },
+    [mediaQueries.sm]: {
+      top: calc.multiply(vars.space.md, -2),
+      left: calc.multiply(vars.space.md, -2),
+      margin: vars.space.md,
+      width: calc.add("100%", calc.multiply(vars.space.md, 2)),
+      height: calc.add("100%", calc.multiply(vars.space.md, 2)),
+    },
   },
 });
 
