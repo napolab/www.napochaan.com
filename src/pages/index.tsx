@@ -80,7 +80,7 @@ const Page: NextPage = () => {
 
         <Article id="works" className={styles.worksRoot}>
           <div>
-            <Link href="/#work" className={styles.anchorLink}>
+            <Link href="/#works" className={styles.anchorLink}>
               <Heading>Works</Heading>
             </Link>
           </div>
