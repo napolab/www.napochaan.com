@@ -18,7 +18,7 @@ const SquareImage: FC<SquareImageProps> = ({ loading = "lazy", strategy, ...prop
   const imageProps = useMemo(
     () => ({
       loading,
-      alt: props.alt ?? props.caption,
+      alt: props.alt ?? `ref: ${props.caption}`,
       width: 160,
       height: 160,
       ...props,
