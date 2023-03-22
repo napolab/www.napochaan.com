@@ -33,10 +33,10 @@ export const pallets = {
   scrollbar: {
     background: {
       main: "#808080",
-      hover: "#404040"
+      hover: "#404040",
     },
-    thumb: "#bfbfbf"
-  }
+    thumb: "#bfbfbf",
+  },
 } as const satisfies Pallets;
 
 createGlobalTheme(":root", vars.pallets, {

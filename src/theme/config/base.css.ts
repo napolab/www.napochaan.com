@@ -31,10 +31,10 @@ const pallets = {
   scrollbar: {
     background: {
       main: null,
-      hover: null
+      hover: null,
     },
     thumb: null,
-  }
+  },
 };
 
 export type Pallets = MapLeafNodes<typeof pallets, string>;

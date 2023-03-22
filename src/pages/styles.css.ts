@@ -527,7 +527,7 @@ export const scrollAreaScrollbar = style({
   borderRadius: vars.borderRadius.xl,
   ":hover": {
     background: vars.pallets.scrollbar.background.hover,
-  }
+  },
 });
 
 /**
