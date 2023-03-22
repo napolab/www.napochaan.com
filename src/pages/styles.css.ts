@@ -484,6 +484,14 @@ export const worksRoot = style([
   },
 ]);
 
+/**
+ * @package
+ */
+export const workText = style({
+  wordBreak: "keep-all",
+  overflowWrap: "break-word",
+});
+
 const scrollbarSize = createVar();
 /**
  * @package

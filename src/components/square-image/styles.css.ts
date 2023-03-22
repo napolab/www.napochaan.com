@@ -40,6 +40,7 @@ export const image = style({
  * @package
  */
 export const captionRoot = style({
+  display: "block",
   width,
   color: "inherit",
   fontFamily: vars.font.body,
@@ -47,12 +48,4 @@ export const captionRoot = style({
   fontSize: vars.typography.body,
   lineHeight: 1.5,
   letterSpacing: "0.01em",
-});
-
-/**
- * @package
- */
-export const caption = style({
-  wordBreak: "break-all",
-  overflowWrap: "break-word",
 });

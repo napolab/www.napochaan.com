@@ -6,6 +6,11 @@ import type { Meta as ComponentMeta, Story as ComponentStory } from "@storybook/
 const meta: ComponentMeta<SquareImageProps> = {
   title: "components/SquareImage",
   component: SquareImage,
+  argTypes: {
+    caption: {
+      type: "string",
+    },
+  },
 };
 
 export default meta;

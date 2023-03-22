@@ -14,6 +14,7 @@ import { cloudflareImages } from "@utils/cloudflare-images";
 import * as styles from "./styles.css";
 
 import type { NextPage } from "next";
+import type { ReactNode } from "react";
 
 const Page: NextPage = () => {
   const [aboutRef, aboutInView] = useInView({ once: true });
@@ -240,7 +241,7 @@ export default Page;
 type Work = {
   id: string;
   alt: string;
-  caption: string;
+  caption: ReactNode;
   href: string;
 };
 const services: Work[] = [
@@ -251,37 +252,63 @@ const services: Work[] = [
     href: "https://lgtm.napochaan.com",
   },
   {
-    caption: "flat-工房買取専用アプリの開発",
+    caption: (
+      <span className={styles.workText}>
+        flat-工房買取専用
+        <wbr />
+        アプリの開発
+      </span>
+    ),
     alt: "買取先頭アプリのスクリーンショット",
     id: "313b54a8-620e-46dc-320d-fe74827d1900",
     href: "https://flat-kobo-kaitori.web.app/",
   },
   {
-    caption: "flat-工房ネットショップUI改善",
+    caption: (
+      <span className={styles.workText}>
+        flat-工房
+        <wbr />
+        ネットショップ
+        <wbr />
+        UI改善
+      </span>
+    ),
     alt: "flatkobo.shop のスクリーンショット",
     id: "6e506cc1-daf8-4e75-84d6-a6b709e7c600",
     href: "https://flatkobo.shop",
   },
   {
-    caption: "PROJECT BLUE OFFICIAL HP作成",
+    caption: (
+      <span className={styles.workText}>
+        PROJECT BLUE
+        <wbr />
+        OFFICIAL HP作成
+      </span>
+    ),
     alt: "pjblue.jp のスクリーンショット",
     id: "94eee0af-68bf-4948-be33-3f8f036b3700",
     href: "https://pjblue.jp",
   },
   {
-    caption: "447Records TANAの開発",
+    caption: (
+      <span className={styles.workText}>
+        447Records
+        <wbr />
+        TANAの開発
+      </span>
+    ),
     alt: "tana.447pro.com のスクリーンショット",
     id: "8349bdbc-22ef-4183-8d52-fd1492747800",
     href: "https://tana.447pro.com/",
   },
   {
-    caption: "soelu.com instructor ページの開発",
+    caption: "soelu.com/instructorsページの開発",
     alt: "soelu.com/instructors のスクリーンショット",
     id: "af31f5b3-0732-4b4a-b42e-ccaf20f41d00",
     href: "https://twitter.com/naporin24690/status/1244865712490856448?s=20",
   },
   {
-    caption: "soelu.com lesson ページの開発",
+    caption: "soelu.com/lessons ページの開発",
     alt: "soelu.com/lessons のスクリーンショット",
     id: "fdd649b4-067e-4f93-493d-0770935f6900",
     href: "https://twitter.com/naporin24690/status/1227830616227344384",
@@ -302,25 +329,25 @@ const services: Work[] = [
 
 const libraries: Work[] = [
   {
-    caption: "rxjsベースのReactの状態管理ライブラリ",
+    caption: "react-flowder",
     alt: "npmのロゴ",
     id: "a463002e-d758-4349-3d53-024d21500c00",
     href: "https://www.npmjs.com/package/react-flowder",
   },
   {
-    caption: "vanilla-extractをinline化するライブラリ",
+    caption: "vanilla-extract-inline",
     alt: "vanilla-extractのOGP",
     id: "9fd1d1dd-e97a-443d-5d1f-37760c710a00",
     href: "https://github.com/napolab/vanilla-extract-inline",
   },
   {
-    caption: "naporin0624のeslint config",
+    caption: "@naporin0624/eslint-config",
     alt: "npmのロゴ",
     id: "a463002e-d758-4349-3d53-024d21500c00",
     href: "https://www.npmjs.com/package/@naporin0624/eslint-config",
   },
   {
-    caption: "monaco-editorにtypescriptの型読み込ませる",
+    caption: "monaco-editor-type-installer",
     alt: "gistのOGP",
     id: "51e0d14a-d842-4e33-f20e-70db0d117500",
     href: "https://gist.github.com/naporin0624/2c1c187950738ef4e07a755489ba49de",
