@@ -39,7 +39,7 @@ const Page: NextPage = () => {
 
   return (
     <>
-      <PageHead title="Home" />
+      <PageHead>{/*  */}</PageHead>
 
       <Section className={styles.pageRoot}>
         <div className={styles.decorationRoot}>
