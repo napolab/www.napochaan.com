@@ -19,7 +19,7 @@ globalStyle("body::-webkit-scrollbar", {
   display: "none",
 });
 globalStyle("*::selection", {
-  color: vars.pallets.background.main,
+  color: vars.pallets.black,
   background: vars.pallets.accent1,
 });
 

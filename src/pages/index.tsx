@@ -1,4 +1,3 @@
-import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { useSpring, animated, useInView } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
@@ -7,6 +6,7 @@ import Article from "@components/article";
 import Budoux from "@components/budoux";
 import Heading from "@components/heading";
 import PageHead from "@components/page-head";
+import ScrollArea from "@components/scroll-area";
 import Section from "@components/section";
 import SquareImage from "@components/square-image";
 import { cloudflareImages } from "@utils/cloudflare-images";
@@ -124,33 +124,19 @@ const Page: NextPage = () => {
                 <Heading>Service</Heading>
               </Link>
 
-              <ScrollArea.Root className={styles.scrollAreaWrapper}>
-                <ScrollArea.Viewport>
-                  <div className={styles.scrollArea}>
-                    {services.map((service, idx) => (
-                      <Link
-                        href={service.href}
-                        className={styles.link}
-                        target="_blank"
-                        key={`application__${service.id}-${idx}`}
-                      >
-                        <SquareImage
-                          decoding="async"
-                          loading="lazy"
-                          {...cloudflareImages(service.id)}
-                          caption={service.caption}
-                          alt={service.alt}
-                        />
-                      </Link>
-                    ))}
-                  </div>
-                </ScrollArea.Viewport>
-
-                <ScrollArea.Scrollbar orientation="horizontal" className={styles.scrollAreaScrollbar}>
-                  <ScrollArea.Thumb className={styles.scrollAreaThumb} />
-                </ScrollArea.Scrollbar>
-                <ScrollArea.Corner />
-              </ScrollArea.Root>
+              <ScrollArea orientation="horizontal">
+                {services.map((item, idx) => (
+                  <Link href={item.href} className={styles.link} target="_blank" key={`application__${item.id}-${idx}`}>
+                    <SquareImage
+                      decoding="async"
+                      loading="lazy"
+                      {...cloudflareImages(item.id)}
+                      caption={item.caption}
+                      alt={item.alt}
+                    />
+                  </Link>
+                ))}
+              </ScrollArea>
             </Article>
 
             <Article id="library">
@@ -158,32 +144,24 @@ const Page: NextPage = () => {
                 <Heading>Library</Heading>
               </Link>
 
-              <ScrollArea.Root className={styles.scrollAreaWrapper}>
-                <ScrollArea.Viewport>
-                  <div className={styles.scrollArea}>
-                    {libraries.map((library, idx) => (
-                      <Link
-                        href={library.href}
-                        className={styles.link}
-                        target="_blank"
-                        key={`library__${library.id}-${idx}`}
-                      >
-                        <SquareImage
-                          decoding="async"
-                          loading="lazy"
-                          {...cloudflareImages(library.id)}
-                          caption={library.caption}
-                          alt={library.alt}
-                        />
-                      </Link>
-                    ))}
-                  </div>
-                </ScrollArea.Viewport>
-
-                <ScrollArea.Scrollbar orientation="horizontal" className={styles.scrollAreaScrollbar}>
-                  <ScrollArea.Thumb className={styles.scrollAreaThumb} />
-                </ScrollArea.Scrollbar>
-              </ScrollArea.Root>
+              <ScrollArea orientation="horizontal">
+                {libraries.map((service, idx) => (
+                  <Link
+                    href={service.href}
+                    className={styles.link}
+                    target="_blank"
+                    key={`library__${service.id}-${idx}`}
+                  >
+                    <SquareImage
+                      decoding="async"
+                      loading="lazy"
+                      {...cloudflareImages(service.id)}
+                      caption={service.caption}
+                      alt={service.alt}
+                    />
+                  </Link>
+                ))}
+              </ScrollArea>
             </Article>
           </Article>
         </animated.div>
