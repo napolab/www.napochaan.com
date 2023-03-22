@@ -26,13 +26,14 @@ export const pallets = {
   accent3: "#9ED9CC",
   disabled: "#A5A5A5",
   white: "#ffffff",
+  black: "#333333",
   border: {
     main: "#CCCCCC",
     focus: "#66B2FF",
   },
   scrollbar: {
     background: {
-      main: "#808080",
+      main: "#666666",
       hover: "#404040",
     },
     thumb: "#bfbfbf",

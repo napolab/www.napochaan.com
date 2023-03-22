@@ -26,16 +26,17 @@ export const pallets = {
   accent3: "#9ED9CC",
   disabled: "#A5A5A5",
   white: "#ffffff",
+  black: "#333333",
   border: {
     main: "#CCCCCC",
     focus: "#336699",
   },
   scrollbar: {
     background: {
-      main: "#808080",
-      hover: "#404040",
+      main: "#B3B3B3",
+      hover: "#cccccc",
     },
-    thumb: "#bfbfbf",
+    thumb: "#666666",
   },
 } as const satisfies Pallets;
 

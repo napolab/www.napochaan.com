@@ -28,6 +28,7 @@ const pallets = {
   accent3: null,
   disabled: null,
   white: null,
+  black: null,
   scrollbar: {
     background: {
       main: null,
