@@ -28,6 +28,7 @@ The website is built using the following technologies:
 - next
 - vanilla-extract/css
 - react-aria
+- radix-ui
 - jotai
 - @react-spring/web
 
