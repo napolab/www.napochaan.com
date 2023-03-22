@@ -33,6 +33,7 @@ const Page: NextPage = () => {
               alt="naporitan のオリジナルキャラクター"
               width={800}
               height={800}
+              loading="lazy"
             />
           </div>
         </div>
@@ -99,8 +100,8 @@ const Page: NextPage = () => {
               <Heading>Service</Heading>
             </Link>
             <ul className={styles.scrollArea} tabIndex={0}>
-              {services.map((service) => (
-                <li key={`application__${service.id}`}>
+              {services.map((service, idx) => (
+                <li key={`application__${service.id}-${idx}`}>
                   <Link href={service.href} className={styles.link} target="_blank">
                     <SquareImage
                       decoding="async"
@@ -119,8 +120,8 @@ const Page: NextPage = () => {
               <Heading>Library</Heading>
             </Link>
             <ul className={styles.scrollArea} tabIndex={0}>
-              {libraries.map((library) => (
-                <li key={`library__${library.id}`}>
+              {libraries.map((library, idx) => (
+                <li key={`library__${library.id}-${idx}`}>
                   <Link href={library.href} className={styles.link} target="_blank">
                     <SquareImage
                       decoding="async"
