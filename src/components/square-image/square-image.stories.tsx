@@ -1,15 +1,16 @@
 import SquareImage from "@components/square-image";
 
-import type { ComponentMeta, ComponentStory } from "@storybook/react";
+import type { SquareImageProps } from "@components/square-image";
+import type { Meta as ComponentMeta, Story as ComponentStory } from "@storybook/react";
 
-const meta: ComponentMeta<typeof SquareImage> = {
+const meta: ComponentMeta<SquareImageProps> = {
   title: "components/SquareImage",
   component: SquareImage,
 };
 
 export default meta;
 
-export const Default: ComponentStory<typeof SquareImage> = (props) => {
+export const Default: ComponentStory<SquareImageProps> = (props) => {
   return (
     <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
       <SquareImage {...props} />

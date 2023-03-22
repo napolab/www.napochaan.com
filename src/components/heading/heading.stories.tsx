@@ -2,15 +2,16 @@ import Article from "@components/article";
 import Heading from "@components/heading";
 import Section from "@components/section";
 
-import type { ComponentMeta, ComponentStory } from "@storybook/react";
+import type { HeadingProps } from "@components/heading";
+import type { Meta as ComponentMeta, Story as ComponentStory } from "@storybook/react";
 
-const meta: ComponentMeta<typeof Heading> = {
+const meta: ComponentMeta<HeadingProps> = {
   title: "components/Heading",
   component: Heading,
 };
 export default meta;
 
-export const Default: ComponentStory<typeof Heading> = ({ children, ...props }) => {
+export const Default: ComponentStory<HeadingProps> = ({ children, ...props }) => {
   return (
     <Section style={{ padding: "1rem" }}>
       <Heading {...props}>{children}</Heading>
@@ -48,7 +49,7 @@ Default.args = {
   children: "napochaan.com",
 };
 
-export const Unstyled: ComponentStory<typeof Heading> = ({ children, ...props }) => {
+export const Unstyled: ComponentStory<HeadingProps> = ({ children, ...props }) => {
   return (
     <Section style={{ padding: "1rem" }}>
       <Heading {...props} unstyled>

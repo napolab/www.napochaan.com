@@ -3,9 +3,10 @@ import React, { useCallback } from "react";
 
 import Switch from "@components/switch";
 
-import type { ComponentMeta, ComponentStory } from "@storybook/react";
+import type { SwitchProps } from "@components/switch";
+import type { Meta as ComponentMeta, Story as ComponentStory } from "@storybook/react";
 
-const meta: ComponentMeta<typeof Switch> = {
+const meta: ComponentMeta<SwitchProps> = {
   title: "components/Switch",
   component: Switch,
   argTypes: {
@@ -16,7 +17,7 @@ const meta: ComponentMeta<typeof Switch> = {
 };
 export default meta;
 
-export const Default: ComponentStory<typeof Switch> = (props) => {
+export const Default: ComponentStory<SwitchProps> = (props) => {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1em" }}>
       <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} />
@@ -52,7 +53,7 @@ Default.args = {
   labelPosition: "right",
 };
 
-export const WithLabel: ComponentStory<typeof Switch> = (props) => {
+export const WithLabel: ComponentStory<SwitchProps> = (props) => {
   return <Switch {...props} onChange={action("change")} onBlur={action("blur")} onFocus={action("focus")} />;
 };
 WithLabel.args = {
@@ -60,7 +61,7 @@ WithLabel.args = {
   label: <p>with label</p>,
 };
 
-export const UseForm: ComponentStory<typeof Switch> = (props) => {
+export const UseForm: ComponentStory<SwitchProps> = (props) => {
   const handleSubmit = useCallback((e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     action("submit")(e);

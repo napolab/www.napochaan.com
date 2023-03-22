@@ -8,9 +8,10 @@ import { useResizeObserver } from "@hooks/resize-observer";
 
 import * as styles from "./styles.css";
 
-import type { ComponentMeta, ComponentStory } from "@storybook/react";
+import type { BudouxProps } from "@components/budoux";
+import type { Meta as ComponentMeta, Story as ComponentStory } from "@storybook/react";
 
-const meta: ComponentMeta<typeof Budoux> = {
+const meta: ComponentMeta<BudouxProps> = {
   title: "components/Budoux",
   component: Budoux,
   argTypes: {
@@ -22,7 +23,7 @@ const meta: ComponentMeta<typeof Budoux> = {
 
 export default meta;
 
-export const Default: ComponentStory<typeof Budoux> = (props) => {
+export const Default: ComponentStory<BudouxProps> = (props) => {
   const ref1 = useRef<HTMLDivElement>(null);
   const resize1 = useResizeObserver(ref1);
 
