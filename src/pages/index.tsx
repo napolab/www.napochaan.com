@@ -1,4 +1,4 @@
-import { useSpring, animated, useInView } from "@react-spring/web";
+import { useSpring, animated, useInView, config } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -35,7 +35,14 @@ const Page: NextPage = () => {
   });
 
   const decorationImageAnim = useSpring({
-    transform: contactInView ? "translateY(0%) rotate(0deg)" : `translateY(200%) rotate(-60deg)`,
+    from: {
+      transform: `translateX(125%)`,
+    },
+    to: {
+      transform: contactInView ? "translateX(0%)" : `translateX(125%)`,
+    },
+    config: config.gentle,
+    delay: 800,
   });
 
   return (
