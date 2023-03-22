@@ -5,7 +5,7 @@ import type { DocumentProps } from "next/document";
 import type { FC } from "react";
 
 const description =
-  "こんにちは、 naporitan です！僕はアプリケーション開発や React, TypeScript が得意で、新しい技術に触れたり、音楽を聴いたり、FPS をすることが好きです。特に TypeScript と Haskell がお気に入りの言語で、JavaScript, Python, Ruby, Swift, Rust もたまに書きます。";
+  "こんにちは、 naporitanです！僕はアプリケーション開発やReact, TypeScriptが得意で、新しい技術に触れたり、音楽を聴いたり、FPSをすることが好きです。";
 
 const Document: FC<DocumentProps> = () => {
   return (
@@ -25,7 +25,7 @@ const Document: FC<DocumentProps> = () => {
           name="keywords"
           content="naporitan,WebApplicationDeveloper,React,TypeScript,FrontEnd,StateManagement,JavaScript,Python,Ruby,Swift,Haskell"
         />
-        <meta name="auhor" content="naporitan" />
+        <meta name="author" content="naporitan" />
         <meta name="description" content={description} />
 
         <meta property="og:type" content="website" />
@@ -37,7 +37,7 @@ const Document: FC<DocumentProps> = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="@naporin24690 official website" />
         <meta name="twitter:image" content="https://napochaan.com/ogp.png" />
-        <meta name="twitter:description" content="React と TypeScript のオタクだったりオタクじゃなかったりします。" />
+        <meta name="twitter:description" content="ReactとTypeScriptのオタクだったりオタクじゃなかったりします。" />
         <meta name="twitter:site" content="@naporin24690" />
         <meta name="twitter:creator" content="@naporin24690" />
 
