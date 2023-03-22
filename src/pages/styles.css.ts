@@ -19,6 +19,14 @@ export const link = style([
 /**
  * @package
  */
+export const characterImage = style({
+  objectFit: "contain",
+  width: "100%",
+});
+
+/**
+ * @package
+ */
 export const pageRoot = style({
   vars: {
     [characterLayer]: "2",
@@ -133,40 +141,57 @@ export const decoration2 = style({
 /**
  * @package
  */
-export const decorationImage = style({
+export const decorationImageRoot = style({
   position: "absolute",
   zIndex: 0,
-  transformOrigin: "bottom right",
   userSelect: "none",
   pointerEvents: "none",
 
   "@media": {
     [mediaQueries.xl]: {
-      bottom: 1425,
-      right: -50,
+      bottom: 195,
+      right: -540,
       width: "56.25rem",
-      transform: "rotate(-144deg)",
     },
     [mediaQueries.lg]: {
-      left: 35,
-      bottom: 621,
-      width: "56.25rem",
-      transform: "rotate(-97deg)",
+      left: 18,
+      bottom: -516,
+      width: "68.25rem",
     },
     [mediaQueries.md]: {
-      left: 146,
-      bottom: 772,
-      width: "56.25rem",
-      transform: "rotate(-97deg)",
+      left: 40,
+      bottom: -417,
+      width: "72.25rem",
     },
     [mediaQueries.sm]: {
-      left: -213,
-      bottom: 851,
-      width: "42.75rem",
-      transform: "rotate(-128deg)",
+      left: -32,
+      bottom: -147,
+      width: "54.75rem",
     },
   },
 });
+/**
+ * @package
+ */
+export const decorationImage = style([
+  characterImage,
+  {
+    "@media": {
+      [mediaQueries.xl]: {
+        transform: "rotate(-144deg)",
+      },
+      [mediaQueries.lg]: {
+        transform: "rotate(-97deg)",
+      },
+      [mediaQueries.md]: {
+        transform: "rotate(-97deg)",
+      },
+      [mediaQueries.sm]: {
+        transform: "rotate(-128deg)",
+      },
+    },
+  },
+]);
 
 /**
  * @package
@@ -204,14 +229,6 @@ export const characterImageRoot = style({
       transform: `rotate(-19deg)`,
     },
   },
-});
-
-/**
- * @package
- */
-export const characterImage = style({
-  objectFit: "contain",
-  width: "100%",
 });
 
 const firstViewMinHeight = createVar();
@@ -360,6 +377,9 @@ export const tileRoot = style({
  * @package
  */
 export const aboutMeWrapper = style({
+  position: "relative",
+  zIndex: calc.add(characterLayer, 1),
+
   "@media": {
     [mediaQueries.lg]: {
       display: "flex",
@@ -417,6 +437,14 @@ export const aboutMe = style({
       gap: vars.space.sm,
     },
   },
+});
+
+/**
+ * @package
+ */
+export const worksWrapper = style({
+  position: "relative",
+  zIndex: calc.add(characterLayer, 1),
 });
 
 /**
@@ -511,6 +539,9 @@ globalStyle(`${scrollArea} > *`, {
  * @package
  */
 export const contactWrapper = style({
+  position: "relative",
+  zIndex: calc.add(characterLayer, 1),
+
   "@media": {
     [mediaQueries.xl]: {
       display: "flex",
@@ -546,7 +577,7 @@ export const contactRoot = style([
         width: "41.5rem",
       },
       [mediaQueries.md]: {
-        marginTop: vars.space.xl,
+        marginTop: vars.space.lg,
         display: "flex",
         flexDirection: "column",
         gap: vars.space.md,

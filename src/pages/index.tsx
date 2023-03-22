@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+import { useSpring, animated, useInView } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -15,6 +16,27 @@ import * as styles from "./styles.css";
 import type { NextPage } from "next";
 
 const Page: NextPage = () => {
+  const [aboutRef, aboutInView] = useInView({ once: true });
+  const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
+  const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
+
+  const aboutAnim = useSpring({
+    opacity: aboutInView ? 1 : 0,
+    transform: aboutInView ? "translateY(0rem)" : "translateY(0.5rem)",
+  });
+  const worksAnim = useSpring({
+    opacity: worksInView ? 1 : 0,
+    transform: worksInView ? "translateY(0rem)" : "translateY(0.5rem)",
+  });
+  const contactAnim = useSpring({
+    opacity: contactInView ? 1 : 0,
+    transform: contactInView ? "translateY(0rem)" : "translateY(0.5rem)",
+  });
+
+  const decorationImageAnim = useSpring({
+    transform: contactInView ? "translateY(0%) rotate(0deg)" : `translateY(200%) rotate(-60deg)`,
+  });
+
   return (
     <>
       <PageHead title="Home" />
@@ -23,9 +45,9 @@ const Page: NextPage = () => {
         <div className={styles.decorationRoot}>
           <div aria-hidden="true" className={styles.decoration1} />
           <div aria-hidden="true" className={styles.decoration2} />
-          <div className={styles.decorationImage} aria-hidden="true">
+          <animated.div className={styles.decorationImageRoot} aria-hidden="true" style={decorationImageAnim}>
             <img
-              className={styles.characterImage}
+              className={styles.decorationImage}
               decoding="async"
               srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
               src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
@@ -35,7 +57,7 @@ const Page: NextPage = () => {
               height={800}
               loading="lazy"
             />
-          </div>
+          </animated.div>
         </div>
 
         <div className={styles.firstView}>
@@ -56,7 +78,7 @@ const Page: NextPage = () => {
             </div>
           </div>
 
-          <div className={styles.aboutMeWrapper}>
+          <animated.div className={styles.aboutMeWrapper} ref={aboutRef} style={aboutAnim}>
             <Article className={styles.aboutMeRoot} id="about">
               <Link href="/#about" scroll className={styles.anchorLink}>
                 <Heading>About me</Heading>
@@ -86,57 +108,59 @@ const Page: NextPage = () => {
                 </p>
               </div>
             </Article>
-          </div>
+          </animated.div>
         </div>
 
-        <Article id="works" className={styles.worksRoot}>
-          <div>
-            <Link href="/#works" className={styles.anchorLink}>
-              <Heading>Works</Heading>
-            </Link>
-          </div>
-          <Article id="service">
-            <Link href="/#service" className={styles.anchorLink}>
-              <Heading>Service</Heading>
-            </Link>
-            <ul className={styles.scrollArea} tabIndex={0}>
-              {services.map((service, idx) => (
-                <li key={`application__${service.id}-${idx}`}>
-                  <Link href={service.href} className={styles.link} target="_blank">
-                    <SquareImage
-                      decoding="async"
-                      {...cloudflareImages(service.id)}
-                      caption={service.caption}
-                      alt={service.alt}
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </Article>
+        <animated.div ref={worksRef} className={styles.worksWrapper} style={worksAnim}>
+          <Article id="works" className={styles.worksRoot}>
+            <div>
+              <Link href="/#works" className={styles.anchorLink}>
+                <Heading>Works</Heading>
+              </Link>
+            </div>
+            <Article id="service">
+              <Link href="/#service" className={styles.anchorLink}>
+                <Heading>Service</Heading>
+              </Link>
+              <ul className={styles.scrollArea} tabIndex={0}>
+                {services.map((service, idx) => (
+                  <li key={`application__${service.id}-${idx}`}>
+                    <Link href={service.href} className={styles.link} target="_blank">
+                      <SquareImage
+                        decoding="async"
+                        {...cloudflareImages(service.id)}
+                        caption={service.caption}
+                        alt={service.alt}
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Article>
 
-          <Article id="library">
-            <Link href="/#library" className={styles.anchorLink}>
-              <Heading>Library</Heading>
-            </Link>
-            <ul className={styles.scrollArea} tabIndex={0}>
-              {libraries.map((library, idx) => (
-                <li key={`library__${library.id}-${idx}`}>
-                  <Link href={library.href} className={styles.link} target="_blank">
-                    <SquareImage
-                      decoding="async"
-                      {...cloudflareImages(library.id)}
-                      caption={library.caption}
-                      alt={library.alt}
-                    />
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <Article id="library">
+              <Link href="/#library" className={styles.anchorLink}>
+                <Heading>Library</Heading>
+              </Link>
+              <ul className={styles.scrollArea} tabIndex={0}>
+                {libraries.map((library, idx) => (
+                  <li key={`library__${library.id}-${idx}`}>
+                    <Link href={library.href} className={styles.link} target="_blank">
+                      <SquareImage
+                        decoding="async"
+                        {...cloudflareImages(library.id)}
+                        caption={library.caption}
+                        alt={library.alt}
+                      />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Article>
           </Article>
-        </Article>
+        </animated.div>
 
-        <div className={styles.contactWrapper}>
+        <animated.div className={styles.contactWrapper} ref={contactRef} style={contactAnim}>
           <Article id="contact" className={styles.contactRoot}>
             <div>
               <Link href="/#contact" className={styles.anchorLink}>
@@ -178,7 +202,7 @@ const Page: NextPage = () => {
               </Link>
             </div>
           </Article>
-        </div>
+        </animated.div>
       </Section>
     </>
   );
