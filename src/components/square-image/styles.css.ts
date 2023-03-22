@@ -31,6 +31,7 @@ export const imageRoot = style({
  */
 export const image = style({
   width,
+  height: width,
   aspectRatio: "1 / 1",
   objectFit: "cover",
 });
@@ -39,7 +40,7 @@ export const image = style({
  * @package
  */
 export const captionRoot = style({
-  width: "100%",
+  width,
   color: "inherit",
   fontFamily: vars.font.body,
   fontWeight: 400,
