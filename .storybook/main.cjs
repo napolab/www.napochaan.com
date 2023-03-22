@@ -4,25 +4,19 @@ const baseURL = process.env.STORYBOOK_BASE ?? "";
 
 /** @type {import("@storybook/react/types").StorybookConfig} */
 const config = {
-  stories: ["../src/**/*.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
-  addons: [
-    "@storybook/addon-links",
-    "@storybook/addon-essentials",
-    "storybook-dark-mode",
-    "@storybook/addon-a11y",
-    "@storybook/addon-mdx-gfm",
-  ],
-  framework: {
-    name: "@storybook/react-vite",
-    options: {},
+  stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
+  addons: ["@storybook/addon-links", "@storybook/addon-essentials", "storybook-dark-mode", "@storybook/addon-a11y"],
+  framework: "@storybook/react",
+  core: {
+    builder: "@storybook/builder-vite",
   },
-  core: {},
   features: {
     storyStoreV7: true,
   },
   async viteFinal(config) {
     /** @type {{ config: import("vite").UserConfig }} */
     const { config: userConfig } = await loadConfigFromFile(path.resolve(__dirname, "../vite.config.ts"));
+
     return mergeConfig(config, {
       ...userConfig,
       base: baseURL,
@@ -52,8 +46,6 @@ const config = {
       <meta name="twitter:creator" content="@naporin24690" />
     `;
   },
-  docs: {
-    autodocs: true,
-  },
 };
+
 module.exports = config;
