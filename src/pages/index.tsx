@@ -1,4 +1,4 @@
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
+import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { useSpring, animated, useInView } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
@@ -122,40 +122,67 @@ const Page: NextPage = () => {
               <Link href="/#service" className={styles.anchorLink}>
                 <Heading>Service</Heading>
               </Link>
-              <ul className={styles.scrollArea} tabIndex={0}>
-                {services.map((service, idx) => (
-                  <li key={`application__${service.id}-${idx}`}>
-                    <Link href={service.href} className={styles.link} target="_blank">
-                      <SquareImage
-                        decoding="async"
-                        {...cloudflareImages(service.id)}
-                        caption={service.caption}
-                        alt={service.alt}
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+
+              <ScrollArea.Root className={styles.scrollAreaWrapper}>
+                <ScrollArea.Viewport>
+                  <div className={styles.scrollArea}>
+                    {services.map((service, idx) => (
+                      <Link
+                        href={service.href}
+                        className={styles.link}
+                        target="_blank"
+                        key={`application__${service.id}-${idx}`}
+                      >
+                        <SquareImage
+                          decoding="async"
+                          loading="lazy"
+                          {...cloudflareImages(service.id)}
+                          caption={service.caption}
+                          alt={service.alt}
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </ScrollArea.Viewport>
+
+                <ScrollArea.Scrollbar orientation="horizontal" className={styles.scrollAreaScrollbar}>
+                  <ScrollArea.Thumb className={styles.scrollAreaThumb} />
+                </ScrollArea.Scrollbar>
+                <ScrollArea.Corner />
+              </ScrollArea.Root>
             </Article>
 
             <Article id="library">
               <Link href="/#library" className={styles.anchorLink}>
                 <Heading>Library</Heading>
               </Link>
-              <ul className={styles.scrollArea} tabIndex={0}>
-                {libraries.map((library, idx) => (
-                  <li key={`library__${library.id}-${idx}`}>
-                    <Link href={library.href} className={styles.link} target="_blank">
-                      <SquareImage
-                        decoding="async"
-                        {...cloudflareImages(library.id)}
-                        caption={library.caption}
-                        alt={library.alt}
-                      />
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+
+              <ScrollArea.Root className={styles.scrollAreaWrapper}>
+                <ScrollArea.Viewport>
+                  <div className={styles.scrollArea}>
+                    {libraries.map((library, idx) => (
+                      <Link
+                        href={library.href}
+                        className={styles.link}
+                        target="_blank"
+                        key={`library__${library.id}-${idx}`}
+                      >
+                        <SquareImage
+                          decoding="async"
+                          loading="lazy"
+                          {...cloudflareImages(library.id)}
+                          caption={library.caption}
+                          alt={library.alt}
+                        />
+                      </Link>
+                    ))}
+                  </div>
+                </ScrollArea.Viewport>
+
+                <ScrollArea.Scrollbar orientation="horizontal" className={styles.scrollAreaScrollbar}>
+                  <ScrollArea.Thumb />
+                </ScrollArea.Scrollbar>
+              </ScrollArea.Root>
             </Article>
           </Article>
         </animated.div>
