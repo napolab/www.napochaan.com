@@ -28,6 +28,13 @@ const pallets = {
   accent3: null,
   disabled: null,
   white: null,
+  scrollbar: {
+    background: {
+      main: null,
+      hover: null
+    },
+    thumb: null,
+  }
 };
 
 export type Pallets = MapLeafNodes<typeof pallets, string>;

@@ -30,6 +30,13 @@ export const pallets = {
     main: "#CCCCCC",
     focus: "#66B2FF",
   },
+  scrollbar: {
+    background: {
+      main: "#808080",
+      hover: "#404040"
+    },
+    thumb: "#bfbfbf"
+  }
 } satisfies Pallets;
 
 createGlobalTheme(":root.dark", vars.pallets, {
