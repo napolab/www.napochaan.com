@@ -48,3 +48,11 @@ export const captionRoot = style({
   lineHeight: 1.5,
   letterSpacing: "0.01em",
 });
+
+/**
+ * @package
+ */
+export const caption = style({
+  wordBreak: "break-all",
+  overflowWrap: "break-word",
+});

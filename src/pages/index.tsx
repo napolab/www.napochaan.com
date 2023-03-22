@@ -180,7 +180,7 @@ const Page: NextPage = () => {
                 </ScrollArea.Viewport>
 
                 <ScrollArea.Scrollbar orientation="horizontal" className={styles.scrollAreaScrollbar}>
-                  <ScrollArea.Thumb />
+                  <ScrollArea.Thumb className={styles.scrollAreaThumb} />
                 </ScrollArea.Scrollbar>
               </ScrollArea.Root>
             </Article>
