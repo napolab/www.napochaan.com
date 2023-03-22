@@ -16,12 +16,12 @@ export const Default: ComponentStory<SquareImageProps> = (props) => {
       <SquareImage {...props} />
       <SquareImage
         {...props}
-        src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/5ca1e2d1-41bd-4ce8-c903-3af938fc8c00/square"
+        src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/6305471d-3774-4bc1-09c8-1e7ed3c40100/800x800"
         caption="クール系の naporitan"
       />
       <SquareImage
         {...props}
-        src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c161150a-80cb-4783-4bda-870c85e5de00/square"
+        src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
         caption="かわいい系の naporitan"
       />
     </div>
