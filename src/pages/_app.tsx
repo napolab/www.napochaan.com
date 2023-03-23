@@ -18,13 +18,11 @@ import "@acab/reset.css";
 
 const notoSansJP = Noto_Sans_JP({
   weight: ["400"],
-  preload: true,
   subsets: ["latin"],
   variable: "--noto-sans-jp",
 });
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
-  preload: true,
   subsets: ["latin"],
   variable: "--poppins",
 });
