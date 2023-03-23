@@ -1,6 +1,5 @@
 /* eslint-disable react/jsx-no-bind */
 import { Noto_Sans_JP, Poppins } from "next/font/google";
-import { useTheme } from "next-themes";
 import React, { memo, Suspense } from "react";
 
 import PageHead from "@components/page-head";
@@ -51,24 +50,10 @@ export default memo(App);
 const Layout: FC<PropsWithChildren> = ({ children }) => {
   return (
     <ThemeProvider defaultTheme="dark">
-      <header>
-        <Header />
-      </header>
       <HeadingLevelProvider>
         <main className={styles.mainRoot}>{children}</main>
       </HeadingLevelProvider>
       <footer className={styles.footerRoot}>© 2023 naporitan</footer>
     </ThemeProvider>
-  );
-};
-
-const Header = () => {
-  const { setTheme } = useTheme();
-
-  return (
-    <div>
-      <button onClick={() => setTheme("light")}>light</button>
-      <button onClick={() => setTheme("dark")}>dark</button>
-    </div>
   );
 };

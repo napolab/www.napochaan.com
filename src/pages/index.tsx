@@ -2,6 +2,7 @@ import { useSpring, animated, useInView, config, useChain, useSpringRef, useTrai
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useTheme } from "next-themes";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
@@ -10,6 +11,8 @@ import PageHead from "@components/page-head";
 import ScrollArea from "@components/scroll-area";
 import Section from "@components/section";
 import SquareImage from "@components/square-image";
+import SwitchTheme from "@components/switch-theme";
+import { isTheme } from "@theme";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
 import * as styles from "./styles.css";
@@ -18,6 +21,7 @@ import type { NextPage } from "next";
 import type { ReactNode } from "react";
 
 const Page: NextPage = () => {
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const firstViewInView = router.asPath === "/";
 
@@ -98,6 +102,9 @@ const Page: NextPage = () => {
               loading="lazy"
             />
           </animated.div>
+        </div>
+        <div className={styles.switchTheme}>
+          <SwitchTheme theme={isTheme(theme) ? theme : "dark"} onChange={setTheme} />
         </div>
 
         <div className={styles.firstView}>
