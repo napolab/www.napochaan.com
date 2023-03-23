@@ -2,7 +2,6 @@ import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { IconBrightnessUp, IconMoonStars } from "@tabler/icons-react";
 import { forwardRef, memo, useCallback, useState } from "react";
 
-import { useIsomorphicLayoutEffect } from "@hooks/isomorphic-effect";
 import { isTheme } from "@theme";
 
 import * as styles from "./styles.css";
@@ -18,7 +17,8 @@ export type SwitchThemeProps = {
 
 const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
   ({ theme, defaultTheme, onChange, orientation }, ref) => {
-    const [value, setValue] = useState<Theme | undefined>(defaultTheme);
+    const [_value, setValue] = useState<Theme | undefined>(defaultTheme);
+    const value = theme ?? _value;
     const handleValueChange = useCallback(
       (value: string) => {
         if (!isTheme(value)) return;
@@ -29,26 +29,29 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
       [onChange],
     );
 
-    const [mounted, setMounted] = useState(false);
-    useIsomorphicLayoutEffect(() => setMounted(true), []);
-
-    if (!mounted) return null;
-
     return (
       <ToggleGroup.Root
         type="single"
         ref={ref}
         defaultValue={defaultTheme}
-        value={theme ?? value}
+        value={value}
         onValueChange={handleValueChange}
         orientation={orientation}
         loop
         className={styles.switchThemeRoot}
       >
-        <ToggleGroup.Item value="light" aria-label="Light theme" className={styles.lightButton}>
+        <ToggleGroup.Item
+          value="light"
+          aria-label="Light theme"
+          className={styles.lightButton[value === "light" ? "checked" : "default"]}
+        >
           <IconBrightnessUp className={styles.icon} />
         </ToggleGroup.Item>
-        <ToggleGroup.Item value="dark" aria-label="Dark theme" className={styles.darkButton}>
+        <ToggleGroup.Item
+          value="dark"
+          aria-label="Dark theme"
+          className={styles.darkButton[value === "dark" ? "checked" : "default"]}
+        >
           <IconMoonStars className={styles.icon} />
         </ToggleGroup.Item>
       </ToggleGroup.Root>
