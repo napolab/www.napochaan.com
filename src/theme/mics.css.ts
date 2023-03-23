@@ -6,7 +6,7 @@ import type { StyleRule } from "@vanilla-extract/css";
 
 globalStyle("html, body", {
   scrollBehavior: "smooth",
-  overflowX: "hidden"
+  overflowX: "hidden",
 });
 globalStyle("body", {
   color: vars.pallets.text.main,
