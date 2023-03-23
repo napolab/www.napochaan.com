@@ -39,7 +39,7 @@ const Page: NextPage = () => {
     transform: worksInView ? "translateY(0rem)" : "translateY(0.5rem)",
   });
 
-  const [serviceRef, serviceInView] = useInView({ once: false, rootMargin: "-30% 0%" });
+  const [serviceRef, serviceInView] = useInView({ once: true, rootMargin: "-30% 0%" });
   const serviceTrails = useTrail(services.length, {
     from: { opacity: 0, transform: "scale(0.8)" },
     opacity: serviceInView ? 1 : 0,
@@ -47,7 +47,7 @@ const Page: NextPage = () => {
     config: config.stiff,
   });
 
-  const [libraryRef, libraryInView] = useInView({ once: false, rootMargin: "-30% 0%" });
+  const [libraryRef, libraryInView] = useInView({ once: true, rootMargin: "-30% 0%" });
   const libraryTrails = useTrail(libraries.length, {
     from: { opacity: 0, transform: "scale(0.8)" },
     opacity: libraryInView ? 1 : 0,
