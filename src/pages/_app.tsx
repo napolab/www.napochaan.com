@@ -50,7 +50,7 @@ export default memo(App);
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
   return (
-    <ThemeProvider theme="dark">
+    <ThemeProvider defaultTheme="dark">
       <header>
         <Header />
       </header>

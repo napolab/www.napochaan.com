@@ -14,14 +14,15 @@ import "./config/light.css";
  */
 export type ThemeProviderProps = {
   theme?: Theme;
+  defaultTheme?: Theme;
 };
 
 /**
  * @package
  */
-export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ theme, children }) => {
+export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ theme, defaultTheme, children }) => {
   return (
-    <NextThemeProvider attribute="class" defaultTheme={theme}>
+    <NextThemeProvider attribute="class" forcedTheme={theme} defaultTheme={defaultTheme}>
       <div className={styles.providerRoot}>{children}</div>
     </NextThemeProvider>
   );
