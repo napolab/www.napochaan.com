@@ -104,7 +104,7 @@ const Page: NextPage = () => {
           </animated.div>
         </div>
         <div className={styles.switchTheme}>
-          <SwitchTheme theme={isTheme(theme) ? theme : "dark"} onChange={setTheme} />
+          <SwitchTheme theme={isTheme(theme) ? theme : undefined} onChange={setTheme} />
         </div>
 
         <div className={styles.firstView}>

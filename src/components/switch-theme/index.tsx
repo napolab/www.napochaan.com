@@ -2,6 +2,7 @@ import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { IconBrightnessUp, IconMoonStars } from "@tabler/icons-react";
 import { forwardRef, memo, useCallback, useState } from "react";
 
+import { useIsomorphicLayoutEffect } from "@hooks/isomorphic-effect";
 import { isTheme } from "@theme";
 
 import * as styles from "./styles.css";
@@ -17,7 +18,7 @@ export type SwitchThemeProps = {
 
 const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
   ({ theme, defaultTheme, onChange, orientation }, ref) => {
-    const [value, setValue] = useState<Theme>(defaultTheme ?? "light");
+    const [value, setValue] = useState<Theme | undefined>(defaultTheme);
     const handleValueChange = useCallback(
       (value: string) => {
         if (!isTheme(value)) return;
@@ -27,6 +28,11 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
       },
       [onChange],
     );
+
+    const [mounted, setMounted] = useState(false);
+    useIsomorphicLayoutEffect(() => setMounted(true), []);
+
+    if(!mounted) return null;
 
     return (
       <ToggleGroup.Root
