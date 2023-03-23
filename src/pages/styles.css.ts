@@ -366,7 +366,16 @@ export const section2 = style({
 export const section3 = style({
   display: "flex",
   flexDirection: "column",
-  gap: vars.space.md,
+  gap: vars.space.sm,
+
+  "@media": {
+    [mediaQueries.md]: {
+      gap: vars.space.xs,
+    },
+    [mediaQueries.sm]: {
+      gap: vars.space.xs,
+    },
+  },
 });
 
 export const tile = style({
@@ -374,24 +383,24 @@ export const tile = style({
     [mediaQueries.xl]: {
       padding: vars.space.lg,
       background: `rgba(${vars.pallets.rgb.background.main})`,
-      boxShadow: `0px ${vars.space.sx} ${vars.space.md} 0px ${vars.pallets.background.secondary}`,
+      boxShadow: `0px ${vars.space.xs} ${vars.space.md} 0px ${vars.pallets.background.secondary}`,
     },
     [mediaQueries.lg]: {
       padding: vars.space.lg,
       background: `rgba(${vars.pallets.rgb.background.secondary}, 0.9)`,
-      boxShadow: `${vars.space.sx} ${vars.space.sx} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
+      boxShadow: `${vars.space.xs} ${vars.space.xs} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
       borderRadius: vars.borderRadius.lg,
     },
     [mediaQueries.md]: {
       padding: calc.multiply(vars.space.md, 1.5),
       background: `rgba(${vars.pallets.rgb.background.secondary}, 0.9)`,
-      boxShadow: `${vars.space.sx} ${vars.space.sx} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
+      boxShadow: `${vars.space.xs} ${vars.space.xs} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
       borderRadius: vars.borderRadius.md,
     },
     [mediaQueries.sm]: {
       padding: `${vars.space.sm} ${vars.space.md}`,
       background: `rgba(${vars.pallets.rgb.background.secondary}, 0.9)`,
-      boxShadow: `${vars.space.sx} ${vars.space.sx} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
+      boxShadow: `${vars.space.xs} ${vars.space.xs} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
       borderRadius: vars.borderRadius.md,
     },
   },
@@ -479,7 +488,7 @@ export const tags = style({
   "@media": {
     [mediaQueries.sm]: {
       fontSize: 14,
-      gap: `${vars.space.sx} ${vars.space.sm}`,
+      gap: `${vars.space.xs} ${vars.space.sm}`,
     },
   },
 });

@@ -59,7 +59,7 @@ export const headingRoot = styleVariants(
     },
     h3: {
       fontWeight: 500,
-      padding: `${vars.space.sx} 0`,
+      padding: `${vars.space.xs} 0`,
       letterSpacing: "0.03em",
       "@media": {
         [mediaQueries.xl]: {
@@ -78,17 +78,17 @@ export const headingRoot = styleVariants(
     },
     h4: {
       fontWeight: 400,
-      padding: `${vars.space.sx} 0`,
+      padding: `${vars.space.xs} 0`,
       letterSpacing: "0.03em",
     },
     h5: {
       fontWeight: 400,
-      padding: `${vars.space.sx} 0`,
+      padding: `${vars.space.xs} 0`,
       letterSpacing: "0.03em",
     },
     h6: {
       fontWeight: 400,
-      padding: `${vars.space.sx} 0`,
+      padding: `${vars.space.xs} 0`,
       letterSpacing: "0.03em",
     },
   },

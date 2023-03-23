@@ -46,7 +46,7 @@ export const vars = createGlobalThemeContract(
       rgb: pallets,
     },
     borderRadius: {
-      sx: null,
+      xs: null,
       sm: null,
       md: null,
       lg: null,
@@ -56,7 +56,7 @@ export const vars = createGlobalThemeContract(
       body: null,
     },
     space: {
-      sx: null,
+      xs: null,
       sm: null,
       md: null,
       lg: null,
@@ -79,7 +79,7 @@ createGlobalTheme(":root", vars.easing, {
 });
 
 createGlobalTheme(":root", vars.space, {
-  sx: "calc(1rem / 4)",
+  xs: "calc(1rem / 4)",
   sm: "calc(1rem / 2)",
   md: "1rem",
   lg: "calc(1rem * 2)",
@@ -93,7 +93,7 @@ createGlobalTheme(":root", vars.font, {
 });
 
 createGlobalTheme(":root", vars.borderRadius, {
-  sx: "calc(1rem / 4)",
+  xs: "calc(1rem / 4)",
   sm: "calc(1rem / 2)",
   md: "1rem",
   lg: "calc(1rem * 2)",

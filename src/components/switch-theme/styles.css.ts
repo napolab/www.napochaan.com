@@ -8,13 +8,13 @@ const shadow = createVar();
  */
 export const switchThemeRoot = style({
   vars: {
-    [shadow]: `0px ${vars.space.sx} ${vars.space.sx} rgba(${vars.pallets.rgb.black}, 0.25)`,
+    [shadow]: `0px ${vars.space.xs} ${vars.space.xs} rgba(${vars.pallets.rgb.black}, 0.25)`,
   },
   background: vars.pallets.background.tertiary,
   display: "inline-flex",
-  gap: vars.space.sx,
-  padding: vars.space.sx,
-  borderRadius: vars.borderRadius.sx,
+  gap: vars.space.xs,
+  padding: vars.space.xs,
+  borderRadius: vars.borderRadius.xs,
   boxShadow: `inset ${shadow}`,
 });
 
@@ -22,7 +22,7 @@ const button = style({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  borderRadius: vars.borderRadius.sx,
+  borderRadius: vars.borderRadius.xs,
   width: 44,
   height: 44,
   background: "transparent",
