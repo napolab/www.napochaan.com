@@ -14,6 +14,7 @@ import ScrollArea from "@components/scroll-area";
 import Section from "@components/section";
 import SquareImage from "@components/square-image";
 import SwitchTheme from "@components/switch-theme";
+import { useMounted } from "@hooks/mounted";
 import { isTheme } from "@theme";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
@@ -25,6 +26,7 @@ import type { ReactNode } from "react";
 const Page: NextPage = () => {
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+  const mounted = useMounted();
   const firstViewInView = router.asPath === "/";
 
   const [titleRef, titleInView] = useInView({ once: true });
@@ -93,7 +95,7 @@ const Page: NextPage = () => {
           </animated.div>
         </div>
         <div className={styles.switchTheme}>
-          <SwitchTheme theme={isTheme(theme) ? theme : undefined} onChange={setTheme} />
+          {mounted ? <SwitchTheme theme={isTheme(theme) ? theme : undefined} onChange={setTheme} /> : null}
         </div>
 
         <div className={styles.firstView}>

@@ -1,4 +1,4 @@
-import { createVar, globalStyle, style } from "@vanilla-extract/css";
+import { createVar, style, styleVariants } from "@vanilla-extract/css";
 
 import { focusRing, vars } from "@theme/css";
 
@@ -34,21 +34,31 @@ const button = style({
 /**
  * @package
  */
-export const lightButton = style([button]);
-globalStyle(`${lightButton}[aria-checked="true"]`, {
-  background: vars.pallets.accent1,
-  color: vars.pallets.black,
-  boxShadow: `${shadow}, ${shadow}`,
+export const lightButton = styleVariants({
+  default: [button],
+  checked: [
+    button,
+    {
+      background: vars.pallets.accent1,
+      color: vars.pallets.black,
+      boxShadow: `${shadow}, ${shadow}`,
+    },
+  ],
 });
 
 /**
  * @package
  */
-export const darkButton = style([button]);
-globalStyle(`${darkButton}[aria-checked="true"]`, {
-  background: vars.pallets.black,
-  color: vars.pallets.accent1,
-  boxShadow: `${shadow}, ${shadow}`,
+export const darkButton = styleVariants({
+  default: [button],
+  checked: [
+    button,
+    {
+      background: vars.pallets.black,
+      color: vars.pallets.accent1,
+      boxShadow: `${shadow}, ${shadow}`,
+    },
+  ],
 });
 
 /**
