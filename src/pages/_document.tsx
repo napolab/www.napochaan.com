@@ -1,5 +1,4 @@
 import { Html, Head, Main, NextScript } from "next/document";
-import Script from "next/script";
 
 import type { DocumentProps } from "next/document";
 import type { FC } from "react";
@@ -46,8 +45,6 @@ const Document: FC<DocumentProps> = () => {
         <meta name="twitter:description" content="ReactとTypeScriptのオタクだったりオタクじゃなかったりします。" />
         <meta name="twitter:site" content="@naporin24690" />
         <meta name="twitter:creator" content="@naporin24690" />
-
-        <Script src="/widget-theme.js" strategy="beforeInteractive" />
       </Head>
 
       <body>

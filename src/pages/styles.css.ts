@@ -24,6 +24,7 @@ export const pageRoot = style({
       background: vars.pallets.background.tertiary,
       borderRadius: vars.borderRadius.lg,
       paddingBottom: vars.space.xl,
+      boxShadow: `0px ${vars.space.sx} ${vars.space.md} 0px ${vars.pallets.black}`,
     },
   },
 });

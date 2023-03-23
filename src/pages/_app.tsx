@@ -1,8 +1,8 @@
-import { Provider, useAtom } from "jotai";
+/* eslint-disable react/jsx-no-bind */
 import { Noto_Sans_JP, Poppins } from "next/font/google";
+import { useTheme } from "next-themes";
 import React, { memo, Suspense } from "react";
 
-import { themeAtom } from "@atoms/theme";
 import PageHead from "@components/page-head";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
@@ -32,17 +32,14 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
     <>
       <PageHead>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style>{JSON.stringify(poppins.style, null, 2)}</style>
       </PageHead>
 
       <div className={clsx(notoSansJP.className, notoSansJP.variable, poppins.className, poppins.variable)}>
-        <Provider>
-          <Layout>
-            <Suspense>
-              <Component {...pageProps} />
-            </Suspense>
-          </Layout>
-        </Provider>
+        <Layout>
+          <Suspense>
+            <Component {...pageProps} />
+          </Suspense>
+        </Layout>
       </div>
     </>
   );
@@ -52,15 +49,26 @@ void reportAccessibility(React);
 export default memo(App);
 
 const Layout: FC<PropsWithChildren> = ({ children }) => {
-  const [theme] = useAtom(themeAtom);
-
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme="dark">
+      <header>
+        <Header />
+      </header>
       <HeadingLevelProvider>
         <main className={styles.mainRoot}>{children}</main>
-
-        <footer className={styles.footerRoot}>© 2023 naporitan</footer>
       </HeadingLevelProvider>
+      <footer className={styles.footerRoot}>© 2023 naporitan</footer>
     </ThemeProvider>
+  );
+};
+
+const Header = () => {
+  const { setTheme } = useTheme();
+
+  return (
+    <div>
+      <button onClick={() => setTheme("light")}>light</button>
+      <button onClick={() => setTheme("dark")}>dark</button>
+    </div>
   );
 };
