@@ -93,28 +93,28 @@ const Page: NextPage = () => {
               </Link>
               <div className={styles.aboutMe}>
                 <p>
-                  <Budoux>こんにちは、naporitan です。</Budoux>
-                </p>
-                <p>
                   <Budoux>
-                    僕はwebアプリケーションエンジニアで、ReactやTypeScriptを使ったフロントエンドの状態管理を得意としています。
-                  </Budoux>
-                </p>
-
-                <p>
-                  <Budoux>趣味は音楽を聴くこと、新しい技術に触れること、漫画を読むこと、FPSをすることです。</Budoux>
-                </p>
-                <p>
-                  <Budoux>
-                    TypeScriptとHaskellがお気に入りの言語で、その他にもJavaScript、Python、Ruby、Swiftもたまに書きます。
+                    自分を表現するために選んだフロントエンドという分野で自分を表現できないままソフトウェアエンジニアとして彷徨い続けている。
                   </Budoux>
                 </p>
                 <p>
                   <Budoux>
-                    最近は、i18nやa11yをWebで実現して提供する技術や、最速でユーザーにWebページを表示する技術に興味があります。
+                    現在はプログラムが持つ統一性という部分に惹かれ関数型言語のあり方を好んでおり実は関数になりたいと思っている。
                   </Budoux>
                 </p>
               </div>
+
+              <Article>
+                <Link href="/#love" scroll className={styles.anchorLink}>
+                  <Heading>Love</Heading>
+                </Link>
+              </Article>
+
+              <Article>
+                <Link href="/#fav" scroll className={styles.anchorLink}>
+                  <Heading>Favorite</Heading>
+                </Link>
+              </Article>
             </Article>
           </animated.div>
         </div>
