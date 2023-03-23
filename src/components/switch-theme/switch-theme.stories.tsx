@@ -16,5 +16,5 @@ export const Default: Story<SwitchThemeProps> = (props) => {
   return <SwitchTheme {...props} onChange={action("change")} />;
 };
 Default.args = {
-  defaultTheme: "light"
+  defaultTheme: "light",
 };
