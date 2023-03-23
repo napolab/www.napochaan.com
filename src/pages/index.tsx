@@ -287,13 +287,29 @@ const services: Work[] = [
     href: "https://tana.447pro.com/",
   },
   {
-    caption: "soelu.com/instructorsページの開発",
+    caption: (
+      <span className={styles.workText}>
+        soelu.com
+        <wbr />
+        instructorsページ
+        <wbr />
+        の開発
+      </span>
+    ),
     alt: "soelu.com/instructors のスクリーンショット",
     id: "af31f5b3-0732-4b4a-b42e-ccaf20f41d00",
     href: "https://twitter.com/naporin24690/status/1244865712490856448?s=20",
   },
   {
-    caption: "soelu.com/lessons ページの開発",
+    caption: (
+      <span className={styles.workText}>
+        soelu.com
+        <wbr />
+        lessonsページ
+        <wbr />
+        の開発
+      </span>
+    ),
     alt: "soelu.com/lessons のスクリーンショット",
     id: "fdd649b4-067e-4f93-493d-0770935f6900",
     href: "https://twitter.com/naporin24690/status/1227830616227344384",
@@ -320,19 +336,39 @@ const libraries: Work[] = [
     href: "https://www.npmjs.com/package/react-flowder",
   },
   {
-    caption: "vanilla-extract-inline",
+    caption: (
+      <span className={styles.workText}>
+        vanilla-
+        <wbr />
+        extract-
+        <wbr />
+        inline
+      </span>
+    ),
     alt: "vanilla-extractのOGP",
     id: "9fd1d1dd-e97a-443d-5d1f-37760c710a00",
     href: "https://github.com/napolab/vanilla-extract-inline",
   },
   {
-    caption: "@naporin0624/eslint-config",
+    caption: (
+      <span className={styles.workText}>
+        @naporin0624/
+        <wbr />
+        eslint-config
+      </span>
+    ),
     alt: "npmのロゴ",
     id: "a463002e-d758-4349-3d53-024d21500c00",
     href: "https://www.npmjs.com/package/@naporin0624/eslint-config",
   },
   {
-    caption: "monaco-editor-type-installer",
+    caption: (
+      <span className={styles.workText}>
+        monaco-editor
+        <wbr />
+        type-installer
+      </span>
+    ),
     alt: "gistのOGP",
     id: "51e0d14a-d842-4e33-f20e-70db0d117500",
     href: "https://gist.github.com/naporin0624/2c1c187950738ef4e07a755489ba49de",
