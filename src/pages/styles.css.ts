@@ -1,11 +1,11 @@
-import { createContainer, createVar, style } from "@vanilla-extract/css";
+import { createVar, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
 import { mediaQueries, vars, fillImage } from "@theme/css";
 export { anchorLink, wrappedText, textLink, fillImage } from "@theme/css";
 
 const characterLayer = createVar();
-const firstViewContainer = createContainer();
+const fixedLayer = createVar();
 
 /**
  * @package
@@ -13,6 +13,7 @@ const firstViewContainer = createContainer();
 export const pageRoot = style({
   vars: {
     [characterLayer]: "2",
+    [fixedLayer]: "10",
   },
   position: "relative",
   isolation: "isolate",
@@ -24,6 +25,33 @@ export const pageRoot = style({
       background: vars.pallets.background.tertiary,
       borderRadius: vars.borderRadius.lg,
       paddingBottom: vars.space.xl,
+    },
+  },
+});
+
+/**
+ * @package
+ */
+export const switchTheme = style({
+  position: "fixed",
+  zIndex: fixedLayer,
+
+  "@media": {
+    [mediaQueries.xl]: {
+      right: calc.divide(calc.subtract("100%", "1440px"), 2),
+      bottom: vars.space.md,
+    },
+    [mediaQueries.lg]: {
+      right: vars.space.lg,
+      bottom: vars.space.md,
+    },
+    [mediaQueries.md]: {
+      right: vars.space.lg,
+      bottom: vars.space.md,
+    },
+    [mediaQueries.sm]: {
+      right: vars.space.md,
+      bottom: vars.space.md,
     },
   },
 });
@@ -219,8 +247,6 @@ const firstViewMinHeight = createVar();
  * @package
  */
 export const firstView = style({
-  containerName: firstViewContainer,
-  containerType: "inline-size",
   position: "relative",
   width: "100%",
   zIndex: characterLayer,

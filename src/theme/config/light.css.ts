@@ -1,4 +1,4 @@
-import { createGlobalTheme, globalStyle } from "@vanilla-extract/css";
+import { createGlobalTheme } from "@vanilla-extract/css";
 
 import { convertHex2Rgb } from "@theme/utils";
 
@@ -43,8 +43,4 @@ export const pallets = {
 createGlobalTheme(":root", vars.pallets, {
   ...pallets,
   rgb: convertHex2Rgb(pallets),
-});
-
-globalStyle(":root", {
-  colorScheme: "light",
 });

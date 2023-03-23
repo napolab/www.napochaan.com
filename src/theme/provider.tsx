@@ -1,6 +1,4 @@
-import { SSRProvider } from "react-aria";
-
-import { useIsomorphicLayoutEffect } from "@hooks/isomorphic-effect";
+import { ThemeProvider as NextThemeProvider } from "next-themes";
 
 import * as styles from "./provider.css";
 
@@ -16,26 +14,16 @@ import "./config/light.css";
  */
 export type ThemeProviderProps = {
   theme?: Theme;
+  defaultTheme?: Theme;
 };
 
 /**
  * @package
  */
-export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ theme, children }) => {
-  useIsomorphicLayoutEffect(() => {
-    const el = document.querySelector("html");
-    if (!theme) return;
-
-    el?.classList.add(theme);
-
-    return () => {
-      el?.classList.remove(theme);
-    };
-  }, [theme]);
-
+export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ theme, defaultTheme, children }) => {
   return (
-    <SSRProvider>
+    <NextThemeProvider attribute="class" forcedTheme={theme} defaultTheme={defaultTheme}>
       <div className={styles.providerRoot}>{children}</div>
-    </SSRProvider>
+    </NextThemeProvider>
   );
 };

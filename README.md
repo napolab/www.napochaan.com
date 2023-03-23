@@ -24,13 +24,13 @@ The component library used to build the website can be found on Storybook [here]
 
 The website is built using the following technologies:
 
-- typeScript
+- typescript
 - next
+- next-themes
 - vanilla-extract/css
-- react-aria
 - radix-ui
-- jotai
 - @react-spring/web
+- budoux
 
 ## Deployment
 

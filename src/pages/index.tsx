@@ -1,7 +1,10 @@
+/* eslint-disable no-use-before-define */
 import { useSpring, animated, useInView, config, useChain, useSpringRef, useTrail } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useTheme } from "next-themes";
+import { forwardRef, memo } from "react";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
@@ -10,6 +13,8 @@ import PageHead from "@components/page-head";
 import ScrollArea from "@components/scroll-area";
 import Section from "@components/section";
 import SquareImage from "@components/square-image";
+import SwitchTheme from "@components/switch-theme";
+import { isTheme } from "@theme";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
 import * as styles from "./styles.css";
@@ -18,6 +23,7 @@ import type { NextPage } from "next";
 import type { ReactNode } from "react";
 
 const Page: NextPage = () => {
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const firstViewInView = router.asPath === "/";
 
@@ -45,20 +51,7 @@ const Page: NextPage = () => {
   });
 
   const [serviceRef, serviceInView] = useInView({ once: true, rootMargin: "-30% 0%" });
-  const serviceTrails = useTrail(services.length, {
-    from: { opacity: 0, transform: "scale(0.8)" },
-    opacity: serviceInView ? 1 : 0,
-    transform: serviceInView ? "scale(1)" : "scale(0.8)",
-    config: config.stiff,
-  });
-
   const [libraryRef, libraryInView] = useInView({ once: true, rootMargin: "-30% 0%" });
-  const libraryTrails = useTrail(libraries.length, {
-    from: { opacity: 0, transform: "scale(0.8)" },
-    opacity: libraryInView ? 1 : 0,
-    transform: libraryInView ? "scale(1)" : "scale(0.8)",
-    config: config.stiff,
-  });
 
   const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
   const contactAnim = useSpring({
@@ -98,6 +91,9 @@ const Page: NextPage = () => {
               loading="lazy"
             />
           </animated.div>
+        </div>
+        <div className={styles.switchTheme}>
+          <SwitchTheme theme={isTheme(theme) ? theme : undefined} onChange={setTheme} />
         </div>
 
         <div className={styles.firstView}>
@@ -202,26 +198,7 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <ScrollArea orientation="horizontal">
-                {serviceTrails.map((style, idx) => (
-                  <Link
-                    href={services[idx].href}
-                    className={styles.textLink}
-                    target="_blank"
-                    key={`application__${services[idx].id}-${idx}`}
-                  >
-                    <animated.div style={style}>
-                      <SquareImage
-                        decoding="async"
-                        loading="lazy"
-                        {...cloudflareImages(services[idx].id)}
-                        caption={services[idx].caption}
-                        alt={services[idx].alt}
-                      />
-                    </animated.div>
-                  </Link>
-                ))}
-              </ScrollArea>
+              <WorksArea name="service" works={services} visibility={serviceInView} />
             </Article>
 
             <Article id="library" className={styles.section3} ref={libraryRef}>
@@ -231,26 +208,7 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <ScrollArea orientation="horizontal">
-                {libraryTrails.map((style, idx) => (
-                  <Link
-                    href={libraries[idx].href}
-                    className={styles.textLink}
-                    target="_blank"
-                    key={`library__${libraries[idx].id}-${idx}`}
-                  >
-                    <animated.div style={style}>
-                      <SquareImage
-                        decoding="async"
-                        loading="lazy"
-                        {...cloudflareImages(libraries[idx].id)}
-                        caption={libraries[idx].caption}
-                        alt={libraries[idx].alt}
-                      />
-                    </animated.div>
-                  </Link>
-                ))}
-              </ScrollArea>
+              <WorksArea name="library" works={libraries} visibility={libraryInView} />
             </Article>
           </Article>
         </animated.div>
@@ -312,6 +270,46 @@ type Work = {
   href: string;
   skills?: string[];
 };
+
+type WorksArea = {
+  works: Work[];
+  visibility?: boolean;
+  name: string;
+};
+const WorksArea = memo(
+  forwardRef<HTMLDivElement, WorksArea>(({ works, visibility, name }, ref) => {
+    const trails = useTrail(works.length, {
+      from: { opacity: 0, transform: "scale(0.8)" },
+      opacity: visibility ? 1 : 0,
+      transform: visibility ? "scale(1)" : "scale(0.8)",
+      config: config.stiff,
+    });
+
+    return (
+      <ScrollArea orientation="horizontal" ref={ref}>
+        {trails.map((style, idx) => (
+          <Link
+            href={works[idx].href}
+            className={styles.textLink}
+            target="_blank"
+            key={`${name}__${works[idx].id}-${idx}`}
+          >
+            <animated.div style={style}>
+              <SquareImage
+                decoding="async"
+                loading="lazy"
+                {...cloudflareImages(works[idx].id)}
+                caption={works[idx].caption}
+                alt={works[idx].alt}
+              />
+            </animated.div>
+          </Link>
+        ))}
+      </ScrollArea>
+    );
+  }),
+);
+
 const services: Work[] = [
   {
     caption: "LGTMジェネレータ",
