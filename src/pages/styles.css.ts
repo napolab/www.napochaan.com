@@ -1,28 +1,11 @@
-import { createContainer, createVar, globalStyle, style } from "@vanilla-extract/css";
+import { createContainer, createVar, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
-import { link as commonLink, mediaQueries, vars } from "@theme/css";
+import { mediaQueries, vars, fillImage } from "@theme/css";
+export { anchorLink, wrappedText, textLink, fillImage } from "@theme/css";
 
 const characterLayer = createVar();
 const firstViewContainer = createContainer();
-
-/**
- * @package
- */
-export const link = style([
-  commonLink,
-  {
-    color: vars.pallets.text.main,
-  },
-]);
-
-/**
- * @package
- */
-export const characterImage = style({
-  objectFit: "contain",
-  width: "100%",
-});
 
 /**
  * @package
@@ -174,7 +157,7 @@ export const decorationImageRoot = style({
  * @package
  */
 export const decorationImage = style([
-  characterImage,
+  fillImage,
   {
     "@media": {
       [mediaQueries.xl]: {
@@ -196,7 +179,7 @@ export const decorationImage = style([
 /**
  * @package
  */
-export const characterImageRoot = style({
+export const mainVisualRoot = style({
   position: "absolute",
   userSelect: "none",
   pointerEvents: "none",
@@ -240,7 +223,7 @@ export const firstView = style({
   containerType: "inline-size",
   position: "relative",
   width: "100%",
-  isolation: "isolate",
+  zIndex: characterLayer,
 
   "@media": {
     [mediaQueries.xl]: {
@@ -291,9 +274,10 @@ export const firstView = style({
 /**
  * @package
  */
-export const heading1 = style({
+export const pageTitle = style({
   position: "relative",
   zIndex: calc.add(characterLayer, 1),
+  display: "flex",
 
   "@media": {
     [mediaQueries.xl]: {
@@ -316,36 +300,50 @@ export const heading1 = style({
 /**
  * @package
  */
-export const anchorLink = style([
-  commonLink,
-  {
-    display: "inline-block",
-    color: vars.pallets.text.main,
-  },
-]);
-
-globalStyle(`${anchorLink} > *`, {
-  display: "inline-flex",
-});
-
-/**
- * @package
- */
 export const section1 = style({
   "@media": {
     [mediaQueries.sm]: {
-      minHeight: calc.subtract("100vh", calc.multiply(vars.space.md, 2)),
+      minHeight: calc.subtract("100vh", calc.multiply(vars.space.md, 1)),
 
       "@supports": {
         "(height: 100svh)": {
-          minHeight: calc.subtract("100svh", calc.multiply(vars.space.md, 2)),
+          minHeight: calc.subtract("100svh", calc.multiply(vars.space.md, 1)),
         },
       },
     },
   },
 });
 
-export const tileRoot = style({
+/**
+ * @package
+ */
+export const section2 = style({
+  "@media": {
+    [mediaQueries.xl]: {
+      marginTop: vars.space.xl,
+    },
+    [mediaQueries.lg]: {
+      marginTop: vars.space.xl,
+    },
+    [mediaQueries.md]: {
+      marginTop: vars.space.lg,
+    },
+    [mediaQueries.sm]: {
+      marginTop: vars.space.lg,
+    },
+  },
+});
+
+/**
+ * @package
+ */
+export const section3 = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: vars.space.md,
+});
+
+export const tile = style({
   "@media": {
     [mediaQueries.xl]: {
       padding: vars.space.lg,
@@ -392,20 +390,30 @@ export const aboutMeWrapper = style({
  * @package
  */
 export const aboutMeRoot = style([
-  tileRoot,
+  tile,
   {
     position: "relative",
     zIndex: calc.add(characterLayer, 1),
+    display: "flex",
+    flexDirection: "column",
 
     "@media": {
       [mediaQueries.xl]: {
         width: "40rem",
         borderRadius: `${vars.borderRadius.md} 0px 0px ${vars.borderRadius.md}`,
+        gap: calc.multiply(vars.space.md, 1.5),
       },
       [mediaQueries.lg]: {
         marginTop: "23.75rem",
         width: "36.5625rem",
         borderRadius: vars.borderRadius.md,
+        gap: calc.multiply(vars.space.md, 1.5),
+      },
+      [mediaQueries.md]: {
+        gap: vars.space.md,
+      },
+      [mediaQueries.sm]: {
+        gap: vars.space.md,
       },
     },
   },
@@ -421,19 +429,15 @@ export const aboutMe = style({
 
   "@media": {
     [mediaQueries.xl]: {
-      marginTop: calc.multiply(vars.space.md, 1.5),
       gap: vars.space.md,
     },
     [mediaQueries.lg]: {
-      marginTop: calc.multiply(vars.space.md, 1.5),
       gap: vars.space.md,
     },
     [mediaQueries.md]: {
-      marginTop: vars.space.md,
       gap: vars.space.sm,
     },
     [mediaQueries.sm]: {
-      marginTop: vars.space.md,
       gap: vars.space.sm,
     },
   },
@@ -442,20 +446,37 @@ export const aboutMe = style({
 /**
  * @package
  */
-export const worksWrapper = style({
-  position: "relative",
-  zIndex: calc.add(characterLayer, 1),
+export const tags = style({
+  display: "flex",
+  gap: `${vars.space.sm} ${vars.space.md}`,
+  flexWrap: "wrap",
+  "@media": {
+    [mediaQueries.sm]: {
+      fontSize: 14,
+      gap: `${vars.space.sx} ${vars.space.sm}`,
+    },
+  },
 });
 
 /**
  * @package
  */
+export const worksWrapper = style([
+  section2,
+  {
+    position: "relative",
+    zIndex: calc.subtract(characterLayer, 1),
+  },
+]);
+
+/**
+ * @package
+ */
 export const worksRoot = style([
-  tileRoot,
+  tile,
   {
     "@media": {
       [mediaQueries.xl]: {
-        marginTop: vars.space.xl,
         width: "58.875rem",
         borderRadius: `0px ${vars.space.md} ${vars.space.md} 0px`,
         display: "flex",
@@ -463,19 +484,16 @@ export const worksRoot = style([
         gap: calc.multiply(vars.space.md, 1.5),
       },
       [mediaQueries.lg]: {
-        marginTop: vars.space.xl,
         display: "flex",
         flexDirection: "column",
         gap: vars.space.md,
       },
       [mediaQueries.md]: {
-        marginTop: vars.space.lg,
         display: "flex",
         flexDirection: "column",
         gap: vars.space.md,
       },
       [mediaQueries.sm]: {
-        marginTop: vars.space.lg,
         display: "flex",
         flexDirection: "column",
         gap: vars.space.md,
@@ -487,39 +505,33 @@ export const worksRoot = style([
 /**
  * @package
  */
-export const workText = style({
-  wordBreak: "keep-all",
-  overflowWrap: "break-word",
-});
+export const contactWrapper = style([
+  section2,
+  {
+    position: "relative",
+    zIndex: calc.add(characterLayer, 1),
 
-/**
- * @package
- */
-export const contactWrapper = style({
-  position: "relative",
-  zIndex: calc.add(characterLayer, 1),
-
-  "@media": {
-    [mediaQueries.xl]: {
-      display: "flex",
-      justifyContent: "flex-end",
-    },
-    [mediaQueries.lg]: {
-      display: "flex",
-      justifyContent: "flex-end",
+    "@media": {
+      [mediaQueries.xl]: {
+        display: "flex",
+        justifyContent: "flex-end",
+      },
+      [mediaQueries.lg]: {
+        display: "flex",
+        justifyContent: "flex-end",
+      },
     },
   },
-});
+]);
 
 /**
  * @package
  */
 export const contactRoot = style([
-  tileRoot,
+  tile,
   {
     "@media": {
       [mediaQueries.xl]: {
-        marginTop: vars.space.xl,
         display: "flex",
         flexDirection: "column",
         gap: calc.multiply(vars.space.md, 1.5),
@@ -527,20 +539,17 @@ export const contactRoot = style([
         borderRadius: `${vars.borderRadius.md} 0px 0px ${vars.borderRadius.md}`,
       },
       [mediaQueries.lg]: {
-        marginTop: vars.space.xl,
         display: "flex",
         flexDirection: "column",
         gap: calc.multiply(vars.space.md, 1.5),
         width: "41.5rem",
       },
       [mediaQueries.md]: {
-        marginTop: vars.space.lg,
         display: "flex",
         flexDirection: "column",
         gap: vars.space.md,
       },
       [mediaQueries.sm]: {
-        marginTop: vars.space.lg,
         display: "flex",
         flexDirection: "column",
         gap: vars.space.md,
@@ -561,7 +570,7 @@ export const contactList = style({
 /**
  * @package
  */
-export const icon = style({
+export const contactItem = style({
   "@media": {
     [mediaQueries.xl]: {
       width: 44,

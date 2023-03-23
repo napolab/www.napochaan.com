@@ -1,6 +1,7 @@
-import { useSpring, animated, useInView, config } from "@react-spring/web";
+import { useSpring, animated, useInView, config, useChain, useSpringRef, useTrail } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
@@ -17,18 +18,49 @@ import type { NextPage } from "next";
 import type { ReactNode } from "react";
 
 const Page: NextPage = () => {
-  const [aboutRef, aboutInView] = useInView({ once: true });
-  const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
-  const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
+  const router = useRouter();
+  const firstViewInView = router.asPath === "/";
 
+  const [titleRef, titleInView] = useInView({ once: true });
+  const mainVisualAnimApi = useSpringRef();
+  const mainVisualAnim = useSpring({
+    ref: mainVisualAnimApi,
+    from: { opacity: 0 },
+    opacity: titleInView || firstViewInView ? 1 : 0,
+  });
+
+  const [aboutRef, aboutInView] = useInView({ once: true });
+  const aboutAnimApi = useSpringRef();
   const aboutAnim = useSpring({
+    ref: aboutAnimApi,
     opacity: aboutInView ? 1 : 0,
     transform: aboutInView ? "translateY(0rem)" : "translateY(0.5rem)",
   });
+  useChain([mainVisualAnimApi, aboutAnimApi], [0, 0.5]);
+
+  const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
   const worksAnim = useSpring({
     opacity: worksInView ? 1 : 0,
     transform: worksInView ? "translateY(0rem)" : "translateY(0.5rem)",
   });
+
+  const [serviceRef, serviceInView] = useInView({ once: true, rootMargin: "-30% 0%" });
+  const serviceTrails = useTrail(services.length, {
+    from: { opacity: 0, transform: "scale(0.8)" },
+    opacity: serviceInView ? 1 : 0,
+    transform: serviceInView ? "scale(1)" : "scale(0.8)",
+    config: config.stiff,
+  });
+
+  const [libraryRef, libraryInView] = useInView({ once: true, rootMargin: "-30% 0%" });
+  const libraryTrails = useTrail(libraries.length, {
+    from: { opacity: 0, transform: "scale(0.8)" },
+    opacity: libraryInView ? 1 : 0,
+    transform: libraryInView ? "scale(1)" : "scale(0.8)",
+    config: config.stiff,
+  });
+
+  const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
   const contactAnim = useSpring({
     opacity: contactInView ? 1 : 0,
     transform: contactInView ? "translateY(0rem)" : "translateY(0.5rem)",
@@ -70,11 +102,16 @@ const Page: NextPage = () => {
 
         <div className={styles.firstView}>
           <div className={styles.section1}>
-            <Heading className={styles.heading1}>napochaan.com</Heading>
+            <div className={styles.pageTitle} ref={titleRef}>
+              <Link href="/" scroll className={styles.anchorLink}>
+                <Heading>napochaan.com</Heading>
+              </Link>
+            </div>
 
-            <div className={styles.characterImageRoot}>
-              <img
-                className={styles.characterImage}
+            <div className={styles.mainVisualRoot}>
+              <animated.img
+                className={styles.fillImage}
+                style={mainVisualAnim}
                 decoding="async"
                 srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
                 src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
@@ -93,28 +130,60 @@ const Page: NextPage = () => {
               </Link>
               <div className={styles.aboutMe}>
                 <p>
-                  <Budoux>こんにちは、naporitan です。</Budoux>
-                </p>
-                <p>
                   <Budoux>
-                    僕はwebアプリケーションエンジニアで、ReactやTypeScriptを使ったフロントエンドの状態管理を得意としています。
-                  </Budoux>
-                </p>
-
-                <p>
-                  <Budoux>趣味は音楽を聴くこと、新しい技術に触れること、漫画を読むこと、FPSをすることです。</Budoux>
-                </p>
-                <p>
-                  <Budoux>
-                    TypeScriptとHaskellがお気に入りの言語で、その他にもJavaScript、Python、Ruby、Swiftもたまに書きます。
+                    自分を表現するために選んだフロントエンドという分野で自分を表現できないままソフトウェアエンジニアとして彷徨い続けている。
                   </Budoux>
                 </p>
                 <p>
                   <Budoux>
-                    最近は、i18nやa11yをWebで実現して提供する技術や、最速でユーザーにWebページを表示する技術に興味があります。
+                    現在はプログラムが持つ統一性という部分に惹かれ関数型言語のあり方を好んでおり実は関数になりたいと思っている。
                   </Budoux>
                 </p>
               </div>
+
+              <Article className={styles.section3} id="love">
+                <div>
+                  <Link href="/#love" scroll className={styles.anchorLink}>
+                    <Heading>Love</Heading>
+                  </Link>
+                </div>
+                <ul className={styles.tags}>
+                  <li>TypeScript</li>
+                  <li>Haskell</li>
+                  <li>Music(ボカロ)</li>
+                  <li>FPS</li>
+                </ul>
+              </Article>
+
+              <Article className={styles.section3} id="skill">
+                <div>
+                  <Link href="/#skill" scroll className={styles.anchorLink}>
+                    <Heading>Skill</Heading>
+                  </Link>
+                </div>
+                <ul className={styles.tags}>
+                  <li>TypeScript</li>
+                  <li>React</li>
+                  <li>CSS</li>
+                  <li>Next.js</li>
+                  <li>NestJS</li>
+                  <li>firebase</li>
+                  <li>GraphQL</li>
+                  <li>Python</li>
+                  <li>Flask</li>
+                  <li>pandas</li>
+                  <li>numpy</li>
+                  <li>scikit-learn</li>
+                  <li>Ruby</li>
+                  <li>Rails</li>
+                  <li>Swift</li>
+                  <li>ReactNative</li>
+                  <li>Cloudflare Workers</li>
+                  <li>Cloudflare Pages</li>
+                  <li>Cloudflare R2</li>
+                  <li>Cloudflare Images</li>
+                </ul>
+              </Article>
             </Article>
           </animated.div>
         </div>
@@ -126,46 +195,59 @@ const Page: NextPage = () => {
                 <Heading>Works</Heading>
               </Link>
             </div>
-            <Article id="service">
-              <Link href="/#service" className={styles.anchorLink}>
-                <Heading>Service</Heading>
-              </Link>
+            <Article id="service" className={styles.section3} ref={serviceRef}>
+              <div>
+                <Link href="/#service" scroll className={styles.anchorLink}>
+                  <Heading>Service</Heading>
+                </Link>
+              </div>
 
               <ScrollArea orientation="horizontal">
-                {services.map((item, idx) => (
-                  <Link href={item.href} className={styles.link} target="_blank" key={`application__${item.id}-${idx}`}>
-                    <SquareImage
-                      decoding="async"
-                      loading="lazy"
-                      {...cloudflareImages(item.id)}
-                      caption={item.caption}
-                      alt={item.alt}
-                    />
+                {serviceTrails.map((style, idx) => (
+                  <Link
+                    href={services[idx].href}
+                    className={styles.textLink}
+                    target="_blank"
+                    key={`application__${services[idx].id}-${idx}`}
+                  >
+                    <animated.div style={style}>
+                      <SquareImage
+                        decoding="async"
+                        loading="lazy"
+                        {...cloudflareImages(services[idx].id)}
+                        caption={services[idx].caption}
+                        alt={services[idx].alt}
+                      />
+                    </animated.div>
                   </Link>
                 ))}
               </ScrollArea>
             </Article>
 
-            <Article id="library">
-              <Link href="/#library" className={styles.anchorLink}>
-                <Heading>Library</Heading>
-              </Link>
+            <Article id="library" className={styles.section3} ref={libraryRef}>
+              <div>
+                <Link href="/#library" scroll className={styles.anchorLink}>
+                  <Heading>Library</Heading>
+                </Link>
+              </div>
 
               <ScrollArea orientation="horizontal">
-                {libraries.map((service, idx) => (
+                {libraryTrails.map((style, idx) => (
                   <Link
-                    href={service.href}
-                    className={styles.link}
+                    href={libraries[idx].href}
+                    className={styles.textLink}
                     target="_blank"
-                    key={`library__${service.id}-${idx}`}
+                    key={`library__${libraries[idx].id}-${idx}`}
                   >
-                    <SquareImage
-                      decoding="async"
-                      loading="lazy"
-                      {...cloudflareImages(service.id)}
-                      caption={service.caption}
-                      alt={service.alt}
-                    />
+                    <animated.div style={style}>
+                      <SquareImage
+                        decoding="async"
+                        loading="lazy"
+                        {...cloudflareImages(libraries[idx].id)}
+                        caption={libraries[idx].caption}
+                        alt={libraries[idx].alt}
+                      />
+                    </animated.div>
                   </Link>
                 ))}
               </ScrollArea>
@@ -176,7 +258,7 @@ const Page: NextPage = () => {
         <animated.div className={styles.contactWrapper} ref={contactRef} style={contactAnim}>
           <Article id="contact" className={styles.contactRoot}>
             <div>
-              <Link href="/#contact" className={styles.anchorLink}>
+              <Link href="/#contact" scroll className={styles.anchorLink}>
                 <Heading>SNS&nbsp;&amp;&nbsp;Contact</Heading>
               </Link>
             </div>
@@ -188,30 +270,30 @@ const Page: NextPage = () => {
               <Link
                 href="https://github.com/naporin0624"
                 target="_blank"
-                className={styles.link}
+                className={styles.textLink}
                 aria-label="github link"
                 title="github のリンク"
               >
-                <IconBrandGithubFilled className={styles.icon} aria-hidden="true" />
+                <IconBrandGithubFilled className={styles.contactItem} aria-hidden="true" />
               </Link>
 
               <Link
                 href="https://twitter.com/naporin24690"
                 target="_blank"
-                className={styles.link}
+                className={styles.textLink}
                 aria-label="twitter link"
                 title="twitter のリンク"
               >
-                <IconBrandTwitterFilled className={styles.icon} aria-hidden="true" />
+                <IconBrandTwitterFilled className={styles.contactItem} aria-hidden="true" />
               </Link>
               <Link
                 href="mailto:contact@napochaan.com"
                 target="_blank"
-                className={styles.link}
+                className={styles.textLink}
                 aria-label="email link"
                 title="email のリンク"
               >
-                <IconAt className={styles.icon} aria-hidden="true" />
+                <IconAt className={styles.contactItem} aria-hidden="true" />
               </Link>
             </div>
           </Article>
@@ -228,6 +310,7 @@ type Work = {
   alt: string;
   caption: ReactNode;
   href: string;
+  skills?: string[];
 };
 const services: Work[] = [
   {
@@ -238,7 +321,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         flat-工房買取専用
         <wbr />
         アプリの開発
@@ -250,7 +333,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         flat-工房
         <wbr />
         ネットショップ
@@ -264,7 +347,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         PROJECT BLUE
         <wbr />
         OFFICIAL HP作成
@@ -276,7 +359,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         447Records
         <wbr />
         TANAの開発
@@ -288,7 +371,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         soelu.com
         <wbr />
         instructorsページ
@@ -302,7 +385,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         soelu.com
         <wbr />
         lessonsページ
@@ -337,7 +420,7 @@ const libraries: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         vanilla-
         <wbr />
         extract-
@@ -351,7 +434,7 @@ const libraries: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         @naporin0624/
         <wbr />
         eslint-config
@@ -363,7 +446,7 @@ const libraries: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         monaco-editor
         <wbr />
         type-installer
