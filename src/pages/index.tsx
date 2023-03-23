@@ -268,6 +268,7 @@ type Work = {
   alt: string;
   caption: ReactNode;
   href: string;
+  skills?: string[];
 };
 
 type WorksArea = {
