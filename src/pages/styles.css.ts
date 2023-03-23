@@ -276,6 +276,7 @@ export const firstView = style({
 export const pageTitle = style({
   position: "relative",
   zIndex: calc.add(characterLayer, 1),
+  display: "flex",
 
   "@media": {
     [mediaQueries.xl]: {

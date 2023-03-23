@@ -1,4 +1,4 @@
-import { useSpring, animated, useInView, config } from "@react-spring/web";
+import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -21,10 +21,20 @@ const Page: NextPage = () => {
   const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
   const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
 
+  const mainVisualAnimApi = useSpringRef();
+  const mainVisualAnim = useSpring({
+    ref: mainVisualAnimApi,
+    opacity: aboutInView ? 1 : 0,
+  });
+
+  const aboutAnimApi = useSpringRef();
   const aboutAnim = useSpring({
+    ref: aboutAnimApi,
     opacity: aboutInView ? 1 : 0,
     transform: aboutInView ? "translateY(0rem)" : "translateY(0.5rem)",
   });
+  useChain([mainVisualAnimApi, aboutAnimApi], [0, 0.5]);
+
   const worksAnim = useSpring({
     opacity: worksInView ? 1 : 0,
     transform: worksInView ? "translateY(0rem)" : "translateY(0.5rem)",
@@ -70,11 +80,16 @@ const Page: NextPage = () => {
 
         <div className={styles.firstView}>
           <div className={styles.section1}>
-            <Heading className={styles.pageTitle}>napochaan.com</Heading>
+            <div className={styles.pageTitle}>
+              <Link href="/" scroll className={styles.anchorLink}>
+                <Heading>napochaan.com</Heading>
+              </Link>
+            </div>
 
             <div className={styles.mainVisualRoot}>
-              <img
+              <animated.img
                 className={styles.fillImage}
+                style={mainVisualAnim}
                 decoding="async"
                 srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
                 src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
