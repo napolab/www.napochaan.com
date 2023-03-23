@@ -35,7 +35,6 @@ export const pageRoot = style({
 export const switchTheme = style({
   position: "fixed",
   zIndex: fixedLayer,
-  
 
   "@media": {
     [mediaQueries.xl]: {
@@ -53,7 +52,7 @@ export const switchTheme = style({
     [mediaQueries.sm]: {
       right: vars.space.md,
       bottom: vars.space.md,
-    }
+    },
   },
 });
 

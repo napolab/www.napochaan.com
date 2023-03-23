@@ -1,8 +1,10 @@
+/* eslint-disable no-use-before-define */
 import { useSpring, animated, useInView, config, useChain, useSpringRef, useTrail } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
+import { forwardRef, memo } from "react";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
@@ -49,20 +51,7 @@ const Page: NextPage = () => {
   });
 
   const [serviceRef, serviceInView] = useInView({ once: true, rootMargin: "-30% 0%" });
-  const serviceTrails = useTrail(services.length, {
-    from: { opacity: 0, transform: "scale(0.8)" },
-    opacity: serviceInView ? 1 : 0,
-    transform: serviceInView ? "scale(1)" : "scale(0.8)",
-    config: config.stiff,
-  });
-
   const [libraryRef, libraryInView] = useInView({ once: true, rootMargin: "-30% 0%" });
-  const libraryTrails = useTrail(libraries.length, {
-    from: { opacity: 0, transform: "scale(0.8)" },
-    opacity: libraryInView ? 1 : 0,
-    transform: libraryInView ? "scale(1)" : "scale(0.8)",
-    config: config.stiff,
-  });
 
   const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
   const contactAnim = useSpring({
@@ -209,26 +198,7 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <ScrollArea orientation="horizontal">
-                {serviceTrails.map((style, idx) => (
-                  <Link
-                    href={services[idx].href}
-                    className={styles.textLink}
-                    target="_blank"
-                    key={`application__${services[idx].id}-${idx}`}
-                  >
-                    <animated.div style={style}>
-                      <SquareImage
-                        decoding="async"
-                        loading="lazy"
-                        {...cloudflareImages(services[idx].id)}
-                        caption={services[idx].caption}
-                        alt={services[idx].alt}
-                      />
-                    </animated.div>
-                  </Link>
-                ))}
-              </ScrollArea>
+              <WorksArea key="service" works={services} visibility={serviceInView} />
             </Article>
 
             <Article id="library" className={styles.section3} ref={libraryRef}>
@@ -238,26 +208,7 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <ScrollArea orientation="horizontal">
-                {libraryTrails.map((style, idx) => (
-                  <Link
-                    href={libraries[idx].href}
-                    className={styles.textLink}
-                    target="_blank"
-                    key={`library__${libraries[idx].id}-${idx}`}
-                  >
-                    <animated.div style={style}>
-                      <SquareImage
-                        decoding="async"
-                        loading="lazy"
-                        {...cloudflareImages(libraries[idx].id)}
-                        caption={libraries[idx].caption}
-                        alt={libraries[idx].alt}
-                      />
-                    </animated.div>
-                  </Link>
-                ))}
-              </ScrollArea>
+              <WorksArea key="library" works={libraries} visibility={libraryInView} />
             </Article>
           </Article>
         </animated.div>
@@ -317,8 +268,47 @@ type Work = {
   alt: string;
   caption: ReactNode;
   href: string;
-  skills?: string[];
 };
+
+type WorksArea = {
+  works: Work[];
+  visibility?: boolean;
+  key: string;
+};
+const WorksArea = memo(
+  forwardRef<HTMLDivElement, WorksArea>(({ works, visibility, key }, ref) => {
+    const trails = useTrail(works.length, {
+      from: { opacity: 0, transform: "scale(0.8)" },
+      opacity: visibility ? 1 : 0,
+      transform: visibility ? "scale(1)" : "scale(0.8)",
+      config: config.stiff,
+    });
+
+    return (
+      <ScrollArea orientation="horizontal" ref={ref}>
+        {trails.map((style, idx) => (
+          <Link
+            href={works[idx].href}
+            className={styles.textLink}
+            target="_blank"
+            key={`${key}__${works[idx].id}-${idx}`}
+          >
+            <animated.div style={style}>
+              <SquareImage
+                decoding="async"
+                loading="lazy"
+                {...cloudflareImages(works[idx].id)}
+                caption={works[idx].caption}
+                alt={works[idx].alt}
+              />
+            </animated.div>
+          </Link>
+        ))}
+      </ScrollArea>
+    );
+  }),
+);
+
 const services: Work[] = [
   {
     caption: "LGTMジェネレータ",
