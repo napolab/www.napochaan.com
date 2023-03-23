@@ -198,7 +198,7 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <WorksArea key="service" works={services} visibility={serviceInView} />
+              <WorksArea name="service" works={services} visibility={serviceInView} />
             </Article>
 
             <Article id="library" className={styles.section3} ref={libraryRef}>
@@ -208,7 +208,7 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <WorksArea key="library" works={libraries} visibility={libraryInView} />
+              <WorksArea name="library" works={libraries} visibility={libraryInView} />
             </Article>
           </Article>
         </animated.div>
@@ -273,10 +273,10 @@ type Work = {
 type WorksArea = {
   works: Work[];
   visibility?: boolean;
-  key: string;
+  name: string;
 };
 const WorksArea = memo(
-  forwardRef<HTMLDivElement, WorksArea>(({ works, visibility, key }, ref) => {
+  forwardRef<HTMLDivElement, WorksArea>(({ works, visibility, name }, ref) => {
     const trails = useTrail(works.length, {
       from: { opacity: 0, transform: "scale(0.8)" },
       opacity: visibility ? 1 : 0,
@@ -291,7 +291,7 @@ const WorksArea = memo(
             href={works[idx].href}
             className={styles.textLink}
             target="_blank"
-            key={`${key}__${works[idx].id}-${idx}`}
+            key={`${name}__${works[idx].id}-${idx}`}
           >
             <animated.div style={style}>
               <SquareImage
