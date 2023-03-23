@@ -223,6 +223,7 @@ export const firstView = style({
   containerType: "inline-size",
   position: "relative",
   width: "100%",
+  zIndex: characterLayer,
 
   "@media": {
     [mediaQueries.xl]: {
