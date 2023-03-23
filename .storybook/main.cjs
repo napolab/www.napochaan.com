@@ -13,10 +13,10 @@ const config = {
   features: {
     storyStoreV7: true,
   },
+  staticDirs: ["../public"],
   async viteFinal(config) {
     /** @type {{ config: import("vite").UserConfig }} */
     const { config: userConfig } = await loadConfigFromFile(path.resolve(__dirname, "../vite.config.ts"));
-
     return mergeConfig(config, {
       ...userConfig,
       base: baseURL,
@@ -46,6 +46,8 @@ const config = {
       <meta name="twitter:creator" content="@naporin24690" />
     `;
   },
+  docs: {
+    autodocs: true,
+  },
 };
-
 module.exports = config;
