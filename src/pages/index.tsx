@@ -70,11 +70,11 @@ const Page: NextPage = () => {
 
         <div className={styles.firstView}>
           <div className={styles.section1}>
-            <Heading className={styles.heading1}>napochaan.com</Heading>
+            <Heading className={styles.pageTitle}>napochaan.com</Heading>
 
-            <div className={styles.characterImageRoot}>
+            <div className={styles.mainVisualRoot}>
               <img
-                className={styles.characterImage}
+                className={styles.fillImage}
                 decoding="async"
                 srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
                 src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
@@ -104,16 +104,48 @@ const Page: NextPage = () => {
                 </p>
               </div>
 
-              <Article>
-                <Link href="/#love" scroll className={styles.anchorLink}>
-                  <Heading>Love</Heading>
-                </Link>
+              <Article className={styles.section3} id="love">
+                <div>
+                  <Link href="/#love" scroll className={styles.anchorLink}>
+                    <Heading>Love</Heading>
+                  </Link>
+                </div>
+                <ul className={styles.tags}>
+                  <li>TypeScript</li>
+                  <li>Haskell</li>
+                  <li>Music(ボカロ)</li>
+                  <li>FPS</li>
+                </ul>
               </Article>
 
-              <Article>
-                <Link href="/#fav" scroll className={styles.anchorLink}>
-                  <Heading>Favorite</Heading>
-                </Link>
+              <Article className={styles.section3} id="skill">
+                <div>
+                  <Link href="/#skill" scroll className={styles.anchorLink}>
+                    <Heading>Skill</Heading>
+                  </Link>
+                </div>
+                <ul className={styles.tags}>
+                  <li>TypeScript</li>
+                  <li>React</li>
+                  <li>CSS</li>
+                  <li>Next.js</li>
+                  <li>NestJS</li>
+                  <li>firebase</li>
+                  <li>GraphQL</li>
+                  <li>Python</li>
+                  <li>Flask</li>
+                  <li>pandas</li>
+                  <li>numpy</li>
+                  <li>scikit-learn</li>
+                  <li>Ruby</li>
+                  <li>Rails</li>
+                  <li>Swift</li>
+                  <li>ReactNative</li>
+                  <li>Cloudflare Workers</li>
+                  <li>Cloudflare Pages</li>
+                  <li>Cloudflare R2</li>
+                  <li>Cloudflare Images</li>
+                </ul>
               </Article>
             </Article>
           </animated.div>
@@ -126,14 +158,21 @@ const Page: NextPage = () => {
                 <Heading>Works</Heading>
               </Link>
             </div>
-            <Article id="service">
-              <Link href="/#service" className={styles.anchorLink}>
-                <Heading>Service</Heading>
-              </Link>
+            <Article id="service" className={styles.section3}>
+              <div>
+                <Link href="/#service" scroll className={styles.anchorLink}>
+                  <Heading>Service</Heading>
+                </Link>
+              </div>
 
               <ScrollArea orientation="horizontal">
                 {services.map((item, idx) => (
-                  <Link href={item.href} className={styles.link} target="_blank" key={`application__${item.id}-${idx}`}>
+                  <Link
+                    href={item.href}
+                    className={styles.textLink}
+                    target="_blank"
+                    key={`application__${item.id}-${idx}`}
+                  >
                     <SquareImage
                       decoding="async"
                       loading="lazy"
@@ -146,16 +185,18 @@ const Page: NextPage = () => {
               </ScrollArea>
             </Article>
 
-            <Article id="library">
-              <Link href="/#library" className={styles.anchorLink}>
-                <Heading>Library</Heading>
-              </Link>
+            <Article id="library" className={styles.section3}>
+              <div>
+                <Link href="/#library" scroll className={styles.anchorLink}>
+                  <Heading>Library</Heading>
+                </Link>
+              </div>
 
               <ScrollArea orientation="horizontal">
                 {libraries.map((service, idx) => (
                   <Link
                     href={service.href}
-                    className={styles.link}
+                    className={styles.textLink}
                     target="_blank"
                     key={`library__${service.id}-${idx}`}
                   >
@@ -176,7 +217,7 @@ const Page: NextPage = () => {
         <animated.div className={styles.contactWrapper} ref={contactRef} style={contactAnim}>
           <Article id="contact" className={styles.contactRoot}>
             <div>
-              <Link href="/#contact" className={styles.anchorLink}>
+              <Link href="/#contact" scroll className={styles.anchorLink}>
                 <Heading>SNS&nbsp;&amp;&nbsp;Contact</Heading>
               </Link>
             </div>
@@ -188,30 +229,30 @@ const Page: NextPage = () => {
               <Link
                 href="https://github.com/naporin0624"
                 target="_blank"
-                className={styles.link}
+                className={styles.textLink}
                 aria-label="github link"
                 title="github のリンク"
               >
-                <IconBrandGithubFilled className={styles.icon} aria-hidden="true" />
+                <IconBrandGithubFilled className={styles.contactItem} aria-hidden="true" />
               </Link>
 
               <Link
                 href="https://twitter.com/naporin24690"
                 target="_blank"
-                className={styles.link}
+                className={styles.textLink}
                 aria-label="twitter link"
                 title="twitter のリンク"
               >
-                <IconBrandTwitterFilled className={styles.icon} aria-hidden="true" />
+                <IconBrandTwitterFilled className={styles.contactItem} aria-hidden="true" />
               </Link>
               <Link
                 href="mailto:contact@napochaan.com"
                 target="_blank"
-                className={styles.link}
+                className={styles.textLink}
                 aria-label="email link"
                 title="email のリンク"
               >
-                <IconAt className={styles.icon} aria-hidden="true" />
+                <IconAt className={styles.contactItem} aria-hidden="true" />
               </Link>
             </div>
           </Article>
@@ -228,6 +269,7 @@ type Work = {
   alt: string;
   caption: ReactNode;
   href: string;
+  skills?: string[];
 };
 const services: Work[] = [
   {
@@ -238,7 +280,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         flat-工房買取専用
         <wbr />
         アプリの開発
@@ -250,7 +292,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         flat-工房
         <wbr />
         ネットショップ
@@ -264,7 +306,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         PROJECT BLUE
         <wbr />
         OFFICIAL HP作成
@@ -276,7 +318,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         447Records
         <wbr />
         TANAの開発
@@ -288,7 +330,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         soelu.com
         <wbr />
         instructorsページ
@@ -302,7 +344,7 @@ const services: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         soelu.com
         <wbr />
         lessonsページ
@@ -337,7 +379,7 @@ const libraries: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         vanilla-
         <wbr />
         extract-
@@ -351,7 +393,7 @@ const libraries: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         @naporin0624/
         <wbr />
         eslint-config
@@ -363,7 +405,7 @@ const libraries: Work[] = [
   },
   {
     caption: (
-      <span className={styles.workText}>
+      <span className={styles.wrappedText}>
         monaco-editor
         <wbr />
         type-installer

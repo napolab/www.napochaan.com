@@ -52,3 +52,29 @@ export const link = style({
   },
   ":focus-visible": focusRing,
 });
+
+export const fillImage = style({
+  objectFit: "contain",
+  width: "100%",
+});
+
+export const textLink = style([
+  link,
+  {
+    color: vars.pallets.text.main,
+  },
+]);
+
+export const wrappedText = style({
+  wordBreak: "keep-all",
+  overflowWrap: "break-word",
+});
+
+export const anchorLink = style([
+  link,
+  {
+    display: "inline-block",
+    color: vars.pallets.text.main,
+    textDecoration: "none",
+  },
+]);

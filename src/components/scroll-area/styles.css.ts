@@ -23,7 +23,6 @@ export const root = style({
 export const scrollArea = style({
   display: "flex",
   gap: vars.space.md,
-  marginTop: vars.space.md,
 
   "@media": {
     [mediaQueries.sm]: {
