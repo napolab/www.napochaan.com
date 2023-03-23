@@ -1,4 +1,4 @@
-import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
+import { useSpring, animated, useInView, config, useChain, useSpringRef, useTrail } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -18,8 +18,6 @@ import type { ReactNode } from "react";
 
 const Page: NextPage = () => {
   const [aboutRef, aboutInView] = useInView({ once: true });
-  const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
-  const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
 
   const mainVisualAnimApi = useSpringRef();
   const mainVisualAnim = useSpring({
@@ -35,10 +33,29 @@ const Page: NextPage = () => {
   });
   useChain([mainVisualAnimApi, aboutAnimApi], [0, 0.5]);
 
+  const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
   const worksAnim = useSpring({
     opacity: worksInView ? 1 : 0,
     transform: worksInView ? "translateY(0rem)" : "translateY(0.5rem)",
   });
+
+  const [serviceRef, serviceInView] = useInView({ once: false, rootMargin: "-30% 0%" });
+  const serviceTrails = useTrail(services.length, {
+    from: { opacity: 0, transform: "scale(0.8)" },
+    opacity: serviceInView ? 1 : 0,
+    transform: serviceInView ? "scale(1)" : "scale(0.8)",
+    config: config.stiff,
+  });
+
+  const [libraryRef, libraryInView] = useInView({ once: false, rootMargin: "-30% 0%" });
+  const libraryTrails = useTrail(libraries.length, {
+    from: { opacity: 0, transform: "scale(0.8)" },
+    opacity: libraryInView ? 1 : 0,
+    transform: libraryInView ? "scale(1)" : "scale(0.8)",
+    config: config.stiff,
+  });
+
+  const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
   const contactAnim = useSpring({
     opacity: contactInView ? 1 : 0,
     transform: contactInView ? "translateY(0rem)" : "translateY(0.5rem)",
@@ -173,7 +190,7 @@ const Page: NextPage = () => {
                 <Heading>Works</Heading>
               </Link>
             </div>
-            <Article id="service" className={styles.section3}>
+            <Article id="service" className={styles.section3} ref={serviceRef}>
               <div>
                 <Link href="/#service" scroll className={styles.anchorLink}>
                   <Heading>Service</Heading>
@@ -181,26 +198,28 @@ const Page: NextPage = () => {
               </div>
 
               <ScrollArea orientation="horizontal">
-                {services.map((item, idx) => (
+                {serviceTrails.map((style, idx) => (
                   <Link
-                    href={item.href}
+                    href={services[idx].href}
                     className={styles.textLink}
                     target="_blank"
-                    key={`application__${item.id}-${idx}`}
+                    key={`application__${services[idx].id}-${idx}`}
                   >
-                    <SquareImage
-                      decoding="async"
-                      loading="lazy"
-                      {...cloudflareImages(item.id)}
-                      caption={item.caption}
-                      alt={item.alt}
-                    />
+                    <animated.div style={style}>
+                      <SquareImage
+                        decoding="async"
+                        loading="lazy"
+                        {...cloudflareImages(services[idx].id)}
+                        caption={services[idx].caption}
+                        alt={services[idx].alt}
+                      />
+                    </animated.div>
                   </Link>
                 ))}
               </ScrollArea>
             </Article>
 
-            <Article id="library" className={styles.section3}>
+            <Article id="library" className={styles.section3} ref={libraryRef}>
               <div>
                 <Link href="/#library" scroll className={styles.anchorLink}>
                   <Heading>Library</Heading>
@@ -208,20 +227,22 @@ const Page: NextPage = () => {
               </div>
 
               <ScrollArea orientation="horizontal">
-                {libraries.map((service, idx) => (
+                {libraryTrails.map((style, idx) => (
                   <Link
-                    href={service.href}
+                    href={libraries[idx].href}
                     className={styles.textLink}
                     target="_blank"
-                    key={`library__${service.id}-${idx}`}
+                    key={`library__${libraries[idx].id}-${idx}`}
                   >
-                    <SquareImage
-                      decoding="async"
-                      loading="lazy"
-                      {...cloudflareImages(service.id)}
-                      caption={service.caption}
-                      alt={service.alt}
-                    />
+                    <animated.div style={style}>
+                      <SquareImage
+                        decoding="async"
+                        loading="lazy"
+                        {...cloudflareImages(libraries[idx].id)}
+                        caption={libraries[idx].caption}
+                        alt={libraries[idx].alt}
+                      />
+                    </animated.div>
                   </Link>
                 ))}
               </ScrollArea>
