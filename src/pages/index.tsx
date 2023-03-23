@@ -1,6 +1,7 @@
 import { useSpring, animated, useInView, config, useChain, useSpringRef, useTrail } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
@@ -17,11 +18,15 @@ import type { NextPage } from "next";
 import type { ReactNode } from "react";
 
 const Page: NextPage = () => {
+  const router = useRouter();
+  const firstViewInView = router.asPath === "/";
+
   const [titleRef, titleInView] = useInView({ once: true });
   const mainVisualAnimApi = useSpringRef();
   const mainVisualAnim = useSpring({
     ref: mainVisualAnimApi,
-    opacity: titleInView ? 1 : 0,
+    from: { opacity: 0 },
+    opacity: titleInView || firstViewInView ? 1 : 0,
   });
 
   const [aboutRef, aboutInView] = useInView({ once: true });
