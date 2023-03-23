@@ -17,14 +17,14 @@ import type { NextPage } from "next";
 import type { ReactNode } from "react";
 
 const Page: NextPage = () => {
-  const [aboutRef, aboutInView] = useInView({ once: true });
-
+  const [titleRef, titleInView] = useInView({ once: true });
   const mainVisualAnimApi = useSpringRef();
   const mainVisualAnim = useSpring({
     ref: mainVisualAnimApi,
-    opacity: aboutInView ? 1 : 0,
+    opacity: titleInView ? 1 : 0,
   });
 
+  const [aboutRef, aboutInView] = useInView({ once: true });
   const aboutAnimApi = useSpringRef();
   const aboutAnim = useSpring({
     ref: aboutAnimApi,
@@ -97,7 +97,7 @@ const Page: NextPage = () => {
 
         <div className={styles.firstView}>
           <div className={styles.section1}>
-            <div className={styles.pageTitle}>
+            <div className={styles.pageTitle} ref={titleRef}>
               <Link href="/" scroll className={styles.anchorLink}>
                 <Heading>napochaan.com</Heading>
               </Link>
