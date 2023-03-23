@@ -32,7 +32,7 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
     const [mounted, setMounted] = useState(false);
     useIsomorphicLayoutEffect(() => setMounted(true), []);
 
-    if(!mounted) return null;
+    if (!mounted) return null;
 
     return (
       <ToggleGroup.Root
