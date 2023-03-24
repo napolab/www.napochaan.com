@@ -12,7 +12,7 @@ export type SwitchThemeProps = {
   theme?: Theme;
   defaultTheme?: Theme;
   onChange?: (theme: Theme) => void;
-  orientation?: "horizontal" | "vertical";
+  orientation?: "horizontal";
 };
 
 const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(

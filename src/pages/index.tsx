@@ -4,7 +4,7 @@ import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/i
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
-import { forwardRef, memo } from "react";
+import { forwardRef, memo, useMemo } from "react";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
@@ -14,17 +14,17 @@ import ScrollArea from "@components/scroll-area";
 import Section from "@components/section";
 import SquareImage from "@components/square-image";
 import SwitchTheme from "@components/switch-theme";
+import WrappedText from "@components/wrapped-text";
 import { useMounted } from "@hooks/mounted";
-import { isTheme, useWatchSystemTheme } from "@theme";
+import { isTheme } from "@theme";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
 import * as styles from "./styles.css";
 
 import type { NextPage } from "next";
-import type { ReactNode } from "react";
+import type { ReactNode, Key } from "react";
 
 const Page: NextPage = () => {
-  const systemTheme = useWatchSystemTheme();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const mounted = useMounted();
@@ -97,7 +97,7 @@ const Page: NextPage = () => {
         </div>
         <div className={styles.switchTheme}>
           {mounted ? (
-            <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme={systemTheme} onChange={setTheme} />
+            <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
           ) : null}
         </div>
 
@@ -203,7 +203,27 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <WorksArea name="service" works={services} visibility={serviceInView} />
+              <AnimatedHorizontalScrollArea
+                items={useMemo(
+                  () =>
+                    services.map((item, idx) => ({
+                      key: `service__${item.id}-${idx}`,
+                      children: (
+                        <Link href={item.href} className={styles.textLink} target="_blank">
+                          <SquareImage
+                            decoding="async"
+                            loading="lazy"
+                            {...cloudflareImages(item.id)}
+                            caption={<WrappedText texts={item.caption} />}
+                            alt={item.alt}
+                          />
+                        </Link>
+                      ),
+                    })),
+                  [],
+                )}
+                visibility={serviceInView}
+              />
             </Article>
 
             <Article id="library" className={styles.section3} ref={libraryRef}>
@@ -213,7 +233,27 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <WorksArea name="library" works={libraries} visibility={libraryInView} />
+              <AnimatedHorizontalScrollArea
+                items={useMemo(
+                  () =>
+                    libraries.map((item, idx) => ({
+                      key: `library__{item.id}-${idx}`,
+                      children: (
+                        <Link href={item.href} className={styles.textLink} target="_blank">
+                          <SquareImage
+                            decoding="async"
+                            loading="lazy"
+                            {...cloudflareImages(item.id)}
+                            caption={<WrappedText texts={item.caption} />}
+                            alt={item.alt}
+                          />
+                        </Link>
+                      ),
+                    })),
+                  [],
+                )}
+                visibility={libraryInView}
+              />
             </Article>
           </Article>
         </animated.div>
@@ -268,22 +308,17 @@ const Page: NextPage = () => {
 
 export default Page;
 
-type Work = {
-  id: string;
-  alt: string;
-  caption: ReactNode;
-  href: string;
-  skills?: string[];
+type ScrollItem = {
+  key: Key;
+  children: ReactNode;
 };
-
-type WorksArea = {
-  works: Work[];
+type AnimatedHorizontalScrollAreaProps = {
   visibility?: boolean;
-  name: string;
+  items: ScrollItem[];
 };
-const WorksArea = memo(
-  forwardRef<HTMLDivElement, WorksArea>(({ works, visibility, name }, ref) => {
-    const trails = useTrail(works.length, {
+const AnimatedHorizontalScrollArea = memo(
+  forwardRef<HTMLDivElement, AnimatedHorizontalScrollAreaProps>(({ visibility, items }, ref) => {
+    const trails = useTrail(items.length, {
       from: { opacity: 0, transform: "scale(0.8)" },
       opacity: visibility ? 1 : 0,
       transform: visibility ? "scale(1)" : "scale(0.8)",
@@ -293,121 +328,73 @@ const WorksArea = memo(
     return (
       <ScrollArea orientation="horizontal" ref={ref}>
         {trails.map((style, idx) => (
-          <Link
-            href={works[idx].href}
-            className={styles.textLink}
-            target="_blank"
-            key={`${name}__${works[idx].id}-${idx}`}
-          >
-            <animated.div style={style}>
-              <SquareImage
-                decoding="async"
-                loading="lazy"
-                {...cloudflareImages(works[idx].id)}
-                caption={works[idx].caption}
-                alt={works[idx].alt}
-              />
-            </animated.div>
-          </Link>
+          <animated.div style={style} key={items[idx].key}>
+            {items[idx].children}
+          </animated.div>
         ))}
       </ScrollArea>
     );
   }),
 );
 
+type Work = {
+  id: string;
+  alt: string;
+  caption: string[];
+  href: string;
+};
+
 const services: Work[] = [
   {
-    caption: "LGTMジェネレータ",
+    caption: ["LGTMジェネレータ"],
     alt: "lgtmの画像",
     id: "96f54b5a-176c-4f8c-70cd-754511bd3f00",
     href: "https://lgtm.napochaan.com",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        flat-工房買取専用
-        <wbr />
-        アプリの開発
-      </span>
-    ),
+    caption: ["flat-工房買取専用", "アプリの開発"],
     alt: "買取先頭アプリのスクリーンショット",
     id: "313b54a8-620e-46dc-320d-fe74827d1900",
     href: "https://flat-kobo-kaitori.web.app/",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        flat-工房
-        <wbr />
-        ネットショップ
-        <wbr />
-        UI改善
-      </span>
-    ),
+    caption: ["flat-工房", "ネットショップ", "UI改善"],
     alt: "flatkobo.shop のスクリーンショット",
     id: "6e506cc1-daf8-4e75-84d6-a6b709e7c600",
     href: "https://flatkobo.shop",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        PROJECT BLUE
-        <wbr />
-        OFFICIAL HP作成
-      </span>
-    ),
+    caption: ["PROJECT BLUE", "OFFICIAL HP作成"],
     alt: "pjblue.jp のスクリーンショット",
     id: "94eee0af-68bf-4948-be33-3f8f036b3700",
     href: "https://pjblue.jp",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        447Records
-        <wbr />
-        TANAの開発
-      </span>
-    ),
+    caption: ["447Records", "TANAの開発"],
     alt: "tana.447pro.com のスクリーンショット",
     id: "8349bdbc-22ef-4183-8d52-fd1492747800",
     href: "https://tana.447pro.com/",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        soelu.com
-        <wbr />
-        instructorsページ
-        <wbr />
-        の開発
-      </span>
-    ),
+    caption: ["soelu.com", "instructorsページ", "の開発"],
     alt: "soelu.com/instructors のスクリーンショット",
     id: "af31f5b3-0732-4b4a-b42e-ccaf20f41d00",
     href: "https://twitter.com/naporin24690/status/1244865712490856448?s=20",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        soelu.com
-        <wbr />
-        lessonsページ
-        <wbr />
-        の開発
-      </span>
-    ),
+    caption: ["soelu.com", "lessonsページ", "の開発"],
     alt: "soelu.com/lessons のスクリーンショット",
     id: "fdd649b4-067e-4f93-493d-0770935f6900",
     href: "https://twitter.com/naporin24690/status/1227830616227344384",
   },
   {
-    caption: "名取さなさんのファンアプリ開発",
+    caption: ["名取さなさんのファンアプリ開発"],
     alt: "名取さなさんがPCの上に絶っている写真",
     id: "0f48a932-ef98-482d-a33f-68590a059e00",
     href: "https://twitter.com/naporin24690/status/1106641342506004480",
   },
   {
-    caption: "名取さなさんのファンアプリ開発",
+    caption: ["名取さなさんのファンアプリ開発"],
     alt: "タスクを操作している様子",
     id: "91b28c8e-f38b-4833-0582-2e73e12fe500",
     href: "https://twitter.com/naporin24690/status/1091367573587865601",
@@ -416,45 +403,25 @@ const services: Work[] = [
 
 const libraries: Work[] = [
   {
-    caption: "react-flowder",
+    caption: ["react-flowder"],
     alt: "npmのロゴ",
     id: "a463002e-d758-4349-3d53-024d21500c00",
     href: "https://www.npmjs.com/package/react-flowder",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        vanilla-
-        <wbr />
-        extract-
-        <wbr />
-        inline
-      </span>
-    ),
+    caption: ["vanilla-", "extract-", "inline"],
     alt: "vanilla-extractのOGP",
     id: "9fd1d1dd-e97a-443d-5d1f-37760c710a00",
     href: "https://github.com/napolab/vanilla-extract-inline",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        @naporin0624/
-        <wbr />
-        eslint-config
-      </span>
-    ),
+    caption: ["@naporin0624/", "eslint-config"],
     alt: "npmのロゴ",
     id: "a463002e-d758-4349-3d53-024d21500c00",
     href: "https://www.npmjs.com/package/@naporin0624/eslint-config",
   },
   {
-    caption: (
-      <span className={styles.wrappedText}>
-        monaco-editor
-        <wbr />
-        type-installer
-      </span>
-    ),
+    caption: ["monaco-editor", "type-installer"],
     alt: "gistのOGP",
     id: "51e0d14a-d842-4e33-f20e-70db0d117500",
     href: "https://gist.github.com/naporin0624/2c1c187950738ef4e07a755489ba49de",

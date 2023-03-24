@@ -65,11 +65,6 @@ export const textLink = style([
   },
 ]);
 
-export const wrappedText = style({
-  wordBreak: "keep-all",
-  overflowWrap: "break-word",
-});
-
 export const anchorLink = style([
   link,
   {

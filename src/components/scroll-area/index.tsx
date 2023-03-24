@@ -7,8 +7,9 @@ import type { ReactNode } from "react";
 
 export type ScrollAreaProps = {
   orientation: "horizontal";
-  children: ReactNode[];
+  children: ReactNode;
 };
+
 const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(({ orientation, children }, ref) => {
   return (
     <Root ref={ref} className={styles.root}>
