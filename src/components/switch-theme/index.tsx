@@ -1,8 +1,10 @@
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import { animated, config, useSpring } from "@react-spring/web";
 import { IconBrightnessUp, IconMoonStars } from "@tabler/icons-react";
 import { forwardRef, memo, useCallback, useState } from "react";
 
 import { isTheme } from "@theme";
+import { vars } from "@theme/css";
 
 import * as styles from "./styles.css";
 
@@ -29,6 +31,29 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
       [onChange],
     );
 
+    const lightButtonAnim = useSpring({
+      from: { transform: "scale(0)", background: "transparent" },
+      transform: value === "light" ? "scale(1)" : "scale(0)",
+      background: value === "light" ? vars.pallets.accent1 : "transparent",
+      config: config.gentle,
+    });
+    const lightIconAnim = useSpring({
+      from: { color: vars.pallets.disabled },
+      color: value === "light" ? vars.pallets.black : vars.pallets.disabled,
+      config: config.gentle,
+    });
+    const darkButtonAnim = useSpring({
+      from: { transform: "scale(0)", background: "transparent" },
+      transform: value === "dark" ? "scale(1)" : "scale(0)",
+      background: value === "dark" ? vars.pallets.black : "transparent",
+      config: config.gentle,
+    });
+    const darkIconAnim = useSpring({
+      from: { color: vars.pallets.disabled },
+      color: value === "dark" ? vars.pallets.accent1 : vars.pallets.disabled,
+      config: config.gentle,
+    });
+
     return (
       <ToggleGroup.Root
         type="single"
@@ -40,20 +65,19 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
         loop
         className={styles.switchThemeRoot}
       >
-        <ToggleGroup.Item
-          value="light"
-          aria-label="Light theme"
-          className={styles.lightButton[value === "light" ? "checked" : "default"]}
-        >
-          <IconBrightnessUp className={styles.icon} />
-        </ToggleGroup.Item>
-        <ToggleGroup.Item
-          value="dark"
-          aria-label="Dark theme"
-          className={styles.darkButton[value === "dark" ? "checked" : "default"]}
-        >
-          <IconMoonStars className={styles.icon} />
-        </ToggleGroup.Item>
+        <animated.div className={styles.thumb.light} style={lightButtonAnim} />
+        <animated.div className={styles.thumb.dark} style={darkButtonAnim} />
+
+        <animated.div style={lightIconAnim}>
+          <ToggleGroup.Item value="light" aria-label="Light theme" className={styles.button}>
+            <IconBrightnessUp className={styles.icon} />
+          </ToggleGroup.Item>
+        </animated.div>
+        <animated.div style={darkIconAnim}>
+          <ToggleGroup.Item value="dark" aria-label="Dark theme" className={styles.button}>
+            <IconMoonStars className={styles.icon} />
+          </ToggleGroup.Item>
+        </animated.div>
       </ToggleGroup.Root>
     );
   },
