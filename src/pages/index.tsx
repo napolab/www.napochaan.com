@@ -267,9 +267,10 @@ const Page: NextPage = () => {
             <p>
               <Budoux>連絡は twitter の DM が一番つながりやすいです。</Budoux>
               <Link href="https://bento.me/napochaan" target="_blank" className={styles.link}>
-                関連リンク
+                bento.me
               </Link>
             </p>
+
 
             <address className={styles.contactList}>
               <Link
@@ -318,6 +319,12 @@ type Work = {
 };
 
 const services: Work[] = [
+  {
+    caption: ["napochaan.comの作成"],
+    alt: "napochaan.comのOGP",
+    id: "46fbeda6-e4fe-4519-defc-d04bb7af4200",
+    href: "#"
+  },
   {
     caption: ["LGTMジェネレータ"],
     alt: "lgtmの画像",

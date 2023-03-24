@@ -79,6 +79,7 @@ export const decorationRoot = style({
       left: 0,
       width: "100%",
       height: "100%",
+      borderRadius: vars.borderRadius.lg,
     },
     [mediaQueries.sm]: {
       top: calc.multiply(vars.space.md, -2),

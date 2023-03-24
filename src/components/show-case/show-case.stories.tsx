@@ -7,8 +7,6 @@ import ShowCase from ".";
 import type { ShowCaseProps } from ".";
 import type { Story, Meta } from "@storybook/react";
 
-
-
 const meta: Meta = {
   title: "components/ShowCase",
   component: ShowCase,
@@ -25,4 +23,3 @@ Default.args = {
     children: <div style={{ width: 200, height: 200, background: vars.pallets.accent2 }} />,
   })),
 };
-  

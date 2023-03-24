@@ -21,7 +21,6 @@ const ShowCase = forwardRef<HTMLDivElement, ShowCaseProps>(({ visibility, items 
     config: config.stiff,
   });
 
-
   return (
     <ScrollArea orientation="horizontal" ref={ref}>
       {trails.map((style, idx) => (

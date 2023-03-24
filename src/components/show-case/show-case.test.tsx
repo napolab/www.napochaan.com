@@ -5,8 +5,6 @@ import { axe } from "vitest-axe";
 
 import ShowCase from ".";
 
-
-
 it("axe", async () => {
   const { container } = render(<ShowCase items={[]} />);
   expect(await axe(container)).toHaveNoViolations();
