@@ -267,6 +267,9 @@ const Page: NextPage = () => {
             </div>
             <p>
               <Budoux>連絡は twitter の DM が一番つながりやすいです。</Budoux>
+              <Link href="https://bento.me/napochaan" target="_blank" className={styles.link}>
+                関連リンク
+              </Link>
             </p>
 
             <div className={styles.contactList}>

@@ -31,7 +31,7 @@ export const focusRing: StyleRule = {
   outlineOffset: -2,
 };
 
-const link = style({
+export const link = style({
   display: "inline-block",
   color: vars.pallets.link.main,
   ":hover": { color: vars.pallets.link.hover },

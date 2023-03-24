@@ -2,7 +2,7 @@ import { createVar, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
 import { mediaQueries, vars, fillImage } from "@theme/css";
-export { anchorLink, textLink, fillImage } from "@theme/css";
+export { anchorLink, textLink, fillImage, link } from "@theme/css";
 
 const characterLayer = createVar();
 const fixedLayer = createVar();
