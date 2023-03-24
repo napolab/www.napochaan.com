@@ -1,17 +1,17 @@
 /* eslint-disable no-use-before-define */
-import { useSpring, animated, useInView, config, useChain, useSpringRef, useTrail } from "@react-spring/web";
+import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useTheme } from "next-themes";
-import { forwardRef, memo, useMemo } from "react";
+import { useMemo } from "react";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
 import Heading from "@components/heading";
 import PageHead from "@components/page-head";
-import ScrollArea from "@components/scroll-area";
 import Section from "@components/section";
+import ShowCase from "@components/show-case";
 import SquareImage from "@components/square-image";
 import SwitchTheme from "@components/switch-theme";
 import WrappedText from "@components/wrapped-text";
@@ -22,7 +22,6 @@ import { cloudflareImages } from "@utils/cloudflare-images";
 import * as styles from "./styles.css";
 
 import type { NextPage } from "next";
-import type { ReactNode, Key } from "react";
 
 const Page: NextPage = () => {
   const { theme, setTheme } = useTheme();
@@ -75,7 +74,7 @@ const Page: NextPage = () => {
 
   return (
     <>
-      <PageHead>{/*  */}</PageHead>
+      <PageHead />
 
       <Section className={styles.pageRoot}>
         <div className={styles.decorationRoot}>
@@ -137,7 +136,7 @@ const Page: NextPage = () => {
                 </p>
                 <p>
                   <Budoux>
-                    現在はプログラムが持つ統一性という部分に惹かれ関数型言語のあり方を好んでおり実は関数になりたいと思っている。
+                    現在はプログラムが持つ統一性という部分に惹かれ関数型言語のあり方を好んでいる。実は関数になりたいと思っている。
                   </Budoux>
                 </p>
               </div>
@@ -190,20 +189,20 @@ const Page: NextPage = () => {
         </div>
 
         <animated.div ref={worksRef} className={styles.worksWrapper} style={worksAnim}>
-          <Article id="works" className={styles.worksRoot}>
+          <Section id="works" className={styles.worksRoot}>
             <div>
               <Link href="/#works" className={styles.anchorLink}>
                 <Heading>Works</Heading>
               </Link>
             </div>
-            <Article id="service" className={styles.section3} ref={serviceRef}>
+            <Section id="service" className={styles.section3} ref={serviceRef}>
               <div>
                 <Link href="/#service" scroll className={styles.anchorLink}>
                   <Heading>Service</Heading>
                 </Link>
               </div>
 
-              <AnimatedHorizontalScrollArea
+              <ShowCase
                 items={useMemo(
                   () =>
                     services.map((item, idx) => ({
@@ -224,16 +223,16 @@ const Page: NextPage = () => {
                 )}
                 visibility={serviceInView}
               />
-            </Article>
+            </Section>
 
-            <Article id="library" className={styles.section3} ref={libraryRef}>
+            <Section id="library" className={styles.section3} ref={libraryRef}>
               <div>
                 <Link href="/#library" scroll className={styles.anchorLink}>
                   <Heading>Library</Heading>
                 </Link>
               </div>
 
-              <AnimatedHorizontalScrollArea
+              <ShowCase
                 items={useMemo(
                   () =>
                     libraries.map((item, idx) => ({
@@ -254,12 +253,12 @@ const Page: NextPage = () => {
                 )}
                 visibility={libraryInView}
               />
-            </Article>
-          </Article>
+            </Section>
+          </Section>
         </animated.div>
 
         <animated.div className={styles.contactWrapper} ref={contactRef} style={contactAnim}>
-          <Article id="contact" className={styles.contactRoot}>
+          <Section id="contact" className={styles.contactRoot}>
             <div>
               <Link href="/#contact" scroll className={styles.anchorLink}>
                 <Heading>SNS&nbsp;&amp;&nbsp;Contact</Heading>
@@ -272,7 +271,7 @@ const Page: NextPage = () => {
               </Link>
             </p>
 
-            <div className={styles.contactList}>
+            <address className={styles.contactList}>
               <Link
                 href="https://github.com/naporin0624"
                 target="_blank"
@@ -301,8 +300,8 @@ const Page: NextPage = () => {
               >
                 <IconAt className={styles.contactItem} aria-hidden="true" />
               </Link>
-            </div>
-          </Article>
+            </address>
+          </Section>
         </animated.div>
       </Section>
     </>
@@ -310,35 +309,6 @@ const Page: NextPage = () => {
 };
 
 export default Page;
-
-type ScrollItem = {
-  key: Key;
-  children: ReactNode;
-};
-type AnimatedHorizontalScrollAreaProps = {
-  visibility?: boolean;
-  items: ScrollItem[];
-};
-const AnimatedHorizontalScrollArea = memo(
-  forwardRef<HTMLDivElement, AnimatedHorizontalScrollAreaProps>(({ visibility, items }, ref) => {
-    const trails = useTrail(items.length, {
-      from: { opacity: 0, transform: "scale(0.8)" },
-      opacity: visibility ? 1 : 0,
-      transform: visibility ? "scale(1)" : "scale(0.8)",
-      config: config.stiff,
-    });
-
-    return (
-      <ScrollArea orientation="horizontal" ref={ref}>
-        {trails.map((style, idx) => (
-          <animated.div style={style} key={items[idx].key}>
-            {items[idx].children}
-          </animated.div>
-        ))}
-      </ScrollArea>
-    );
-  }),
-);
 
 type Work = {
   id: string;
