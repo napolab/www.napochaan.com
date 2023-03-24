@@ -15,7 +15,7 @@ import Section from "@components/section";
 import SquareImage from "@components/square-image";
 import SwitchTheme from "@components/switch-theme";
 import { useMounted } from "@hooks/mounted";
-import { isTheme } from "@theme";
+import { isTheme, useWatchSystemTheme } from "@theme";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
 import * as styles from "./styles.css";
@@ -24,6 +24,7 @@ import type { NextPage } from "next";
 import type { ReactNode } from "react";
 
 const Page: NextPage = () => {
+  const systemTheme = useWatchSystemTheme();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const mounted = useMounted();
@@ -95,7 +96,9 @@ const Page: NextPage = () => {
           </animated.div>
         </div>
         <div className={styles.switchTheme}>
-          {mounted ? <SwitchTheme theme={isTheme(theme) ? theme : undefined} onChange={setTheme} /> : null}
+          {mounted ? (
+            <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme={systemTheme} onChange={setTheme} />
+          ) : null}
         </div>
 
         <div className={styles.firstView}>
