@@ -38,7 +38,10 @@ export const switchTheme = style({
 
   "@media": {
     [mediaQueries.xl]: {
-      right: calc.divide(calc.subtract("100%", "1440px"), 2),
+      right: calc.divide(
+        calc.subtract("100%", `min(1440px, ${calc.subtract("100vw", calc.multiply(vars.space.lg, 2))})`),
+        2,
+      ),
       bottom: vars.space.md,
     },
     [mediaQueries.lg]: {
