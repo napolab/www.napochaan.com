@@ -24,19 +24,6 @@ globalStyle("*::selection", {
   background: vars.pallets.accent1,
 });
 
-export const visibilityHidden = style({
-  border: 0,
-  clip: "rect(0px, 0px, 0px, 0px)",
-  clipPath: "inset(50%)",
-  height: 1,
-  margin: "0px -1px -1px 0px",
-  overflow: "hidden",
-  padding: 0,
-  position: "absolute",
-  width: 1,
-  whiteSpace: "nowrap",
-});
-
 export const focusRing: StyleRule = {
   outlineStyle: "solid",
   outlineWidth: 2,
@@ -44,12 +31,10 @@ export const focusRing: StyleRule = {
   outlineOffset: -2,
 };
 
-export const link = style({
+const link = style({
   display: "inline-block",
   color: vars.pallets.link.main,
-  ":hover": {
-    color: vars.pallets.link.hover,
-  },
+  ":hover": { color: vars.pallets.link.hover },
   ":focus-visible": focusRing,
 });
 
@@ -58,12 +43,7 @@ export const fillImage = style({
   width: "100%",
 });
 
-export const textLink = style([
-  link,
-  {
-    color: vars.pallets.text.main,
-  },
-]);
+export const textLink = style([link, { color: vars.pallets.text.main }]);
 
 export const anchorLink = style([
   link,

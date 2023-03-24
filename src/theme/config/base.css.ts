@@ -67,16 +67,9 @@ export const vars = createGlobalThemeContract(
       notoSansJP: "noto-sans-jp",
       poppins: "poppins",
     },
-    easing: {
-      easeInOutCirc: null,
-    },
   },
   (value, path) => value ?? path.join("-"),
 );
-
-createGlobalTheme(":root", vars.easing, {
-  easeInOutCirc: "cubic-bezier(0.79,0.14,0.15,0.86)",
-});
 
 createGlobalTheme(":root", vars.space, {
   xs: "calc(1rem / 4)",
