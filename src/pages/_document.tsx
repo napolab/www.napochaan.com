@@ -3,8 +3,7 @@ import { Html, Head, Main, NextScript } from "next/document";
 import type { DocumentProps } from "next/document";
 import type { FC } from "react";
 
-const description =
-  "こんにちは、 naporitanです！僕はアプリケーション開発やReact, TypeScriptが得意で、新しい技術に触れたり、音楽を聴いたり、FPSをすることが好きです。";
+const description = "ReactとTypeScriptのオタクだったりオタクじゃなかったりします。";
 
 const Document: FC<DocumentProps> = () => {
   return (
@@ -22,7 +21,7 @@ const Document: FC<DocumentProps> = () => {
 
         <meta
           name="keywords"
-          content="naporitan,WebApplicationDeveloper,React,TypeScript,FrontEnd,StateManagement,JavaScript,Python,Ruby,Swift,Haskell"
+          content="naporitan,engineer,web,application,react,typescript,frontend,statemanagement,javascript,python,ruby,swift,haskell"
         />
         <meta name="author" content="naporitan" />
         <meta name="description" content={description} />
@@ -42,7 +41,7 @@ const Document: FC<DocumentProps> = () => {
           name="twitter:image"
           content="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/46fbeda6-e4fe-4519-defc-d04bb7af4200/ogp"
         />
-        <meta name="twitter:description" content="ReactとTypeScriptのオタクだったりオタクじゃなかったりします。" />
+        <meta name="twitter:description" content={description} />
         <meta name="twitter:site" content="@naporin24690" />
         <meta name="twitter:creator" content="@naporin24690" />
       </Head>
