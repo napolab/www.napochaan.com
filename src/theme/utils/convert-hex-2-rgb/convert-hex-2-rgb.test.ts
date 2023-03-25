@@ -33,5 +33,5 @@ test("empty pallets", () => {
 });
 
 test("not hex pallets", () => {
-  expect(() => convertHex2Rgb({ color: "red " })).toThrow();
+  expect(convertHex2Rgb({ color: "red " })).toEqual({ color: "" });
 });

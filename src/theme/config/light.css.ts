@@ -31,6 +31,8 @@ export const pallets = {
     main: "#CCCCCC",
     focus: "#336699",
   },
+  overlay: "rgba(0, 0, 0, 0.44)",
+  shadow: `0px ${vars.space.xs} ${vars.space.xs} rgba(${vars.pallets.rgb.black}, 0.25)`,
   scrollbar: {
     background: {
       main: "#B3B3B3",

@@ -1,3 +1,5 @@
+import { vars } from "@theme/css";
+
 import ScrollArea from ".";
 
 import type { ScrollAreaProps } from ".";
@@ -14,11 +16,11 @@ export const Default: Story<ScrollAreaProps> = () => {
   return (
     <div style={{ maxWidth: 500 }}>
       <ScrollArea orientation="horizontal">
-        <div style={{ width: 160, height: 160, background: "red" }}></div>
-        <div style={{ width: 160, height: 160, background: "red" }}></div>
-        <div style={{ width: 160, height: 160, background: "red" }}></div>
-        <div style={{ width: 160, height: 160, background: "red" }}></div>
-        <div style={{ width: 160, height: 160, background: "red" }}></div>
+        <div style={{ width: 160, height: 160, background: vars.pallets.text.main }} />
+        <div style={{ width: 160, height: 160, background: vars.pallets.text.main }} />
+        <div style={{ width: 160, height: 160, background: vars.pallets.text.main }} />
+        <div style={{ width: 160, height: 160, background: vars.pallets.text.main }} />
+        <div style={{ width: 160, height: 160, background: vars.pallets.text.main }} />
       </ScrollArea>
     </div>
   );

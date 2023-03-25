@@ -3,7 +3,6 @@ import { calc } from "@vanilla-extract/css-utils";
 
 import { focusRing, vars } from "@theme/css";
 
-const shadow = createVar();
 const layer = createVar();
 const size = createVar();
 const offset = createVar();
@@ -12,7 +11,6 @@ const offset = createVar();
  */
 export const switchThemeRoot = style({
   vars: {
-    [shadow]: `0px ${vars.space.xs} ${vars.space.xs} rgba(${vars.pallets.rgb.black}, 0.25)`,
     [layer]: "2",
     [size]: "44px",
     [offset]: vars.space.xs,
@@ -24,7 +22,7 @@ export const switchThemeRoot = style({
   gap: vars.space.xs,
   padding: offset,
   borderRadius: vars.borderRadius.xs,
-  boxShadow: `inset ${shadow}`,
+  boxShadow: `inset ${vars.pallets.shadow}`,
 });
 
 const baseThumb = style({
@@ -34,7 +32,7 @@ const baseThumb = style({
   width: size,
   height: size,
   borderRadius: vars.borderRadius.xs,
-  boxShadow: `${shadow}, ${shadow}`,
+  boxShadow: `${vars.pallets.shadow}, ${vars.pallets.shadow}`,
 });
 /**
  * @package

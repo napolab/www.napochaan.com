@@ -79,6 +79,7 @@ export const decorationRoot = style({
       left: 0,
       width: "100%",
       height: "100%",
+      borderRadius: vars.borderRadius.lg,
     },
     [mediaQueries.sm]: {
       top: calc.multiply(vars.space.md, -2),
@@ -627,4 +628,24 @@ export const contactItem = style({
       height: 36,
     },
   },
+});
+
+/**
+ * @package
+ */
+export const dialogContent = style({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-end",
+  gap: vars.space.md,
+});
+
+/**
+ * @package
+ */
+export const description = style({
+  lineHeight: 1.8,
+  letterSpacing: 1.2,
+  fontSize: 18,
+  whiteSpace: "pre-wrap",
 });
