@@ -629,3 +629,23 @@ export const contactItem = style({
     },
   },
 });
+
+/**
+ * @package
+ */
+export const dialogContent = style({
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "flex-end",
+  gap: vars.space.md,
+});
+
+/**
+ * @package
+ */
+export const description = style({
+  lineHeight: 1.8,
+  letterSpacing: 1.2,
+  fontSize: 18,
+  whiteSpace: "pre-wrap",
+});
