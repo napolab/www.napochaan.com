@@ -1,4 +1,4 @@
-import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import { Root, Item } from "@radix-ui/react-toggle-group";
 import { animated, config, useSpring } from "@react-spring/web";
 import { IconBrightnessUp, IconMoonStars } from "@tabler/icons-react";
 import { forwardRef, memo, useCallback, useState } from "react";
@@ -55,7 +55,7 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
     });
 
     return (
-      <ToggleGroup.Root
+      <Root
         type="single"
         ref={ref}
         defaultValue={defaultTheme}
@@ -69,16 +69,16 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
         <animated.div className={styles.thumb.dark} style={darkButtonAnim} />
 
         <animated.div style={lightIconAnim}>
-          <ToggleGroup.Item value="light" aria-label="Light theme" className={styles.button}>
+          <Item value="light" aria-label="Light theme" className={styles.button}>
             <IconBrightnessUp className={styles.icon} />
-          </ToggleGroup.Item>
+          </Item>
         </animated.div>
         <animated.div style={darkIconAnim}>
-          <ToggleGroup.Item value="dark" aria-label="Dark theme" className={styles.button}>
+          <Item value="dark" aria-label="Dark theme" className={styles.button}>
             <IconMoonStars className={styles.icon} />
-          </ToggleGroup.Item>
+          </Item>
         </animated.div>
-      </ToggleGroup.Root>
+      </Root>
     );
   },
 );

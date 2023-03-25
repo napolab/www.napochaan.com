@@ -271,7 +271,6 @@ const Page: NextPage = () => {
               </Link>
             </p>
 
-
             <address className={styles.contactList}>
               <Link
                 href="https://github.com/naporin0624"
@@ -323,7 +322,7 @@ const services: Work[] = [
     caption: ["napochaan.comの作成"],
     alt: "napochaan.comのOGP",
     id: "46fbeda6-e4fe-4519-defc-d04bb7af4200",
-    href: "#"
+    href: "#",
   },
   {
     caption: ["LGTMジェネレータ"],
