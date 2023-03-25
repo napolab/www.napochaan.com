@@ -31,7 +31,7 @@ const Heading: FC<HeadingProps> = forwardRef<HTMLHeadingElement, HeadingProps>(
     }
 
     return (
-      <Component className={clsx(styles.headingRoot[type], className)} ref={ref} {...props}>
+      <Component className={clsx(styles.heading[type], className)} ref={ref} {...props}>
         <span>{"#".repeat(level)}</span>
         <span>{children}</span>
       </Component>
