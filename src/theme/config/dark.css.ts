@@ -28,6 +28,7 @@ export const pallets = {
   white: "#ffffff",
   black: "#333333",
   overlay: "rgba(0, 0, 0, 0.44)",
+  shadow: `0px ${vars.space.xs} ${vars.space.xs} rgba(${vars.pallets.rgb.black}, 0.25)`,
   border: {
     main: "#CCCCCC",
     focus: "#66B2FF",
