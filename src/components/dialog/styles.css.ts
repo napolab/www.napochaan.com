@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { createVar, style } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
 import { focusRing, heading, mediaQueries, vars } from "@theme/css";
@@ -42,12 +42,6 @@ export const content = style({
   padding: vars.space.md,
   boxShadow: vars.pallets.shadow,
 
-  "@supports": {
-    "(height: 100svh)": {
-      maxHeight: "85svh",
-    },
-  },
-
   "@media": {
     [mediaQueries.sm]: {
       top: "unset",
@@ -58,11 +52,6 @@ export const content = style({
       width: "100%",
       height: "60vh",
       borderRadius: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
-      "@supports": {
-        "(height: 100svh)": {
-          height: "60svh",
-        },
-      },
     },
   },
 });
@@ -103,6 +92,68 @@ export const titleRoot = style({
 export const border = style({
   height: 1,
   background: vars.pallets.border.main,
+});
+
+const scrollbarSize = createVar();
+/**
+ * @package
+ */
+export const scrollArea = style({
+  vars: {
+    [scrollbarSize]: "10px",
+  },
+  height: "100%",
+  overflow: "hidden",
+  paddingRight: calc.add(scrollbarSize, vars.space.sm),
+});
+
+/**
+ * @package
+ */
+export const viewport = style({
+  width: "100%",
+  height: "100%",
+});
+
+/**
+ * @package
+ */
+export const scrollbar = style({
+  display: "flex",
+  flexDirection: "column",
+  width: scrollbarSize,
+  userSelect: "none",
+  touchAction: "none",
+  padding: 2,
+  borderRadius: vars.borderRadius.xl,
+  background: vars.pallets.scrollbar.background.main,
+  transition: "background 0.3s ease",
+
+  ":hover": {
+    background: vars.pallets.scrollbar.background.hover,
+  },
+});
+
+/**
+ * @package
+ */
+export const thumb = style({
+  position: "relative",
+  flex: 1,
+  background: vars.pallets.scrollbar.thumb,
+  borderRadius: "inherit",
+
+  ":before": {
+    content: "",
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: "100%",
+    height: "100%",
+    minWidth: 44,
+    minHeight: 44,
+  },
 });
 
 /**

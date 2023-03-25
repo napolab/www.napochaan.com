@@ -1,4 +1,11 @@
 import { Close, Content, Description, Overlay, Portal, Root, Title, Trigger } from "@radix-ui/react-dialog";
+import {
+  Root as ScrollArea,
+  ScrollAreaCorner,
+  ScrollAreaScrollbar,
+  ScrollAreaThumb,
+  ScrollAreaViewport,
+} from "@radix-ui/react-scroll-area";
 import { Root as Separator } from "@radix-ui/react-separator";
 import { animated, config, useTransition } from "@react-spring/web";
 import { IconX } from "@tabler/icons-react";
@@ -42,7 +49,6 @@ const smAnim: UseTransitionProps = {
 export const DialogContent = memo(
   forwardRef<HTMLDivElement, DialogContentProps>(({ children, title, description }, external) => {
     const { open, size } = useContext(Context);
-
     const transitions = useTransition(open, size !== "sm" ? anim : smAnim);
 
     return (
@@ -69,7 +75,14 @@ export const DialogContent = memo(
                       <Separator className={styles.border} />
                     </div>
 
-                    <div>{children}</div>
+                    <ScrollArea className={styles.scrollArea}>
+                      <ScrollAreaViewport className={styles.viewport}>{children}</ScrollAreaViewport>
+
+                      <ScrollAreaScrollbar orientation="vertical" forceMount className={styles.scrollbar}>
+                        <ScrollAreaThumb className={styles.thumb} />
+                      </ScrollAreaScrollbar>
+                      <ScrollAreaCorner />
+                    </ScrollArea>
                   </animated.div>
                 </Content>
               </>
