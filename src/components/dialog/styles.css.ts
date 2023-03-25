@@ -56,11 +56,11 @@ export const content = style({
       maxWidth: "none",
       maxHeight: "none",
       width: "100%",
-      height: "95vh",
+      height: "60vh",
       borderRadius: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
       "@supports": {
         "(height: 100svh)": {
-          height: "95svh",
+          height: "60svh",
         },
       },
     },
