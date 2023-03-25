@@ -8,6 +8,7 @@ import { useMemo } from "react";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
+import { DialogRoot, DialogContent, DialogTrigger } from "@components/dialog";
 import Heading from "@components/heading";
 import PageHead from "@components/page-head";
 import Section from "@components/section";
@@ -209,15 +210,18 @@ const Page: NextPage = () => {
                     services.map((item, idx) => ({
                       key: `service__${item.id}-${idx}`,
                       children: (
-                        <Link href={item.href} className={styles.textLink} target="_blank">
-                          <SquareImage
-                            decoding="async"
-                            loading="lazy"
-                            {...cloudflareImages(item.id)}
-                            caption={<WrappedText texts={item.caption} />}
-                            alt={item.alt}
-                          />
-                        </Link>
+                        <DialogRoot>
+                          <DialogTrigger className={styles.trigger}>
+                            <SquareImage
+                              decoding="async"
+                              loading="lazy"
+                              {...cloudflareImages(item.id)}
+                              caption={<WrappedText texts={item.caption} />}
+                              alt={item.alt}
+                            />
+                          </DialogTrigger>
+                          <DialogContent title={item.caption}>aaaaaaaaaaaaa</DialogContent>
+                        </DialogRoot>
                       ),
                     })),
                   [],
