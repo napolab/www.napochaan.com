@@ -48,4 +48,5 @@ export const captionRoot = style({
   fontSize: vars.typography.body,
   lineHeight: 1.5,
   letterSpacing: "0.01em",
+  textAlign: "left",
 });
