@@ -171,8 +171,9 @@ const Page: NextPage = () => {
                   <li>GraphQL</li>
                   <li>Python</li>
                   <li>Flask</li>
+                  <li>FastAPI</li>
                   <li>pandas</li>
-                  <li>numpy</li>
+                  <li>NumPy</li>
                   <li>scikit-learn</li>
                   <li>Ruby</li>
                   <li>Rails</li>
