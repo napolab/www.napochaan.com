@@ -29,6 +29,7 @@ const pallets = {
   disabled: null,
   white: null,
   black: null,
+  overlay: null,
   scrollbar: {
     background: {
       main: null,
@@ -43,7 +44,7 @@ export const vars = createGlobalThemeContract(
   {
     pallets: {
       ...pallets,
-      rgb: pallets,
+      rgb: pallets as Omit<typeof pallets, "overlay">,
     },
     borderRadius: {
       xs: null,

@@ -27,6 +27,7 @@ export const pallets = {
   disabled: "#A5A5A5",
   white: "#ffffff",
   black: "#333333",
+  overlay: "rgba(0, 0, 0, 0.44)",
   border: {
     main: "#CCCCCC",
     focus: "#66B2FF",

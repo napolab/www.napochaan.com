@@ -1,9 +1,13 @@
 import hexRgb from "hex-rgb";
 
-const decimalize = (hex: string): string => {
-  const { red, blue, green } = hexRgb(hex);
+const decimalize = (color: string): string => {
+  if (color.startsWith("#")) {
+    const { red, blue, green } = hexRgb(color);
 
-  return `${red}, ${green}, ${blue}`;
+    return `${red}, ${green}, ${blue}`;
+  }
+
+  return color;
 };
 type Pallets = {
   [key: string]: Pallets | string;
