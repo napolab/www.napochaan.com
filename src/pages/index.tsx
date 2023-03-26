@@ -375,7 +375,7 @@ const services: Work[] = [
     id: "8349bdbc-22ef-4183-8d52-fd1492747800",
     href: "https://tana.447pro.com/",
     content:
-      "447RecordsTANA の開発の開発を担当した。主にオーディオプレイヤー周りを実装した。\n React で作る複雑な UI に初めて取り組み、AppleMusic のようなインタラクションになるように目指した。",
+      "447RecordsTANA の開発を担当した。主にオーディオプレイヤー周りを実装した。\n React で作る複雑な UI に初めて取り組み、AppleMusic のようなインタラクションになるように目指した。",
   },
   {
     caption: ["instructorsページ", "の開発"],
