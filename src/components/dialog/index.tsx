@@ -1,6 +1,6 @@
 import { Close, Content, Description, Overlay, Portal, Root, Title, Trigger } from "@radix-ui/react-dialog";
 import { Root as Separator } from "@radix-ui/react-separator";
-import { animated, config, useTransition } from "@react-spring/web";
+import { animated, useTransition } from "@react-spring/web";
 import { IconX } from "@tabler/icons-react";
 import { createContext, forwardRef, memo, useCallback, useContext, useMemo, useState } from "react";
 import { useMedia } from "use-media";
@@ -28,17 +28,27 @@ export type DialogContentProps = {
 };
 
 const anim: UseTransitionProps = {
-  from: { opacity: 0.1, transform: "translate(-50%, -10%)" },
+  from: { opacity: 0.1, transform: "translate(-50%, -25%)" },
   enter: { opacity: 1, transform: "translate(-50%, -50%)" },
-  leave: { opacity: 0, transform: "translate(-50%, -10%)" },
-  config: config.gentle,
+  leave: { opacity: 0, transform: "translate(-50%, -25%)" },
+  config: {
+  mass: 0.8,
+  tension: 140,
+  friction: 16,
+  precision: 0.016,
+  velocity: 0.015
+}
 };
 
 const smAnim: UseTransitionProps = {
   from: { opacity: 1, transform: "translate(0%, 100%) scale(1)" },
   enter: { opacity: 1, transform: "translate(0%, 0%) scale(1)" },
-  leave: { opacity: 1, transform: "translate(0%, 100%) scale(1)" },
+  leave: { op25ity: 1, transform: "translate(0%, 100%) scale(1)" },
+  config: {
+    tension: 230,
+  }
 };
+
 
 export const DialogContent = memo(
   forwardRef<HTMLDivElement, DialogContentProps>(({ children, title, description }, external) => {
