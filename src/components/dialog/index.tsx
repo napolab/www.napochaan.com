@@ -57,9 +57,7 @@ export const DialogContent = memo(
           <>
             {show ? (
               <>
-                <Overlay className={styles.overlay} asChild>
-                  <animated.div />
-                </Overlay>
+                <Overlay className={styles.overlay} />
                 <Content ref={external}>
                   <animated.div style={style} className={styles.content}>
                     <div className={styles.header}>
