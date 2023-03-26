@@ -3,6 +3,8 @@ import { forwardRef, memo } from "react";
 
 import ScrollArea from "@components/scroll-area";
 
+import * as styles from "./styles.css";
+
 import type { Key, ReactNode, FC } from "react";
 
 type Item = {
@@ -23,11 +25,13 @@ const ShowCase = forwardRef<HTMLDivElement, ShowCaseProps>(({ visibility, items 
 
   return (
     <ScrollArea orientation="horizontal" ref={ref}>
-      {trails.map((style, idx) => (
-        <animated.div style={style} key={items[idx].key}>
-          {items[idx].children}
-        </animated.div>
-      ))}
+      <div className={styles.scrollArea}>
+        {trails.map((style, idx) => (
+          <animated.div style={style} key={items[idx].key}>
+            {items[idx].children}
+          </animated.div>
+        ))}
+      </div>
     </ScrollArea>
   );
 }) satisfies FC<ShowCaseProps>;

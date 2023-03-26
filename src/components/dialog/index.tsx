@@ -1,17 +1,11 @@
 import { Close, Content, Description, Overlay, Portal, Root, Title, Trigger } from "@radix-ui/react-dialog";
-import {
-  Root as ScrollArea,
-  ScrollAreaCorner,
-  ScrollAreaScrollbar,
-  ScrollAreaThumb,
-  ScrollAreaViewport,
-} from "@radix-ui/react-scroll-area";
 import { Root as Separator } from "@radix-ui/react-separator";
 import { animated, config, useTransition } from "@react-spring/web";
 import { IconX } from "@tabler/icons-react";
 import { createContext, forwardRef, memo, useCallback, useContext, useMemo, useState } from "react";
 import { useMedia } from "use-media";
 
+import ScrollArea from "@components/scroll-area";
 import { mediaQueries } from "@theme/css";
 import { clsx } from "@utils/clsx";
 
@@ -72,15 +66,10 @@ export const DialogContent = memo(
                       {description ? <Description>{description}</Description> : null}
                       <Separator className={styles.border} />
                     </div>
-
-                    <ScrollArea className={styles.scrollArea}>
-                      <ScrollAreaViewport className={styles.viewport}>{children}</ScrollAreaViewport>
-
-                      <ScrollAreaScrollbar orientation="vertical" forceMount className={styles.scrollbar}>
-                        <ScrollAreaThumb className={styles.thumb} />
-                      </ScrollAreaScrollbar>
-                      <ScrollAreaCorner />
+                    <ScrollArea orientation="vertical" scrollbar="all">
+                      {children}
                     </ScrollArea>
+
                   </animated.div>
                 </Content>
               </>

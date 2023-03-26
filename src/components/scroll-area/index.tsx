@@ -6,18 +6,17 @@ import * as styles from "./styles.css";
 import type { ReactNode } from "react";
 
 export type ScrollAreaProps = {
-  orientation: "horizontal";
+  orientation: "horizontal" | "vertical";
   children: ReactNode;
+  scrollbar?: "hover" | "all" 
 };
 
-const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(({ orientation, children }, ref) => {
+const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(({ orientation, children, scrollbar }, ref) => {
   return (
-    <Root ref={ref} className={styles.root}>
-      <Viewport>
-        <div className={styles.scrollArea}>{children}</div>
-      </Viewport>
+    <Root ref={ref} className={styles.root[orientation]}>
+      <Viewport className={styles.viewport}>{children}</Viewport>
 
-      <Scrollbar orientation={orientation} className={styles.scrollbar}>
+      <Scrollbar orientation={orientation} className={styles.scrollbar[orientation]} forceMount={scrollbar === "all" ? true : undefined}>
         <Thumb className={styles.thumb} />
       </Scrollbar>
       <Corner />

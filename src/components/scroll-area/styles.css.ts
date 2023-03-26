@@ -1,43 +1,51 @@
-import { createVar, style } from "@vanilla-extract/css";
+import { createVar, style, styleVariants } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
-import { focusRing, mediaQueries, vars } from "@theme/css";
+import { focusRing, vars } from "@theme/css";
 
 const scrollbarSize = createVar();
-/**
- * @package
- */
-export const root = style({
+
+const _root = style({
   vars: {
     [scrollbarSize]: "10px",
   },
   position: "relative",
   isolation: "isolate",
   ":focus-visible": focusRing,
-  paddingBottom: calc.add(scrollbarSize, vars.space.sm),
 });
-
 /**
  * @package
  */
-export const scrollArea = style({
-  display: "flex",
-  gap: vars.space.md,
-
-  "@media": {
-    [mediaQueries.sm]: {
-      gap: vars.space.sm,
+export const root = styleVariants({
+  horizontal: [
+    _root,
+    {
+      width: "100%",
+      overflow: "hidden",
+      paddingBottom: calc.add(scrollbarSize, vars.space.sm),
     },
-  },
+  ],
+  vertical: [
+    _root,
+    {
+      height: "100%",
+      overflow: "hidden",
+      paddingRight: calc.add(scrollbarSize, vars.space.sm),
+    },
+  ],
 });
 
 /**
  * @package
  */
-export const scrollbar = style({
+export const viewport = style({
+  width: "100%",
+  height: "100%",
+});
+
+
+const _scrollbar = style({
   display: "flex",
-  flexDirection: "column",
-  height: scrollbarSize,
   userSelect: "none",
   touchAction: "none",
   padding: 2,
@@ -48,6 +56,18 @@ export const scrollbar = style({
   ":hover": {
     background: vars.pallets.scrollbar.background.hover,
   },
+});
+/**
+ * @package
+ */
+export const scrollbar = styleVariants({
+  horizontal: [_scrollbar, {
+    height: scrollbarSize,
+    flexDirection: "column",
+  }],
+  vertical: [_scrollbar, {
+    width: scrollbarSize,
+  }],
 });
 
 /**
