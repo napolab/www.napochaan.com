@@ -30,7 +30,6 @@ export const Horizontal: Story<ScrollAreaProps> = () => {
   );
 };
 
-
 export const Vertical: Story<ScrollAreaProps> = () => {
   return (
     <div style={{ height: 500, width: calc.add("160px", calc.multiply(vars.space.sm, 2)) }}>

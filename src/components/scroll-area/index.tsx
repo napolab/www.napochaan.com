@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 export type ScrollAreaProps = {
   orientation: "horizontal" | "vertical";
   children: ReactNode;
-  scrollbar?: "hover" | "all" 
+  scrollbar?: "hover" | "all";
 };
 
 const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(({ orientation, children, scrollbar }, ref) => {
@@ -16,7 +16,11 @@ const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(({ orientation, c
     <Root ref={ref} className={styles.root[orientation]}>
       <Viewport className={styles.viewport}>{children}</Viewport>
 
-      <Scrollbar orientation={orientation} className={styles.scrollbar[orientation]} forceMount={scrollbar === "all" ? true : undefined}>
+      <Scrollbar
+        orientation={orientation}
+        className={styles.scrollbar[orientation]}
+        forceMount={scrollbar === "all" ? true : undefined}
+      >
         <Thumb className={styles.thumb} />
       </Scrollbar>
       <Corner />

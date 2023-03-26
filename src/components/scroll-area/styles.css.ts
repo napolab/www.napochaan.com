@@ -43,7 +43,6 @@ export const viewport = style({
   height: "100%",
 });
 
-
 const _scrollbar = style({
   display: "flex",
   userSelect: "none",
@@ -61,13 +60,19 @@ const _scrollbar = style({
  * @package
  */
 export const scrollbar = styleVariants({
-  horizontal: [_scrollbar, {
-    height: scrollbarSize,
-    flexDirection: "column",
-  }],
-  vertical: [_scrollbar, {
-    width: scrollbarSize,
-  }],
+  horizontal: [
+    _scrollbar,
+    {
+      height: scrollbarSize,
+      flexDirection: "column",
+    },
+  ],
+  vertical: [
+    _scrollbar,
+    {
+      width: scrollbarSize,
+    },
+  ],
 });
 
 /**
