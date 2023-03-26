@@ -74,6 +74,24 @@ const Page: NextPage = () => {
     delay: 800,
   });
 
+  const serviceItems = useMemo(
+    () =>
+      services.map((item, idx) => ({
+        key: `service__${item.id}-${idx}`,
+        children: <WorkItem {...item} />,
+      })),
+    [],
+  );
+
+  const libraryItems = useMemo(
+    () =>
+      libraries.map((item, idx) => ({
+        key: `library__{item.id}-${idx}`,
+        children: <WorkItem {...item} />,
+      })),
+    [],
+  );
+
   return (
     <>
       <PageHead />
@@ -205,17 +223,7 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <ShowCase
-                items={useMemo(
-                  () =>
-                    services.map((item, idx) => ({
-                      key: `service__${item.id}-${idx}`,
-                      children: <WorkItem {...item} />,
-                    })),
-                  [],
-                )}
-                visibility={serviceInView}
-              />
+              <ShowCase items={serviceItems} visibility={serviceInView} />
             </Section>
 
             <Section id="library" className={styles.section3} ref={libraryRef}>
@@ -225,17 +233,7 @@ const Page: NextPage = () => {
                 </Link>
               </div>
 
-              <ShowCase
-                items={useMemo(
-                  () =>
-                    libraries.map((item, idx) => ({
-                      key: `library__{item.id}-${idx}`,
-                      children: <WorkItem {...item} />,
-                    })),
-                  [],
-                )}
-                visibility={libraryInView}
-              />
+              <ShowCase items={libraryItems} visibility={libraryInView} />
             </Section>
           </Section>
         </animated.div>
