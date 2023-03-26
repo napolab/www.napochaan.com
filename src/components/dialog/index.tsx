@@ -32,12 +32,12 @@ const anim: UseTransitionProps = {
   enter: { opacity: 1, transform: "translate(-50%, -50%)" },
   leave: { opacity: 0, transform: "translate(-50%, -25%)" },
   config: {
-  mass: 0.8,
-  tension: 140,
-  friction: 16,
-  precision: 0.016,
-  velocity: 0.015
-}
+    mass: 0.8,
+    tension: 140,
+    friction: 16,
+    precision: 0.016,
+    velocity: 0.015,
+  },
 };
 
 const smAnim: UseTransitionProps = {
@@ -45,10 +45,12 @@ const smAnim: UseTransitionProps = {
   enter: { opacity: 1, transform: "translate(0%, 0%) scale(1)" },
   leave: { op25ity: 1, transform: "translate(0%, 100%) scale(1)" },
   config: {
-    tension: 230,
-  }
+    tension: 280,
+    friction: 30,
+    precision: 0.013,
+    velocity: 0.016,
+  },
 };
-
 
 export const DialogContent = memo(
   forwardRef<HTMLDivElement, DialogContentProps>(({ children, title, description }, external) => {
@@ -79,7 +81,6 @@ export const DialogContent = memo(
                     <ScrollArea orientation="vertical" scrollbar="all">
                       {children}
                     </ScrollArea>
-
                   </animated.div>
                 </Content>
               </>
