@@ -54,8 +54,8 @@ const Page: NextPage = () => {
     transform: worksInView ? "translateY(0rem)" : "translateY(0.5rem)",
   });
 
-  const [serviceRef, serviceInView] = useInView({ once: true, rootMargin: "-30% 0%" });
-  const [libraryRef, libraryInView] = useInView({ once: true, rootMargin: "-30% 0%" });
+  const [serviceRef, serviceInView] = useInView({ once: true });
+  const [libraryRef, libraryInView] = useInView({ once: true });
 
   const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
   const contactAnim = useSpring({

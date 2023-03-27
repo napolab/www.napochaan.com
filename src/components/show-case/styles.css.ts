@@ -9,6 +9,8 @@ import { mediaQueries } from "@theme/utils";
 export const scrollArea = style({
   display: "flex",
   gap: vars.space.md,
+  margin: `-${vars.space.xs}`,
+  padding: vars.space.xs,
 
   "@media": {
     [mediaQueries.sm]: {
