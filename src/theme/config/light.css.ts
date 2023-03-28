@@ -31,14 +31,14 @@ export const pallets = {
     main: "#CCCCCC",
     focus: "#336699",
   },
-  overlay: "rgba(0, 0, 0, 0.44)",
+  overlay: "#00000070",
   shadow: `0px ${vars.space.xs} ${vars.space.xs} rgba(${vars.pallets.rgb.black}, 0.25)`,
   scrollbar: {
     background: {
-      main: "#B3B3B3",
-      hover: "#cccccc",
+      main: "#D9D9D9",
+      hover: "#BFBFBF",
     },
-    thumb: "#666666",
+    thumb: "#8C8C8C",
   },
 } as const satisfies Pallets;
 

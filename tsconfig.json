@@ -23,8 +23,7 @@
     "baseUrl": ".",
     "paths": {
       "@theme": ["src/theme/index.ts"],
-      "@theme/css": ["src/theme/css.ts"],
-      "@theme/utils": ["src/theme/utils/index.ts"],
+      "@theme/*": ["src/theme/*"],
       "@hooks/*": ["src/hooks/*"],
       "@components/*": ["src/components/*"],
       "@utils/*": ["src/utils/*"]

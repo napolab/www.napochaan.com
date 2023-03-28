@@ -1,28 +1,26 @@
 import { ThemeProvider as NextThemeProvider } from "next-themes";
 
-import * as styles from "./provider.css";
+import * as styles from "./styles.css";
 
 import type { Theme } from "@theme";
 import type { FC, PropsWithChildren } from "react";
 
-import "./config/base.css";
-import "./config/dark.css";
-import "./config/light.css";
+import "@theme/global.css";
 
 /**
  * @package
  */
 export type ThemeProviderProps = {
-  theme?: Theme;
   defaultTheme?: Theme;
+  theme?: Theme;
 };
 
 /**
  * @package
  */
-export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ theme, defaultTheme, children }) => {
+export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ defaultTheme, theme, children }) => {
   return (
-    <NextThemeProvider attribute="class" forcedTheme={theme} defaultTheme={defaultTheme}>
+    <NextThemeProvider attribute="class" defaultTheme={defaultTheme} forcedTheme={theme}>
       <div className={styles.providerRoot}>{children}</div>
     </NextThemeProvider>
   );

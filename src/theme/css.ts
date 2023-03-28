@@ -1,3 +1,3 @@
 export { vars } from "./config/base.css";
-export * from "./mics.css";
+export * from "./styles.css";
 export { mediaQueries } from "./utils";

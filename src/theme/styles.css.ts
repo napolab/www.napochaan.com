@@ -1,30 +1,10 @@
-import { globalStyle, style, styleVariants } from "@vanilla-extract/css";
+import { style, styleVariants } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
 import { vars } from "./config/base.css";
 import { mediaQueries } from "./utils";
 
 import type { StyleRule } from "@vanilla-extract/css";
-
-globalStyle("html, body", {
-  scrollBehavior: "smooth",
-  overflowX: "hidden",
-});
-globalStyle("body", {
-  color: vars.pallets.text.main,
-  backgroundColor: vars.pallets.background.main,
-  fontFamily: vars.font.body,
-  fontSize: "16px",
-  fontWeight: 400,
-});
-
-globalStyle("body::-webkit-scrollbar", {
-  display: "none",
-});
-globalStyle("*::selection", {
-  color: vars.pallets.black,
-  background: vars.pallets.accent1,
-});
 
 export const focusRing: StyleRule = {
   outlineStyle: "solid",

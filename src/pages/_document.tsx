@@ -4,6 +4,8 @@ import type { DocumentProps } from "next/document";
 import type { FC } from "react";
 
 const description = "ReactとTypeScriptのオタクだったりオタクじゃなかったりします。";
+const ogp = "https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/46fbeda6-e4fe-4519-defc-d04bb7af4200/ogp";
+const twitter = "@naporin24690";
 
 const Document: FC<DocumentProps> = () => {
   return (
@@ -29,21 +31,15 @@ const Document: FC<DocumentProps> = () => {
         <meta property="og:type" content="website" />
         <meta property="og:title" content="naporitan official website" />
         <meta property="og:url" content="https://napochaan.com/" />
-        <meta
-          property="og:image"
-          content="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/46fbeda6-e4fe-4519-defc-d04bb7af4200/ogp"
-        />
+        <meta property="og:image" content={ogp} />
         <meta property="og:description" content={description} />
 
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="@naporin24690 official website" />
-        <meta
-          name="twitter:image"
-          content="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/46fbeda6-e4fe-4519-defc-d04bb7af4200/ogp"
-        />
+        <meta name="twitter:title" content={`${twitter} official website`} />
+        <meta name="twitter:image" content={ogp} />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:site" content="@naporin24690" />
-        <meta name="twitter:creator" content="@naporin24690" />
+        <meta name="twitter:site" content={twitter} />
+        <meta name="twitter:creator" content={twitter} />
       </Head>
 
       <body>

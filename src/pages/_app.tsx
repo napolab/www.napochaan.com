@@ -26,6 +26,7 @@ const poppins = Poppins({
   variable: "--poppins",
 });
 
+const fonts = clsx(notoSansJP.className, notoSansJP.variable, poppins.className, poppins.variable);
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
@@ -33,7 +34,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </PageHead>
 
-      <div className={clsx(notoSansJP.className, notoSansJP.variable, poppins.className, poppins.variable)}>
+      <div className={fonts}>
         <Layout>
           <Suspense>
             <Component {...pageProps} />

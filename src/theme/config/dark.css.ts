@@ -27,7 +27,7 @@ export const pallets = {
   disabled: "#A5A5A5",
   white: "#ffffff",
   black: "#333333",
-  overlay: "rgba(0, 0, 0, 0.44)",
+  overlay: "#00000070",
   shadow: `0px ${vars.space.xs} ${vars.space.xs} rgba(${vars.pallets.rgb.black}, 0.25)`,
   border: {
     main: "#CCCCCC",
@@ -35,10 +35,10 @@ export const pallets = {
   },
   scrollbar: {
     background: {
-      main: "#666666",
-      hover: "#404040",
+      main: "#858585",
+      hover: "#6D6D6D",
     },
-    thumb: "#bfbfbf",
+    thumb: "#B3B3B3",
   },
 } satisfies Pallets;
 
