@@ -3,7 +3,7 @@ import { Html, Head, Main, NextScript } from "next/document";
 import type { DocumentProps } from "next/document";
 import type { FC } from "react";
 
-const description = "ReactとTypeScriptのオタクだったりオタクじゃなかったりします。";
+const description = "React と TypeScriptのオタクだったりオタクじゃなかったりします。";
 const ogp = "https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/46fbeda6-e4fe-4519-defc-d04bb7af4200/ogp";
 const twitter = "@naporin24690";
 
