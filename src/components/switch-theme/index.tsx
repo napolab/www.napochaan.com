@@ -50,7 +50,9 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
     });
     const darkIconAnim = useSpring({
       from: { color: vars.pallets.disabled },
-      color: value === "dark" ? vars.pallets.accent1 : vars.pallets.disabled,
+      get color() {
+        return value === "dark" ? vars.pallets.accent1 : vars.pallets.disabled;
+      },
       config: config.gentle,
     });
 

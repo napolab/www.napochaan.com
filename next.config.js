@@ -7,9 +7,10 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   experimental: {
+    appDir: true,
     runtime: "experimental-edge",
   },
-  pageExtensions: ["tsx"],
+  // pageExtensions: ["tsx"],
   webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
@@ -17,7 +18,7 @@ const nextConfig = {
         {
           loader: "@svgr/webpack",
           options: {
-            svgo: false, // 圧縮無効
+            svgo: false,
           },
         },
       ],

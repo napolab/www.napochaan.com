@@ -1,3 +1,4 @@
+"use client";
 import { ThemeProvider as NextThemeProvider } from "next-themes";
 
 import * as styles from "./styles.css";

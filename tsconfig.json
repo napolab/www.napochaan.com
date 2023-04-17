@@ -29,6 +29,6 @@
       "@utils/*": ["src/utils/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "vitest-setup.ts", "next.config.js", ".eslintrc.cjs"],
+  "include": ["**/*.ts", "**/*.tsx", "vitest-setup.ts", "next.config.js", ".eslintrc.cjs", ".next/types/**/*.ts"],
   "exclude": ["node_modules", "dist", "coverage", "out", "build", "public", "storybook-static", ".next"]
 }

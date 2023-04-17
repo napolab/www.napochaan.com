@@ -1,4 +1,3 @@
-/* eslint-disable react/jsx-no-bind */
 import { Noto_Sans_JP, Poppins } from "next/font/google";
 import React, { memo, Suspense } from "react";
 
