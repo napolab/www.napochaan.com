@@ -1,10 +1,8 @@
 "use client";
 import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
 import { memo, useMemo } from "react";
 
 import Article from "@components/article";
@@ -16,7 +14,6 @@ import Section from "@components/section";
 import ShowCase from "@components/show-case";
 import SquareImage from "@components/square-image";
 import WrappedText from "@components/wrapped-text";
-import { isTheme } from "@theme";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
 import * as styles from "./styles.css";
@@ -24,10 +21,10 @@ import * as styles from "./styles.css";
 import type { NextPage } from "next";
 import type { FC } from "react";
 
-const SwitchTheme = dynamic(() => import("@components/switch-theme"), { ssr: false });
+// const SwitchTheme = dynamic(() => import("@components/switch-theme"), { ssr: false });
 
 const Page: NextPage = () => {
-  const { theme, setTheme } = useTheme();
+  // const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const firstViewInView = pathname === "/";
 
@@ -115,7 +112,7 @@ const Page: NextPage = () => {
           </animated.div>
         </div>
         <div className={styles.switchTheme}>
-          <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
+          {/* <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} /> */}
         </div>
 
         <div className={styles.firstView}>
