@@ -42,7 +42,6 @@ const RootLayout: FC<Props> = ({ children }) => {
   );
 };
 
-
 const description = "ReactとTypeScriptのオタクだったりオタクじゃなかったりします。";
 export const metadata: Metadata = {
   title: "napocnaan",
@@ -57,7 +56,21 @@ export const metadata: Metadata = {
     apple: [{ sizes: "180x180", url: "/apple-touch-icon.png", rel: "apple-touch-icon" }],
   },
   manifest: "/site.webmanifest",
-  keywords: ["naporitan", "engineer", "web", "application", "react", "typescript", "frontend", "statemanagement", "javascript", "python", "ruby", "swift", "haskell"],
+  keywords: [
+    "naporitan",
+    "engineer",
+    "web",
+    "application",
+    "react",
+    "typescript",
+    "frontend",
+    "statemanagement",
+    "javascript",
+    "python",
+    "ruby",
+    "swift",
+    "haskell",
+  ],
   authors: { name: "naporitan", url: "https://twitter.com/naporin24690" },
   description,
   openGraph: {
@@ -66,7 +79,7 @@ export const metadata: Metadata = {
     siteName: "napochaan",
     url: "https://napochaan.com/",
     images: "https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/46fbeda6-e4fe-4519-defc-d04bb7af4200/ogp",
-    description
+    description,
   },
   twitter: {
     card: "summary_large_image",
@@ -75,7 +88,7 @@ export const metadata: Metadata = {
     description,
     creator: "@naporin24690",
     creatorId: "@naporin24690",
-  }
+  },
 };
 export const runtime = "edge";
 export default RootLayout;
