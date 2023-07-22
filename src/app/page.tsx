@@ -1,7 +1,8 @@
+"use client";
 import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { memo, useMemo } from "react";
 
@@ -9,13 +10,11 @@ import Article from "@components/article";
 import Budoux from "@components/budoux";
 import { DialogRoot, DialogContent, DialogTrigger } from "@components/dialog";
 import Heading from "@components/heading";
-import PageHead from "@components/page-head";
 import Section from "@components/section";
 import ShowCase from "@components/show-case";
 import SquareImage from "@components/square-image";
 import SwitchTheme from "@components/switch-theme";
 import WrappedText from "@components/wrapped-text";
-import { useMounted } from "@hooks/mounted";
 import { isTheme } from "@theme";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
@@ -26,9 +25,8 @@ import type { FC } from "react";
 
 const Page: NextPage = () => {
   const { theme, setTheme } = useTheme();
-  const router = useRouter();
-  const mounted = useMounted();
-  const firstViewInView = router.asPath === "/";
+  const pathname = usePathname();
+  const firstViewInView = pathname === "/";
 
   const [titleRef, titleInView] = useInView({ once: true });
   const mainVisualAnimApi = useSpringRef();
@@ -93,8 +91,6 @@ const Page: NextPage = () => {
 
   return (
     <>
-      <PageHead />
-
       <Section className={styles.pageRoot}>
         <div className={styles.decorationRoot}>
           <div aria-hidden="true" className={styles.decoration1} />
@@ -103,9 +99,7 @@ const Page: NextPage = () => {
             <img
               className={styles.decorationImage}
               decoding="async"
-              srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
-              src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
-              sizes="(max-width: 1080px) 100vw, 1080px"
+              src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
               alt="naporitan のオリジナルキャラクター"
               width={800}
               height={800}
@@ -114,9 +108,7 @@ const Page: NextPage = () => {
           </animated.div>
         </div>
         <div className={styles.switchTheme}>
-          {mounted ? (
-            <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
-          ) : null}
+          <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
         </div>
 
         <div className={styles.firstView}>
@@ -132,9 +124,7 @@ const Page: NextPage = () => {
                 className={styles.fillImage}
                 style={mainVisualAnim}
                 decoding="async"
-                srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
-                src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
-                sizes="(max-width: 1080px) 100vw, 1080px"
+                src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
                 alt="naporitan のオリジナルキャラクター"
                 width={800}
                 height={800}
@@ -288,7 +278,7 @@ const Page: NextPage = () => {
   );
 };
 
-export default Page;
+export default memo(Page);
 
 type Work = {
   id: string;
