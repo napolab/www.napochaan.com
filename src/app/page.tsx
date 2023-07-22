@@ -1,7 +1,6 @@
 "use client";
 import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -15,6 +14,7 @@ import PageHead from "@components/page-head";
 import Section from "@components/section";
 import ShowCase from "@components/show-case";
 import SquareImage from "@components/square-image";
+import SwitchTheme from "@components/switch-theme";
 import WrappedText from "@components/wrapped-text";
 import { isTheme } from "@theme";
 import { cloudflareImages } from "@utils/cloudflare-images";
@@ -23,8 +23,6 @@ import * as styles from "./styles.css";
 
 import type { NextPage } from "next";
 import type { FC } from "react";
-
-const SwitchTheme = dynamic(() => import("@components/switch-theme"), { ssr: false });
 
 const Page: NextPage = () => {
   const { theme, setTheme } = useTheme();
@@ -104,9 +102,7 @@ const Page: NextPage = () => {
             <img
               className={styles.decorationImage}
               decoding="async"
-              srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
-              src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
-              sizes="(max-width: 1080px) 100vw, 1080px"
+              src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
               alt="naporitan のオリジナルキャラクター"
               width={800}
               height={800}
@@ -115,7 +111,7 @@ const Page: NextPage = () => {
           </animated.div>
         </div>
         <div className={styles.switchTheme}>
-         <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
+          <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
         </div>
 
         <div className={styles.firstView}>
@@ -131,9 +127,7 @@ const Page: NextPage = () => {
                 className={styles.fillImage}
                 style={mainVisualAnim}
                 decoding="async"
-                srcSet="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800 800w, https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600 1600w"
-                src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/1600x1600"
-                sizes="(max-width: 1080px) 100vw, 1080px"
+                src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
                 alt="naporitan のオリジナルキャラクター"
                 width={800}
                 height={800}
@@ -287,7 +281,7 @@ const Page: NextPage = () => {
   );
 };
 
-export default Page;
+export default memo(Page);
 
 type Work = {
   id: string;

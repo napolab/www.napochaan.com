@@ -1,4 +1,3 @@
-"use client";
 import { Noto_Sans_JP, Poppins } from "next/font/google";
 
 import { HeadingLevelProvider } from "@hooks/heading-level";
@@ -42,4 +41,5 @@ const RootLayout: FC<Props> = ({ children }) => {
   );
 };
 
+export const runtime = "edge";
 export default RootLayout;

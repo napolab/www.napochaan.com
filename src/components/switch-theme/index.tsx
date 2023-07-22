@@ -1,7 +1,8 @@
+"use client";
 import { Root, Item } from "@radix-ui/react-toggle-group";
 import { animated, config, useSpring } from "@react-spring/web";
 import { IconBrightnessUp, IconMoonStars } from "@tabler/icons-react";
-import { forwardRef, memo, useCallback, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useState } from "react";
 
 import { isTheme } from "@theme";
 import { vars } from "@theme/css";
@@ -21,6 +22,17 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
   ({ theme, defaultTheme, onChange, orientation }, ref) => {
     const [_value, setValue] = useState<Theme | undefined>(defaultTheme);
     const value = theme ?? _value;
+    const [forceKey, updateForceKey] = useState(0);
+    useEffect(() => {
+      const id = setTimeout(() => {
+        updateForceKey(Date.now());
+      }, 100);
+
+      return () => {
+        clearTimeout(id);
+      };
+    }, []);
+
     const handleValueChange = useCallback(
       (value: string) => {
         if (!isTheme(value)) return;
@@ -66,6 +78,7 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
         orientation={orientation}
         loop
         className={styles.switchThemeRoot}
+        key={forceKey}
       >
         <animated.div className={styles.thumb.light} style={lightButtonAnim} />
         <animated.div className={styles.thumb.dark} style={darkButtonAnim} />
