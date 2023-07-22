@@ -24,7 +24,7 @@ jobs:
       - name: create lightouse budge
         run: |
           npx lighthouse-badges \
-            --urls https://napochaan.com \
+            --url https://napochaan.com \
             --save-report \
             --output-path=${{ env.output-folder }}
 
