@@ -10,7 +10,6 @@ import Article from "@components/article";
 import Budoux from "@components/budoux";
 import { DialogRoot, DialogContent, DialogTrigger } from "@components/dialog";
 import Heading from "@components/heading";
-import PageHead from "@components/page-head";
 import Section from "@components/section";
 import ShowCase from "@components/show-case";
 import SquareImage from "@components/square-image";
@@ -92,8 +91,6 @@ const Page: NextPage = () => {
 
   return (
     <>
-      <PageHead />
-
       <Section className={styles.pageRoot}>
         <div className={styles.decorationRoot}>
           <div aria-hidden="true" className={styles.decoration1} />
