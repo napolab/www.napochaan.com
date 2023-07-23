@@ -44,7 +44,7 @@ const RootLayout: FC<Props> = ({ children }) => {
 
 const description = "ReactとTypeScriptのオタクだったりオタクじゃなかったりします。";
 export const metadata: Metadata = {
-  title: "napocnaan",
+  title: "napochaan",
   colorScheme: "light dark",
   themeColor: "#fff",
   icons: {
