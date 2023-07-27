@@ -5,6 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { memo, useMemo } from "react";
+import { mergeRefs } from "react-merge-refs";
+import {useMedia} from "use-media";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
@@ -16,6 +18,7 @@ import SquareImage from "@components/square-image";
 import SwitchTheme from "@components/switch-theme";
 import WrappedText from "@components/wrapped-text";
 import { isTheme } from "@theme";
+import { vars, mediaQueries } from "@theme/css";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
 import * as styles from "./styles.css";
@@ -24,6 +27,7 @@ import type { NextPage } from "next";
 import type { FC } from "react";
 
 const Page: NextPage = () => {
+  const isXL = useMedia(mediaQueries.xl);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
   const firstViewInView = pathname === "/";
@@ -71,6 +75,12 @@ const Page: NextPage = () => {
     delay: 800,
   });
 
+  const [lastRef, lastInView] = useInView();
+  const themeSwitchAnim = useSpring({
+    transform: !isXL && lastInView ? "translateY(100%)" : "translateY(0%)",
+    bottom: !isXL && lastInView ? "0rem" : vars.space.md,
+  });
+
   const serviceItems = useMemo(
     () =>
       services.map((item, idx) => ({
@@ -107,9 +117,9 @@ const Page: NextPage = () => {
             />
           </animated.div>
         </div>
-        <div className={styles.switchTheme}>
+        <animated.div className={styles.switchTheme} style={themeSwitchAnim}>
           <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
-        </div>
+        </animated.div>
 
         <div className={styles.firstView}>
           <div className={styles.section1}>
@@ -227,7 +237,7 @@ const Page: NextPage = () => {
           </Section>
         </animated.div>
 
-        <animated.div className={styles.contactWrapper} ref={contactRef} style={contactAnim}>
+        <animated.div className={styles.contactWrapper} ref={mergeRefs([contactRef, lastRef])} style={contactAnim}>
           <Section id="contact" className={styles.contactRoot}>
             <div>
               <Link href="/#contact" scroll className={styles.anchorLink}>
