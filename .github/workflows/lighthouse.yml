@@ -5,6 +5,7 @@ on:
     branches-ignore:
       - main
       - gh-pages
+      - renovate/**
 
 jobs:
   lighthouse:
