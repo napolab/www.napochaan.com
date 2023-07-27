@@ -1,12 +1,12 @@
 "use client";
-import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
+import { useSpring, animated, useInView, useChain, useSpringRef } from "@react-spring/web";
 import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { memo, useMemo } from "react";
 import { mergeRefs } from "react-merge-refs";
-import {useMedia} from "use-media";
+import { useMedia } from "use-media";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
@@ -21,6 +21,7 @@ import { isTheme } from "@theme";
 import { vars, mediaQueries } from "@theme/css";
 import { cloudflareImages } from "@utils/cloudflare-images";
 
+import Decoration from "./compositions/decoration";
 import * as styles from "./styles.css";
 
 import type { NextPage } from "next";
@@ -64,17 +65,6 @@ const Page: NextPage = () => {
     transform: contactInView ? "translateY(0rem)" : "translateY(0.5rem)",
   });
 
-  const decorationImageAnim = useSpring({
-    from: {
-      transform: `translateX(125%)`,
-    },
-    to: {
-      transform: contactInView ? "translateX(0%)" : `translateX(125%)`,
-    },
-    config: config.gentle,
-    delay: 800,
-  });
-
   const [lastRef, lastInView] = useInView();
   const themeSwitchAnim = useSpring({
     transform: !isXL && lastInView ? "translateY(100%)" : "translateY(0%)",
@@ -102,21 +92,7 @@ const Page: NextPage = () => {
   return (
     <>
       <Section className={styles.pageRoot}>
-        <div className={styles.decorationRoot}>
-          <div aria-hidden="true" className={styles.decoration1} />
-          <div aria-hidden="true" className={styles.decoration2} />
-          <animated.div className={styles.decorationImageRoot} aria-hidden="true" style={decorationImageAnim}>
-            <img
-              className={styles.decorationImage}
-              decoding="async"
-              src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
-              alt="naporitan のオリジナルキャラクター"
-              width={800}
-              height={800}
-              loading="lazy"
-            />
-          </animated.div>
-        </div>
+        <Decoration visible={contactInView} />
         <animated.div className={styles.switchTheme} style={themeSwitchAnim}>
           <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
         </animated.div>
