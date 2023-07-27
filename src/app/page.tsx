@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { memo, useMemo } from "react";
 import { mergeRefs } from "react-merge-refs";
-import {useMedia} from "use-media";
+import { useMedia } from "use-media";
 
 import Article from "@components/article";
 import Budoux from "@components/budoux";
