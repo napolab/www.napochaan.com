@@ -98,7 +98,7 @@
     "showDetails": true
   },
   "overrides": {
-    "trim": "0.0.3",
+    "trim": "1.0.1",
     "trim-newlines": "3.0.1",
     "glob-parent": "6.0.2"
   }
