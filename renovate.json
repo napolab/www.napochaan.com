@@ -1,4 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>HikaruEgashira/renovate"]
+  "extends": ["config:base", "schedule:weekly", ":timezone(Asia/Tokyo)"],
+  "labels": ["dependencies"],
+  "dependencyDashboard": true,
+  "automerge": false,
+  "rangeStrategy": "auto",
+  "packageRules": [
+    {
+      "matchDepTypes": ["devDependencies"],
+      "groupName": "devDependencies"
+    },
+    {
+      "matchDepTypes": ["dependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "dependencies (non-major)"
+    }
+  ]
 }
