@@ -21,7 +21,7 @@
     "find-deadcode": "ts-prune | grep -v 'used in module'"
   },
   "dependencies": {
-    "@acab/reset.css": "^0.6.0",
+    "@acab/reset.css": "^0.5.3",
     "@radix-ui/react-dialog": "^1.0.3",
     "@radix-ui/react-scroll-area": "^1.0.3",
     "@radix-ui/react-separator": "^1.0.2",
