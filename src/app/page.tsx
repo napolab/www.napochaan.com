@@ -81,10 +81,10 @@ const Page: NextPage = () => {
     bottom: !isXL && lastInView ? "0rem" : vars.space.md,
   });
 
-  const serviceItems = useMemo(
+  const historiesItems = useMemo(
     () =>
-      services.map((item, idx) => ({
-        key: `service__${item.id}-${idx}`,
+      histories.map((item, idx) => ({
+        key: `histories__${item.id}-${idx}`,
         children: <WorkItem {...item} />,
       })),
     [],
@@ -215,14 +215,14 @@ const Page: NextPage = () => {
                 <Heading>Works</Heading>
               </Link>
             </div>
-            <Section id="service" className={styles.section3} ref={serviceRef}>
+            <Section id="histories" className={styles.section3} ref={serviceRef}>
               <div>
-                <Link href="/#service" scroll className={styles.anchorLink}>
-                  <Heading>Service</Heading>
+                <Link href="/#histories" scroll className={styles.anchorLink}>
+                  <Heading>History</Heading>
                 </Link>
               </div>
 
-              <ShowCase items={serviceItems} visibility={serviceInView} />
+              <ShowCase items={historiesItems} visibility={serviceInView} />
             </Section>
 
             <Section id="library" className={styles.section3} ref={libraryRef}>
@@ -326,7 +326,22 @@ const WorkItem = memo((item) => {
   );
 }) satisfies FC<Work>;
 
-const services: Work[] = [
+const histories: Work[] = [
+  {
+    caption: ["ボカコレランキング", "アーカイブの作成"],
+    alt: "ボカコレ2023夏ランキングアーカイブのスクリーンショット",
+    id: "98e71cf5-cc6e-4413-7c28-520570871800",
+    href: "https://vocaloid-collection-archive.studiognu.org/",
+    content:
+      "ボカコレ2023夏の毎時ランキングを作成した。\n統計情報や増加量を出すことで様々な角度から情報を整理し、ランキングの傾向を可視化した。\n仮想スクロールを縦横両方に入れており、大量のコンテンツに対して拘束に検索、スクロールができるようになっている。\nデータ基盤は cloudflare workers + cloudflare KV + cloudflare R2 を使用し、アプリケーションコードは主に hono で構築されている。\nデータ収集時は cloudflare queue + cloudflare cron trigger を併用することで取りこぼし無くデータを毎時で集計する仕組みを構築している。",
+  },
+  {
+    caption: ["熱異常 / シャノン REMIX", "テクニカルサポート"],
+    alt: "熱異常 / シャノン REMIXのジャケット",
+    id: "bc6e6dcf-4661-4cab-1685-9355dea2f600",
+    href: "https://twitter.com/naporin24690/status/1687483050253561856",
+    content: "シャノンさんが REMIX した熱異常のテクニカルサポートをした。主にプログラム周り。",
+  },
   {
     caption: ["napochaan.com", "の作成"],
     alt: "napochaan.comのOGP",
@@ -406,6 +421,14 @@ const services: Work[] = [
 ];
 
 const libraries: Work[] = [
+  {
+    caption: ["kv-response-cache"],
+    alt: "npmのロゴ",
+    id: "a463002e-d758-4349-3d53-024d21500c00",
+    href: "https://www.npmjs.com/package/@napolab/kv-response-cache",
+    content:
+      "cloudflare workers + hono 用の KV を使ってレスポンスをキャッシュするためのライブラリを作った。\ncustom domain を割り当てられない状況の時に使用することができ、hono middleware を提供しているため、一行で KV Cache を組み込むことができる。",
+  },
   {
     caption: ["react-flowder"],
     alt: "npmのロゴ",
