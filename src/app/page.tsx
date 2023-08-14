@@ -333,7 +333,7 @@ const histories: Work[] = [
     id: "98e71cf5-cc6e-4413-7c28-520570871800",
     href: "https://vocaloid-collection-archive.studiognu.org/",
     content:
-      "ボカコレ2023夏の毎時ランキングを作成した。\n統計情報や増加量を出すことで様々な角度から情報を整理し、ランキングの傾向を可視化した。\n仮想スクロールを縦横両方に入れており、大量のコンテンツに対して拘束に検索、スクロールができるようになっている。\nデータ基盤は cloudflare workers + cloudflare KV + cloudflare R2 を使用し、アプリケーションコードは主に hono で構築されている。\nデータ収集時は cloudflare queue + cloudflare cron trigger を併用することで取りこぼし無くデータを毎時で集計する仕組みを構築している。",
+      "ボカコレ2023夏の毎時ランキングを作成した。\n統計情報や増加量を出すことで様々な角度から情報を整理し、ランキングの傾向を可視化した。\n仮想スクロールを縦横両方に入れており、大量のコンテンツに対して高速に検索、スクロールができるようになっている。\nデータ基盤は cloudflare workers + cloudflare KV + cloudflare R2 を使用し、アプリケーションコードは主に hono で構築されている。\nデータ収集時は cloudflare queue + cloudflare cron trigger を併用することで取りこぼし無くデータを毎時で集計する仕組みを構築している。",
   },
   {
     caption: ["熱異常 / シャノン REMIX", "テクニカルサポート"],
