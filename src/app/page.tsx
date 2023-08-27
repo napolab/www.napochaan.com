@@ -422,6 +422,14 @@ const histories: Work[] = [
 
 const libraries: Work[] = [
   {
+    caption: ["alpha-blend"],
+    alt: "npmのロゴ",
+    id: "a463002e-d758-4349-3d53-024d21500c00",
+    href: "https://www.npmjs.com/package/@napolab/alpha-blend",
+    content:
+      "基本色と半透明な色を合成することができるライブラリ。\n 半透明な色の overlay を absolute の要素なしで実装できることが強み。",
+  },
+  {
     caption: ["kv-response-cache"],
     alt: "npmのロゴ",
     id: "a463002e-d758-4349-3d53-024d21500c00",
