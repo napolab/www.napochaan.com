@@ -125,7 +125,7 @@ const Page: NextPage = () => {
           <div className={styles.section1}>
             <div className={styles.pageTitle} ref={titleRef}>
               <Link href="/" scroll className={styles.anchorLink}>
-                <Heading>napochaan.com</Heading>
+                <Heading translate="no">napochaan.com</Heading>
               </Link>
             </div>
 
@@ -145,7 +145,7 @@ const Page: NextPage = () => {
           <animated.div className={styles.aboutMeWrapper} ref={aboutRef} style={aboutAnim}>
             <Article className={styles.aboutMeRoot} id="about">
               <Link href="/#about" scroll className={styles.anchorLink}>
-                <Heading>About me</Heading>
+                <Heading translate="no">About me</Heading>
               </Link>
               <div className={styles.aboutMe}>
                 <p>
@@ -163,10 +163,10 @@ const Page: NextPage = () => {
               <Article className={styles.section3} id="love">
                 <div>
                   <Link href="/#love" scroll className={styles.anchorLink}>
-                    <Heading>Love</Heading>
+                    <Heading translate="no">Love</Heading>
                   </Link>
                 </div>
-                <ul className={styles.tags}>
+                <ul className={styles.tags} translate="no">
                   <li>TypeScript</li>
                   <li>Haskell</li>
                   <li>Music(ボカロ)</li>
@@ -177,10 +177,10 @@ const Page: NextPage = () => {
               <Article className={styles.section3} id="skill">
                 <div>
                   <Link href="/#skill" scroll className={styles.anchorLink}>
-                    <Heading>Skill</Heading>
+                    <Heading translate="no">Skill</Heading>
                   </Link>
                 </div>
-                <ul className={styles.tags}>
+                <ul className={styles.tags} translate="no">
                   <li>TypeScript</li>
                   <li>React</li>
                   <li>CSS</li>
@@ -212,13 +212,13 @@ const Page: NextPage = () => {
           <Section id="works" className={styles.worksRoot}>
             <div>
               <Link href="/#works" className={styles.anchorLink}>
-                <Heading>Works</Heading>
+                <Heading translate="no">Works</Heading>
               </Link>
             </div>
             <Section id="histories" className={styles.section3} ref={serviceRef}>
               <div>
                 <Link href="/#histories" scroll className={styles.anchorLink}>
-                  <Heading>History</Heading>
+                  <Heading translate="no">History</Heading>
                 </Link>
               </div>
 
@@ -228,7 +228,7 @@ const Page: NextPage = () => {
             <Section id="library" className={styles.section3} ref={libraryRef}>
               <div>
                 <Link href="/#library" scroll className={styles.anchorLink}>
-                  <Heading>Library</Heading>
+                  <Heading translate="no">Library</Heading>
                 </Link>
               </div>
 
@@ -241,7 +241,7 @@ const Page: NextPage = () => {
           <Section id="contact" className={styles.contactRoot}>
             <div>
               <Link href="/#contact" scroll className={styles.anchorLink}>
-                <Heading>SNS&nbsp;&amp;&nbsp;Contact</Heading>
+                <Heading translate="no">SNS&nbsp;&amp;&nbsp;Contact</Heading>
               </Link>
             </div>
             <p>

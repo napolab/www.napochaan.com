@@ -35,6 +35,9 @@ const RootLayout: FC<Props> = ({ children }) => {
         <ThemeProvider defaultTheme="dark">
           <HeadingLevelProvider>
             <main className={styles.mainRoot}>{children}</main>
+            <footer className={styles.footerRoot} translate="no">
+              © 2023 naporitan
+            </footer>
           </HeadingLevelProvider>
         </ThemeProvider>
       </body>
