@@ -15,7 +15,7 @@ export type HeadingProps = Omit<
 };
 
 const Heading: FC<HeadingProps> = forwardRef<HTMLHeadingElement, HeadingProps>(
-  ({ children, className, unstyled, ...props }, ref) => {
+  ({ children, className, unstyled = false, ...props }, ref) => {
     const level = useHeadingLevel();
     const type = `h${level ?? 6}` as const;
     const Component = type;

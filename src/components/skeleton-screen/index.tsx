@@ -6,7 +6,7 @@ export type SkeletonScreenProps = {
   loading?: boolean;
   children: React.ReactNode;
 };
-const SkeletonScreen = forwardRef<HTMLDivElement, SkeletonScreenProps>(({ loading, children }, ref) => {
+const SkeletonScreen = forwardRef<HTMLDivElement, SkeletonScreenProps>(({ loading = false, children }, ref) => {
   return (
     <div ref={ref}>
       <div aria-hidden="true" />

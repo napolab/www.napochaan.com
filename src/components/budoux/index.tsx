@@ -11,12 +11,15 @@ export type BudouxProps = Omit<ComponentPropsWithoutRef<"span">, "children" | "c
 
 const parser = loadDefaultJapaneseParser();
 const Budoux = forwardRef<HTMLSpanElement, BudouxProps>(({ children, ...props }, ref) => {
-  const texts = useMemo(() => (children.length > 0 ? parser.parse(children) : []), [children]);
+  const texts = useMemo(
+    () => (children.length > 0 ? parser.parse(children) : []).map((text, idx) => ({ text, key: `${text}_${idx}` })),
+    [children],
+  );
 
   return (
     <span {...props} ref={ref} className={styles.budouxRoot}>
-      {texts.map((text, idx) => (
-        <Fragment key={idx}>
+      {texts.map(({ text, key }, idx) => (
+        <Fragment key={key}>
           {text}
           {texts.length === idx - 1 ? null : <wbr />}
         </Fragment>

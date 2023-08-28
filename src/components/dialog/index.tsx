@@ -56,38 +56,36 @@ const smAnim: UseTransitionProps = {
 export const DialogContent = memo(
   forwardRef<HTMLDivElement, DialogContentProps>(({ children, title, description }, external) => {
     const { open, size } = useContext(Context);
-    const transitions = useTransition(open, size !== "sm" ? anim : smAnim);
+    const transitions = useTransition<boolean, object>(open, size !== "sm" ? anim : smAnim);
 
     return (
       <Portal forceMount>
-        {transitions((style, show) => (
-          <>
-            {show ? (
-              <>
-                <Overlay className={styles.overlay} />
-                <Content ref={external}>
-                  <animated.div style={style} className={styles.content}>
-                    <div className={styles.header}>
-                      <div className={styles.titleRoot}>
-                        <Title className={styles.title}>{title}</Title>
-                        <Close asChild>
-                          <button aria-label="Close" className={styles.close}>
-                            <IconX className={styles.icon} />
-                          </button>
-                        </Close>
-                      </div>
-                      {description ? <Description>{description}</Description> : null}
-                      <Separator className={styles.border} />
+        {transitions((style, show) =>
+          show ? (
+            <>
+              <Overlay className={styles.overlay} />
+              <Content ref={external}>
+                <animated.div style={style} className={styles.content}>
+                  <div className={styles.header}>
+                    <div className={styles.titleRoot}>
+                      <Title className={styles.title}>{title}</Title>
+                      <Close asChild>
+                        <button aria-label="Close" className={styles.close}>
+                          <IconX className={styles.icon} />
+                        </button>
+                      </Close>
                     </div>
-                    <ScrollArea orientation="vertical" scrollbar="all">
-                      {children}
-                    </ScrollArea>
-                  </animated.div>
-                </Content>
-              </>
-            ) : null}
-          </>
-        ))}
+                    {description !== undefined ? <Description>{description}</Description> : null}
+                    <Separator className={styles.border} />
+                  </div>
+                  <ScrollArea orientation="vertical" scrollbar="all">
+                    {children}
+                  </ScrollArea>
+                </animated.div>
+              </Content>
+            </>
+          ) : null,
+        )}
       </Portal>
     );
   }) satisfies FC<DialogContentProps>,
