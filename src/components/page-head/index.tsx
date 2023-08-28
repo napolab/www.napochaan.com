@@ -12,7 +12,7 @@ const PageHead: FC<PageTitleProps> = (props) => {
   return (
     <Head>
       {props.children}
-      <title>{props.title ? `${props.title} | ${site}` : site}</title>
+      <title>{props.title !== undefined ? `${props.title} | ${site}` : site}</title>
     </Head>
   );
 };

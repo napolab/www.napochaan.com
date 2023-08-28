@@ -9,6 +9,7 @@ const WrappedText = forwardRef<HTMLSpanElement, WrappedTextProps>(({ texts }, re
   return (
     <span className={styles.root} ref={ref}>
       {texts.map((text, idx) => (
+        // eslint-disable-next-line react/no-array-index-key
         <Fragment key={`${text}__${idx}`}>
           {text}
           {texts.length === idx - 1 ? null : <wbr />}

@@ -35,7 +35,7 @@ const Template: Story<StoryProps> = ({ open, ...props }) => {
         <button>open</button>
       </DialogTrigger>
 
-      <DialogContent {...props} title={props.title || "ダイアログ"}>
+      <DialogContent {...props} title={props.title ?? "ダイアログ"}>
         <p>これはダイアログです。</p>
 
         <div>

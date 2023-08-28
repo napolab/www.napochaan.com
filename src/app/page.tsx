@@ -100,191 +100,189 @@ const Page: NextPage = () => {
   );
 
   return (
-    <>
-      <Section className={styles.pageRoot}>
-        <div className={styles.decorationRoot}>
-          <div aria-hidden="true" className={styles.decoration1} />
-          <div aria-hidden="true" className={styles.decoration2} />
-          <animated.div className={styles.decorationImageRoot} aria-hidden="true" style={decorationImageAnim}>
-            <img
-              className={styles.decorationImage}
+    <Section className={styles.pageRoot}>
+      <div className={styles.decorationRoot}>
+        <div aria-hidden="true" className={styles.decoration1} />
+        <div aria-hidden="true" className={styles.decoration2} />
+        <animated.div className={styles.decorationImageRoot} aria-hidden="true" style={decorationImageAnim}>
+          <img
+            className={styles.decorationImage}
+            decoding="async"
+            src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
+            alt="naporitan のオリジナルキャラクター"
+            width={800}
+            height={800}
+            loading="lazy"
+          />
+        </animated.div>
+      </div>
+      <animated.div className={styles.switchTheme} style={themeSwitchAnim}>
+        <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
+      </animated.div>
+
+      <div className={styles.firstView}>
+        <div className={styles.section1}>
+          <div className={styles.pageTitle} ref={titleRef}>
+            <Link href="/" scroll className={styles.anchorLink}>
+              <Heading translate="no">napochaan.com</Heading>
+            </Link>
+          </div>
+
+          <div className={styles.mainVisualRoot}>
+            <animated.img
+              className={styles.fillImage}
+              style={mainVisualAnim}
               decoding="async"
               src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
               alt="naporitan のオリジナルキャラクター"
               width={800}
               height={800}
-              loading="lazy"
             />
-          </animated.div>
-        </div>
-        <animated.div className={styles.switchTheme} style={themeSwitchAnim}>
-          <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
-        </animated.div>
-
-        <div className={styles.firstView}>
-          <div className={styles.section1}>
-            <div className={styles.pageTitle} ref={titleRef}>
-              <Link href="/" scroll className={styles.anchorLink}>
-                <Heading translate="no">napochaan.com</Heading>
-              </Link>
-            </div>
-
-            <div className={styles.mainVisualRoot}>
-              <animated.img
-                className={styles.fillImage}
-                style={mainVisualAnim}
-                decoding="async"
-                src="https://imagedelivery.net/TQ7GECK3x8OMl8rY8WdOxQ/c62aaf15-fa76-4dd6-1cbb-6c75aa1a5f00/800x800"
-                alt="naporitan のオリジナルキャラクター"
-                width={800}
-                height={800}
-              />
-            </div>
           </div>
-
-          <animated.div className={styles.aboutMeWrapper} ref={aboutRef} style={aboutAnim}>
-            <Article className={styles.aboutMeRoot} id="about">
-              <Link href="/#about" scroll className={styles.anchorLink}>
-                <Heading translate="no">About me</Heading>
-              </Link>
-              <div className={styles.aboutMe}>
-                <p>
-                  <Budoux>
-                    自分を表現するために選んだフロントエンドという分野で自分を表現できないままソフトウェアエンジニアとして彷徨い続けている。
-                  </Budoux>
-                </p>
-                <p>
-                  <Budoux>
-                    現在はプログラムが持つ統一性という部分に惹かれ関数型言語のあり方を好んでいる。実は関数になりたいと思っている。
-                  </Budoux>
-                </p>
-              </div>
-
-              <Article className={styles.section3} id="love">
-                <div>
-                  <Link href="/#love" scroll className={styles.anchorLink}>
-                    <Heading translate="no">Love</Heading>
-                  </Link>
-                </div>
-                <ul className={styles.tags} translate="no">
-                  <li>TypeScript</li>
-                  <li>Haskell</li>
-                  <li>Music(ボカロ)</li>
-                  <li>FPS</li>
-                </ul>
-              </Article>
-
-              <Article className={styles.section3} id="skill">
-                <div>
-                  <Link href="/#skill" scroll className={styles.anchorLink}>
-                    <Heading translate="no">Skill</Heading>
-                  </Link>
-                </div>
-                <ul className={styles.tags} translate="no">
-                  <li>TypeScript</li>
-                  <li>React</li>
-                  <li>CSS</li>
-                  <li>Next.js</li>
-                  <li>NestJS</li>
-                  <li>firebase</li>
-                  <li>GraphQL</li>
-                  <li>Python</li>
-                  <li>Flask</li>
-                  <li>FastAPI</li>
-                  <li>pandas</li>
-                  <li>NumPy</li>
-                  <li>scikit-learn</li>
-                  <li>Ruby</li>
-                  <li>Rails</li>
-                  <li>Swift</li>
-                  <li>ReactNative</li>
-                  <li>Cloudflare Workers</li>
-                  <li>Cloudflare Pages</li>
-                  <li>Cloudflare R2</li>
-                  <li>Cloudflare Images</li>
-                </ul>
-              </Article>
-            </Article>
-          </animated.div>
         </div>
 
-        <animated.div ref={worksRef} className={styles.worksWrapper} style={worksAnim}>
-          <Section id="works" className={styles.worksRoot}>
-            <div>
-              <Link href="/#works" className={styles.anchorLink}>
-                <Heading translate="no">Works</Heading>
-              </Link>
+        <animated.div className={styles.aboutMeWrapper} ref={aboutRef} style={aboutAnim}>
+          <Article className={styles.aboutMeRoot} id="about">
+            <Link href="/#about" scroll className={styles.anchorLink}>
+              <Heading translate="no">About me</Heading>
+            </Link>
+            <div className={styles.aboutMe}>
+              <p>
+                <Budoux>
+                  自分を表現するために選んだフロントエンドという分野で自分を表現できないままソフトウェアエンジニアとして彷徨い続けている。
+                </Budoux>
+              </p>
+              <p>
+                <Budoux>
+                  現在はプログラムが持つ統一性という部分に惹かれ関数型言語のあり方を好んでいる。実は関数になりたいと思っている。
+                </Budoux>
+              </p>
             </div>
-            <Section id="histories" className={styles.section3} ref={serviceRef}>
+
+            <Article className={styles.section3} id="love">
               <div>
-                <Link href="/#histories" scroll className={styles.anchorLink}>
-                  <Heading translate="no">History</Heading>
+                <Link href="/#love" scroll className={styles.anchorLink}>
+                  <Heading translate="no">Love</Heading>
                 </Link>
               </div>
+              <ul className={styles.tags} translate="no">
+                <li>TypeScript</li>
+                <li>Haskell</li>
+                <li>Music(ボカロ)</li>
+                <li>FPS</li>
+              </ul>
+            </Article>
 
-              <ShowCase items={historiesItems} visibility={serviceInView} />
-            </Section>
-
-            <Section id="library" className={styles.section3} ref={libraryRef}>
+            <Article className={styles.section3} id="skill">
               <div>
-                <Link href="/#library" scroll className={styles.anchorLink}>
-                  <Heading translate="no">Library</Heading>
+                <Link href="/#skill" scroll className={styles.anchorLink}>
+                  <Heading translate="no">Skill</Heading>
                 </Link>
               </div>
-
-              <ShowCase items={libraryItems} visibility={libraryInView} />
-            </Section>
-          </Section>
+              <ul className={styles.tags} translate="no">
+                <li>TypeScript</li>
+                <li>React</li>
+                <li>CSS</li>
+                <li>Next.js</li>
+                <li>NestJS</li>
+                <li>firebase</li>
+                <li>GraphQL</li>
+                <li>Python</li>
+                <li>Flask</li>
+                <li>FastAPI</li>
+                <li>pandas</li>
+                <li>NumPy</li>
+                <li>scikit-learn</li>
+                <li>Ruby</li>
+                <li>Rails</li>
+                <li>Swift</li>
+                <li>ReactNative</li>
+                <li>Cloudflare Workers</li>
+                <li>Cloudflare Pages</li>
+                <li>Cloudflare R2</li>
+                <li>Cloudflare Images</li>
+              </ul>
+            </Article>
+          </Article>
         </animated.div>
+      </div>
 
-        <animated.div className={styles.contactWrapper} ref={mergeRefs([contactRef, lastRef])} style={contactAnim}>
-          <Section id="contact" className={styles.contactRoot}>
+      <animated.div ref={worksRef} className={styles.worksWrapper} style={worksAnim}>
+        <Section id="works" className={styles.worksRoot}>
+          <div>
+            <Link href="/#works" className={styles.anchorLink}>
+              <Heading translate="no">Works</Heading>
+            </Link>
+          </div>
+          <Section id="histories" className={styles.section3} ref={serviceRef}>
             <div>
-              <Link href="/#contact" scroll className={styles.anchorLink}>
-                <Heading translate="no">SNS&nbsp;&amp;&nbsp;Contact</Heading>
+              <Link href="/#histories" scroll className={styles.anchorLink}>
+                <Heading translate="no">History</Heading>
               </Link>
             </div>
-            <p>
-              <Budoux>連絡は twitter の DM が一番つながりやすいです。</Budoux>
-              <Link href="https://bento.me/napochaan" target="_blank" className={styles.link}>
-                bento.me
-              </Link>
-            </p>
 
-            <address className={styles.contactList}>
-              <Link
-                href="https://github.com/naporin0624"
-                target="_blank"
-                className={styles.textLink}
-                aria-label="github link"
-                title="github のリンク"
-              >
-                <IconBrandGithubFilled className={styles.contactItem} aria-hidden="true" />
-              </Link>
-
-              <Link
-                href="https://twitter.com/naporin24690"
-                target="_blank"
-                className={styles.textLink}
-                aria-label="twitter link"
-                title="twitter のリンク"
-              >
-                <IconBrandTwitterFilled className={styles.contactItem} aria-hidden="true" />
-              </Link>
-              <Link
-                href="mailto:contact@napochaan.com"
-                target="_blank"
-                className={styles.textLink}
-                aria-label="email link"
-                title="email のリンク"
-              >
-                <IconAt className={styles.contactItem} aria-hidden="true" />
-              </Link>
-            </address>
+            <ShowCase items={historiesItems} visibility={serviceInView} />
           </Section>
-        </animated.div>
-      </Section>
-    </>
+
+          <Section id="library" className={styles.section3} ref={libraryRef}>
+            <div>
+              <Link href="/#library" scroll className={styles.anchorLink}>
+                <Heading translate="no">Library</Heading>
+              </Link>
+            </div>
+
+            <ShowCase items={libraryItems} visibility={libraryInView} />
+          </Section>
+        </Section>
+      </animated.div>
+
+      <animated.div className={styles.contactWrapper} ref={mergeRefs([contactRef, lastRef])} style={contactAnim}>
+        <Section id="contact" className={styles.contactRoot}>
+          <div>
+            <Link href="/#contact" scroll className={styles.anchorLink}>
+              <Heading translate="no">SNS&nbsp;&amp;&nbsp;Contact</Heading>
+            </Link>
+          </div>
+          <p>
+            <Budoux>連絡は twitter の DM が一番つながりやすいです。</Budoux>
+            <Link href="https://bento.me/napochaan" target="_blank" className={styles.link}>
+              bento.me
+            </Link>
+          </p>
+
+          <address className={styles.contactList}>
+            <Link
+              href="https://github.com/naporin0624"
+              target="_blank"
+              className={styles.textLink}
+              aria-label="github link"
+              title="github のリンク"
+            >
+              <IconBrandGithubFilled className={styles.contactItem} aria-hidden="true" />
+            </Link>
+
+            <Link
+              href="https://twitter.com/naporin24690"
+              target="_blank"
+              className={styles.textLink}
+              aria-label="twitter link"
+              title="twitter のリンク"
+            >
+              <IconBrandTwitterFilled className={styles.contactItem} aria-hidden="true" />
+            </Link>
+            <Link
+              href="mailto:contact@napochaan.com"
+              target="_blank"
+              className={styles.textLink}
+              aria-label="email link"
+              title="email のリンク"
+            >
+              <IconAt className={styles.contactItem} aria-hidden="true" />
+            </Link>
+          </address>
+        </Section>
+      </animated.div>
+    </Section>
   );
 };
 

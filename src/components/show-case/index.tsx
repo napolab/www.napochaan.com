@@ -15,7 +15,7 @@ export type ShowCaseProps = {
   visibility?: boolean;
   items: Item[];
 };
-const ShowCase = forwardRef<HTMLDivElement, ShowCaseProps>(({ visibility, items }, ref) => {
+const ShowCase = forwardRef<HTMLDivElement, ShowCaseProps>(({ visibility = false, items }, ref) => {
   const trails = useTrail(items.length, {
     from: { opacity: 0, transform: "scale(0.8)" },
     opacity: visibility ? 1 : 0,
