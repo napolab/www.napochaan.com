@@ -326,6 +326,14 @@ const WorkItem = memo((item) => {
 
 const histories: Work[] = [
   {
+    caption: ["naporitan", "オリジナル名刺"],
+    alt: "naporitan の名刺",
+    id: "b4b60b0b-627b-4401-b6c5-ea13a6ca0000",
+    href: "https://x.com/naporin24690/status/1705577231928697299",
+    content:
+      "名刺のデザイン(figma)、入稿すべて自分で行いオリジナルの名刺を作成した。\nキャラクターを大きく表示して必要な情報のみをまとめること、レイアウトにこだわった。",
+  },
+  {
     caption: ["ボカコレランキング", "アーカイブの作成"],
     alt: "ボカコレ2023夏ランキングアーカイブのスクリーンショット",
     id: "98e71cf5-cc6e-4413-7c28-520570871800",
