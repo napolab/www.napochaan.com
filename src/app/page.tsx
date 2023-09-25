@@ -99,10 +99,10 @@ const Page: NextPage = () => {
       })),
     [],
   );
-  
+
   useEffect(() => {
-    void reportAccessibility(React)
-  }, [])
+    void reportAccessibility(React);
+  }, []);
 
   return (
     <Section className={styles.pageRoot}>
