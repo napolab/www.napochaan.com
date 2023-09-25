@@ -1,6 +1,6 @@
 "use client";
 import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
-import { IconAt, IconBrandGithubFilled, IconBrandTwitterFilled } from "@tabler/icons-react";
+import { IconAt, IconBrandGithubFilled, IconBrandX } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -170,6 +170,7 @@ const Page: NextPage = () => {
                 <li>Haskell</li>
                 <li>Music(ボカロ)</li>
                 <li>FPS</li>
+                <li>ニーゴ(プロセカ)</li>
               </ul>
             </Article>
 
@@ -244,7 +245,7 @@ const Page: NextPage = () => {
             </Link>
           </div>
           <p>
-            <Budoux>連絡は twitter の DM が一番つながりやすいです。</Budoux>
+            <Budoux>連絡は X の DM が一番つながりやすいです。</Budoux>
             <Link href="https://bento.me/napochaan" target="_blank" className={styles.link}>
               bento.me
             </Link>
@@ -268,7 +269,7 @@ const Page: NextPage = () => {
               aria-label="twitter link"
               title="twitter のリンク"
             >
-              <IconBrandTwitterFilled className={styles.contactItem} aria-hidden="true" />
+              <IconBrandX className={styles.contactItem} aria-hidden="true" />
             </Link>
             <Link
               href="mailto:contact@napochaan.com"

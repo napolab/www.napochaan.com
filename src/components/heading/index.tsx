@@ -1,3 +1,4 @@
+"use client";
 import { forwardRef, memo } from "react";
 
 import { useHeadingLevel } from "@hooks/heading-level";
