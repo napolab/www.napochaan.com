@@ -4,7 +4,7 @@ import { IconAt, IconBrandGithubFilled, IconBrandX } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import { memo, useMemo } from "react";
+import React, { memo, useEffect, useMemo } from "react";
 import { mergeRefs } from "react-merge-refs";
 import { useMedia } from "use-media";
 
@@ -20,6 +20,7 @@ import WrappedText from "@components/wrapped-text";
 import { isTheme } from "@theme";
 import { vars, mediaQueries } from "@theme/css";
 import { cloudflareImages } from "@utils/cloudflare-images";
+import reportAccessibility from "@utils/report-accessibility";
 
 import * as styles from "./styles.css";
 
@@ -98,6 +99,10 @@ const Page: NextPage = () => {
       })),
     [],
   );
+  
+  useEffect(() => {
+    void reportAccessibility(React)
+  }, [])
 
   return (
     <Section className={styles.pageRoot}>
@@ -327,7 +332,7 @@ const WorkItem = memo((item) => {
 
 const histories: Work[] = [
   {
-    caption: ["naporitan", "オリジナル名刺"],
+    caption: ["オリジナル名刺", "の作成"],
     alt: "naporitan の名刺",
     id: "b4b60b0b-627b-4401-b6c5-ea13a6ca0000",
     href: "https://x.com/naporin24690/status/1705577231928697299",
