@@ -186,27 +186,9 @@ const Page: NextPage = () => {
                 </Link>
               </div>
               <ul className={styles.tags} translate="no">
-                <li>TypeScript</li>
-                <li>React</li>
-                <li>CSS</li>
-                <li>Next.js</li>
-                <li>NestJS</li>
-                <li>firebase</li>
-                <li>GraphQL</li>
-                <li>Python</li>
-                <li>Flask</li>
-                <li>FastAPI</li>
-                <li>pandas</li>
-                <li>NumPy</li>
-                <li>scikit-learn</li>
-                <li>Ruby</li>
-                <li>Rails</li>
-                <li>Swift</li>
-                <li>ReactNative</li>
-                <li>Cloudflare Workers</li>
-                <li>Cloudflare Pages</li>
-                <li>Cloudflare R2</li>
-                <li>Cloudflare Images</li>
+                {techTags.map((tag) => (
+                  <li key={tag}>{tag}</li>
+                ))}
               </ul>
             </Article>
           </Article>
@@ -293,6 +275,31 @@ const Page: NextPage = () => {
 };
 
 export default memo(Page);
+
+const techTags: string[] = [
+  "TypeScript",
+  "React",
+  "CSS",
+  "Next.js",
+  "NestJS",
+  "firebase",
+  "ReactNative",
+  "Expo",
+  "GraphQL",
+  "Python",
+  "Flask",
+  "FastAPI",
+  "pandas",
+  "NumPy",
+  "scikit-learn",
+  "Ruby",
+  "Rails",
+  "Swift",
+  "Cloudflare Workers",
+  "Cloudflare Pages",
+  "Cloudflare R2",
+  "Cloudflare Images",
+];
 
 type Work = {
   id: string;
