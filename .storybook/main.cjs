@@ -6,10 +6,11 @@ const baseURL = process.env.STORYBOOK_BASE ?? "";
 const config = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
   addons: ["@storybook/addon-links", "@storybook/addon-essentials", "storybook-dark-mode", "@storybook/addon-a11y"],
-  framework: "@storybook/react",
-  core: {
-    builder: "@storybook/builder-vite",
+  framework: {
+    name: "@storybook/react-vite",
+    options: {},
   },
+  core: {},
   features: {
     storyStoreV7: true,
   },
