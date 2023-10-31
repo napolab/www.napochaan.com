@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "next dev",
     "wrangler:dev": "next-on-pages && wrangler pages dev --port 3000 .vercel/output/static",
-    "prebuild": "rimraf dist",
+    "prebuild": "rimraf dist && rimraf .next",
     "build": "next build",
     "start": "next start",
     "lint": "npm-run-all -s 'lint:*'",
