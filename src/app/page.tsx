@@ -12,6 +12,7 @@ import Article from "@components/article";
 import Budoux from "@components/budoux";
 import { DialogRoot, DialogContent, DialogTrigger } from "@components/dialog";
 import Heading from "@components/heading";
+import IconZenn from "@components/icons/zenn.svg";
 import Section from "@components/section";
 import ShowCase from "@components/show-case";
 import SquareImage from "@components/square-image";
@@ -250,13 +251,22 @@ const Page: NextPage = () => {
             </Link>
 
             <Link
-              href="https://twitter.com/naporin24690"
+              href="https://x.com/naporin24690"
               target="_blank"
               className={styles.textLink}
-              aria-label="twitter link"
-              title="twitter のリンク"
+              aria-label="X link"
+              title="X のリンク"
             >
               <IconBrandX className={styles.contactItem} aria-hidden="true" />
+            </Link>
+            <Link
+              href="https://zenn.dev/naporin24690"
+              target="_blank"
+              className={styles.textLink}
+              aria-label="zenn link"
+              title="zenn のリンク"
+            >
+              <IconZenn className={styles.contactItem} aria-hidden="true" />
             </Link>
             <Link
               href="mailto:contact@napochaan.com"
