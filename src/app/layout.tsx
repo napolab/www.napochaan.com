@@ -6,7 +6,7 @@ import { clsx } from "@utils/clsx";
 
 import * as styles from "./layout.css";
 
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { FC, PropsWithChildren } from "react";
 
 import "@acab/reset.css";
@@ -46,10 +46,14 @@ const RootLayout: FC<Props> = ({ children }) => {
 };
 
 const description = "ReactとTypeScriptのオタクだったりオタクじゃなかったりします。";
-export const metadata: Metadata = {
-  title: "napochaan",
-  colorScheme: "light dark",
+
+export const viewport: Viewport = {
   themeColor: "#fff",
+  colorScheme: "light dark",
+};
+export const metadata: Metadata = {
+  metadataBase: new URL("https://napochaan.com"),
+  title: "napochaan",
   icons: {
     icon: [
       { url: "/favicon.ico", rel: "icon" },
