@@ -129,7 +129,7 @@ const Page: NextPage = () => {
       <div className={styles.firstView}>
         <div className={styles.section1}>
           <div className={styles.pageTitle} ref={titleRef}>
-            <Link href="/" scroll={false} className={styles.anchorLink}>
+            <Link href="/" scroll className={styles.anchorLink}>
               <Heading translate="no">napochaan.com</Heading>
             </Link>
           </div>
@@ -149,7 +149,7 @@ const Page: NextPage = () => {
 
         <animated.div className={styles.aboutMeWrapper} ref={aboutRef} style={aboutAnim}>
           <Article className={styles.aboutMeRoot} id="about">
-            <Link href="/#about" scroll={false} className={styles.anchorLink}>
+            <Link href="/#about" scroll className={styles.anchorLink}>
               <Heading translate="no">About me</Heading>
             </Link>
             <div className={styles.aboutMe}>
@@ -167,7 +167,7 @@ const Page: NextPage = () => {
 
             <Article className={styles.section3} id="love">
               <div>
-                <Link href="/#love" scroll={false} className={styles.anchorLink}>
+                <Link href="/#love" scroll className={styles.anchorLink}>
                   <Heading translate="no">Love</Heading>
                 </Link>
               </div>
@@ -182,7 +182,7 @@ const Page: NextPage = () => {
 
             <Article className={styles.section3} id="skill">
               <div>
-                <Link href="/#skill" scroll={false} className={styles.anchorLink}>
+                <Link href="/#skill" scroll className={styles.anchorLink}>
                   <Heading translate="no">Skill</Heading>
                 </Link>
               </div>
@@ -199,13 +199,13 @@ const Page: NextPage = () => {
       <animated.div ref={worksRef} className={styles.worksWrapper} style={worksAnim}>
         <Section id="works" className={styles.worksRoot}>
           <div>
-            <Link href="/#works" scroll={false} className={styles.anchorLink}>
+            <Link href="/#works" scroll className={styles.anchorLink}>
               <Heading translate="no">Works</Heading>
             </Link>
           </div>
           <Section id="histories" className={styles.section3} ref={serviceRef}>
             <div>
-              <Link href="/#histories" scroll={false} className={styles.anchorLink}>
+              <Link href="/#histories" scroll className={styles.anchorLink}>
                 <Heading translate="no">History</Heading>
               </Link>
             </div>
@@ -215,7 +215,7 @@ const Page: NextPage = () => {
 
           <Section id="library" className={styles.section3} ref={libraryRef}>
             <div>
-              <Link href="/#library" scroll={false} className={styles.anchorLink}>
+              <Link href="/#library" scroll className={styles.anchorLink}>
                 <Heading translate="no">Library</Heading>
               </Link>
             </div>
@@ -228,7 +228,7 @@ const Page: NextPage = () => {
       <animated.div className={styles.contactWrapper} ref={mergeRefs([contactRef, lastRef])} style={contactAnim}>
         <Section id="contact" className={styles.contactRoot}>
           <div>
-            <Link href="/#contact" scroll={false} className={styles.anchorLink}>
+            <Link href="/#contact" scroll className={styles.anchorLink}>
               <Heading translate="no">SNS&nbsp;&amp;&nbsp;Contact</Heading>
             </Link>
           </div>
