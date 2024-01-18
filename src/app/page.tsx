@@ -129,7 +129,7 @@ const Page: NextPage = () => {
       <div className={styles.firstView}>
         <div className={styles.section1}>
           <div className={styles.pageTitle} ref={titleRef}>
-            <Link href="/" scroll className={styles.anchorLink}>
+            <Link href="#" scroll className={styles.anchorLink}>
               <Heading translate="no">napochaan.com</Heading>
             </Link>
           </div>
@@ -149,7 +149,7 @@ const Page: NextPage = () => {
 
         <animated.div className={styles.aboutMeWrapper} ref={aboutRef} style={aboutAnim}>
           <Article className={styles.aboutMeRoot} id="about">
-            <Link href="/#about" scroll className={styles.anchorLink}>
+            <Link href="#about" scroll className={styles.anchorLink}>
               <Heading translate="no">About me</Heading>
             </Link>
             <div className={styles.aboutMe}>
@@ -167,7 +167,7 @@ const Page: NextPage = () => {
 
             <Article className={styles.section3} id="love">
               <div>
-                <Link href="/#love" scroll className={styles.anchorLink}>
+                <Link href="#love" scroll className={styles.anchorLink}>
                   <Heading translate="no">Love</Heading>
                 </Link>
               </div>
@@ -182,7 +182,7 @@ const Page: NextPage = () => {
 
             <Article className={styles.section3} id="skill">
               <div>
-                <Link href="/#skill" scroll className={styles.anchorLink}>
+                <Link href="#skill" scroll className={styles.anchorLink}>
                   <Heading translate="no">Skill</Heading>
                 </Link>
               </div>
@@ -199,13 +199,13 @@ const Page: NextPage = () => {
       <animated.div ref={worksRef} className={styles.worksWrapper} style={worksAnim}>
         <Section id="works" className={styles.worksRoot}>
           <div>
-            <Link href="/#works" scroll className={styles.anchorLink}>
+            <Link href="#works" scroll className={styles.anchorLink}>
               <Heading translate="no">Works</Heading>
             </Link>
           </div>
           <Section id="histories" className={styles.section3} ref={serviceRef}>
             <div>
-              <Link href="/#histories" scroll className={styles.anchorLink}>
+              <Link href="#histories" scroll className={styles.anchorLink}>
                 <Heading translate="no">History</Heading>
               </Link>
             </div>
@@ -215,7 +215,7 @@ const Page: NextPage = () => {
 
           <Section id="library" className={styles.section3} ref={libraryRef}>
             <div>
-              <Link href="/#library" scroll className={styles.anchorLink}>
+              <Link href="#library" scroll className={styles.anchorLink}>
                 <Heading translate="no">Library</Heading>
               </Link>
             </div>
@@ -348,6 +348,21 @@ const WorkItem = memo((item) => {
 }) satisfies FC<Work>;
 
 const histories: Work[] = [
+  {
+    id: "a702bfdf-5064-4887-ced5-0c420d2bdb00",
+    alt: "大阪関西国際芸術祭2023に出展したシステム図",
+    caption: ["「多面体、鏡面」システム作成"],
+    href: "https://x.com/StudioGnu/status/1741010587495416144?s=20",
+    content:
+      "大阪関西国際芸術祭2023に出展するためのシステムを作成した。\n感想投稿、ChatGPT API と stable diffusion による自動動画生成の仕組みを作成、ポスター、投稿コメント表示画面の実装を行った。大部分を cloudflare の製品で作るという技術的にも挑戦的なことを行った。",
+  },
+  {
+    id: "dde25115-a4c2-4169-6925-91374f683c00",
+    alt: "シャノン 1st アルバム LP",
+    caption: ["第一象徴体系 LP 作成"],
+    href: "https://1st-album.hakualab.org/",
+    content: "シャノンさんの 1st アルバムの LP を作成した。\nFigma でデザインを行い、Astro で実装した。",
+  },
   {
     caption: ["オリジナル名刺", "の作成"],
     alt: "naporitan の名刺",
