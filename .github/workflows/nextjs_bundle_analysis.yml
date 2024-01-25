@@ -24,7 +24,7 @@ jobs:
       - uses: ./.github/workflows/modules/setup-node
 
       - name: Restore next build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: restore-build-cache
         env:
           cache-name: cache-next-build
