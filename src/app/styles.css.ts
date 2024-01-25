@@ -644,6 +644,7 @@ export const dialogContent = style({
  * @package
  */
 export const description = style({
+  width: "100%",
   lineHeight: 1.8,
   letterSpacing: 1.2,
   fontSize: 18,

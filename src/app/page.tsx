@@ -349,6 +349,29 @@ const WorkItem = memo((item) => {
 
 const histories: Work[] = [
   {
+    id: "d8f97c4f-df19-4f40-2193-00b38dfc5500",
+    alt: "StudioGnu HP のスクリーンショット",
+    caption: ["StudioGnu HP", "の作成"],
+    href: "https://www.studiognu.org",
+    content: [
+      "StudioGnu の HP を作成した。",
+      "Next.js と vanilla-extract を主に使用している。データ入稿部は MicroCMS を用いており、Interweave を利用して文字列を HTML として変換している。",
+      "また、作品ごとに動的な og:image が生成されるようになっている。これには next/og を利用した。",
+    ].join(""),
+  },
+  {
+    id: "b387674e-9f1d-4f71-00d2-9673b2dac400",
+    alt: "楽曲「デュレエ」関連データ解析セクションのスクリーンショット",
+    caption: ["楽曲「デュレエ」", "関連データ解析"],
+    href: "https://www.youtube.com/watch?v=dpT-ZAPVvyI",
+    content: [
+      "楽曲「デュレエ」の一部で使われているデータの解析を担当した。",
+      "データ分析部は JupyterLab と pandas, numpy を描画には matplotlib, NetWorkX と js の canvas を用いた。",
+      "サムネイル変遷においては 描画する内容が膨大で matplotlib では処理できなかったため、 canvas で行っている。",
+      "適切なアウトプットを行うために言語に縛られずに動けた。",
+    ].join("\n"),
+  },
+  {
     id: "a702bfdf-5064-4887-ced5-0c420d2bdb00",
     alt: "大阪関西国際芸術祭2023に出展したシステム図",
     caption: ["「多面体、鏡面」システム作成"],
