@@ -374,7 +374,7 @@ const histories: Work[] = [
   {
     id: "a702bfdf-5064-4887-ced5-0c420d2bdb00",
     alt: "大阪関西国際芸術祭2023に出展したシステム図",
-    caption: ["「多面体、鏡面」システム作成"],
+    caption: ["「多面体、鏡面」", "システム作成"],
     href: "https://x.com/StudioGnu/status/1741010587495416144?s=20",
     content:
       "大阪関西国際芸術祭2023に出展するためのシステムを作成した。\n感想投稿、ChatGPT API と stable diffusion による自動動画生成の仕組みを作成、ポスター、投稿コメント表示画面の実装を行った。大部分を cloudflare の製品で作るという技術的にも挑戦的なことを行った。",
