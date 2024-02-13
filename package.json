@@ -100,7 +100,7 @@
     "trim": "1.0.1",
     "trim-newlines": "3.0.1",
     "glob-parent": "6.0.2",
-    "word-wrap": "1.2.4"
+    "word-wrap": "1.2.5"
   },
   "volta": {
     "node": "20.10.0"
