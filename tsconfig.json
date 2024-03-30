@@ -38,5 +38,5 @@
     ".next/types/**/*.ts",
     "postcss.config.cjs"
   ],
-  "exclude": ["node_modules", "dist", "coverage", "out", "build", "public", "storybook-static", ".next"]
+  "exclude": ["node_modules", "dist", "coverage", "out", "build", "public", ".next"]
 }

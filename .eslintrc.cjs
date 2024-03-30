@@ -37,13 +37,5 @@ module.exports = {
         "no-restricted-imports": "off",
       },
     },
-    {
-      files: ["**/*.stories.tsx", "**/*.story.tsx"],
-      extends: ["plugin:storybook/recommended"],
-      rules: {
-        "react/jsx-no-bind": "off",
-        "no-restricted-imports": "off",
-      },
-    },
   ],
 };

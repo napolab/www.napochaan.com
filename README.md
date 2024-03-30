@@ -16,10 +16,6 @@ Welcome to the repository of www.napochaan.com! This is the home page of @napori
 
 The UI design and color palette of the website can be found on Figma [here](https://www.figma.com/file/JZ24VUuy639Kf29oiB32FX/www.napochaan.com?node-id=0%3A1). The design includes both light and dark themes, as well as a color palette that is also available in the vanilla-extract format [here](https://github.com/napolab/www.napochaan.com/tree/main/src/theme/config).
 
-## Component Library
-
-The component library used to build the website can be found on Storybook [here](https://napolab.github.io/www.napochaan.com/main/). It is designed to be compatible with the Figma design.
-
 ## Technologies Used
 
 The website is built using the following technologies:
