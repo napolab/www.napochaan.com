@@ -6,6 +6,11 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [...(process.env.NODE_ENV === "test" ? [react()] : []), vanillaExtractPlugin(), tsconfigPaths()],
+  css: {
+    postcss: {
+      plugins: [],
+    },
+  },
   test: {
     globals: true,
     environment: "jsdom",
