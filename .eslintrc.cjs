@@ -1,9 +1,11 @@
 module.exports = {
+  plugins: ["next-on-pages"],
   extends: [
     "@naporin0624/eslint-config",
     "@naporin0624/eslint-config/react",
     "plugin:jsx-a11y/strict",
     "plugin:@next/next/recommended",
+    "plugin:next-on-pages/recommended",
   ],
   rules: {
     "no-void": "off",
@@ -32,14 +34,6 @@ module.exports = {
     {
       files: ["**/__tests__/**/*.[t]s?(x)", "**/?(*.)+(spec|test).[t]s?(x)"],
       extends: ["plugin:jest-dom/recommended", "plugin:testing-library/react"],
-      rules: {
-        "react/jsx-no-bind": "off",
-        "no-restricted-imports": "off",
-      },
-    },
-    {
-      files: ["**/*.stories.tsx", "**/*.story.tsx"],
-      extends: ["plugin:storybook/recommended"],
       rules: {
         "react/jsx-no-bind": "off",
         "no-restricted-imports": "off",

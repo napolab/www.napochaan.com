@@ -1,9 +1,9 @@
 node_modules
 .next
 *.log
-storybook-static
 tsconfig.tsbuildinfo
 out
 .lighthouseci
 .vercel
 coverage
+.wrangler
