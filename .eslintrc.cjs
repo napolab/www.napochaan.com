@@ -1,9 +1,11 @@
 module.exports = {
+  plugins: ["next-on-pages"],
   extends: [
     "@naporin0624/eslint-config",
     "@naporin0624/eslint-config/react",
     "plugin:jsx-a11y/strict",
     "plugin:@next/next/recommended",
+    "plugin:next-on-pages/recommended",
   ],
   rules: {
     "no-void": "off",

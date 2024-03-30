@@ -6,3 +6,4 @@ out
 .lighthouseci
 .vercel
 coverage
+.wrangler
