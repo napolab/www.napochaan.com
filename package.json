@@ -44,6 +44,8 @@
     "@naporin0624/eslint-config": "^0.14.2",
     "@next/eslint-plugin-next": "^14.0.0",
     "@svgr/webpack": "^8.0.0",
+    "@testing-library/jest-dom": "^6.4.2",
+    "@testing-library/react": "^14.2.2",
     "@types/eslint": "^8.21.1",
     "@types/jsdom": "^21.1.0",
     "@types/node": "^20.0.0",
