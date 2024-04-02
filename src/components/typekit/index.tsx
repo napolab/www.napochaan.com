@@ -1,9 +1,9 @@
 type Props = {
-  id: string;
+  projectId: string;
 };
 
-export const OptimizeTypeKit = async ({ id }: Props) => {
-  const url = `https://use.typekit.net/${id}.css`;
+export const OptimizeTypeKit = async ({ projectId }: Props) => {
+  const url = `https://use.typekit.net/${projectId}.css`;
   const res = await fetch(url);
   const css = await res.text();
 
