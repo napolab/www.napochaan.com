@@ -7,9 +7,7 @@ import { clsx } from "@utils/clsx";
 import * as styles from "./layout.css";
 
 import type { Metadata, Viewport } from "next";
-import type { FC, PropsWithChildren } from "react";
-
-import "@acab/reset.css";
+import type { PropsWithChildren } from "react";
 
 const notoSansJP = Noto_Sans_JP({
   weight: ["400"],
@@ -28,9 +26,11 @@ type Props = PropsWithChildren<{
   //
 }>;
 
-const RootLayout: FC<Props> = ({ children }) => {
+const RootLayout = async ({ children }: Props) => {
   return (
     <html lang="ja">
+      <head>{/* <OptimizeTypeKit projectId="ygf6mjq" /> */}</head>
+
       <body className={fonts}>
         <ThemeProvider defaultTheme="dark">
           <HeadingLevelProvider>

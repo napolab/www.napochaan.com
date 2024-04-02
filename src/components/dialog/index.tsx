@@ -14,7 +14,7 @@ import * as styles from "./styles.css";
 
 import type { DialogProps } from "@radix-ui/react-dialog";
 import type { UseTransitionProps } from "@react-spring/web";
-import type { FC, ReactNode } from "react";
+import type { ComponentPropsWithoutRef, FC, ReactNode } from "react";
 
 type ContextValue = {
   open: boolean;
@@ -91,10 +91,10 @@ export const DialogContent = memo(
   }) satisfies FC<DialogContentProps>,
 );
 
-export const DialogTrigger: typeof Trigger = memo(
-  forwardRef(({ className, ...props }, ref) => {
+export const DialogTrigger = forwardRef<HTMLButtonElement, ComponentPropsWithoutRef<typeof Trigger>>(
+  ({ className, ...props }, ref) => {
     return <Trigger {...props} ref={ref} className={clsx(styles.trigger, className)} />;
-  }),
+  },
 );
 
 type DialogRootProps = DialogProps;

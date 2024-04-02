@@ -7,6 +7,7 @@ import type { Theme } from "@theme";
 import type { FC, PropsWithChildren } from "react";
 
 import "@theme/global.css";
+import "@acab/reset.css";
 
 /**
  * @package
