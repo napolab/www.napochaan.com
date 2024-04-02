@@ -2,8 +2,10 @@ type Props = {
   projectId: string;
 };
 
+const ts = Date.now();
 export const OptimizeTypeKit = async ({ projectId }: Props) => {
-  const url = `https://use.typekit.net/${projectId}.css?ts=${Date.now()}`;
+  console.log("ts", ts);
+  const url = `https://use.typekit.net/${projectId}.css?ts=${ts}`;
   const res = await fetch(url, {
     next: {
       revalidate: 3600,
