@@ -5,6 +5,10 @@
   "extends": [
     "markuplint:recommended-react"
   ],
+  "rules": {
+    "no-hard-code-id": false,
+    "permitted-contents": false
+  },
   "parser": {
     ".tsx$": "@markuplint/jsx-parser"
   },

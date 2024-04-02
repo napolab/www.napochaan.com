@@ -33,8 +33,10 @@ const RootLayout = async ({ children }: Props) => {
   return (
     <html lang="ja">
       <head>
+        <meta charSet="UTF-8" />
         <OptimizeTypeKit id="ygf6mjq" />
       </head>
+
       <body className={fonts}>
         <ThemeProvider defaultTheme="dark">
           <HeadingLevelProvider>
