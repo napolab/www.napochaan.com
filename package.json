@@ -60,7 +60,7 @@
     "@vitest/coverage-c8": "^0.29.3",
     "autoprefixer": "^10.4.19",
     "babel-loader": "^9.0.0",
-    "eslint": "^8.50.0",
+    "eslint": "^8.57.0",
     "eslint-config-next": "^14.0.0",
     "eslint-plugin-jest-dom": "^5.0.0",
     "eslint-plugin-next-on-pages": "^1.11.0",
@@ -74,7 +74,7 @@
     "postcss-gap-properties": "^5.0.1",
     "postcss-media-minmax": "^5.0.0",
     "postcss-preset-env": "^9.5.2",
-    "prettier": "^3.0.3",
+    "prettier": "^3.2.5",
     "rimraf": "^5.0.0",
     "ts-prune": "^0.10.3",
     "typescript": "^5.2.2",
@@ -94,7 +94,8 @@
     "trim": "1.0.1",
     "trim-newlines": "3.0.1",
     "glob-parent": "6.0.2",
-    "word-wrap": "1.2.4"
+    "word-wrap": "1.2.4",
+    "@typescript-eslint/typescript-estree": "7.4.0"
   },
   "volta": {
     "node": "20.10.0"
