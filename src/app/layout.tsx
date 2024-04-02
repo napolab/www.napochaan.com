@@ -1,6 +1,5 @@
 import { Noto_Sans_JP, Poppins } from "next/font/google";
 
-import { OptimizeTypeKit } from "@components/typekit";
 import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
 import { clsx } from "@utils/clsx";
@@ -34,14 +33,14 @@ const RootLayout = async ({ children }: Props) => {
     <html lang="ja">
       <head>
         <meta charSet="UTF-8" />
-        <OptimizeTypeKit id="ygf6mjq" />
+        {/* <OptimizeTypeKit id="ygf6mjq" /> */}
       </head>
 
       <body className={fonts}>
         <ThemeProvider defaultTheme="dark">
           <HeadingLevelProvider>
             <main className={styles.mainRoot}>{children}</main>
-            <footer className={styles.footerRoot} translate="no" style={{ fontFamily: "meloche" }}>
+            <footer className={styles.footerRoot} translate="no">
               © 2023 naporitan
             </footer>
           </HeadingLevelProvider>
