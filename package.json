@@ -94,7 +94,7 @@
     "trim": "1.0.1",
     "trim-newlines": "5.0.0",
     "glob-parent": "6.0.2",
-    "word-wrap": "1.2.4",
+    "word-wrap": "1.2.5",
     "@typescript-eslint/typescript-estree": "7.6.0"
   },
   "volta": {
