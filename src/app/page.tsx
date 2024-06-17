@@ -419,7 +419,7 @@ const histories: Work[] = [
       "大阪関西国際芸術祭2023に出展するためのシステムを作成した。\n感想投稿、ChatGPT API と stable diffusion による自動動画生成の仕組みを作成、ポスター、投稿コメント表示画面の実装を行った。大部分を cloudflare の製品で作るという技術的にも挑戦的なことを行った。",
   },
   {
-    src: "/images/histories/1st-album.hakualab.org_.png",
+    src: "/images/histories/1st-album.hakualab.org.png",
     alt: "シャノン 1st アルバム LP",
     caption: ["第一象徴体系 LP 作成"],
     href: "https://1st-album.hakualab.org/",
@@ -434,7 +434,7 @@ const histories: Work[] = [
       "名刺のデザイン(figma)、入稿すべて自分で行いオリジナルの名刺を作成した。\nキャラクターを大きく表示して必要な情報のみをまとめること、レイアウトにこだわった。",
   },
   {
-    src: "/images/histories/ボカコレアーカイブ.jpg",
+    src: "/images/histories/vocacolle-2023.jpg",
     caption: ["ボカコレランキング", "アーカイブの作成"],
     alt: "ボカコレ2023夏ランキングアーカイブのスクリーンショット",
     href: "https://vocaloid-collection-archive.studiognu.org/",
@@ -473,7 +473,7 @@ const histories: Work[] = [
       "flat-工房の買取専用アプリを開発した。\nデザイン以外の部分をすべて担当しており、firebase, React, vanilla-extract, react-hook-form を使用して作成した。",
   },
   {
-    src: "/images/histories/flat-shop.avif",
+    src: "/images/histories/flat-shop.jpg",
     caption: ["ネットショップ", "UI 開発"],
     alt: "flatkobo.shop のスクリーンショット",
     href: "https://flatkobo.shop",
@@ -481,14 +481,14 @@ const histories: Work[] = [
       "flat-工房のネットショップ UI 改善プロジェクトを担当した。\nデザイン以外の部分をすべて担当しており、lit-element を主に使用して開発した。",
   },
   {
-    src: "/images/histories/projectblue-hp.jpg",
+    src: "/images/histories/projectblue-hp.png",
     caption: ["Project BLUE", "Official HP 作成"],
     alt: "pjblue.jp のスクリーンショット",
     href: "https://pjblue.jp",
     content: "ProjectBLUE の official HP の作成を担当した。Next.js と styled-components を使用している。",
   },
   {
-    src: "/images/histories/447pro-tana.avif",
+    src: "/images/histories/447pro-tana.jpg",
     caption: ["447Records", "TANAの開発"],
     alt: "tana.447pro.com のスクリーンショット",
     href: "https://tana.447pro.com/",
@@ -496,7 +496,7 @@ const histories: Work[] = [
       "447RecordsTANA の開発を担当した。主にオーディオプレイヤー周りを実装した。\n React で作る複雑な UI に初めて取り組み、AppleMusic のようなインタラクションになるように目指した。",
   },
   {
-    src: "/images/histories/soelu-instructors.png",
+    src: "/images/histories/soelu-instructor.png",
     caption: ["instructorsページ", "の開発"],
     alt: "soelu.com/instructors のスクリーンショット",
     href: "https://twitter.com/naporin24690/status/1244865712490856448?s=20",
@@ -510,7 +510,7 @@ const histories: Work[] = [
     content: "インターン先で主要な検索ページを作った。\n検索 UI を初めて実装し、コンポーネント分割の手法などを学んだ。",
   },
   {
-    src: "/images/histories/natori-ar.avif",
+    src: "/images/histories/natori-ar.jpg",
     caption: ["名取さなさんの", "ファンアプリ作成"],
     alt: "名取さなさんがPCの上に絶っている写真",
     href: "https://twitter.com/naporin24690/status/1106641342506004480",
