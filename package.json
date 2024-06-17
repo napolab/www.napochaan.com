@@ -19,8 +19,8 @@
     "find-deadcode": "ts-prune | grep -v 'used in module'"
   },
   "dependencies": {
-    "@acab/reset.css": "^0.8.0",
-    "@cloudflare/next-on-pages": "^1.11.0",
+    "@acab/reset.css": "^0.10.0",
+    "@cloudflare/next-on-pages": "^1.11.3",
     "@radix-ui/react-dialog": "^1.0.3",
     "@radix-ui/react-scroll-area": "^1.0.3",
     "@radix-ui/react-separator": "^1.0.2",
@@ -99,5 +99,6 @@
   },
   "volta": {
     "node": "20.12.2"
-  }
+  },
+  "packageManager": "yarn@1.22.9+sha512.12a124451101ff12effe515057f7e1a81d4ac2a6c58ea15881aa4780d6e8cd2413566387fefa0d8dc050fe46914ad895b2f658998257178487e9bb4baf031e70"
 }
