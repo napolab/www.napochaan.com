@@ -353,7 +353,7 @@ const histories: Work[] = [
   {
     src: "/images/histories/flatkobo-hp.png",
     alt: "flat-工房 HP のスクリーンショット",
-    caption: ["flat-工房 HP", "の作成"],
+    caption: ["flat-工房 HP", "制作サポート"],
     href: "https://www.flatkobo.com",
     content: [
       "flat-工房の HP 制作サポートを行った。",
@@ -364,7 +364,7 @@ const histories: Work[] = [
   {
     src: "/images/histories/kanata.png",
     alt: "KANATA LP のスクリーンショット",
-    caption: ["UTAU 彼方の LP"],
+    caption: ["彼方 DL ページ作成"],
     href: "https://www.studiognu.org/lp/kanata",
     content: [
       "StudioGnu で公開した UTAU 彼方の LP を作成した。",

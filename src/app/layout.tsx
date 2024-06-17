@@ -36,7 +36,7 @@ const RootLayout = async ({ children }: Props) => {
           <HeadingLevelProvider>
             <main className={styles.mainRoot}>{children}</main>
             <footer className={styles.footerRoot} translate="no">
-              © 2023 naporitan
+              © 2023-2024 naporitan
             </footer>
           </HeadingLevelProvider>
         </ThemeProvider>

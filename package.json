@@ -1,6 +1,7 @@
 {
   "name": "www.napochaan.com",
   "type": "module",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "wrangler:dev": "npx @cloudflare/next-on-pages && wrangler pages dev --port 3000 .vercel/output/static --compatibility-flags=\"nodejs_compat\" --compatibility-date=2024-03-30",
