@@ -11,12 +11,17 @@ export const focusRing: StyleRule = {
   outlineWidth: 2,
   outlineColor: vars.pallets.border.focus,
   outlineOffset: -2,
+  boxShadow: "none",
 };
 
 export const link = style({
   display: "inline-block",
   color: vars.pallets.link.main,
   ":hover": { color: vars.pallets.link.hover },
+  ":focus-visible": focusRing,
+});
+
+export const button = style({
   ":focus-visible": focusRing,
 });
 

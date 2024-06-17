@@ -22,7 +22,7 @@ import SquareImage from "@components/square-image";
 import SwitchTheme from "@components/switch-theme";
 import WrappedText from "@components/wrapped-text";
 import { isTheme } from "@theme";
-import { vars, mediaQueries } from "@theme/css";
+import { vars, mediaQueries, button } from "@theme/css";
 import reportAccessibility from "@utils/report-accessibility";
 
 import * as styles from "./styles.css";
@@ -323,7 +323,7 @@ type Work = {
 const WorkItem = memo((item) => {
   return (
     <DialogRoot>
-      <DialogTrigger>
+      <DialogTrigger className={button}>
         <SquareImage
           src={item.src}
           caption={<WrappedText texts={item.caption} />}
