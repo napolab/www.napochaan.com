@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.6.0",
-    "@cloudflare/workers-types": "^4.20240329.0",
+    "@cloudflare/workers-types": "^4.20240614.0",
     "@markuplint/jsx-parser": "^4.4.0",
     "@markuplint/react-spec": "^4.2.0",
     "@naporin0624/eslint-config": "^0.14.2",
@@ -83,7 +83,7 @@
     "vitest": "^1.6.0",
     "vitest-axe": "^0.1.0",
     "vitest-canvas-mock": "^0.2.2",
-    "wrangler": "^3.41.0"
+    "wrangler": "^3.60.3"
   },
   "nextBundleAnalysis": {
     "budget": 358400,
