@@ -156,12 +156,7 @@ const Page: NextPage = () => {
             <div className={styles.aboutMe}>
               <p>
                 <Budoux>
-                  自分を表現するために選んだフロントエンドという分野で自分を表現できないままソフトウェアエンジニアとして彷徨い続けている。
-                </Budoux>
-              </p>
-              <p>
-                <Budoux>
-                  現在はプログラムが持つ統一性という部分に惹かれ関数型言語のあり方を好んでいる。実は関数になりたいと思っている。
+                  プログラマー。専門はウェブサイト制作とWebアプリケーション、モバイルアプリの開発・運営であり、これらを本職としている。加えて、インターネット上でのクリエイティブな活動にも積極的で、多才なクリエイターが集うStudioGnuに所属し、様々なプロジェクトにおいて技術面での貢献をしている。
                 </Budoux>
               </p>
             </div>
@@ -174,9 +169,10 @@ const Page: NextPage = () => {
               </div>
               <ul className={styles.tags} translate="no">
                 <li>TypeScript</li>
-                <li>Haskell</li>
+                <li>Cloudflare Workers</li>
                 <li>Music(ボカロ)</li>
-                <li>FPS</li>
+                <li>Valorant</li>
+                <li>東方</li>
                 <li>ニーゴ(プロセカ)</li>
               </ul>
             </Article>
@@ -291,7 +287,10 @@ const techTags: string[] = [
   "TypeScript",
   "React",
   "CSS",
+  "css module",
+  "vanilla-extract",
   "Next.js",
+  "Hono",
   "NestJS",
   "firebase",
   "ReactNative",
@@ -563,7 +562,7 @@ const libraries: Work[] = [
     content: "RxJS と React の Suspense を組み合わせて、非同期処理を効率よく行うことができるライブラリを作った。",
   },
   {
-    src: "/images/vanilla-extract.png",
+    src: "/images/libraries/vanilla-extract.png",
     caption: ["vanilla-", "extract-", "inline"],
     alt: "vanilla-extractのOGP",
     href: "https://github.com/napolab/vanilla-extract-inline",
