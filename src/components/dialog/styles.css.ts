@@ -10,6 +10,13 @@ export const overlay = style({
   position: "fixed",
   inset: 0,
   backgroundColor: vars.pallets.overlay,
+  transition: "backdrop-filter 0.3s",
+
+  "@media": {
+    [mediaQueries.sm]: {
+      backdropFilter: `blur(${vars.space.sm})`,
+    },
+  },
 });
 
 /**
@@ -50,8 +57,13 @@ export const content = style({
       maxWidth: "none",
       maxHeight: "none",
       width: "100%",
-      height: "60vh",
+      height: "90vh",
       borderRadius: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
+      "@supports": {
+        "(height: 100svh)": {
+          height: "90svh",
+        },
+      },
     },
   },
 });
