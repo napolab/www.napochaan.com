@@ -350,18 +350,6 @@ const WorkItem = memo((item) => {
 
 const histories: Work[] = [
   {
-    src: "/images/histories/next-demo.napochaan.dev.png",
-    alt: "Next.js on Cloudflare Pages のデモページのスクリーンショット",
-    caption: ["CF Images & `next/image`", "デモページ作成"],
-    href: "https://next-demo.napochaan.dev",
-    content: [
-      "next-on-pages でビルドされる Next.js でも `next/image` を使用したいというコンセプトで作成した。",
-      "`/_next/image` に対して Cloudflare Image を使って画像加工を行う Worker Routes を設定することで、vercel を使ったほうな体験が実現できないか実験した。",
-      "vercel よりも Cloudflare Images を使用した画像変換のほうが料金を大幅に抑えられそうなことが分かった。",
-      "使用した画像は Stable Diffusion を使用して生成した画像である。銀髪の子がかわいいとされている。",
-    ].join("\n"),
-  },
-  {
     src: "/images/histories/flatkobo-hp.png",
     alt: "flat-工房 HP のスクリーンショット",
     caption: ["flat-工房 HP", "の作成"],
@@ -381,7 +369,7 @@ const histories: Work[] = [
       "StudioGnu で公開した UTAU 彼方の LP を作成した。",
       "利用規約を必ず読んでほしいという要望があったため、特にダウンロードの実装に力を入れている。",
       "Cloudflare Turnstile で bot を排除した後に数分間だけ有効な signed URL がダウンロードリンクになっている。",
-      "またダウンロードリンクには DurableObjects で作られたダウンロードカウンターが搭載されており、そうダウンロード数が確認可能。",
+      "またダウンロードリンクには DurableObjects で作られたダウンロードカウンターが搭載されており、総ダウンロード数が確認可能。",
     ].join("\n"),
   },
   {
