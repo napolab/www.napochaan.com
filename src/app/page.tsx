@@ -15,6 +15,7 @@ import { DialogRoot, DialogContent, DialogTrigger } from "@components/dialog";
 import Heading from "@components/heading";
 import IconZenn from "@components/icons/zenn.svg";
 import Image from "@components/image";
+import { formatBlurURL } from "@components/image/helper";
 import Section from "@components/section";
 import ShowCase from "@components/show-case";
 import SquareImage from "@components/square-image";
@@ -322,7 +323,13 @@ const WorkItem = memo((item) => {
   return (
     <DialogRoot>
       <DialogTrigger>
-        <SquareImage src={item.src} caption={<WrappedText texts={item.caption} />} alt={item.alt} />
+        <SquareImage
+          src={item.src}
+          caption={<WrappedText texts={item.caption} />}
+          alt={item.alt}
+          placeholder="blur"
+          blurDataURL={formatBlurURL(item.src, { blur: 5 })}
+        />
       </DialogTrigger>
       <DialogContent title={<WrappedText texts={item.caption} />}>
         <div className={styles.dialogContent}>
