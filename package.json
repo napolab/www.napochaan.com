@@ -30,7 +30,7 @@
     "@tabler/icons-react": "^3.0.0",
     "@vanilla-extract/css": "^1.12.0",
     "@vanilla-extract/css-utils": "^0.1.3",
-    "budoux": "^0.5.0",
+    "budoux": "^0.6.2",
     "hex-rgb": "^5.0.0",
     "next": "^14.1.4",
     "next-themes": "^0.2.1",
@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@axe-core/react": "^4.6.0",
-    "@cloudflare/workers-types": "^4.20240329.0",
+    "@cloudflare/workers-types": "^4.20240614.0",
     "@markuplint/jsx-parser": "^4.4.0",
     "@markuplint/react-spec": "^4.2.0",
     "@naporin0624/eslint-config": "^0.14.2",
@@ -67,7 +67,7 @@
     "eslint-plugin-next-on-pages": "^1.11.0",
     "eslint-plugin-testing-library": "^6.2.0",
     "jest-extended": "^4.0.0",
-    "jsdom": "^23.0.0",
+    "jsdom": "^24.1.0",
     "markuplint": "^4.4.0",
     "npm-run-all": "^4.1.5",
     "postcss-dark-theme-class": "^1.2.1",
@@ -75,16 +75,15 @@
     "postcss-gap-properties": "^5.0.1",
     "postcss-media-minmax": "^5.0.0",
     "postcss-preset-env": "^9.5.2",
-    "prettier": "^3.2.5",
+    "prettier": "^3.3.2",
     "rimraf": "^5.0.0",
     "ts-prune": "^0.10.3",
-    "typescript": "^5.2.2",
-    "vite": "^5.0.0",
-    "vite-tsconfig-paths": "^4.2.0",
-    "vitest": "^1.0.0",
+    "typescript": "^5.4.5",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "1.3.0",
     "vitest-axe": "^0.1.0",
     "vitest-canvas-mock": "^0.2.2",
-    "wrangler": "^3.41.0"
+    "wrangler": "^3.60.3"
   },
   "nextBundleAnalysis": {
     "budget": 358400,
@@ -97,9 +96,5 @@
     "glob-parent": "6.0.2",
     "word-wrap": "1.2.5",
     "@typescript-eslint/typescript-estree": "7.6.0"
-  },
-  "volta": {
-    "node": "20.12.2"
-  },
-  "packageManager": "yarn@1.22.9+sha512.12a124451101ff12effe515057f7e1a81d4ac2a6c58ea15881aa4780d6e8cd2413566387fefa0d8dc050fe46914ad895b2f658998257178487e9bb4baf031e70"
+  }
 }
