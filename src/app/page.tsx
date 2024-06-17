@@ -89,7 +89,7 @@ const Page: NextPage = () => {
   const historiesItems = useMemo(
     () =>
       histories.map((item, idx) => ({
-        key: `histories__${item.id}-${idx}`,
+        key: `histories__${item.src}-${idx}`,
         children: <WorkItem {...item} />,
       })),
     [],
@@ -98,7 +98,7 @@ const Page: NextPage = () => {
   const libraryItems = useMemo(
     () =>
       libraries.map((item, idx) => ({
-        key: `library__{item.id}-${idx}`,
+        key: `library__${item.src}-${idx}`,
         children: <WorkItem {...item} />,
       })),
     [],
