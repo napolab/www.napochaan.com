@@ -119,8 +119,8 @@ const Page: NextPage = () => {
             className={styles.decorationImage}
             src={heroImage}
             alt="naporitan のオリジナルキャラクター"
-            width={800}
-            height={800}
+            width={600}
+            height={600}
             priority
           />
         </animated.div>
@@ -143,8 +143,9 @@ const Page: NextPage = () => {
               style={mainVisualAnim}
               src={heroImage}
               alt="naporitan のオリジナルキャラクター"
-              width={800}
-              height={800}
+              priority
+              width={600}
+              height={600}
             />
           </div>
         </div>
