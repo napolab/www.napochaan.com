@@ -334,6 +334,21 @@ const WorkItem = memo((item) => {
       </DialogTrigger>
       <DialogContent title={<WrappedText texts={item.caption} />}>
         <div className={styles.dialogContent}>
+          <Link
+            aria-label={`${item.alt} へのリンク`}
+            href={item.href}
+            target="_blank"
+            className={styles.dialogHeroImage}
+          >
+            <Image
+              src={item.src}
+              fill
+              alt={item.alt}
+              style={{ objectFit: "contain" }}
+              placeholder="blur"
+              blurDataURL={formatBlurURL(item.src, { blur: 5 })}
+            />
+          </Link>
           <div className={styles.description}>
             <Budoux>{item.content}</Budoux>
           </div>

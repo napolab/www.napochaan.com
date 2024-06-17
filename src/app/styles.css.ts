@@ -643,6 +643,20 @@ export const dialogContent = style({
 /**
  * @package
  */
+export const dialogHeroImage = style({
+  position: "relative",
+  width: "100%",
+  aspectRatio: "16 / 9",
+  borderRadius: vars.borderRadius.sm,
+  overflow: "hidden",
+  background: vars.pallets.background.main,
+  boxShadow: vars.pallets.shadow,
+  cursor: "pointer",
+});
+
+/**
+ * @package
+ */
 export const description = style({
   width: "100%",
   lineHeight: 1.8,
