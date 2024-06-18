@@ -22,8 +22,8 @@ export const thumbnail = style({
   aspectRatio: "16 / 9",
   borderRadius: vars.borderRadius.sm,
   overflow: "hidden",
-  background: vars.pallets.background.main,
-  boxShadow: vars.pallets.shadow,
+  background: vars.palettes.background.main,
+  boxShadow: vars.palettes.shadow,
   cursor: "pointer",
 });
 

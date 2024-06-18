@@ -9,7 +9,7 @@ import { focusRing, heading, mediaQueries, vars } from "@theme/css";
 export const overlay = style({
   position: "fixed",
   inset: 0,
-  backgroundColor: vars.pallets.overlay,
+  backgroundColor: vars.palettes.overlay,
   transition: "backdrop-filter 0.3s",
 
   "@media": {
@@ -45,9 +45,9 @@ export const content = style({
   maxHeight: "85vh",
 
   borderRadius: vars.borderRadius.md,
-  background: vars.pallets.background.secondary,
+  background: vars.palettes.background.secondary,
   padding: vars.space.md,
-  boxShadow: vars.pallets.shadow,
+  boxShadow: vars.palettes.shadow,
 
   "@media": {
     [mediaQueries.sm]: {
@@ -103,7 +103,7 @@ export const titleRoot = style({
  */
 export const border = style({
   height: 1,
-  background: vars.pallets.border.main,
+  background: vars.palettes.border.main,
 });
 
 /**

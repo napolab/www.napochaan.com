@@ -5,7 +5,7 @@ import { IconBrightnessUp, IconMoonStars } from "@tabler/icons-react";
 import { forwardRef, memo, useCallback, useEffect, useState } from "react";
 
 import { isTheme } from "@theme";
-import { vars } from "@theme/css";
+import { usePalette } from "@theme/provider";
 
 import * as styles from "./styles.css";
 
@@ -20,6 +20,8 @@ export type SwitchThemeProps = {
 
 const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
   ({ theme, defaultTheme, onChange, orientation }, ref) => {
+    const palettes = usePalette();
+
     const [_value, setValue] = useState<Theme | undefined>(defaultTheme);
     const value = theme ?? _value;
     const [forceKey, updateForceKey] = useState(0);
@@ -46,24 +48,24 @@ const SwitchTheme = forwardRef<HTMLDivElement, SwitchThemeProps>(
     const lightButtonAnim = useSpring({
       from: { transform: "scale(0)", background: "transparent" },
       transform: value === "light" ? "scale(1)" : "scale(0)",
-      background: value === "light" ? vars.pallets.accent1 : "transparent",
+      background: value === "light" ? palettes.accent1 : "transparent",
       config: config.gentle,
     });
     const lightIconAnim = useSpring({
-      from: { color: vars.pallets.disabled },
-      color: value === "light" ? vars.pallets.black : vars.pallets.disabled,
+      from: { color: palettes.disabled },
+      color: value === "light" ? palettes.black : palettes.disabled,
       config: config.gentle,
     });
     const darkButtonAnim = useSpring({
       from: { transform: "scale(0)", background: "transparent" },
       transform: value === "dark" ? "scale(1)" : "scale(0)",
-      background: value === "dark" ? vars.pallets.black : "transparent",
+      background: value === "dark" ? palettes.black : "transparent",
       config: config.gentle,
     });
     const darkIconAnim = useSpring({
-      from: { color: vars.pallets.disabled },
+      from: { color: palettes.disabled },
       get color() {
-        return value === "dark" ? vars.pallets.accent1 : vars.pallets.disabled;
+        return value === "dark" ? palettes.accent1 : palettes.disabled;
       },
       config: config.gentle,
     });

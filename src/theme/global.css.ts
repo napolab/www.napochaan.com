@@ -13,8 +13,8 @@ globalStyle("html, body", {
 });
 
 globalStyle("body", {
-  color: vars.pallets.text.main,
-  backgroundColor: vars.pallets.background.main,
+  color: vars.palettes.text.main,
+  backgroundColor: vars.palettes.background.main,
   fontFamily: vars.font.body,
   fontSize: "16px",
   fontWeight: 400,
@@ -25,8 +25,8 @@ globalStyle("body::-webkit-scrollbar", {
 });
 
 globalStyle("*::selection", {
-  color: vars.pallets.black,
-  background: vars.pallets.accent1,
+  color: vars.palettes.black,
+  background: vars.palettes.accent1,
 });
 
 globalStyle("button", {

@@ -9,15 +9,15 @@ import type { StyleRule } from "@vanilla-extract/css";
 export const focusRing: StyleRule = {
   outlineStyle: "solid",
   outlineWidth: 2,
-  outlineColor: vars.pallets.border.focus,
+  outlineColor: vars.palettes.border.focus,
   outlineOffset: -2,
   boxShadow: "none",
 };
 
 export const link = style({
   display: "inline-block",
-  color: vars.pallets.link.main,
-  ":hover": { color: vars.pallets.link.hover },
+  color: vars.palettes.link.main,
+  ":hover": { color: vars.palettes.link.hover },
   ":focus-visible": focusRing,
 });
 
@@ -30,13 +30,13 @@ export const fillImage = style({
   width: "100%",
 });
 
-export const textLink = style([link, { color: vars.pallets.text.main }]);
+export const textLink = style([link, { color: vars.palettes.text.main }]);
 
 export const anchorLink = style([
   link,
   {
     display: "inline-block",
-    color: vars.pallets.text.main,
+    color: vars.palettes.text.main,
     textDecoration: "none",
   },
 ]);

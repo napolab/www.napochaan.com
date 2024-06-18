@@ -1,5 +1,8 @@
 "use client";
-import { ThemeProvider as NextThemeProvider } from "next-themes";
+import { ThemeProvider as NextThemeProvider, useTheme } from "next-themes";
+
+import { dark } from "@theme/config/dark.css";
+import { light } from "@theme/config/light.css";
 
 import * as styles from "./styles.css";
 
@@ -26,4 +29,10 @@ export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ defau
       <div className={styles.providerRoot}>{children}</div>
     </NextThemeProvider>
   );
+};
+
+export const usePalette = () => {
+  const { theme } = useTheme();
+
+  return theme === "dark" ? dark : light;
 };

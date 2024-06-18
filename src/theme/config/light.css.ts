@@ -4,9 +4,9 @@ import { convertHex2Rgb } from "@theme/utils";
 
 import { vars } from "./base.css";
 
-import type { Pallets } from "./base.css";
+import type { Palettes } from "./base.css";
 
-export const pallets = {
+export const light = {
   background: {
     main: "#FFFFFF",
     secondary: "#F5F5F5",
@@ -32,7 +32,7 @@ export const pallets = {
     focus: "#336699",
   },
   overlay: "#00000070",
-  shadow: `0px ${vars.space.xs} ${vars.space.xs} rgba(${vars.pallets.rgb.black}, 0.25)`,
+  shadow: `0px ${vars.space.xs} ${vars.space.xs} rgba(${vars.palettes.rgb.black}, 0.25)`,
   scrollbar: {
     background: {
       main: "#D9D9D9",
@@ -40,9 +40,9 @@ export const pallets = {
     },
     thumb: "#8C8C8C",
   },
-} as const satisfies Pallets;
+} as const satisfies Palettes;
 
-createGlobalTheme(":root", vars.pallets, {
-  ...pallets,
-  rgb: convertHex2Rgb(pallets),
+createGlobalTheme(":root", vars.palettes, {
+  ...light,
+  rgb: convertHex2Rgb(light),
 });

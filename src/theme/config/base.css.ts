@@ -4,7 +4,7 @@ import { mediaQueries } from "@theme/utils";
 
 import type { MapLeafNodes } from "@theme/utils";
 
-const pallets = {
+const palettes = {
   background: {
     main: null,
     secondary: null,
@@ -40,12 +40,12 @@ const pallets = {
   },
 };
 
-export type Pallets = MapLeafNodes<typeof pallets, string>;
+export type Palettes = MapLeafNodes<typeof palettes, string>;
 export const vars = createGlobalThemeContract(
   {
-    pallets: {
-      ...pallets,
-      rgb: pallets as Omit<typeof pallets, "overlay" | "shadow">,
+    palettes: {
+      ...palettes,
+      rgb: palettes as Omit<typeof palettes, "overlay" | "shadow">,
     },
     borderRadius: {
       xs: null,

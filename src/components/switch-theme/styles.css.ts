@@ -17,12 +17,12 @@ export const switchThemeRoot = style({
   },
   isolation: "isolate",
   position: "relative",
-  background: vars.pallets.background.tertiary,
+  background: vars.palettes.background.tertiary,
   display: "inline-flex",
   gap: vars.space.xs,
   padding: offset,
   borderRadius: vars.borderRadius.xs,
-  boxShadow: `inset ${vars.pallets.shadow}`,
+  boxShadow: `inset ${vars.palettes.shadow}`,
 });
 
 const baseThumb = style({
@@ -32,7 +32,7 @@ const baseThumb = style({
   width: size,
   height: size,
   borderRadius: vars.borderRadius.xs,
-  boxShadow: `${vars.pallets.shadow}, ${vars.pallets.shadow}`,
+  boxShadow: `${vars.palettes.shadow}, ${vars.palettes.shadow}`,
 });
 /**
  * @package

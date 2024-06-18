@@ -22,39 +22,9 @@ export const pageRoot = style({
     [mediaQueries.xl]: {
       maxWidth: 1440,
       margin: "0 auto",
-      background: vars.pallets.background.tertiary,
+      background: vars.palettes.background.tertiary,
       borderRadius: vars.borderRadius.lg,
       paddingBottom: vars.space.xl,
-    },
-  },
-});
-
-/**
- * @package
- */
-export const switchTheme = style({
-  position: "fixed",
-  zIndex: fixedLayer,
-
-  "@media": {
-    [mediaQueries.xl]: {
-      right: calc.divide(
-        calc.subtract("100%", `min(1440px, ${calc.subtract("100vw", calc.multiply(vars.space.lg, 2))})`),
-        2,
-      ),
-      bottom: vars.space.md,
-    },
-    [mediaQueries.lg]: {
-      right: vars.space.lg,
-      bottom: vars.space.md,
-    },
-    [mediaQueries.md]: {
-      right: vars.space.lg,
-      bottom: vars.space.md,
-    },
-    [mediaQueries.sm]: {
-      right: vars.space.md,
-      bottom: vars.space.md,
     },
   },
 });
@@ -98,7 +68,7 @@ export const decoration1 = style({
   position: "absolute",
   height: "32.8rem",
   width: "10000px",
-  background: vars.pallets.accent1,
+  background: vars.palettes.accent1,
   transform: "rotate(-50deg)",
   transformOrigin: "top left",
 
@@ -137,7 +107,7 @@ export const decoration2 = style({
       left: 2360,
       height: "32.8rem",
       width: "10000px",
-      background: vars.pallets.accent1,
+      background: vars.palettes.accent1,
       transform: "rotate(-147deg)",
       transformOrigin: "top left",
     },
@@ -386,24 +356,24 @@ export const tile = style({
   "@media": {
     [mediaQueries.xl]: {
       padding: vars.space.lg,
-      background: `rgba(${vars.pallets.rgb.background.main})`,
-      boxShadow: `0px ${vars.space.xs} ${vars.space.md} 0px ${vars.pallets.background.secondary}`,
+      background: `rgba(${vars.palettes.rgb.background.main})`,
+      boxShadow: `0px ${vars.space.xs} ${vars.space.md} 0px ${vars.palettes.background.secondary}`,
     },
     [mediaQueries.lg]: {
       padding: vars.space.lg,
-      background: `rgba(${vars.pallets.rgb.background.secondary}, 0.9)`,
+      background: `rgba(${vars.palettes.rgb.background.secondary}, 0.9)`,
       boxShadow: `${vars.space.xs} ${vars.space.xs} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
       borderRadius: vars.borderRadius.lg,
     },
     [mediaQueries.md]: {
       padding: calc.multiply(vars.space.md, 1.5),
-      background: `rgba(${vars.pallets.rgb.background.secondary}, 0.9)`,
+      background: `rgba(${vars.palettes.rgb.background.secondary}, 0.9)`,
       boxShadow: `${vars.space.xs} ${vars.space.xs} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
       borderRadius: vars.borderRadius.md,
     },
     [mediaQueries.sm]: {
       padding: `${vars.space.sm} ${vars.space.md}`,
-      background: `rgba(${vars.pallets.rgb.background.secondary}, 0.9)`,
+      background: `rgba(${vars.palettes.rgb.background.secondary}, 0.9)`,
       boxShadow: `${vars.space.xs} ${vars.space.xs} ${vars.space.md} rgba(0, 0, 0, 0.25)`,
       borderRadius: vars.borderRadius.md,
     },

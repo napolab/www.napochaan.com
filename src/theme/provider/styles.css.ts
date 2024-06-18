@@ -6,8 +6,8 @@ import { vars } from "@theme/css";
  * @package
  */
 export const providerRoot = style({
-  color: vars.pallets.text.main,
-  backgroundColor: vars.pallets.background.main,
+  color: vars.palettes.text.main,
+  backgroundColor: vars.palettes.background.main,
   fontSize: 16,
   fontFamily: vars.font.body,
 });

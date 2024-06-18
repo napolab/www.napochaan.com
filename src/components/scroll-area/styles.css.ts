@@ -49,11 +49,11 @@ const _scrollbar = style({
   touchAction: "none",
   padding: 2,
   borderRadius: vars.borderRadius.xl,
-  background: vars.pallets.scrollbar.background.main,
+  background: vars.palettes.scrollbar.background.main,
   transition: "background 0.3s ease",
 
   ":hover": {
-    background: vars.pallets.scrollbar.background.hover,
+    background: vars.palettes.scrollbar.background.hover,
   },
 });
 /**
@@ -81,7 +81,7 @@ export const scrollbar = styleVariants({
 export const thumb = style({
   position: "relative",
   flex: 1,
-  background: vars.pallets.scrollbar.thumb,
+  background: vars.palettes.scrollbar.thumb,
   borderRadius: "inherit",
 
   ":before": {
