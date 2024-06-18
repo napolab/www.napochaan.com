@@ -4,31 +4,28 @@ import { IconAt, IconBrandGithubFilled, IconBrandX } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import React, { memo, useEffect, useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { mergeRefs } from "react-merge-refs";
 import { useMedia } from "use-media";
 
 import heroImage from "@assets/napochaan.webp";
 import Article from "@components/article";
 import Budoux from "@components/budoux";
-import { DialogRoot, DialogContent, DialogTrigger } from "@components/dialog";
 import Heading from "@components/heading";
 import IconZenn from "@components/icons/zenn.svg";
 import Image from "@components/image";
-import { formatBlurURL } from "@components/image/helper";
 import Section from "@components/section";
 import ShowCase from "@components/show-case";
-import SquareImage from "@components/square-image";
 import SwitchTheme from "@components/switch-theme";
-import WrappedText from "@components/wrapped-text";
 import { isTheme } from "@theme";
-import { vars, mediaQueries, button } from "@theme/css";
+import { vars, mediaQueries } from "@theme/css";
 import reportAccessibility from "@utils/report-accessibility";
 
+import { WorkItem } from "./_components/work-item";
 import * as styles from "./styles.css";
 
+import type { ComponentPropsWithRef } from "@react-spring/web";
 import type { NextPage } from "next";
-import type { FC } from "react";
 
 const AnimatedImage = animated(Image);
 
@@ -283,18 +280,17 @@ const Page: NextPage = () => {
   );
 };
 
-export default memo(Page);
+export default Page;
 
 const techTags: string[] = [
   "TypeScript",
   "React",
   "CSS",
-  "css module",
   "vanilla-extract",
   "Next.js",
+  "Remix",
   "Hono",
   "NestJS",
-  "firebase",
   "ReactNative",
   "Expo",
   "GraphQL",
@@ -307,64 +303,14 @@ const techTags: string[] = [
   "Ruby",
   "Rails",
   "Swift",
+  "firebase",
   "Cloudflare Workers",
   "Cloudflare Pages",
   "Cloudflare R2",
   "Cloudflare Images",
 ];
 
-type Work = {
-  src: string;
-  alt: string;
-  caption: string[];
-  href: string;
-  content: string;
-};
-const WorkItem = memo((item) => {
-  return (
-    <DialogRoot>
-      <DialogTrigger className={button}>
-        <SquareImage
-          src={item.src}
-          caption={<WrappedText texts={item.caption} />}
-          alt={item.alt}
-          placeholder="blur"
-          blurDataURL={formatBlurURL(item.src, { blur: 5 })}
-        />
-      </DialogTrigger>
-      <DialogContent title={<WrappedText texts={item.caption} />}>
-        <div className={styles.dialogContent}>
-          <Link
-            aria-label={`${item.alt} へのリンク`}
-            href={item.href}
-            target="_blank"
-            className={styles.dialogHeroImage}
-          >
-            <Image
-              src={item.src}
-              fill
-              alt={item.alt}
-              style={{ objectFit: "contain" }}
-              placeholder="blur"
-              blurDataURL={formatBlurURL(item.src, { blur: 5 })}
-            />
-          </Link>
-          <div className={styles.description}>
-            <Budoux>{item.content}</Budoux>
-          </div>
-
-          {item.href ? (
-            <Link href={item.href} target="_blank" className={styles.link}>
-              外部リンク
-            </Link>
-          ) : null}
-        </div>
-      </DialogContent>
-    </DialogRoot>
-  );
-}) satisfies FC<Work>;
-
-const histories: Work[] = [
+const histories: ComponentPropsWithRef<typeof WorkItem>[] = [
   {
     src: "/images/histories/flatkobo-hp.png",
     alt: "flat-工房 HP のスクリーンショット",
@@ -537,7 +483,7 @@ const histories: Work[] = [
   },
 ];
 
-const libraries: Work[] = [
+const libraries: ComponentPropsWithRef<typeof WorkItem>[] = [
   {
     src: "/images/libraries/npm.png",
     caption: ["y-durableobjects"],
