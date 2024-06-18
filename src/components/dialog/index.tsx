@@ -1,4 +1,4 @@
-"use cilent";
+"use client";
 import { Close, Content, Description, Overlay, Portal, Root, Title, Trigger } from "@radix-ui/react-dialog";
 import { Root as Separator } from "@radix-ui/react-separator";
 import { animated, useTransition } from "@react-spring/web";

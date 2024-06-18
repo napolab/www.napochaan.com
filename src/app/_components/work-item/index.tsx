@@ -27,6 +27,7 @@ export const WorkItem = (Props: Props) => {
           alt={Props.alt}
           placeholder="blur"
           blurDataURL={formatBlurURL(Props.src, { blur: 5 })}
+          size={160}
         />
       </DialogTrigger>
       <DialogContent title={<WrappedText texts={Props.caption} />}>

@@ -1,3 +1,4 @@
+"use client";
 import { useTrail, animated, config } from "@react-spring/web";
 import { forwardRef, memo } from "react";
 
