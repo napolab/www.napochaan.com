@@ -9,6 +9,7 @@ import "@theme/config/light.css";
 globalStyle("html, body", {
   scrollBehavior: "smooth",
   overflowX: "hidden",
+  transition: "color 0.2s, background-color 0.2s",
 });
 
 globalStyle("body", {
@@ -26,4 +27,29 @@ globalStyle("body::-webkit-scrollbar", {
 globalStyle("*::selection", {
   color: vars.pallets.black,
   background: vars.pallets.accent1,
+});
+
+globalStyle("button", {
+  touchAction: "manipulation",
+});
+
+globalStyle("html:focus-within", {
+  "@media": {
+    "(prefers-reduced-motion: reduce)": {
+      scrollBehavior: "auto",
+    },
+  },
+});
+
+globalStyle("*, *::before, *::after", {
+  "@media": {
+    "(prefers-reduced-motion: reduce)": {
+      animationDuration: "0.01ms !important",
+      animationIterationCount: "1 !important",
+      transitionDuration: "0.01ms !important",
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      scrollBehavior: "auto !important",
+    },
+  },
 });
