@@ -12,17 +12,19 @@ import type { ShowCaseItem } from "@components/show-case";
 
 type Props = {
   histories: ShowCaseItem[];
+  articles: ShowCaseItem[];
   libraries: ShowCaseItem[];
 };
 
-export const Works = ({ histories, libraries }: Props) => {
+export const Works = ({ histories, libraries, articles }: Props) => {
   const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
   const worksAnim = useSpring({
     opacity: worksInView ? 1 : 0,
     transform: worksInView ? "translateY(0rem)" : "translateY(0.5rem)",
   });
 
-  const [serviceRef, serviceInView] = useInView({ once: true });
+  const [historyRef, historyInView] = useInView({ once: true });
+  const [articleRef, articleInView] = useInView({ once: true });
   const [libraryRef, libraryInView] = useInView({ once: true });
 
   return (
@@ -33,14 +35,24 @@ export const Works = ({ histories, libraries }: Props) => {
             <Heading translate="no">Works</Heading>
           </Link>
         </div>
-        <Section id="histories" className={styles.section3} ref={serviceRef}>
+        <Section id="histories" className={styles.section3} ref={historyRef}>
           <div>
             <Link href="#histories" scroll className={styles.anchorLink}>
               <Heading translate="no">History</Heading>
             </Link>
           </div>
 
-          <ShowCase items={histories} visibility={serviceInView} />
+          <ShowCase items={histories} visibility={historyInView} />
+        </Section>
+
+        <Section id="article" className={styles.section3} ref={articleRef}>
+          <div>
+            <Link href="#article" scroll className={styles.anchorLink}>
+              <Heading translate="no">Article</Heading>
+            </Link>
+          </div>
+
+          <ShowCase items={articles} visibility={articleInView} />
         </Section>
 
         <Section id="library" className={styles.section3} ref={libraryRef}>

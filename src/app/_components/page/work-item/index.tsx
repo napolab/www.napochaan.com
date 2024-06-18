@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-import Budoux from "@components/budoux";
 import { DialogTrigger, DialogContent, DialogRoot } from "@components/dialog";
 import Image from "@components/image";
 import { formatBlurURL } from "@components/image/helper";
@@ -10,44 +9,56 @@ import { button } from "@theme/styles.css";
 
 import * as styles from "./styles.css";
 
+import type { ReactNode } from "react";
+
 export type Props = {
   src: string;
   alt: string;
-  caption: string[];
+  caption: string | string[];
   href: string;
-  content: string;
+  content: ReactNode;
+  description?: ReactNode;
 };
-export const WorkItem = (Props: Props) => {
+export const WorkItem = (props: Props) => {
   return (
     <DialogRoot>
       <DialogTrigger className={button}>
         <SquareImage
-          src={Props.src}
-          caption={<WrappedText texts={Props.caption} />}
-          alt={Props.alt}
+          src={props.src}
+          caption={
+            <span className={styles.title}>
+              {Array.isArray(props.caption) ? <WrappedText texts={props.caption} /> : props.caption}
+            </span>
+          }
+          alt={props.alt}
           placeholder="blur"
-          blurDataURL={formatBlurURL(Props.src, { blur: 5 })}
+          blurDataURL={formatBlurURL(props.src, { blur: 5 })}
           size={160}
         />
       </DialogTrigger>
-      <DialogContent title={<WrappedText texts={Props.caption} />}>
+      <DialogContent
+        title={
+          <span className={styles.dialogTitle}>
+            {Array.isArray(props.caption) ? <WrappedText texts={props.caption} /> : props.caption}
+          </span>
+        }
+        description={props.description}
+      >
         <div className={styles.content}>
-          <Link aria-label={`${Props.alt} へのリンク`} href={Props.href} target="_blank" className={styles.thumbnail}>
+          <Link aria-label={`${props.alt} へのリンク`} href={props.href} target="_blank" className={styles.thumbnail}>
             <Image
-              src={Props.src}
+              src={props.src}
               fill
-              alt={Props.alt}
+              alt={props.alt}
               style={{ objectFit: "contain" }}
               placeholder="blur"
-              blurDataURL={formatBlurURL(Props.src, { blur: 5 })}
+              blurDataURL={formatBlurURL(props.src, { blur: 5 })}
             />
           </Link>
-          <div className={styles.description}>
-            <Budoux>{Props.content}</Budoux>
-          </div>
+          <div className={styles.description}>{props.content}</div>
 
-          {Props.href ? (
-            <Link href={Props.href} target="_blank" className={styles.link}>
+          {props.href ? (
+            <Link href={props.href} target="_blank" className={styles.link}>
               外部リンク
             </Link>
           ) : null}

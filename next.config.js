@@ -11,6 +11,11 @@ if (process.env.NODE_ENV === "development") {
 const nextConfig = {
   swcMinify: true,
   images: {
+    remotePatterns: [
+      {
+        hostname: "res.cloudinary.com",
+      },
+    ],
     deviceSizes: [320, 420, 768, 800, 1024, 1200].flatMap((size) => [size, size * 2]),
   },
   webpack: (config) => {

@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { mediaQueries, vars } from "@theme/css";
+import { ellipsis, ellipsisLine, mediaQueries, vars } from "@theme/css";
 
 import { characterLayer, fixedLayer } from "./_components/styles.css";
 export { anchorLink, textLink, fillImage, link } from "@theme/css";
@@ -26,3 +26,14 @@ export const pageRoot = style({
     },
   },
 });
+
+export const workDialogContent = style([
+  ellipsis,
+  {
+    vars: {
+      [ellipsisLine]: "4",
+    },
+    wordBreak: "break-word",
+    width: "100%",
+  },
+]);

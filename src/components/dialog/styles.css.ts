@@ -42,12 +42,20 @@ export const content = style({
 
   width: "100%",
   maxWidth: `min(${calc.subtract("100%", calc.multiply(vars.space.md, 2))}, 512px)`,
-  maxHeight: "85vh",
+  minHeight: "450px",
+  height: "60vh",
+  maxHeight: "600px",
 
   borderRadius: vars.borderRadius.md,
   background: vars.palettes.background.secondary,
   padding: vars.space.md,
   boxShadow: vars.palettes.shadow,
+
+  "@supports": {
+    "(height: 60svh)": {
+      height: "60svh",
+    },
+  },
 
   "@media": {
     [mediaQueries.sm]: {
@@ -56,12 +64,13 @@ export const content = style({
       bottom: 0,
       maxWidth: "none",
       maxHeight: "none",
+      minHeight: "none",
       width: "100%",
       height: "90vh",
       borderRadius: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
       "@supports": {
         "(height: 100svh)": {
-          height: "90svh",
+          height: "90svh !important",
         },
       },
     },
@@ -122,4 +131,11 @@ export const close = style({
 export const icon = style({
   width: 44,
   height: 44,
+});
+
+/**
+ * @package
+ */
+export const scrollInner = style({
+  flexShrink: 0,
 });

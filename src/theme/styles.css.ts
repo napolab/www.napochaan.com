@@ -1,4 +1,4 @@
-import { style, styleVariants } from "@vanilla-extract/css";
+import { createVar, fallbackVar, style, styleVariants } from "@vanilla-extract/css";
 import { calc } from "@vanilla-extract/css-utils";
 
 import { vars } from "./config/base.css";
@@ -129,3 +129,13 @@ export const heading = styleVariants(
   },
   (override) => [baseHeadingRoot, override],
 );
+
+export const ellipsisLine = createVar();
+export const ellipsis = style({
+  wordBreak: "break-all",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
+  WebkitLineClamp: fallbackVar(ellipsisLine, "2"),
+  WebkitBoxOrient: "vertical",
+  display: "-webkit-box",
+});

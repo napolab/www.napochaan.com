@@ -1,3 +1,6 @@
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
 import { Noto_Sans_JP, Poppins } from "next/font/google";
 
 import { HeadingLevelProvider } from "@hooks/heading-level";
@@ -9,6 +12,10 @@ import * as styles from "./layout.css";
 
 import type { Metadata, Viewport } from "next";
 import type { PropsWithChildren } from "react";
+
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Asia/Tokyo");
 
 const notoSansJP = Noto_Sans_JP({
   weight: ["400"],

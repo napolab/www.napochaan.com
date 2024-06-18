@@ -27,7 +27,8 @@
       "@theme/*": ["src/theme/*"],
       "@hooks/*": ["src/hooks/*"],
       "@components/*": ["src/components/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@adapters/*": ["src/adapters/*"]
     }
   },
   "include": [

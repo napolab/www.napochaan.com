@@ -1,3 +1,7 @@
+import dayjs from "dayjs";
+
+import { getZennArticles } from "@adapters/rss";
+import Budoux from "@components/budoux";
 import Section from "@components/section";
 
 import { Background } from "./_components/page/background";
@@ -9,22 +13,40 @@ import * as styles from "./styles.css";
 
 import type { ComponentPropsWithRef } from "@react-spring/web";
 
-const Page = () => {
+export const runtime = "edge";
+
+const Page = async () => {
   const historiesItems = histories.map((item, idx) => ({
     key: `histories__${item.src}-${idx}`,
-    children: <WorkItem {...item} />,
+    children: <WorkItem {...item} content={<Budoux>{item.content}</Budoux>} />,
   }));
 
   const libraryItems = libraries.map((item, idx) => ({
     key: `library__${item.src}-${idx}`,
-    children: <WorkItem {...item} />,
+    children: <WorkItem {...item} content={<Budoux>{item.content}</Budoux>} />,
+  }));
+
+  const articles = await getZennArticles();
+
+  const articleItems = articles.map((item) => ({
+    key: `article__${item.link}`,
+    children: (
+      <WorkItem
+        src={item.enclosure?.["@_url"] ?? ""}
+        caption={item.title}
+        alt={`${item.title} のサムネイル`}
+        href={item.link}
+        description={dayjs(item.pubDate).format("YYYY-MM-DD")}
+        content={<span className={styles.workDialogContent}>{item.description.trimStart()}</span>}
+      />
+    ),
   }));
 
   return (
     <Section className={styles.pageRoot}>
       <Background />
       <FirstView tags={techTags} />
-      <Works histories={historiesItems} libraries={libraryItems} />
+      <Works histories={historiesItems} libraries={libraryItems} articles={articleItems} />
       <Contact />
     </Section>
   );
@@ -60,7 +82,7 @@ const techTags: string[] = [
   "Cloudflare Images",
 ];
 
-const histories: ComponentPropsWithRef<typeof WorkItem>[] = [
+const histories = [
   {
     src: "/images/histories/flatkobo-hp.png",
     alt: "flat-工房 HP のスクリーンショット",
@@ -231,9 +253,9 @@ const histories: ComponentPropsWithRef<typeof WorkItem>[] = [
     content:
       "初めて web アプリケーションを作った。\nタスク管理アプリに推しの声をかけ合わせることで面白い体験を作りだした。",
   },
-];
+] satisfies ComponentPropsWithRef<typeof WorkItem>[];
 
-const libraries: ComponentPropsWithRef<typeof WorkItem>[] = [
+const libraries = [
   {
     src: "/images/libraries/npm.png",
     caption: ["y-durableobjects"],
@@ -290,4 +312,4 @@ const libraries: ComponentPropsWithRef<typeof WorkItem>[] = [
     href: "https://gist.github.com/naporin0624/2c1c187950738ef4e07a755489ba49de",
     content: "monaco-editor で作ったエディタに型定義をインストールするためのライブラリを作った。",
   },
-];
+] satisfies ComponentPropsWithRef<typeof WorkItem>[];
