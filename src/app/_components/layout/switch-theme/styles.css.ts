@@ -4,12 +4,14 @@ import { calc } from "@vanilla-extract/css-utils";
 import { vars } from "@theme/css";
 import { mediaQueries } from "@theme/utils";
 
+import { fixedLayer } from "../../styles.css";
+
 /**
  * @package
  */
 export const switchTheme = style({
   position: "fixed",
-  zIndex: 10,
+  zIndex: fixedLayer,
 
   "@media": {
     [mediaQueries.xl]: {

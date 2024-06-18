@@ -9,5 +9,6 @@
     "**/*.code-search": true,
     ".lighthouseci": true,
     ".next": true
-  }
+  },
+  "cSpell.words": ["naporitan"]
 }

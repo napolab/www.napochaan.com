@@ -8,13 +8,13 @@ import * as styles from "./styles.css";
 
 import type { Key, ReactNode, FC } from "react";
 
-type Item = {
+export type ShowCaseItem = {
   key: Key;
   children: ReactNode;
 };
 export type ShowCaseProps = {
   visibility?: boolean;
-  items: Item[];
+  items: ShowCaseItem[];
 };
 const ShowCase = forwardRef<HTMLDivElement, ShowCaseProps>(({ visibility = false, items }, ref) => {
   const trails = useTrail(items.length, {

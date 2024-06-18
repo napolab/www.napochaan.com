@@ -1,69 +1,15 @@
-"use client";
-import { useSpring, animated, useInView, config, useChain, useSpringRef } from "@react-spring/web";
-import { IconAt, IconBrandGithubFilled, IconBrandX } from "@tabler/icons-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React from "react";
-
-import keyVisualImage from "@assets/napochaan.webp";
-import Article from "@components/article";
-import Budoux from "@components/budoux";
-import Heading from "@components/heading";
-import IconZenn from "@components/icons/zenn.svg";
-import Image from "@components/image";
 import Section from "@components/section";
-import ShowCase from "@components/show-case";
 
-import { AnimatedImage } from "./_components/animated";
-import { WorkItem } from "./_components/work-item";
+import { Background } from "./_components/page/background";
+import { Contact } from "./_components/page/contact";
+import { FirstView } from "./_components/page/first-view";
+import { WorkItem } from "./_components/page/work-item";
+import { Works } from "./_components/page/works";
 import * as styles from "./styles.css";
 
 import type { ComponentPropsWithRef } from "@react-spring/web";
 
 const Page = () => {
-  const [titleRef, titleInView] = useInView({ once: true });
-  const pathname = usePathname();
-  const firstViewInView = pathname === "/";
-  const mainVisualInView = titleInView || firstViewInView;
-
-  const mainVisualAnimApi = useSpringRef();
-  const mainVisualAnim = useSpring({
-    ref: mainVisualAnimApi,
-    from: { opacity: 0 },
-    opacity: mainVisualInView ? 1 : 0,
-  });
-
-  const [aboutRef, aboutInView] = useInView({ once: true });
-  const aboutAnimApi = useSpringRef();
-  const aboutAnim = useSpring({
-    ref: aboutAnimApi,
-    opacity: aboutInView ? 1 : 0,
-    transform: aboutInView ? "translateY(0rem)" : "translateY(0.5rem)",
-  });
-  useChain([mainVisualAnimApi, aboutAnimApi], [0, 0.5]);
-
-  const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
-  const worksAnim = useSpring({
-    opacity: worksInView ? 1 : 0,
-    transform: worksInView ? "translateY(0rem)" : "translateY(0.5rem)",
-  });
-
-  const [serviceRef, serviceInView] = useInView({ once: true });
-  const [libraryRef, libraryInView] = useInView({ once: true });
-
-  const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
-  const contactAnim = useSpring({
-    opacity: contactInView ? 1 : 0,
-    transform: contactInView ? "translateY(0rem)" : "translateY(0.5rem)",
-  });
-
-  const decorationImageAnim = useSpring({
-    from: { transform: `translateX(125%)` },
-    to: { transform: contactInView ? "translateX(0%)" : `translateX(125%)` },
-    config: config.gentle,
-    delay: 800,
-  });
-
   const historiesItems = histories.map((item, idx) => ({
     key: `histories__${item.src}-${idx}`,
     children: <WorkItem {...item} />,
@@ -76,170 +22,10 @@ const Page = () => {
 
   return (
     <Section className={styles.pageRoot}>
-      <div className={styles.decorationRoot}>
-        <div aria-hidden="true" className={styles.decoration1} />
-        <div aria-hidden="true" className={styles.decoration2} />
-        <animated.div className={styles.decorationImageRoot} aria-hidden="true" style={decorationImageAnim}>
-          <Image
-            className={styles.decorationImage}
-            src={keyVisualImage}
-            alt="naporitan のオリジナルキャラクター"
-            width={600}
-            height={600}
-          />
-        </animated.div>
-      </div>
-
-      <div className={styles.firstView}>
-        <div className={styles.section1}>
-          <div className={styles.pageTitle} ref={titleRef}>
-            <Link href="#" scroll className={styles.anchorLink}>
-              <Heading translate="no">napochaan.com</Heading>
-            </Link>
-          </div>
-
-          <div className={styles.mainVisualRoot}>
-            <AnimatedImage
-              className={styles.fillImage}
-              style={mainVisualAnim}
-              src={keyVisualImage}
-              alt="naporitan のオリジナルキャラクター"
-              priority
-              width={600}
-              height={600}
-            />
-          </div>
-        </div>
-
-        <animated.div className={styles.aboutMeWrapper} ref={aboutRef} style={aboutAnim}>
-          <Article className={styles.aboutMeRoot} id="about">
-            <Link href="#about" scroll className={styles.anchorLink}>
-              <Heading translate="no">About me</Heading>
-            </Link>
-            <div className={styles.aboutMe}>
-              <p>
-                <Budoux>
-                  プログラマー。専門はウェブサイト制作とWebアプリケーション、モバイルアプリの開発・運営であり、これらを本職としている。加えて、インターネット上でのクリエイティブな活動にも積極的で、多才なクリエイターが集うStudioGnuに所属し、様々なプロジェクトにおいて技術面での貢献をしている。
-                </Budoux>
-              </p>
-            </div>
-
-            <Article className={styles.section3} id="love">
-              <div>
-                <Link href="#love" scroll className={styles.anchorLink}>
-                  <Heading translate="no">Love</Heading>
-                </Link>
-              </div>
-              <ul className={styles.tags} translate="no">
-                <li>TypeScript</li>
-                <li>Cloudflare Workers</li>
-                <li>Music(ボカロ)</li>
-                <li>Valorant</li>
-                <li>東方</li>
-                <li>ニーゴ(プロセカ)</li>
-              </ul>
-            </Article>
-
-            <Article className={styles.section3} id="skill">
-              <div>
-                <Link href="#skill" scroll className={styles.anchorLink}>
-                  <Heading translate="no">Skill</Heading>
-                </Link>
-              </div>
-              <ul className={styles.tags} translate="no">
-                {techTags.map((tag) => (
-                  <li key={tag}>{tag}</li>
-                ))}
-              </ul>
-            </Article>
-          </Article>
-        </animated.div>
-      </div>
-
-      <animated.div ref={worksRef} className={styles.worksWrapper} style={worksAnim}>
-        <Section id="works" className={styles.worksRoot}>
-          <div>
-            <Link href="#works" scroll className={styles.anchorLink}>
-              <Heading translate="no">Works</Heading>
-            </Link>
-          </div>
-          <Section id="histories" className={styles.section3} ref={serviceRef}>
-            <div>
-              <Link href="#histories" scroll className={styles.anchorLink}>
-                <Heading translate="no">History</Heading>
-              </Link>
-            </div>
-
-            <ShowCase items={historiesItems} visibility={serviceInView} />
-          </Section>
-
-          <Section id="library" className={styles.section3} ref={libraryRef}>
-            <div>
-              <Link href="#library" scroll className={styles.anchorLink}>
-                <Heading translate="no">Library</Heading>
-              </Link>
-            </div>
-
-            <ShowCase items={libraryItems} visibility={libraryInView} />
-          </Section>
-        </Section>
-      </animated.div>
-
-      <animated.div className={styles.contactWrapper} ref={contactRef} style={contactAnim}>
-        <Section id="contact" className={styles.contactRoot}>
-          <div>
-            <Link href="/#contact" scroll className={styles.anchorLink}>
-              <Heading translate="no">SNS&nbsp;&amp;&nbsp;Contact</Heading>
-            </Link>
-          </div>
-          <p>
-            <Budoux>連絡は X の DM が一番つながりやすいです。</Budoux>
-            <Link href="https://bento.me/napochaan" target="_blank" className={styles.link}>
-              bento.me
-            </Link>
-          </p>
-
-          <address className={styles.contactList}>
-            <Link
-              href="https://github.com/naporin0624"
-              target="_blank"
-              className={styles.textLink}
-              aria-label="github link"
-              title="github のリンク"
-            >
-              <IconBrandGithubFilled className={styles.contactItem} aria-hidden="true" />
-            </Link>
-
-            <Link
-              href="https://x.com/naporin24690"
-              target="_blank"
-              className={styles.textLink}
-              aria-label="X link"
-              title="X のリンク"
-            >
-              <IconBrandX className={styles.contactItem} aria-hidden="true" />
-            </Link>
-            <Link
-              href="https://zenn.dev/naporin24690"
-              target="_blank"
-              className={styles.textLink}
-              aria-label="zenn link"
-              title="zenn のリンク"
-            >
-              <IconZenn className={styles.contactItem} aria-hidden="true" />
-            </Link>
-            <Link
-              href="mailto:contact@napochaan.com"
-              target="_blank"
-              className={styles.textLink}
-              aria-label="email link"
-              title="email のリンク"
-            >
-              <IconAt className={styles.contactItem} aria-hidden="true" />
-            </Link>
-          </address>
-        </Section>
-      </animated.div>
+      <Background />
+      <FirstView tags={techTags} />
+      <Works histories={historiesItems} libraries={libraryItems} />
+      <Contact />
     </Section>
   );
 };

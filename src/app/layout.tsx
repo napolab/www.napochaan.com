@@ -4,7 +4,7 @@ import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
 import { clsx } from "@utils/clsx";
 
-import { SwitchTheme } from "./_components/switch-theme";
+import { SwitchTheme } from "./_components/layout/switch-theme";
 import * as styles from "./layout.css";
 
 import type { Metadata, Viewport } from "next";

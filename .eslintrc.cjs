@@ -39,5 +39,11 @@ module.exports = {
         "no-restricted-imports": "off",
       },
     },
+    {
+      files: ["**/_components/**"],
+      rules: {
+        "no-restricted-imports": "off",
+      },
+    },
   ],
 };
