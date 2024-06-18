@@ -3,10 +3,7 @@ import { useSpring, animated, useInView, config, useChain, useSpringRef } from "
 import { IconAt, IconBrandGithubFilled, IconBrandX } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
-import React, { useEffect } from "react";
-import { mergeRefs } from "react-merge-refs";
-import { useMedia } from "use-media";
+import React from "react";
 
 import keyVisualImage from "@assets/napochaan.webp";
 import Article from "@components/article";
@@ -16,10 +13,6 @@ import IconZenn from "@components/icons/zenn.svg";
 import Image from "@components/image";
 import Section from "@components/section";
 import ShowCase from "@components/show-case";
-import SwitchTheme from "@components/switch-theme";
-import { isTheme } from "@theme";
-import { mediaQueries } from "@theme/css";
-import reportAccessibility from "@utils/report-accessibility";
 
 import { AnimatedImage } from "./_components/animated";
 import { WorkItem } from "./_components/work-item";
@@ -28,17 +21,16 @@ import * as styles from "./styles.css";
 import type { ComponentPropsWithRef } from "@react-spring/web";
 
 const Page = () => {
-  const isXL = useMedia(mediaQueries.xl);
-  const { theme, setTheme } = useTheme();
+  const [titleRef, titleInView] = useInView({ once: true });
   const pathname = usePathname();
   const firstViewInView = pathname === "/";
+  const mainVisualInView = titleInView || firstViewInView;
 
-  const [titleRef, titleInView] = useInView({ once: true });
   const mainVisualAnimApi = useSpringRef();
   const mainVisualAnim = useSpring({
     ref: mainVisualAnimApi,
     from: { opacity: 0 },
-    opacity: titleInView || firstViewInView ? 1 : 0,
+    opacity: mainVisualInView ? 1 : 0,
   });
 
   const [aboutRef, aboutInView] = useInView({ once: true });
@@ -66,20 +58,10 @@ const Page = () => {
   });
 
   const decorationImageAnim = useSpring({
-    from: {
-      transform: `translateX(125%)`,
-    },
-    to: {
-      transform: contactInView ? "translateX(0%)" : `translateX(125%)`,
-    },
+    from: { transform: `translateX(125%)` },
+    to: { transform: contactInView ? "translateX(0%)" : `translateX(125%)` },
     config: config.gentle,
     delay: 800,
-  });
-
-  const [lastRef, lastInView] = useInView();
-  const themeSwitchAnim = useSpring({
-    transform: !isXL && lastInView ? "translateY(100%)" : "translateY(0%)",
-    bottom: !isXL && lastInView ? "0rem" : "calc(1rem / 2)", // vars.space.sm,
   });
 
   const historiesItems = histories.map((item, idx) => ({
@@ -91,10 +73,6 @@ const Page = () => {
     key: `library__${item.src}-${idx}`,
     children: <WorkItem {...item} />,
   }));
-
-  useEffect(() => {
-    void reportAccessibility(React);
-  }, []);
 
   return (
     <Section className={styles.pageRoot}>
@@ -111,9 +89,6 @@ const Page = () => {
           />
         </animated.div>
       </div>
-      <animated.div className={styles.switchTheme} style={themeSwitchAnim}>
-        <SwitchTheme theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
-      </animated.div>
 
       <div className={styles.firstView}>
         <div className={styles.section1}>
@@ -210,7 +185,7 @@ const Page = () => {
         </Section>
       </animated.div>
 
-      <animated.div className={styles.contactWrapper} ref={mergeRefs([contactRef, lastRef])} style={contactAnim}>
+      <animated.div className={styles.contactWrapper} ref={contactRef} style={contactAnim}>
         <Section id="contact" className={styles.contactRoot}>
           <div>
             <Link href="/#contact" scroll className={styles.anchorLink}>

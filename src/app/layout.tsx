@@ -4,6 +4,7 @@ import { HeadingLevelProvider } from "@hooks/heading-level";
 import { ThemeProvider } from "@theme";
 import { clsx } from "@utils/clsx";
 
+import { SwitchTheme } from "./_components/switch-theme";
 import * as styles from "./layout.css";
 
 import type { Metadata, Viewport } from "next";
@@ -36,8 +37,9 @@ const RootLayout = async ({ children }: Props) => {
           <HeadingLevelProvider>
             <main className={styles.mainRoot}>{children}</main>
             <footer className={styles.footerRoot} translate="no">
-              © 2023-2024 naporitan
+              ©2023-2024 naporitan
             </footer>
+            <SwitchTheme />
           </HeadingLevelProvider>
         </ThemeProvider>
       </body>
@@ -63,21 +65,7 @@ export const metadata: Metadata = {
     apple: [{ sizes: "180x180", url: "/apple-touch-icon.png", rel: "apple-touch-icon" }],
   },
   manifest: "/site.webmanifest",
-  keywords: [
-    "naporitan",
-    "engineer",
-    "web",
-    "application",
-    "react",
-    "typescript",
-    "frontend",
-    "statemanagement",
-    "javascript",
-    "python",
-    "ruby",
-    "swift",
-    "haskell",
-  ],
+  keywords: ["naporitan", "engineer", "web", "application", "react", "typescript", "frontend"],
   authors: { name: "naporitan", url: "https://twitter.com/naporin24690" },
   description,
   openGraph: {
