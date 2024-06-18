@@ -4,11 +4,11 @@ import { IconAt, IconBrandGithubFilled, IconBrandX } from "@tabler/icons-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect } from "react";
 import { mergeRefs } from "react-merge-refs";
 import { useMedia } from "use-media";
 
-import heroImage from "@assets/napochaan.webp";
+import keyVisualImage from "@assets/napochaan.webp";
 import Article from "@components/article";
 import Budoux from "@components/budoux";
 import Heading from "@components/heading";
@@ -18,18 +18,16 @@ import Section from "@components/section";
 import ShowCase from "@components/show-case";
 import SwitchTheme from "@components/switch-theme";
 import { isTheme } from "@theme";
-import { vars, mediaQueries } from "@theme/css";
+import { mediaQueries } from "@theme/css";
 import reportAccessibility from "@utils/report-accessibility";
 
+import { AnimatedImage } from "./_components/animated";
 import { WorkItem } from "./_components/work-item";
 import * as styles from "./styles.css";
 
 import type { ComponentPropsWithRef } from "@react-spring/web";
-import type { NextPage } from "next";
 
-const AnimatedImage = animated(Image);
-
-const Page: NextPage = () => {
+const Page = () => {
   const isXL = useMedia(mediaQueries.xl);
   const { theme, setTheme } = useTheme();
   const pathname = usePathname();
@@ -81,26 +79,18 @@ const Page: NextPage = () => {
   const [lastRef, lastInView] = useInView();
   const themeSwitchAnim = useSpring({
     transform: !isXL && lastInView ? "translateY(100%)" : "translateY(0%)",
-    bottom: !isXL && lastInView ? "0rem" : vars.space.md,
+    bottom: !isXL && lastInView ? "0rem" : "calc(1rem / 2)", // vars.space.sm,
   });
 
-  const historiesItems = useMemo(
-    () =>
-      histories.map((item, idx) => ({
-        key: `histories__${item.src}-${idx}`,
-        children: <WorkItem {...item} />,
-      })),
-    [],
-  );
+  const historiesItems = histories.map((item, idx) => ({
+    key: `histories__${item.src}-${idx}`,
+    children: <WorkItem {...item} />,
+  }));
 
-  const libraryItems = useMemo(
-    () =>
-      libraries.map((item, idx) => ({
-        key: `library__${item.src}-${idx}`,
-        children: <WorkItem {...item} />,
-      })),
-    [],
-  );
+  const libraryItems = libraries.map((item, idx) => ({
+    key: `library__${item.src}-${idx}`,
+    children: <WorkItem {...item} />,
+  }));
 
   useEffect(() => {
     void reportAccessibility(React);
@@ -114,11 +104,10 @@ const Page: NextPage = () => {
         <animated.div className={styles.decorationImageRoot} aria-hidden="true" style={decorationImageAnim}>
           <Image
             className={styles.decorationImage}
-            src={heroImage}
+            src={keyVisualImage}
             alt="naporitan のオリジナルキャラクター"
             width={600}
             height={600}
-            priority
           />
         </animated.div>
       </div>
@@ -138,7 +127,7 @@ const Page: NextPage = () => {
             <AnimatedImage
               className={styles.fillImage}
               style={mainVisualAnim}
-              src={heroImage}
+              src={keyVisualImage}
               alt="naporitan のオリジナルキャラクター"
               priority
               width={600}
