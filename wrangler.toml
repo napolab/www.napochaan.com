@@ -16,4 +16,4 @@ BUN_VERSION = "1.1.7"
 
 [[env.production.kv_namespaces]]
 binding = "__NEXT_ON_PAGES__KV_SUSPENSE_CACHE"
-id = "a3fb1c94485348fb97ebd8b64364cdef"
+id = "5306a3a3392243ea80a57fbaae6f13db"
