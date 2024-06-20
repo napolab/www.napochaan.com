@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "wrangler:dev": "npx @cloudflare/next-on-pages && wrangler pages dev --port 3000 .vercel/output/static --compatibility-flags=\"nodejs_compat\" --compatibility-date=2024-03-30",
+    "wrangler:dev": "bun next-on-pages && bun wrangler pages dev --port 3000",
     "prebuild": "rimraf dist && rimraf .next",
     "build": "next build",
     "start": "next start",
