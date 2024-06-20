@@ -13,3 +13,7 @@ compatibility_flags = [ "nodejs_compat" ]
 
 [env.production.vars]
 BUN_VERSION = "1.1.7"
+
+[[env.production.kv_namespaces]]
+binding = "__NEXT_ON_PAGES__KV_SUSPENSE_CACHE"
+id = "a3fb1c94485348fb97ebd8b64364cdef"
