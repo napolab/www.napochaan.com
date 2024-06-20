@@ -20,8 +20,7 @@ jobs:
 
       - name: run Lighthouse CI
         run: |
-          npm install -g @lhci/cli
-          lhci autorun
+          bunx @lhci/cli autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

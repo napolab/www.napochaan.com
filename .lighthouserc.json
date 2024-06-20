@@ -3,7 +3,7 @@
     "preset": "lighthouse:recommended",
     "collect": {
       "numberOfRuns": 1,
-      "startServerCommand": "npm run wrangler:dev",
+      "startServerCommand": "bun run wrangler:dev",
       "url": ["http://localhost:3000"]
     },
     "upload": {
