@@ -11,7 +11,7 @@ import * as styles from "./styles.css";
 
 import type { ReactNode } from "react";
 
-export type Props = {
+type Props = {
   src: string;
   alt: string;
   caption: string | string[];

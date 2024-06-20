@@ -8,14 +8,11 @@ import * as styles from "./styles.css";
 
 import type { DetailedHTMLProps, FC } from "react";
 
-export type HeadingProps = Omit<
-  DetailedHTMLProps<React.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>,
-  "ref" | "style"
-> & {
+type Props = Omit<DetailedHTMLProps<React.HTMLAttributes<HTMLHeadingElement>, HTMLHeadingElement>, "ref" | "style"> & {
   unstyled?: boolean;
 };
 
-const Heading: FC<HeadingProps> = forwardRef<HTMLHeadingElement, HeadingProps>(
+const Heading: FC<Props> = forwardRef<HTMLHeadingElement, Props>(
   ({ children, className, unstyled = false, ...props }, ref) => {
     const level = useHeadingLevel();
     const type = `h${level ?? 6}` as const;

@@ -3,7 +3,6 @@ import { style } from "@vanilla-extract/css";
 import { ellipsis, ellipsisLine, mediaQueries, vars } from "@theme/css";
 
 import { characterLayer, fixedLayer } from "./_components/styles.css";
-export { anchorLink, textLink, fillImage, link } from "@theme/css";
 
 /**
  * @package

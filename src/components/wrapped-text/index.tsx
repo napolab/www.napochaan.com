@@ -2,10 +2,10 @@ import { forwardRef, Fragment, memo } from "react";
 
 import * as styles from "./styles.css";
 
-export type WrappedTextProps = {
+type Props = {
   texts: string[];
 };
-const WrappedText = forwardRef<HTMLSpanElement, WrappedTextProps>(({ texts }, ref) => {
+const WrappedText = forwardRef<HTMLSpanElement, Props>(({ texts }, ref) => {
   return (
     <span className={styles.root} ref={ref}>
       {texts.map((text, idx) => (

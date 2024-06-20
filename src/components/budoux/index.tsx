@@ -5,12 +5,12 @@ import * as styles from "./styles.css";
 
 import type { FC, ComponentPropsWithoutRef } from "react";
 
-export type BudouxProps = Omit<ComponentPropsWithoutRef<"span">, "children" | "className" | "style"> & {
+type Props = Omit<ComponentPropsWithoutRef<"span">, "children" | "className" | "style"> & {
   children: string;
 };
 
 const parser = loadDefaultJapaneseParser();
-const Budoux = forwardRef<HTMLSpanElement, BudouxProps>(({ children, ...props }, ref) => {
+const Budoux = forwardRef<HTMLSpanElement, Props>(({ children, ...props }, ref) => {
   const texts = useMemo(
     () => (children.length > 0 ? parser.parse(children) : []).map((text, idx) => ({ text, key: `${text}_${idx}` })),
     [children],
@@ -26,6 +26,6 @@ const Budoux = forwardRef<HTMLSpanElement, BudouxProps>(({ children, ...props },
       ))}
     </span>
   );
-}) satisfies FC<BudouxProps>;
+}) satisfies FC<Props>;
 
 export default memo(Budoux);

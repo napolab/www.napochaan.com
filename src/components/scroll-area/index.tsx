@@ -6,13 +6,13 @@ import * as styles from "./styles.css";
 
 import type { ReactNode } from "react";
 
-export type ScrollAreaProps = {
+type Props = {
   orientation: "horizontal" | "vertical";
   children: ReactNode;
   scrollbar?: "hover" | "all";
 };
 
-const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(({ orientation, children, scrollbar }, ref) => {
+const ScrollArea = forwardRef<HTMLDivElement, Props>(({ orientation, children, scrollbar }, ref) => {
   return (
     <Root ref={ref} className={styles.root[orientation]}>
       <Viewport className={styles.viewport}>{children}</Viewport>

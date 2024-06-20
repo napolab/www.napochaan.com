@@ -1,5 +1,0 @@
-{
-  "ignore": "pages/(.*)|.stories.(js|jsx|ts|tsx)",
-  "skip": "config.(js|jsx|ts|tsx)|.next|.vercel|public|node_modules",
-  "project": "./tsconfig.json"
-}

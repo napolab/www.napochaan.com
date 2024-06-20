@@ -4,7 +4,7 @@ import { calc } from "@vanilla-extract/css-utils";
 import { mediaQueries, vars } from "@theme/css";
 
 import { characterLayer, section2, section3, tile } from "../../styles.css";
-export { anchorLink, textLink, fillImage, link } from "@theme/css";
+export { anchorLink, } from "@theme/css";
 
 export { section3 };
 
