@@ -132,10 +132,3 @@ export const icon = style({
   width: 44,
   height: 44,
 });
-
-/**
- * @package
- */
-export const scrollInner = style({
-  flexShrink: 0,
-});

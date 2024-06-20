@@ -12,10 +12,7 @@ import type { FC, PropsWithChildren } from "react";
 import "@theme/global.css";
 import "@acab/reset.css";
 
-/**
- * @package
- */
-export type ThemeProviderProps = {
+type Props = {
   defaultTheme?: Theme;
   theme?: Theme;
 };
@@ -23,7 +20,7 @@ export type ThemeProviderProps = {
 /**
  * @package
  */
-export const ThemeProvider: FC<PropsWithChildren<ThemeProviderProps>> = ({ defaultTheme, theme, children }) => {
+export const ThemeProvider: FC<PropsWithChildren<Props>> = ({ defaultTheme, theme, children }) => {
   return (
     <NextThemeProvider attribute="class" defaultTheme={defaultTheme} forcedTheme={theme}>
       <div className={styles.providerRoot}>{children}</div>

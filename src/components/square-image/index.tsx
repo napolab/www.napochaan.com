@@ -7,13 +7,13 @@ import * as styles from "./styles.css";
 
 import type { ComponentPropsWithoutRef, FC, ReactNode } from "react";
 
-export type SquareImageProps = Omit<ComponentPropsWithoutRef<typeof Image>, "width" | "height"> & {
+type Props = Omit<ComponentPropsWithoutRef<typeof Image>, "width" | "height"> & {
   src: string;
   caption: ReactNode;
   size: number;
 };
 
-const SquareImage: FC<SquareImageProps> = (props) => {
+const SquareImage: FC<Props> = (props) => {
   return (
     <figure className={styles.squareImageRoot}>
       <div className={styles.imageRoot}>

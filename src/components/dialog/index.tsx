@@ -22,7 +22,7 @@ type ContextValue = {
 };
 const Context = createContext<ContextValue>({ open: false });
 
-export type DialogContentProps = {
+type DialogContentProps = {
   title: ReactNode;
   description?: ReactNode;
   children: ReactNode;

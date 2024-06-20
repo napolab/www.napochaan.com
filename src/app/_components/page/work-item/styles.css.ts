@@ -1,7 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { ellipsis, ellipsisLine, vars } from "@theme/css";
-export { anchorLink, textLink, fillImage, link } from "@theme/css";
+export { link } from "@theme/css";
 
 /**
  * @package

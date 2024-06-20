@@ -12,11 +12,11 @@ export type ShowCaseItem = {
   key: Key;
   children: ReactNode;
 };
-export type ShowCaseProps = {
+type Props = {
   visibility?: boolean;
   items: ShowCaseItem[];
 };
-const ShowCase = forwardRef<HTMLDivElement, ShowCaseProps>(({ visibility = false, items }, ref) => {
+const ShowCase = forwardRef<HTMLDivElement, Props>(({ visibility = false, items }, ref) => {
   const trails = useTrail(items.length, {
     from: { opacity: 0, transform: "scale(0.8)" },
     opacity: visibility ? 1 : 0,
@@ -35,6 +35,6 @@ const ShowCase = forwardRef<HTMLDivElement, ShowCaseProps>(({ visibility = false
       </div>
     </ScrollArea>
   );
-}) satisfies FC<ShowCaseProps>;
+}) satisfies FC<Props>;
 
 export default memo(ShowCase);

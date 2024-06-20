@@ -1,8 +1,5 @@
 import { ThemeProvider } from "./provider";
 
-import type { ThemeProviderProps } from "./provider";
-
-export type { ThemeProviderProps };
 export { ThemeProvider };
 
 export type Theme = "dark" | "light";

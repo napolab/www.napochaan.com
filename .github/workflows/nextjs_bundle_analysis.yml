@@ -84,7 +84,6 @@ jobs:
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}"
           echo ::set-output name=body::$body
-
       - name: Find Comment
         uses: peter-evans/find-comment@v3
         if: success() && github.event.number
