@@ -4,22 +4,21 @@ description: setup node
 runs:
   using: composite
   steps:
-    - uses: actions/setup-node@v4
+    - uses: oven-sh/setup-bun@v1
       with:
-        node-version-file: ./.node-version
-        cache: npm
+        bun-version: latest
 
     - uses: actions/cache@v4
-      id: npm-cache
+      id: bun-cache
       with:
         path: "**/node_modules"
-        key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-        restore-keys: ${{ runner.os }}-node-
+        key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+        restore-keys: ${{ runner.os }}-bun-
 
-    - run: echo '${{ toJSON(steps.npm-cache.outputs) }}'
+    - run: echo '${{ toJSON(steps.bun-cache.outputs) }}'
       shell: bash
 
     - name: Install Dependencies
-      if: ${{ steps.npm-cache.outputs.cache-hit != 'true' }}
-      run: npm install
+      if: ${{ steps.bun-cache.outputs.cache-hit != 'true' }}
+      run: bun install
       shell: bash
