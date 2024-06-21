@@ -268,7 +268,7 @@ const libraries = [
     ].join(""),
   },
   {
-    src: "/images/libraries/npm.png",
+    src: "/images/libraries/alpha-blend.png",
     caption: ["alpha-blend"],
     alt: "npmのロゴ",
     href: "https://www.npmjs.com/package/@napolab/alpha-blend",
