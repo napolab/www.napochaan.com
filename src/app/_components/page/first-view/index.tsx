@@ -7,6 +7,7 @@ import keyVisualImage from "@assets/napochaan.webp";
 import Article from "@components/article";
 import Heading from "@components/heading";
 import Image from "@components/image";
+import { link } from "@theme/css";
 
 import * as styles from "./styles.css";
 
@@ -67,8 +68,12 @@ export const FirstView = ({ tags }: Props) => {
           </Link>
           <div className={styles.aboutMe}>
             <p className={styles.aboutMeText}>
-              プログラマー。専門はウェブサイト制作とWebアプリケーション、モバイルアプリの開発・運営であり、これらを本職としている。加えて、インターネット上でのクリエイティブな活動にも積極的で、多才なクリエイターが集う{" "}
-              <Link href="https://studiognu.org">StudioGnu</Link>{" "}
+              プログラマー。専門はウェブサイト制作とWebアプリケーション、モバイルアプリの開発・運営であり、これらを本職としている。
+              <br />
+              加えて、インターネット上でのクリエイティブな活動にも積極的で、多才なクリエイターが集う{" "}
+              <Link href="https://studiognu.org" className={link}>
+                StudioGnu
+              </Link>{" "}
               に所属し、様々なプロジェクトにおいて技術面での貢献をしている。
             </p>
           </div>
@@ -83,9 +88,9 @@ export const FirstView = ({ tags }: Props) => {
               <li>TypeScript</li>
               <li>Cloudflare Workers</li>
               <li>Music(ボカロ)</li>
-              <li>Valorant</li>
-              <li>東方</li>
               <li>ニーゴ(プロセカ)</li>
+              <li>valorant</li>
+              <li>東方</li>
             </ul>
           </Article>
 

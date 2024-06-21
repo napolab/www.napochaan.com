@@ -75,11 +75,9 @@ const techTags: string[] = [
   "Ruby",
   "Rails",
   "Swift",
+  "vercel",
   "firebase",
-  "Cloudflare Workers",
-  "Cloudflare Pages",
-  "Cloudflare R2",
-  "Cloudflare Images",
+  "Cloudflare",
 ];
 
 const histories = [
