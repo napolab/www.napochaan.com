@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 import keyVisualImage from "@assets/napochaan.webp";
 import Article from "@components/article";
-import Budoux from "@components/budoux";
 import Heading from "@components/heading";
 import Image from "@components/image";
 
@@ -67,10 +66,10 @@ export const FirstView = ({ tags }: Props) => {
             <Heading translate="no">About me</Heading>
           </Link>
           <div className={styles.aboutMe}>
-            <p>
-              <Budoux>
-                プログラマー。専門はウェブサイト制作とWebアプリケーション、モバイルアプリの開発・運営であり、これらを本職としている。加えて、インターネット上でのクリエイティブな活動にも積極的で、多才なクリエイターが集うStudioGnuに所属し、様々なプロジェクトにおいて技術面での貢献をしている。
-              </Budoux>
+            <p className={styles.aboutMeText}>
+              プログラマー。専門はウェブサイト制作とWebアプリケーション、モバイルアプリの開発・運営であり、これらを本職としている。加えて、インターネット上でのクリエイティブな活動にも積極的で、多才なクリエイターが集う{" "}
+              <Link href="https://studiognu.org">StudioGnu</Link>{" "}
+              に所属し、様々なプロジェクトにおいて技術面での貢献をしている。
             </p>
           </div>
 

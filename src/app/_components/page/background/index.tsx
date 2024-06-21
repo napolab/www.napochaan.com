@@ -5,7 +5,6 @@ import { useSyncExternalStore } from "react";
 import keyVisualImage from "@assets/napochaan.webp";
 import Image from "@components/image";
 
-// eslint-disable-next-line no-restricted-imports
 import * as source from "../source";
 
 import * as styles from "./styles.css";

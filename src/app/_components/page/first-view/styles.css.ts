@@ -202,6 +202,15 @@ export const aboutMe = style({
 /**
  * @package
  */
+export const aboutMeText = style({
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  wordBreak: "auto-phrase",
+});
+
+/**
+ * @package
+ */
 export const tags = style({
   display: "flex",
   gap: `${vars.space.sm} ${vars.space.md}`,

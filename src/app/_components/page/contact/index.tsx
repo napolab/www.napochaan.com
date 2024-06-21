@@ -5,12 +5,10 @@ import { IconBrandGithubFilled, IconBrandX, IconAt } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect } from "react";
 
-import Budoux from "@components/budoux";
 import Heading from "@components/heading";
 import IconZenn from "@components/icons/zenn.svg";
 import Section from "@components/section";
 
-// eslint-disable-next-line no-restricted-imports
 import * as source from "../source";
 
 import * as styles from "./styles.css";
@@ -34,12 +32,7 @@ export const Contact = () => {
             <Heading translate="no">SNS&nbsp;&amp;&nbsp;Contact</Heading>
           </Link>
         </div>
-        <p>
-          <Budoux>連絡は X の DM が一番つながりやすいです。</Budoux>
-          <Link href="https://bento.me/napochaan" target="_blank" className={styles.link}>
-            bento.me
-          </Link>
-        </p>
+        <p>ポストはしてないですが、連絡は X の DM が一番つながりやすいです。</p>
 
         <address className={styles.contactList}>
           <Link
