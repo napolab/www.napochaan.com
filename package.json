@@ -97,5 +97,5 @@
     "word-wrap": "1.2.5",
     "@typescript-eslint/typescript-estree": "7.6.0"
   },
-  "packageManager": "yarn@1.22.9+sha512.12a124451101ff12effe515057f7e1a81d4ac2a6c58ea15881aa4780d6e8cd2413566387fefa0d8dc050fe46914ad895b2f658998257178487e9bb4baf031e70"
+  "packageManager": "yarn@1.22.22"
 }
