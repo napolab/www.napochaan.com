@@ -86,6 +86,18 @@ const techTags: string[] = [
 
 const histories = [
   {
+    src: "/images/histories/hono-conf.jpg",
+    alt: "Hono Conference2024 登壇の写真",
+    caption: ["Hono Conf 2024", "登壇"],
+    href: "https://speakerdeck.com/naporin0624/event-exhibition-with-hono",
+    content: [
+      "Hono Conference 2024 - Our first step に登壇した。",
+      "大阪関西国際芸術祭というイベントで展示したインタラクティブビデオシステムでの事例について発表を行った。",
+      "イベントのような短期開発では Cloudflare を使用するメリットを説明し、Hono と併用することでより効率的に開発したことを話した。",
+      "具体的には、Hono RPC での型安全な通信、 ReverseProxy と getPath を併用した画像最適サーバーの作成のやり方などを紹介した。",
+    ].join("\n"),
+  },
+  {
     src: "/images/histories/flatkobo-hp.png",
     alt: "flat-工房 HP のスクリーンショット",
     caption: ["flat-工房 HP", "制作サポート"],
