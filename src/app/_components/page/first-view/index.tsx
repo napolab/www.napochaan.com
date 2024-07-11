@@ -1,7 +1,5 @@
 "use client";
-import { useInView, useSpringRef, useSpring, useChain, animated } from "@react-spring/web";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import keyVisualImage from "@assets/napochaan.webp";
 import Article from "@components/article";
@@ -11,47 +9,23 @@ import { link } from "@theme/css";
 
 import * as styles from "./styles.css";
 
-const AnimatedImage = animated(Image);
-
 type Props = {
   tags: string[];
 };
 
 export const FirstView = ({ tags }: Props) => {
-  const [titleRef, titleInView] = useInView({ once: true });
-  const pathname = usePathname();
-  const firstViewInView = pathname === "/";
-  const mainVisualInView = titleInView || firstViewInView;
-
-  const mainVisualAnimApi = useSpringRef();
-  const mainVisualAnim = useSpring({
-    ref: mainVisualAnimApi,
-    from: { opacity: 0 },
-    opacity: mainVisualInView ? 1 : 0,
-  });
-
-  const [aboutRef, aboutInView] = useInView({ once: true });
-  const aboutAnimApi = useSpringRef();
-  const aboutAnim = useSpring({
-    ref: aboutAnimApi,
-    opacity: aboutInView ? 1 : 0,
-    transform: aboutInView ? "translateY(0rem)" : "translateY(0.5rem)",
-  });
-  useChain([mainVisualAnimApi, aboutAnimApi], [0, 0.5]);
-
   return (
     <div className={styles.firstView}>
       <div className={styles.section1}>
-        <div className={styles.pageTitle} ref={titleRef}>
+        <div className={styles.pageTitle}>
           <Link href="#" scroll className={styles.anchorLink}>
             <Heading translate="no">napochaan.com</Heading>
           </Link>
         </div>
 
         <div className={styles.mainVisualRoot}>
-          <AnimatedImage
+          <Image
             className={styles.fillImage}
-            style={mainVisualAnim}
             src={keyVisualImage}
             alt="naporitan のオリジナルキャラクター"
             priority
@@ -61,7 +35,7 @@ export const FirstView = ({ tags }: Props) => {
         </div>
       </div>
 
-      <animated.div className={styles.aboutMeWrapper} ref={aboutRef} style={aboutAnim}>
+      <div className={styles.aboutMeWrapper}>
         <Article className={styles.aboutMeRoot} id="about">
           <Link href="#about" scroll className={styles.anchorLink}>
             <Heading translate="no">About me</Heading>
@@ -107,7 +81,7 @@ export const FirstView = ({ tags }: Props) => {
             </ul>
           </Article>
         </Article>
-      </animated.div>
+      </div>
     </div>
   );
 };
