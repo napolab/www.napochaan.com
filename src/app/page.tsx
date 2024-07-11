@@ -26,25 +26,14 @@ const Page = async () => {
     children: <WorkItem {...item} content={<Budoux>{item.content}</Budoux>} />,
   }));
 
-  const articles = await getZennArticles();
+  const zenn = await getZennArticles();
+  const sizume = await getSizuArticles();
+  const articles = [...zenn, ...sizume]
+    .map((x) => ({ ...x, pubDate: dayjs(x.pubDate) }))
+    .sort((a, b) => b.pubDate.unix() - a.pubDate.unix());
 
   const articleItems = articles.map((item) => ({
     key: `article__${item.link}`,
-    children: (
-      <WorkItem
-        src={item.enclosure?.["@_url"] ?? ""}
-        caption={item.title}
-        alt={`${item.title} のサムネイル`}
-        href={item.link}
-        description={dayjs(item.pubDate).format("YYYY-MM-DD")}
-        content={<span className={styles.workDialogContent}>{item.description.trimStart()}</span>}
-      />
-    ),
-  }));
-
-  const blogs = await getSizuArticles();
-  const blogItems = blogs.map((item) => ({
-    key: `blog__${item.link}`,
     children: (
       <WorkItem
         src={item.enclosure?.["@_url"] ?? ""}
@@ -61,7 +50,7 @@ const Page = async () => {
     <Section className={styles.pageRoot}>
       <Background />
       <FirstView tags={techTags} />
-      <Works histories={historiesItems} libraries={libraryItems} articles={articleItems} blogs={blogItems} />
+      <Works histories={historiesItems} libraries={libraryItems} articles={articleItems} />
       <Contact />
     </Section>
   );
