@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 
-import { getZennArticles } from "@adapters/rss";
+import { getSizuArticles, getZennArticles } from "@adapters/rss";
 import Budoux from "@components/budoux";
 import Section from "@components/section";
 
@@ -42,11 +42,26 @@ const Page = async () => {
     ),
   }));
 
+  const blogs = await getSizuArticles();
+  const blogItems = blogs.map((item) => ({
+    key: `blog__${item.link}`,
+    children: (
+      <WorkItem
+        src={item.enclosure?.["@_url"] ?? ""}
+        caption={item.title}
+        alt={`${item.title} のサムネイル`}
+        href={item.link}
+        description={dayjs(item.pubDate).format("YYYY-MM-DD")}
+        content={<span className={styles.workDialogContent}>{item.description.trimStart()}</span>}
+      />
+    ),
+  }));
+
   return (
     <Section className={styles.pageRoot}>
       <Background />
       <FirstView tags={techTags} />
-      <Works histories={historiesItems} libraries={libraryItems} articles={articleItems} />
+      <Works histories={historiesItems} libraries={libraryItems} articles={articleItems} blogs={blogItems} />
       <Contact />
     </Section>
   );

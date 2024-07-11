@@ -12,11 +12,12 @@ import type { ShowCaseItem } from "@components/show-case";
 
 type Props = {
   histories: ShowCaseItem[];
-  articles: ShowCaseItem[];
   libraries: ShowCaseItem[];
+  articles: ShowCaseItem[];
+  blogs: ShowCaseItem[];
 };
 
-export const Works = ({ histories, libraries, articles }: Props) => {
+export const Works = ({ histories, libraries, articles, blogs }: Props) => {
   const [worksRef, worksInView] = useInView({ once: true, rootMargin: "-30% 0%" });
   const worksAnim = useSpring({
     opacity: worksInView ? 1 : 0,
@@ -26,6 +27,7 @@ export const Works = ({ histories, libraries, articles }: Props) => {
   const [historyRef, historyInView] = useInView({ once: true });
   const [articleRef, articleInView] = useInView({ once: true });
   const [libraryRef, libraryInView] = useInView({ once: true });
+  const [blogRef, blogInView] = useInView({ once: true });
 
   return (
     <animated.div ref={worksRef} className={styles.worksWrapper} style={worksAnim}>
@@ -63,6 +65,16 @@ export const Works = ({ histories, libraries, articles }: Props) => {
           </div>
 
           <ShowCase items={libraries} visibility={libraryInView} />
+        </Section>
+
+        <Section id="blog" className={styles.section3} ref={blogRef}>
+          <div>
+            <Link href="#blog" scroll className={styles.anchorLink}>
+              <Heading translate="no">Blog</Heading>
+            </Link>
+          </div>
+
+          <ShowCase items={blogs} visibility={blogInView} />
         </Section>
       </Section>
     </animated.div>
