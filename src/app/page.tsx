@@ -94,7 +94,7 @@ const histories = [
       "Cloudflare Workers DurableObjects で WebSocket を取り扱うための Tips について話した。",
       "DurableObjects は WebSocket を扱うための最適な選択肢になりつつあるが、うまく使用するためには障壁がいくつかある。",
       "自分が直面した問題を例に挙げながら解決策を紹介した。",
-    ],
+    ].join("\n"),
   },
   {
     src: "/images/histories/hono-conf.jpg",
