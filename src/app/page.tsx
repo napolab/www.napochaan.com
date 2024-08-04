@@ -86,6 +86,17 @@ const techTags: string[] = [
 
 const histories = [
   {
+    src: "/images/histories/cloudflare-workers-tech-taslk-3.png",
+    alt: "Cloudflare Workers Tech Talk のスライド",
+    caption: ["Cloudflare Workers", "Tech Talk 登壇"],
+    href: "https://speakerdeck.com/naporin0624/durableobjects-nituite",
+    content: [
+      "Cloudflare Workers DurableObjects で WebSocket を取り扱うための Tips について話した。",
+      "DurableObjects は WebSocket を扱うための最適な選択肢になりつつあるが、うまく使用するためには障壁がいくつかある。",
+      "自分が直面した問題を例に挙げながら解決策を紹介した。",
+    ],
+  },
+  {
     src: "/images/histories/hono-conf.jpg",
     alt: "Hono Conference2024 登壇の写真",
     caption: ["Hono Conf 2024", "登壇"],
@@ -270,6 +281,16 @@ const histories = [
 ] satisfies ComponentPropsWithRef<typeof WorkItem>[];
 
 const libraries = [
+  {
+    src: "/images/libraries/npm.png",
+    caption: ["durabcast"],
+    alt: "npmのロゴ",
+    href: "https://www.npmjs.com/package/durabcast",
+    content: [
+      "DurableObjects で WebSocket を扱うためのライブラリ。",
+      "自動接続チェックや、メッセージの送信機能などが搭載されている基底クラスとなっている。このライブラリを拡張することで煩雑な設定なしに DurableObjects で WebSocket を扱うことが可能になる。",
+    ].join(""),
+  },
   {
     src: "/images/libraries/npm.png",
     caption: ["y-durableobjects"],
