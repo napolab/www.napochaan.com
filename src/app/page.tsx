@@ -86,9 +86,9 @@ const techTags: string[] = [
 
 const histories = [
   {
-    src: "/images/histories/cloudflare-workers-tech-taslk-3.png",
-    alt: "Cloudflare Workers Tech Talk のスライド",
-    caption: ["Cloudflare Workers", "Tech Talk 登壇"],
+    src: "/images/histories/cloudflare-workers-tech-talk-3.png",
+    alt: "Cloudflare Workers Tech Talk#3 のスライド",
+    caption: ["Workers Tech Talk#3", "登壇"],
     href: "https://speakerdeck.com/naporin0624/durableobjects-nituite",
     content: [
       "Cloudflare Workers DurableObjects で WebSocket を取り扱うための Tips について話した。",
@@ -97,7 +97,7 @@ const histories = [
     ].join("\n"),
   },
   {
-    src: "/images/histories/hono-conf.jpg",
+    src: "/images/histories/hono-conference-2024.png",
     alt: "Hono Conference2024 登壇の写真",
     caption: ["Hono Conf 2024", "登壇"],
     href: "https://speakerdeck.com/naporin0624/event-exhibition-with-hono",
