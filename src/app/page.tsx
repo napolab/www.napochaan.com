@@ -79,12 +79,26 @@ const techTags: string[] = [
   "Ruby",
   "Rails",
   "Swift",
+  "C#",
+  "UdonSharp",
+  "Unity",
   "vercel",
   "firebase",
   "Cloudflare",
 ];
 
 const histories = [
+  {
+    src: "/images/histories/five-blocker.png",
+    alt: "工房祭2024ファイブブロッカーステージ",
+    caption: ["工房祭ステージ", "システム実装"],
+    href: "https://x.com/naporin24690/status/1834900593808490701",
+    content: [
+      "OBSのブラウザソースで動作するステージ演出システムを作成した。",
+      "Cloudflare WorkersでWebSocketを使い、OBSとスマホの通信を行っており、自身で作成したdurabcastを用いている。",
+      "演出画面に加え、スマホで正解不正解の選択や再生停止の操作、回答者の位置調整もできるようになっており、現場での使用に耐えられる工夫をしている。",
+    ].join("\n"),
+  },
   {
     src: "/images/histories/cloudflare-workers-tech-talk-3.png",
     alt: "Cloudflare Workers Tech Talk#3 のスライド",
