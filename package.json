@@ -70,7 +70,7 @@
     "jsdom": "^23.0.0",
     "knip": "^5.22.0",
     "markuplint": "^4.4.0",
-    "npm-run-all": "^4.1.5",
+    "npm-run-all2": "^5.0.0",
     "postcss-dark-theme-class": "^1.2.1",
     "postcss-flexbugs-fixes": "^5.0.2",
     "postcss-gap-properties": "^5.0.1",
@@ -82,7 +82,7 @@
     "vite-tsconfig-paths": "^4.2.0",
     "vitest": "^1.6.0",
     "vitest-axe": "^0.1.0",
-    "vitest-canvas-mock": "^0.2.2",
+    "vitest-canvas-mock": "^0.3.0",
     "wrangler": "^3.60.3"
   },
   "nextBundleAnalysis": {
