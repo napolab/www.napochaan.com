@@ -124,7 +124,7 @@ const histories = [
     ].join("\n"),
   },
   {
-    src: "/images/histories/Cloudflare-workers-tech-talk-3.png",
+    src: "/images/histories/cloudflare-workers-tech-talk-3.png",
     alt: "Cloudflare Workers Tech Talk#3 のスライド",
     caption: ["Workers Tech Talk#3", "登壇"],
     href: "https://speakerdeck.com/naporin0624/durableobjects-nituite",
