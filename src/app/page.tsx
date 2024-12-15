@@ -93,14 +93,19 @@ const histories = [
     alt: "展示「W ♭Y ♭K M ♭C K」のシステム作成",
     caption: ["W ♭Y ♭K M ♭C K", "システム作成"],
     href: "https://x.com/naporin24690/status/1867175063893811585",
-    content: [""].join("\n"),
+    content: [
+      "企画展「共に在る音楽」の作品である「W ♭Y ♭K M ♭C K」のシステムの設計・実装を行った。",
+    ].join("\n"),
   },
   {
     src: "/images/histories/DEMiXUS.jpeg",
     alt: "展示「DEMiXUS」のシステム作成",
     caption: ["DEMiXUS", "システム作成"],
     href: "https://x.com/naporin24690/status/1867179943060504598",
-    content: [""].join("\n"),
+    content: [
+      "企画展「共に在る音楽」の作品である「DEMiXUS」のシステムの設計・実装を行った。",
+      "短期間の実装であったが要望を実現すべく Cloudflare Stack をフル活用した内容になっている。",
+    ].join("\n"),
   },
   {
     src: "/images/histories/tomoshibi.png",
