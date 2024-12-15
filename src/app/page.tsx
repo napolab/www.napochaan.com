@@ -108,7 +108,7 @@ const histories = [
   {
     src: "/images/histories/tomoshibi.png",
     alt: "燭 Coding & Technical Advisor naporitan",
-    caption: ["燭[Music Video]", "Coding Advisor"],
+    caption: ["燭/MusicVideo", "Coding Advisor"],
     href: "https://x.com/naporin24690/status/1845201683368071632",
     content: ["燭の MV で使われる図形を p5.js で生成できる簡単なエディターを作った。"].join("\n"),
   },
