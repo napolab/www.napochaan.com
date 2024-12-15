@@ -93,9 +93,7 @@ const histories = [
     alt: "展示「W ♭Y ♭K M ♭C K」のシステム作成",
     caption: ["W ♭Y ♭K M ♭C K", "システム作成"],
     href: "https://x.com/naporin24690/status/1867175063893811585",
-    content: [
-      "企画展「共に在る音楽」の作品である「W ♭Y ♭K M ♭C K」のシステムの設計・実装を行った。",
-    ].join("\n"),
+    content: ["企画展「共に在る音楽」の作品である「W ♭Y ♭K M ♭C K」のシステムの設計・実装を行った。"].join("\n"),
   },
   {
     src: "/images/histories/DEMiXUS.jpeg",
