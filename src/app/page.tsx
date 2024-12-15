@@ -89,7 +89,7 @@ const techTags: string[] = [
 
 const histories = [
   {
-    src: "/images/histories/W ♭Y ♭K M ♭C K.jpeg",
+    src: "/images/histories/WYKMCK.jpeg",
     alt: "展示「W ♭Y ♭K M ♭C K」のシステム作成",
     caption: ["W ♭Y ♭K M ♭C K", "システム作成"],
     href: "https://x.com/naporin24690/status/1867175063893811585",
