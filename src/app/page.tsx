@@ -89,6 +89,30 @@ const techTags: string[] = [
 
 const histories = [
   {
+    src: "/images/histories/WYKMCK.jpeg",
+    alt: "展示「W ♭Y ♭K M ♭C K」のシステム作成",
+    caption: ["W ♭Y ♭K M ♭C K", "システム作成"],
+    href: "https://x.com/naporin24690/status/1867175063893811585",
+    content: ["企画展「共に在る音楽」の作品である「W ♭Y ♭K M ♭C K」のシステムの設計・実装を行った。"].join("\n"),
+  },
+  {
+    src: "/images/histories/DEMiXUS.jpeg",
+    alt: "展示「DEMiXUS」のシステム作成",
+    caption: ["DEMiXUS", "システム作成"],
+    href: "https://x.com/naporin24690/status/1867179943060504598",
+    content: [
+      "企画展「共に在る音楽」の作品である「DEMiXUS」のシステムの設計・実装を行った。",
+      "短期間の実装であったが要望を実現すべく Cloudflare Stack をフル活用した内容になっている。",
+    ].join("\n"),
+  },
+  {
+    src: "/images/histories/tomoshibi.png",
+    alt: "燭 Coding & Technical Advisor naporitan",
+    caption: ["燭[Music Video]", "Coding Advisor"],
+    href: "https://x.com/naporin24690/status/1845201683368071632",
+    content: ["燭の MV で使われる図形を p5.js で生成できる簡単なエディターを作った。"].join("\n"),
+  },
+  {
     src: "/images/histories/five-blocker.png",
     alt: "工房祭2024ファイブブロッカーステージ",
     caption: ["工房祭ステージ", "システム実装"],
@@ -100,7 +124,7 @@ const histories = [
     ].join("\n"),
   },
   {
-    src: "/images/histories/cloudflare-workers-tech-talk-3.png",
+    src: "/images/histories/Cloudflare-workers-tech-talk-3.png",
     alt: "Cloudflare Workers Tech Talk#3 のスライド",
     caption: ["Workers Tech Talk#3", "登壇"],
     href: "https://speakerdeck.com/naporin0624/durableobjects-nituite",
@@ -184,7 +208,7 @@ const histories = [
     caption: ["「多面体、鏡面」", "システム作成"],
     href: "https://x.com/StudioGnu/status/1741010587495416144?s=20",
     content:
-      "大阪関西国際芸術祭2023に出展するためのシステムを作成した。\n感想投稿、ChatGPT API と stable diffusion による自動動画生成の仕組みを作成、ポスター、投稿コメント表示画面の実装を行った。大部分を cloudflare の製品で作るという技術的にも挑戦的なことを行った。",
+      "大阪関西国際芸術祭2023に出展するためのシステムを作成した。\n感想投稿、ChatGPT API と StableDiffusion による自動動画生成の仕組みを作成、ポスター、投稿コメント表示画面の実装を行った。大部分を Cloudflare の製品で作るという技術的にも挑戦的なことを行った。",
   },
   {
     src: "/images/histories/1st-album.hakualab.org.png",
@@ -207,7 +231,7 @@ const histories = [
     alt: "ボカコレ2023夏ランキングアーカイブのスクリーンショット",
     href: "https://vocaloid-collection-archive.studiognu.org/",
     content:
-      "ボカコレ2023夏の毎時ランキングを作成した。\n統計情報や増加量を出すことで様々な角度から情報を整理し、ランキングの傾向を可視化した。\n仮想スクロールを縦横両方に入れており、大量のコンテンツに対して高速に検索、スクロールができるようになっている。\nデータ基盤は cloudflare workers + cloudflare KV + cloudflare R2 を使用し、アプリケーションコードは主に hono で構築されている。\nデータ収集時は cloudflare queue + cloudflare cron trigger を併用することで取りこぼし無くデータを毎時で集計する仕組みを構築している。",
+      "ボカコレ2023夏の毎時ランキングを作成した。\n統計情報や増加量を出すことで様々な角度から情報を整理し、ランキングの傾向を可視化した。\n仮想スクロールを縦横両方に入れており、大量のコンテンツに対して高速に検索、スクロールができるようになっている。\nデータ基盤は Cloudflare workers + Cloudflare KV + Cloudflare R2 を使用し、アプリケーションコードは主に hono で構築されている。\nデータ収集時は Cloudflare queue + Cloudflare cron trigger を併用することで取りこぼし無くデータを毎時で集計する仕組みを構築している。",
   },
   {
     src: "/images/histories/netuijou-remix.jpg",
@@ -222,7 +246,7 @@ const histories = [
     alt: "napochaan.comのOGP",
     href: "https://github.com/napolab/www.napochaan.com",
     content:
-      "figma を勉強するために作成した。\nNext.js と cloudflare pages を使用して高速な web ページになるように目指し、a11y 対応をするために radix-ui を使用している。\nかわいい感じや楽しい感じを出したかったため、react-spring でひそなさんに描いてもらったキャラクターやコンテンツを動かしている。",
+      "figma を勉強するために作成した。\nNext.js と Cloudflare pages を使用して高速な web ページになるように目指し、a11y 対応をするために radix-ui を使用している。\nかわいい感じや楽しい感じを出したかったため、react-spring でひそなさんに描いてもらったキャラクターやコンテンツを動かしている。",
   },
   {
     src: "/images/histories/lgtm-napochaan-com.png",
@@ -230,7 +254,7 @@ const histories = [
     alt: "lgtmの画像",
     href: "https://lgtm.napochaan.com",
     content:
-      "satori で作ったものを cloudflare workers にデプロイしている。\n文字色と背景画像を URLParameter で変更することができる。",
+      "satori で作ったものを Cloudflare workers にデプロイしている。\n文字色と背景画像を URLParameter で変更することができる。",
   },
   {
     src: "/images/histories/flat-kaitori.png",
@@ -330,7 +354,7 @@ const libraries = [
     alt: "npmのロゴ",
     href: "https://www.npmjs.com/package/@napolab/kv-response-cache",
     content:
-      "cloudflare workers + hono 用の KV を使ってレスポンスをキャッシュするためのライブラリを作った。\ncustom domain を割り当てられない状況の時に使用することができ、hono middleware を提供しているため、一行で KV Cache を組み込むことができる。",
+      "Cloudflare workers + hono 用の KV を使ってレスポンスをキャッシュするためのライブラリを作った。\ncustom domain を割り当てられない状況の時に使用することができ、hono middleware を提供しているため、一行で KV Cache を組み込むことができる。",
   },
   {
     src: "/images/libraries/npm.png",
