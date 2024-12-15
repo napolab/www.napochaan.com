@@ -89,18 +89,25 @@ const techTags: string[] = [
 
 const histories = [
   {
-    src: "",
-    alt: "",
-    caption: [""],
-    href: "",
-    content: [].join("\n"),
+    src: "/images/histories/W ♭Y ♭K M ♭C K.jpeg",
+    alt: "展示「W ♭Y ♭K M ♭C K」のシステム作成",
+    caption: ["W ♭Y ♭K M ♭C K", "システム作成"],
+    href: "https://x.com/naporin24690/status/1867175063893811585",
+    content: [""].join("\n"),
   },
   {
-    src: "",
-    alt: "",
-    caption: [""],
-    href: "",
-    content: [].join("\n"),
+    src: "/images/histories/DEMiXUS.jpeg",
+    alt: "展示「DEMiXUS」のシステム作成",
+    caption: ["DEMiXUS", "システム作成"],
+    href: "https://x.com/naporin24690/status/1867179943060504598",
+    content: [""].join("\n"),
+  },
+  {
+    src: "/images/histories/tomoshibi.png",
+    alt: "燭 Coding & Technical Advisor naporitan",
+    caption: ["燭[Music Video]", "Coding Advisor"],
+    href: "https://x.com/naporin24690/status/1845201683368071632",
+    content: ["燭の MV で使われる図形を p5.js で生成できる簡単なエディターを作った。"].join("\n"),
   },
   {
     src: "/images/histories/five-blocker.png",
