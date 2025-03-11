@@ -89,6 +89,18 @@ const techTags: string[] = [
 
 const histories = [
   {
+    src: "/images/histories/halo-gimmick.png",
+    alt: "VRChat で使える好きなものを回せる Halo を作れるギミック",
+    href: "https://booth.pm/ja/items/6604904",
+    caption: ["ヘイロー化ギミック", "booth 販売"],
+    content: [
+      "VRChatで好きなオブジェクトを頭上で回転させるヘイローにできるギミックを作成した。",
+      "ボタン一つで配置したオブジェクトを円形に自動配置できる仕組みを実装し、フルパック版では13種類のメニューを用意した。",
+      "どんなものでも円形に配置するスクリプトが同梱されているので、頭だけでなく腕や腰にもつけることが可能。",
+      "avatarで使用可能なように最適化し、BOOTHで販売している。",
+    ].join("\n"),
+  },
+  {
     src: "/images/histories/WYKMCK.jpeg",
     alt: "展示「W ♭Y ♭K M ♭C K」のシステム作成",
     caption: ["W ♭Y ♭K M ♭C K", "システム作成"],
