@@ -95,10 +95,9 @@ jobs:
           No base bundle found for comparison. This is likely the first run for this branch.
           The bundle will be used as a baseline for future comparisons."
           fi
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
-          echo "body=$body" >> $GITHUB_OUTPUT
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Find Comment
         uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e # v3.1.0
         if: success() && github.event.number
