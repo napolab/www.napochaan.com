@@ -1,5 +1,5 @@
 export * from "./convert-hex-2-rgb";
-export * from "./vanilla-extract";
+export type * from "./vanilla-extract";
 
 const xl = 1440;
 const lg = 1024;
