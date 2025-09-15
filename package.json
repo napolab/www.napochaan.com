@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "wrangler:dev": "bun next-on-pages && bun wrangler pages dev --port 3000",
+    "wrangler:dev": "pnpm next-on-pages && pnpm wrangler pages dev --port 3000",
     "prebuild": "rimraf dist && rimraf .next",
     "build": "next build",
     "start": "next start",
@@ -97,5 +97,5 @@
     "word-wrap": "1.2.5",
     "@typescript-eslint/typescript-estree": "7.6.0"
   },
-  "packageManager": "bun@1.1.10"
+  "packageManager": "pnpm@10.15.1"
 }
