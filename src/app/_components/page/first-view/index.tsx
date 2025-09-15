@@ -1,4 +1,3 @@
-"use client";
 import Link from "next/link";
 
 import keyVisualImage from "@assets/napochaan.webp";
@@ -35,8 +34,8 @@ export const FirstView = ({ tags }: Props) => {
         </div>
       </div>
 
-      <div className={styles.aboutMeWrapper}>
-        <Article className={styles.aboutMeRoot} id="about">
+      <div className={styles.aboutMeRoot}>
+        <Article className={styles.aboutMeSection} id="about">
           <Link href="#about" scroll className={styles.anchorLink}>
             <Heading translate="no">About me</Heading>
           </Link>
