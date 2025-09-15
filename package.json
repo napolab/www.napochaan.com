@@ -94,6 +94,7 @@
     "postcss-preset-env": "^9.6.0",
     "prettier": "^3.6.2",
     "rimraf": "^5.0.10",
+    "typescript": "^5.9.2",
     "typescript-eslint": "^8.43.0",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.1",
