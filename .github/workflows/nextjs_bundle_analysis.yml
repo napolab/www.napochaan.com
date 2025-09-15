@@ -15,12 +15,17 @@ defaults:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: ./.github/workflows/modules/setup-node
 
       - name: Restore next build
@@ -51,8 +56,10 @@ jobs:
           path: .next/analyze/__bundle_analysis.json
 
       - name: Download base branch bundle stats
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb574a96ee720e24f801b7c11 # v6.0.0
         if: success() && github.event.number
+        continue-on-error: true
+        id: download-base-stats
         with:
           workflow: nextjs_bundle_analysis.yml
           branch: ${{ github.event.pull_request.base.ref }}
@@ -72,20 +79,27 @@ jobs:
       # Either of these arguments can be changed or removed by editing the `nextBundleAnalysis`
       # entry in your package.json file.
       - name: Compare with base branch bundle
-        if: success() && github.event.number
+        if: success() && github.event.number && steps.download-base-stats.outcome == 'success'
         run: ls -laR .next/analyze/base && npx -p nextjs-bundle-analysis compare
 
       - name: Get comment body
         id: get-comment-body
         if: success() && github.event.number
         run: |
-          body=$(cat .next/analyze/__bundle_analysis_comment.txt)
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
-          echo ::set-output name=body::$body
+          if [ -f .next/analyze/__bundle_analysis_comment.txt ]; then
+            body=$(cat .next/analyze/__bundle_analysis_comment.txt)
+          else
+            body="<!-- __NEXTJS_BUNDLE -->
+          ## Bundle analysis
+
+          No base bundle found for comparison. This is likely the first run for this branch.
+          The bundle will be used as a baseline for future comparisons."
+          fi
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Find Comment
-        uses: peter-evans/find-comment@v3
+        uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e # v3.1.0
         if: success() && github.event.number
         id: fc
         with:
@@ -93,14 +107,14 @@ jobs:
           body-includes: "<!-- __NEXTJS_BUNDLE -->"
 
       - name: Create Comment
-        uses: peter-evans/create-or-update-comment@v4.0.0
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
         if: success() && github.event.number && steps.fc.outputs.comment-id == 0
         with:
           issue-number: ${{ github.event.number }}
           body: ${{ steps.get-comment-body.outputs.body }}
 
       - name: Update Comment
-        uses: peter-evans/create-or-update-comment@v4.0.0
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
         if: success() && github.event.number && steps.fc.outputs.comment-id != 0
         with:
           issue-number: ${{ github.event.number }}

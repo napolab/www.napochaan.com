@@ -4,6 +4,7 @@ import { style } from "@vanilla-extract/css";
  * @package
  */
 export const budouxRoot = style({
-  wordBreak: "keep-all",
+  // @ts-expect-error: auto-phrase is not yet supported in TypeScript definitions
+  wordBreak: "auto-phrase",
   overflowWrap: "break-word",
 });

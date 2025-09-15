@@ -10,47 +10,63 @@ on:
 jobs:
   lint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-lint
       cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: ./.github/workflows/modules/setup-node
 
-      - run: bun run lint
+      - run: pnpm run lint
 
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-test
       cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: ./.github/workflows/modules/setup-node
 
-      - run: bun run test
+      - run: pnpm run test
 
   type-check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-type-check
       cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: ./.github/workflows/modules/setup-node
 
-      - run: bun run type-check
+      - run: pnpm run type-check
 
   next-on-pages:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}-next-on-pages
       cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: ./.github/workflows/modules/setup-node
 
-      - run: bun next-on-pages
+      - run: pnpm exec next-on-pages

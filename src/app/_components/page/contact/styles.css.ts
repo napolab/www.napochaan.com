@@ -9,7 +9,7 @@ export { anchorLink, textLink, link } from "@theme/css";
 /**
  * @package
  */
-export const contactWrapper = style([
+export const contactRoot = style([
   section2,
   {
     position: "relative",
@@ -31,7 +31,7 @@ export const contactWrapper = style([
 /**
  * @package
  */
-export const contactRoot = style([
+export const contactSection = style([
   tile,
   {
     "@media": {

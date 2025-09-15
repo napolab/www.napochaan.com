@@ -130,7 +130,7 @@ export const pageTitle = style({
 /**
  * @package
  */
-export const aboutMeWrapper = style({
+export const aboutMeRoot = style({
   position: "relative",
   zIndex: calc.add(characterLayer, 1),
 
@@ -145,7 +145,7 @@ export const aboutMeWrapper = style({
 /**
  * @package
  */
-export const aboutMeRoot = style([
+export const aboutMeSection = style([
   tile,
   {
     position: "relative",

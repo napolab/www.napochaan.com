@@ -1,4 +1,4 @@
-"use clint";
+"use client";
 import { forwardRef, memo } from "react";
 
 import { useHeadingLevel, HeadingLevelProvider, isHeadingLevel } from "@hooks/heading-level";

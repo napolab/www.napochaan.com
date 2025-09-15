@@ -8,6 +8,9 @@ on:
 jobs:
   update-lighthouse-budge:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
     env:
       output-folder: lighthouse
     concurrency:
@@ -15,11 +18,10 @@ jobs:
       cancel-in-progress: true
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
         with:
-          node-version-file: ./.node-version
-          cache: npm
+          persist-credentials: false
+
+      - uses: jdx/mise-action@c37c93293d6b742fc901e1406b8f764f6fb19dac # v2
 
       - name: create lightouse budge
         run: |
@@ -29,7 +31,7 @@ jobs:
             --output-path=${{ env.output-folder }}
 
       - name: deploy lighthouse status
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@881db5376404c5c8d621010bcbec0310b58d5e29 # v4.6.8
         with:
           branch: gh-pages
           folder: ${{ env.output-folder }}
