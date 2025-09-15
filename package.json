@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "wrangler:dev": "pnpm next-on-pages && pnpm wrangler pages dev --port 3000",
+    "wrangler:build": "next-on-pages",
     "prebuild": "rimraf dist && rimraf .next",
     "build": "next build",
     "start": "next start",
