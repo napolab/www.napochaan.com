@@ -11,12 +11,12 @@ import * as styles from "./styles.css";
 
 import type { ShowCaseItem } from "@components/show-case";
 
-interface InViewSectionProps {
+type InViewSectionProps = {
   id: string;
   title: string;
   items: ShowCaseItem[];
   className?: string;
-}
+};
 
 export const InViewSection = ({ id, title, items, className }: InViewSectionProps) => {
   const ref = useRef(null);
