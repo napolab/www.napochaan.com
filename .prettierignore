@@ -6,3 +6,5 @@ out
 build
 dist
 coverage
+pnpm-lock.yaml
+.claude/settings.local.json

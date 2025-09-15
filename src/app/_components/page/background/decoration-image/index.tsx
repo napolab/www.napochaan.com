@@ -5,12 +5,12 @@ import * as styles from "./styles.css";
 
 import type { ReactNode } from "react";
 
-interface AnimatedDecorationImageProps {
+type DecorationImageProps = {
   contactInView: boolean;
   children: ReactNode;
-}
+};
 
-export const AnimatedDecorationImage = ({ contactInView, children }: AnimatedDecorationImageProps) => {
+export const DecorationImage = ({ contactInView, children }: DecorationImageProps) => {
   return (
     <motion.div
       className={styles.decorationImageRoot}
@@ -18,8 +18,9 @@ export const AnimatedDecorationImage = ({ contactInView, children }: AnimatedDec
       initial={{ x: "125%" }}
       animate={{ x: contactInView ? "0%" : "125%" }}
       transition={{
-        duration: 0.8,
-        ease: [0.25, 0.46, 0.45, 0.94], // Similar to config.gentle
+        type: "spring",
+        damping: 14,
+        stiffness: 120,
         delay: 0.8,
       }}
     >

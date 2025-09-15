@@ -5,12 +5,12 @@ import Heading from "@components/heading";
 import IconZenn from "@components/icons/zenn.svg";
 import Section from "@components/section";
 
-import { AnimatedContactRoot } from "./animated-contact-wrapper";
+import { ContactSection } from "./contact-section";
 import * as styles from "./styles.css";
 
 export const Contact = () => {
   return (
-    <AnimatedContactRoot>
+    <ContactSection>
       <Section id="contact" className={styles.contactSection}>
         <div>
           <Link href="/#contact" scroll className={styles.anchorLink}>
@@ -59,6 +59,6 @@ export const Contact = () => {
           </Link>
         </address>
       </Section>
-    </AnimatedContactRoot>
+    </ContactSection>
   );
 };

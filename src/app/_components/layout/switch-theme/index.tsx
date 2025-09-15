@@ -13,12 +13,10 @@ import * as styles from "./styles.css";
 export const SwitchTheme = () => {
   const [, force] = useReducer((c) => c + 1, 0);
   const { theme, setTheme } = useTheme();
-  const { scrollYProgress } = useScroll();
   const isXL = useMedia(mediaQueries.xl);
-
-  const translateY = useTransform(scrollYProgress, [0, 0.8, 1], ["0%", "0%", "100%"]);
-
-  const bottom = useTransform(scrollYProgress, [0, 0.8, 1], ["0.5rem", "0.5rem", "0rem"]);
+  const { scrollYProgress } = useScroll();
+  const translateY = useTransform(scrollYProgress, [0.8, 1], ["0%", "100%"]);
+  const bottom = useTransform(scrollYProgress, [0.8, 1], ["0.5rem", "0rem"]);
 
   useEffect(() => {
     // なんか動かないので適当に rerendering する
@@ -34,10 +32,7 @@ export const SwitchTheme = () => {
   return (
     <motion.div
       className={styles.switchTheme}
-      style={{
-        translateY: isXL ? "0%" : translateY,
-        bottom: isXL ? "0.5rem" : bottom,
-      }}
+      style={{ translateY: isXL ? "0%" : translateY, bottom: isXL ? "0.5rem" : bottom }}
     >
       <Switch theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
     </motion.div>

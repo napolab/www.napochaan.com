@@ -26,7 +26,7 @@ export const AnimatedSwitchThemeElements = ({ value, palettes, children }: Anima
           scale: value === "light" ? 1 : 0,
           backgroundColor: value === "light" ? palettes.accent1 : "transparent",
         }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        transition={{ type: "spring", damping: 14, stiffness: 120 }}
       />
       <motion.div
         className={styles.thumb.dark}
@@ -35,7 +35,7 @@ export const AnimatedSwitchThemeElements = ({ value, palettes, children }: Anima
           scale: value === "dark" ? 1 : 0,
           backgroundColor: value === "dark" ? palettes.black : "transparent",
         }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        transition={{ type: "spring", damping: 14, stiffness: 120 }}
       />
 
       <motion.div
@@ -43,7 +43,7 @@ export const AnimatedSwitchThemeElements = ({ value, palettes, children }: Anima
         animate={{
           color: value === "light" ? palettes.black : palettes.disabled,
         }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        transition={{ type: "spring", damping: 14, stiffness: 120 }}
       >
         {lightItem}
       </motion.div>
@@ -52,7 +52,7 @@ export const AnimatedSwitchThemeElements = ({ value, palettes, children }: Anima
         animate={{
           color: value === "dark" ? palettes.accent1 : palettes.disabled,
         }}
-        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+        transition={{ type: "spring", damping: 14, stiffness: 120 }}
       >
         {darkItem}
       </motion.div>

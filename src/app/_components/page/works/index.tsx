@@ -3,9 +3,9 @@ import Link from "next/link";
 import Heading from "@components/heading";
 import Section from "@components/section";
 
-import { AnimatedWorksRoot } from "./animated-works-wrapper";
 import { InViewSection } from "./in-view-section";
 import * as styles from "./styles.css";
+import { WorksSection } from "./works-section";
 
 import type { ShowCaseItem } from "@components/show-case";
 
@@ -17,7 +17,7 @@ type Props = {
 
 export const Works = ({ histories, libraries, articles }: Props) => {
   return (
-    <AnimatedWorksRoot>
+    <WorksSection>
       <Section id="works" className={styles.worksSection}>
         <div>
           <Link href="#works" scroll className={styles.anchorLink}>
@@ -31,6 +31,6 @@ export const Works = ({ histories, libraries, articles }: Props) => {
 
         <InViewSection id="library" title="Library" items={libraries} className={styles.section3} />
       </Section>
-    </AnimatedWorksRoot>
+    </WorksSection>
   );
 };
