@@ -1,26 +1,14 @@
-import { setupDevPlatform } from "@cloudflare/next-on-pages/next-dev";
+import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { createVanillaExtractPlugin } from "@vanilla-extract/next-plugin";
 
-const withVanillaExtract = createVanillaExtractPlugin();
+import images from "./next-image.config.js";
 
-if (process.env.NODE_ENV === "development") {
-  await setupDevPlatform();
-}
+const withVanillaExtract = createVanillaExtractPlugin();
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   swcMinify: true,
-  images: {
-    remotePatterns: [
-      {
-        hostname: "res.cloudinary.com",
-      },
-      {
-        hostname: "static.sizu.me",
-      },
-    ],
-    deviceSizes: [320, 420, 768, 800, 1024, 1200].flatMap((size) => [size, size * 2]),
-  },
+  images,
   webpack: (config) => {
     config.module.rules.push({
       test: /\.svg$/,
@@ -39,3 +27,4 @@ const nextConfig = {
 };
 
 export default withVanillaExtract(nextConfig);
+void initOpenNextCloudflareForDev();

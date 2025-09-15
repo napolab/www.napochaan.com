@@ -9,26 +9,26 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "ESNext",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "types": ["vitest/globals", "@cloudflare/workers-types"],
+    "types": ["vitest/globals"],
     "plugins": [
       {
         "name": "next"
       }
     ],
-    "baseUrl": ".",
     "paths": {
-      "@assets/*": ["src/assets/*"],
-      "@theme": ["src/theme/index.ts"],
-      "@theme/*": ["src/theme/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@components/*": ["src/components/*"],
-      "@utils/*": ["src/utils/*"],
-      "@adapters/*": ["src/adapters/*"]
+      "*": ["./*"],
+      "@assets/*": ["./src/assets/*"],
+      "@theme": ["./src/theme/index.ts"],
+      "@theme/*": ["./src/theme/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@components/*": ["./src/components/*"],
+      "@utils/*": ["./src/utils/*"],
+      "@adapters/*": ["./src/adapters/*"]
     }
   },
   "include": [
@@ -36,7 +36,7 @@
     "**/*.tsx",
     "vitest-setup.ts",
     "next.config.js",
-    ".eslintrc.cjs",
+    "worker-configuration.d.ts",
     ".next/types/**/*.ts",
     "postcss.config.cjs"
   ],
