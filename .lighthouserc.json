@@ -3,8 +3,7 @@
     "preset": "lighthouse:recommended",
     "collect": {
       "numberOfRuns": 1,
-      "startServerCommand": "bun run wrangler:dev",
-      "url": ["http://localhost:3000"]
+      "staticDistDir": "./.next"
     },
     "upload": {
       "target": "temporary-public-storage"

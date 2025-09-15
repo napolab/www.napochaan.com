@@ -1,5 +1,5 @@
 "use client";
-import { animated, useScroll, useSpring } from "@react-spring/web";
+import { motion, useScroll, useTransform } from "motion/react";
 import { useTheme } from "next-themes";
 import { useEffect, useReducer } from "react";
 import { useMedia } from "use-media";
@@ -13,12 +13,10 @@ import * as styles from "./styles.css";
 export const SwitchTheme = () => {
   const [, force] = useReducer((c) => c + 1, 0);
   const { theme, setTheme } = useTheme();
-  const { scrollYProgress } = useScroll();
   const isXL = useMedia(mediaQueries.xl);
-  const themeSwitchAnim = useSpring({
-    transform: scrollYProgress.to((v) => (v > 0.8 && !isXL ? "translateY(100%)" : "translateY(0%)")),
-    bottom: scrollYProgress.to((v) => (v > 0.8 && !isXL ? "0rem" : "0.5rem")),
-  });
+  const { scrollYProgress } = useScroll();
+  const translateY = useTransform(scrollYProgress, [0.8, 1], ["0%", "100%"]);
+  const bottom = useTransform(scrollYProgress, [0.8, 1], ["0.5rem", "0rem"]);
 
   useEffect(() => {
     // なんか動かないので適当に rerendering する
@@ -32,8 +30,11 @@ export const SwitchTheme = () => {
   }, []);
 
   return (
-    <animated.div className={styles.switchTheme} style={themeSwitchAnim}>
+    <motion.div
+      className={styles.switchTheme}
+      style={{ translateY: isXL ? "0%" : translateY, bottom: isXL ? "0.5rem" : bottom }}
+    >
       <Switch theme={isTheme(theme) ? theme : undefined} defaultTheme="dark" onChange={setTheme} />
-    </animated.div>
+    </motion.div>
   );
 };

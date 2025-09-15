@@ -1,44 +1,49 @@
 import dayjs from "dayjs";
-import dynamic from "next/dynamic";
+import { Suspense, lazy } from "react";
 
 import { getSizuArticles, getZennArticles } from "@adapters/rss";
 import Section from "@components/section";
 
+import { Background } from "./_components/page/background";
+import { Contact } from "./_components/page/contact";
+import { FirstView } from "./_components/page/first-view";
+import { WorkItem } from "./_components/page/work-item";
+import { Works } from "./_components/page/works";
 import * as styles from "./styles.css";
 
-import type { ComponentPropsWithRef } from "@react-spring/web";
+import type { ComponentProps } from "react";
 
-const Budoux = dynamic(() => import("@components/budoux"), {
-  ssr: false,
-});
-
-const Background = dynamic(() => import("./_components/page/background").then(mod => ({ default: mod.Background })), {
-  ssr: false,
-});
-const Contact = dynamic(() => import("./_components/page/contact").then(mod => ({ default: mod.Contact })), {
-  ssr: false,
-});
-const FirstView = dynamic(() => import("./_components/page/first-view").then(mod => ({ default: mod.FirstView })), {
-  ssr: false,
-});
-const Works = dynamic(() => import("./_components/page/works").then(mod => ({ default: mod.Works })), {
-  ssr: false,
-});
-const WorkItem = dynamic(() => import("./_components/page/work-item").then(mod => ({ default: mod.WorkItem })), {
-  ssr: false,
-});
+const Budoux = lazy(() => import("@components/budoux"));
 
 export const runtime = "edge";
 
 const Page = async () => {
   const historiesItems = histories.map((item, idx) => ({
     key: `histories__${item.src}-${idx}`,
-    children: <WorkItem {...item} content={<Budoux>{item.content}</Budoux>} />,
+    children: (
+      <WorkItem
+        {...item}
+        content={
+          <Suspense fallback={<span>{item.content}</span>}>
+            <Budoux>{item.content}</Budoux>
+          </Suspense>
+        }
+      />
+    ),
   }));
 
   const libraryItems = libraries.map((item, idx) => ({
     key: `library__${item.src}-${idx}`,
-    children: <WorkItem {...item} content={<Budoux>{item.content}</Budoux>} />,
+    children: (
+      <WorkItem
+        {...item}
+        content={
+          <Suspense fallback={<span>{item.content}</span>}>
+            <Budoux>{item.content}</Budoux>
+          </Suspense>
+        }
+      />
+    ),
   }));
 
   const zenn = await getZennArticles();
@@ -343,7 +348,7 @@ const histories = [
     content:
       "初めて web アプリケーションを作った。\nタスク管理アプリに推しの声をかけ合わせることで面白い体験を作りだした。",
   },
-] satisfies ComponentPropsWithRef<typeof WorkItem>[];
+] satisfies ComponentProps<typeof WorkItem>[];
 
 const libraries = [
   {
@@ -412,4 +417,4 @@ const libraries = [
     href: "https://gist.github.com/naporin0624/2c1c187950738ef4e07a755489ba49de",
     content: "monaco-editor で作ったエディタに型定義をインストールするためのライブラリを作った。",
   },
-] satisfies ComponentPropsWithRef<typeof WorkItem>[];
+] satisfies ComponentProps<typeof WorkItem>[];
