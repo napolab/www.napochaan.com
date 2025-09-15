@@ -1,17 +1,32 @@
 import dayjs from "dayjs";
+import dynamic from "next/dynamic";
 
 import { getSizuArticles, getZennArticles } from "@adapters/rss";
-import Budoux from "@components/budoux";
 import Section from "@components/section";
 
-import { Background } from "./_components/page/background";
-import { Contact } from "./_components/page/contact";
-import { FirstView } from "./_components/page/first-view";
-import { WorkItem } from "./_components/page/work-item";
-import { Works } from "./_components/page/works";
 import * as styles from "./styles.css";
 
 import type { ComponentPropsWithRef } from "@react-spring/web";
+
+const Budoux = dynamic(() => import("@components/budoux"), {
+  ssr: false,
+});
+
+const Background = dynamic(() => import("./_components/page/background").then(mod => ({ default: mod.Background })), {
+  ssr: false,
+});
+const Contact = dynamic(() => import("./_components/page/contact").then(mod => ({ default: mod.Contact })), {
+  ssr: false,
+});
+const FirstView = dynamic(() => import("./_components/page/first-view").then(mod => ({ default: mod.FirstView })), {
+  ssr: false,
+});
+const Works = dynamic(() => import("./_components/page/works").then(mod => ({ default: mod.Works })), {
+  ssr: false,
+});
+const WorkItem = dynamic(() => import("./_components/page/work-item").then(mod => ({ default: mod.WorkItem })), {
+  ssr: false,
+});
 
 export const runtime = "edge";
 
