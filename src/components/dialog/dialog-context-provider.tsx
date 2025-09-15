@@ -34,12 +34,7 @@ const DialogContextProviderImpl = ({ children, ...props }: DialogContextProvider
   return (
     <MediaQueryProvider>
       {(size) => (
-        <DialogContextContent
-          size={size}
-          open={props.open ?? open}
-          props={props}
-          onOpenChange={handleOpenChange}
-        >
+        <DialogContextContent size={size} open={props.open ?? open} props={props} onOpenChange={handleOpenChange}>
           {children}
         </DialogContextContent>
       )}
@@ -47,7 +42,13 @@ const DialogContextProviderImpl = ({ children, ...props }: DialogContextProvider
   );
 };
 
-const DialogContextContent = ({ size, open, props, onOpenChange, children }: {
+const DialogContextContent = ({
+  size,
+  open,
+  props,
+  onOpenChange,
+  children,
+}: {
   size: "sm" | "md" | "lg" | "xl" | undefined;
   open: boolean;
   props: DialogProps;

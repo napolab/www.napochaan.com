@@ -20,20 +20,30 @@ export const runtime = "edge";
 const Page = async () => {
   const historiesItems = histories.map((item, idx) => ({
     key: `histories__${item.src}-${idx}`,
-    children: <WorkItem {...item} content={
-      <Suspense fallback={<span>{item.content}</span>}>
-        <Budoux>{item.content}</Budoux>
-      </Suspense>
-    } />,
+    children: (
+      <WorkItem
+        {...item}
+        content={
+          <Suspense fallback={<span>{item.content}</span>}>
+            <Budoux>{item.content}</Budoux>
+          </Suspense>
+        }
+      />
+    ),
   }));
 
   const libraryItems = libraries.map((item, idx) => ({
     key: `library__${item.src}-${idx}`,
-    children: <WorkItem {...item} content={
-      <Suspense fallback={<span>{item.content}</span>}>
-        <Budoux>{item.content}</Budoux>
-      </Suspense>
-    } />,
+    children: (
+      <WorkItem
+        {...item}
+        content={
+          <Suspense fallback={<span>{item.content}</span>}>
+            <Budoux>{item.content}</Budoux>
+          </Suspense>
+        }
+      />
+    ),
   }));
 
   const zenn = await getZennArticles();

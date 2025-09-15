@@ -59,9 +59,5 @@ export const DialogTrigger = forwardRef<HTMLButtonElement, ComponentPropsWithout
 
 type DialogRootProps = DialogProps;
 export const DialogRoot = memo(({ children, ...props }) => {
-  return (
-    <DialogContextProvider {...props}>
-      {children}
-    </DialogContextProvider>
-  );
+  return <DialogContextProvider {...props}>{children}</DialogContextProvider>;
 }) satisfies FC<DialogRootProps>;

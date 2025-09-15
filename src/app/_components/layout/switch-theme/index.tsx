@@ -16,17 +16,9 @@ export const SwitchTheme = () => {
   const { scrollYProgress } = useScroll();
   const isXL = useMedia(mediaQueries.xl);
 
-  const translateY = useTransform(
-    scrollYProgress,
-    [0, 0.8, 1],
-    ["0%", "0%", "100%"]
-  );
+  const translateY = useTransform(scrollYProgress, [0, 0.8, 1], ["0%", "0%", "100%"]);
 
-  const bottom = useTransform(
-    scrollYProgress,
-    [0, 0.8, 1],
-    ["0.5rem", "0.5rem", "0rem"]
-  );
+  const bottom = useTransform(scrollYProgress, [0, 0.8, 1], ["0.5rem", "0.5rem", "0rem"]);
 
   useEffect(() => {
     // なんか動かないので適当に rerendering する

@@ -18,9 +18,5 @@ export const ContactAwareRoot = ({ children }: ContactAwareRootProps) => {
     () => false,
   );
 
-  return (
-    <AnimatedDecorationImage contactInView={contactInView}>
-      {children}
-    </AnimatedDecorationImage>
-  );
+  return <AnimatedDecorationImage contactInView={contactInView}>{children}</AnimatedDecorationImage>;
 };

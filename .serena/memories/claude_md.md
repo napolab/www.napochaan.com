@@ -3,9 +3,11 @@
 This is the configuration file for Claude Code to work effectively with the www.napochaan.com project.
 
 ## Project Overview
+
 Portfolio and blog website for @naporin0624 built with Next.js 14, TypeScript, and deployed on Cloudflare Pages.
 
 ## Development Commands
+
 - `npx next dev` - Start development server (preferred)
 - `pnpm dev` - Alternative development server command
 - `pnpm build` - Build for production
@@ -15,6 +17,7 @@ Portfolio and blog website for @naporin0624 built with Next.js 14, TypeScript, a
 - `pnpm test` - Run tests
 
 ## Code Standards
+
 - **Formatting**: Prettier (2 spaces, 120 width, trailing commas)
 - **Linting**: ESLint with @naporin0624/eslint-config
 - **Types**: interface for behavior, type for structure
@@ -23,6 +26,7 @@ Portfolio and blog website for @naporin0624 built with Next.js 14, TypeScript, a
 - **Client Boundaries**: Minimize "use client" scope for SSR
 
 ## Tech Stack
+
 - Next.js 14 + TypeScript
 - vanilla-extract/css for styling
 - motion/react for animations
@@ -30,6 +34,7 @@ Portfolio and blog website for @naporin0624 built with Next.js 14, TypeScript, a
 - Cloudflare Pages deployment
 
 ## Task Completion Checklist
+
 1. Run `pnpm type-check` after changes
 2. Run `pnpm lint` for code quality
 3. Test `pnpm build` for production
@@ -37,6 +42,7 @@ Portfolio and blog website for @naporin0624 built with Next.js 14, TypeScript, a
 5. Ensure SSR compatibility for all components
 
 ## Architecture Notes
+
 - SSR/SSG compatible components required
 - Fine-grained "use client" boundaries
 - WAI-ARIA attributes for accessibility

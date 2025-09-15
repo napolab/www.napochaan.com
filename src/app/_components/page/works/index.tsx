@@ -25,26 +25,11 @@ export const Works = ({ histories, libraries, articles }: Props) => {
           </Link>
         </div>
 
-        <InViewSection
-          id="histories"
-          title="History"
-          items={histories}
-          className={styles.section3}
-        />
+        <InViewSection id="histories" title="History" items={histories} className={styles.section3} />
 
-        <InViewSection
-          id="article"
-          title="Article"
-          items={articles}
-          className={styles.section3}
-        />
+        <InViewSection id="article" title="Article" items={articles} className={styles.section3} />
 
-        <InViewSection
-          id="library"
-          title="Library"
-          items={libraries}
-          className={styles.section3}
-        />
+        <InViewSection id="library" title="Library" items={libraries} className={styles.section3} />
       </Section>
     </AnimatedWorksRoot>
   );

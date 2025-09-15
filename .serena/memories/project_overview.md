@@ -1,9 +1,11 @@
 # Project Overview: www.napochaan.com
 
 ## Purpose
+
 Portfolio and blog website for @naporin0624, deployed at https://napochaan.com
 
 ## Tech Stack
+
 - **Framework**: Next.js 14 with TypeScript
 - **Styling**: vanilla-extract/css for CSS-in-JS
 - **UI Components**: Radix UI primitives
@@ -13,6 +15,7 @@ Portfolio and blog website for @naporin0624, deployed at https://napochaan.com
 - **Deployment**: Cloudflare Pages with Edge Runtime
 
 ## Key Features
+
 - Responsive design with light/dark themes
 - Portfolio showcase with animated interactions
 - Blog functionality
@@ -20,6 +23,7 @@ Portfolio and blog website for @naporin0624, deployed at https://napochaan.com
 - SSR/SSG compatible architecture
 
 ## Project Structure
+
 ```
 src/
 ├── app/                    # Next.js app directory
@@ -33,6 +37,7 @@ src/
 ```
 
 ## Development Notes
+
 - Uses pnpm@10.15.1 as package manager
 - Strict TypeScript configuration
 - Comprehensive linting with ESLint, Prettier, Markuplint

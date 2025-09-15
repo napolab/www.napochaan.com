@@ -24,6 +24,7 @@ jobs:
 
       - name: run Lighthouse CI
         run: |
+          pnpm setup
           pnpm add -g @lhci/cli
           pnpm run lhci autorun
         env:
