@@ -203,7 +203,6 @@ export const aboutMe = style({
  * @package
  */
 export const aboutMeText = style({
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-expect-error
   wordBreak: "auto-phrase",
 });

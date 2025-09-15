@@ -9,3 +9,5 @@ coverage
 .wrangler
 .playwright-mcp
 .open-next
+worker-config.json
+.claude/settings.local.json

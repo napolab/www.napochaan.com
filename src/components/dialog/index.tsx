@@ -30,7 +30,7 @@ export const DialogContent = memo(
           <>
             <Overlay className={styles.overlay} />
             <Content ref={external}>
-              <motion.div 
+              <motion.div
                 className={styles.content}
                 initial={
                   isSmall
@@ -38,9 +38,7 @@ export const DialogContent = memo(
                     : { x: "-50%", y: "-25%", opacity: 0.1, scale: 0.96 }
                 }
                 animate={
-                  isSmall
-                    ? { x: 0, y: 0, opacity: 1, scale: 1 }
-                    : { x: "-50%", y: "-50%", opacity: 1, scale: 1 }
+                  isSmall ? { x: 0, y: 0, opacity: 1, scale: 1 } : { x: "-50%", y: "-50%", opacity: 1, scale: 1 }
                 }
                 exit={
                   isSmall

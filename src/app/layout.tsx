@@ -92,5 +92,4 @@ export const metadata: Metadata = {
     creatorId: "@naporin24690",
   },
 };
-export const runtime = "edge";
 export default RootLayout;

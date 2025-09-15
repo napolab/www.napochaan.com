@@ -15,8 +15,6 @@ import type { ComponentProps } from "react";
 
 const Budoux = lazy(() => import("@components/budoux"));
 
-export const runtime = "edge";
-
 const Page = async () => {
   const historiesItems = histories.map((item, idx) => ({
     key: `histories__${item.src}-${idx}`,

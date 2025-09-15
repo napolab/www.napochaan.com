@@ -4,9 +4,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "next dev",
-    "wrangler:dev": "pnpm next-on-pages && pnpm wrangler pages dev --port 3000",
-    "wrangler:build": "next-on-pages",
-    "prebuild": "rimraf dist && rimraf .next",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy -- --env=production",
     "build": "next build",
     "start": "next start",
     "lint": "npm-run-all -s 'lint:*'",
@@ -17,12 +16,14 @@
     "fmt:eslint": "eslint . --fix",
     "fmt:prettier": "prettier --write .",
     "test": "vitest --passWithNoTests",
-    "type-check": "tsc --noEmit",
-    "knip": "knip"
+    "type-check": "tsgo --noEmit",
+    "knip": "knip",
+    "typegen": "npm-run-all -p typegen:*",
+    "typegen:cf": "wrangler types"
   },
   "dependencies": {
     "@acab/reset.css": "^0.10.0",
-    "@cloudflare/next-on-pages": "^1.11.3",
+    "@hono/zod-validator": "^0.7.2",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
@@ -33,20 +34,26 @@
     "dayjs": "^1.11.18",
     "fast-xml-parser": "^4.5.3",
     "hex-rgb": "^5.0.0",
+    "hono": "^4.9.7",
     "motion": "^12.23.12",
     "next": "^14.2.32",
     "next-themes": "^0.2.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "use-media": "^1.5.0"
+    "use-media": "^1.5.0",
+    "zod": "^4.1.8"
   },
   "devDependencies": {
     "@axe-core/react": "^4.10.2",
-    "@cloudflare/workers-types": "^4.20250913.0",
+    "@eslint/compat": "^1.3.2",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.35.0",
     "@markuplint/jsx-parser": "^4.7.21",
     "@markuplint/react-spec": "^4.5.21",
+    "@napolab/eslint-plugin": "^0.1.1",
     "@naporin0624/eslint-config": "^0.14.2",
-    "@next/eslint-plugin-next": "^14.2.32",
+    "@next/eslint-plugin-next": "^15.5.3",
+    "@opennextjs/cloudflare": "^1.8.2",
     "@svgr/webpack": "^8.1.0",
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^14.3.1",
@@ -56,16 +63,28 @@
     "@types/prettier": "^2.7.3",
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
+    "@typescript-eslint/parser": "^8.44.0",
+    "@typescript-eslint/typescript-estree": "^8.44.0",
+    "@typescript/native-preview": "7.0.0-dev.20250915.1",
     "@vanilla-extract/next-plugin": "^2.4.14",
     "@vanilla-extract/vite-plugin": "^3.9.5",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.21",
     "babel-loader": "^9.2.1",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.32",
+    "eslint": "9.35.0",
+    "eslint-config-next": "^15.5.3",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import-x": "^4.16.1",
     "eslint-plugin-jest-dom": "^5.5.0",
-    "eslint-plugin-next-on-pages": "^1.11.0",
-    "eslint-plugin-testing-library": "^6.5.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-testing-library": "^7.8.0",
+    "eslint-plugin-unicorn": "^61.0.2",
+    "eslint-plugin-unused-imports": "^4.2.0",
+    "globals": "^16.4.0",
     "jest-extended": "^4.0.2",
     "jsdom": "^23.2.0",
     "knip": "^5.63.1",
@@ -79,11 +98,12 @@
     "prettier": "^3.6.2",
     "rimraf": "^5.0.10",
     "typescript": "^5.9.2",
+    "typescript-eslint": "^8.43.0",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.1",
     "vitest-axe": "^0.1.0",
     "vitest-canvas-mock": "^0.2.2",
-    "wrangler": "^3.114.14"
+    "wrangler": "^4.37.0"
   },
   "nextBundleAnalysis": {
     "budget": 358400,
@@ -91,11 +111,19 @@
     "showDetails": true
   },
   "overrides": {
-    "@typescript-eslint/typescript-estree": "7.6.0",
     "glob-parent": "6.0.2",
     "trim": "1.0.1",
     "trim-newlines": "5.0.0",
     "word-wrap": "1.2.5"
   },
-  "packageManager": "pnpm@10.16.1"
+  "packageManager": "pnpm@10.16.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "oxc-resolver",
+      "sharp",
+      "unrs-resolver",
+      "workerd"
+    ]
+  }
 }

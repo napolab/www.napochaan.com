@@ -47,7 +47,7 @@ globalStyle("*, *::before, *::after", {
       animationDuration: "0.01ms !important",
       animationIterationCount: "1 !important",
       transitionDuration: "0.01ms !important",
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+
       // @ts-ignore
       scrollBehavior: "auto !important",
     },
