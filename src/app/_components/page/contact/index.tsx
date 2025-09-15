@@ -1,32 +1,17 @@
-"use client";
-
-import { animated, useInView, useSpring } from "@react-spring/web";
 import { IconBrandGithubFilled, IconBrandX, IconAt } from "@tabler/icons-react";
 import Link from "next/link";
-import { useEffect } from "react";
 
 import Heading from "@components/heading";
 import IconZenn from "@components/icons/zenn.svg";
 import Section from "@components/section";
 
-import * as source from "../source";
-
+import { AnimatedContactRoot } from "./animated-contact-wrapper";
 import * as styles from "./styles.css";
 
 export const Contact = () => {
-  const [contactRef, contactInView] = useInView({ once: true, rootMargin: "-10% 0%" });
-  useEffect(() => {
-    source.contactInView.next(contactInView);
-  }, [contactInView]);
-
-  const contactAnim = useSpring({
-    opacity: contactInView ? 1 : 0,
-    transform: contactInView ? "translateY(0rem)" : "translateY(0.5rem)",
-  });
-
   return (
-    <animated.div className={styles.contactWrapper} ref={contactRef} style={contactAnim}>
-      <Section id="contact" className={styles.contactRoot}>
+    <AnimatedContactRoot>
+      <Section id="contact" className={styles.contactSection}>
         <div>
           <Link href="/#contact" scroll className={styles.anchorLink}>
             <Heading translate="no">SNS&nbsp;&amp;&nbsp;Contact</Heading>
@@ -74,6 +59,6 @@ export const Contact = () => {
           </Link>
         </address>
       </Section>
-    </animated.div>
+    </AnimatedContactRoot>
   );
 };
