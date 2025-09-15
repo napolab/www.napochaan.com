@@ -25,7 +25,7 @@ The website is built using the following technologies:
 - next-themes
 - vanilla-extract/css
 - radix-ui
-- @react-spring/web
+- motion/react
 - budoux
 
 ## Deployment
