@@ -2,18 +2,16 @@
 import { motion, useInView } from "motion/react";
 import { useRef, useEffect } from "react";
 
-import * as source from "../source";
+import * as source from "../../source";
 
 import * as styles from "./styles.css";
 
 import type { ReactNode } from "react";
 
-interface AnimatedContactRootProps {
-  children: ReactNode;
-}
+type ContactSectionProps = { children: ReactNode };
 
-export const AnimatedContactRoot = ({ children }: AnimatedContactRootProps) => {
-  const ref = useRef(null);
+export const ContactSection = ({ children }: ContactSectionProps) => {
+  const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-10% 0%" });
 
   useEffect(() => {
@@ -25,10 +23,7 @@ export const AnimatedContactRoot = ({ children }: AnimatedContactRootProps) => {
       ref={ref}
       className={styles.contactRoot}
       initial={{ opacity: 0, y: "0.5rem" }}
-      animate={{
-        opacity: isInView ? 1 : 0,
-        y: isInView ? "0rem" : "0.5rem",
-      }}
+      animate={{ opacity: isInView ? 1 : 0, y: isInView ? "0rem" : "0.5rem" }}
       transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
     >
       {children}
