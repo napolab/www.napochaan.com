@@ -75,3 +75,35 @@ service = "www-napochaan-com-production"
 [[env.production.durable_objects.bindings]]
 name = "NEXT_CACHE_DO_QUEUE"
 class_name = "DOQueueHandler"
+
+[env.staging.vars]
+BASE_URL = "https://staging.napochaan.com"
+NODE_ENV="production"
+NEXTJS_ENV="production"
+
+[env.staging.images]
+binding = "IMAGES"
+
+[[env.staging.routes]]
+pattern = "staging.napochaan.com"
+custom_domain = true
+
+[env.staging.observability.logs]
+enabled = true
+
+[[env.staging.r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "napochaan-next-cache-staging"
+
+[[env.staging.d1_databases]]
+binding = "NEXT_TAG_CACHE_D1"
+database_id = "6d5721f0-6223-4cb8-bc68-f37ff2f02b40"
+database_name = "napochaan-next-tag-cache-staging"
+
+[[env.staging.services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "www-napochaan-com-staging"
+
+[[env.staging.durable_objects.bindings]]
+name = "NEXT_CACHE_DO_QUEUE"
+class_name = "DOQueueHandler"
