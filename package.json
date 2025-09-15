@@ -111,7 +111,6 @@
     "showDetails": true
   },
   "overrides": {
-    "@typescript-eslint/typescript-estree": "7.6.0",
     "glob-parent": "6.0.2",
     "trim": "1.0.1",
     "trim-newlines": "5.0.0",
