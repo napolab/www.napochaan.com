@@ -24,9 +24,7 @@ jobs:
 
       - name: run Lighthouse CI
         run: |
-          pnpm setup
-          pnpm add -g @lhci/cli
-          pnpm run lhci autorun
+          npx @lhci/cli autorun
         env:
           LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
