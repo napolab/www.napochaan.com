@@ -34,7 +34,6 @@ export const content = style({
   position: "fixed",
   top: "50%",
   left: "50%",
-  transform: "translate(-50%, -50%)",
 
   display: "flex",
   flexDirection: "column",
@@ -59,6 +58,7 @@ export const content = style({
 
   "@media": {
     [mediaQueries.sm]: {
+      transform: "none",
       top: "unset",
       left: 0,
       bottom: 0,

@@ -7,3 +7,5 @@ out
 .vercel
 coverage
 .wrangler
+.playwright-mcp
+.open-next
