@@ -11,7 +11,7 @@ export { section3 };
 /**
  * @package
  */
-export const worksWrapper = style([
+export const worksRoot = style([
   section2,
   {
     position: "relative",
@@ -22,7 +22,7 @@ export const worksWrapper = style([
 /**
  * @package
  */
-export const worksRoot = style([
+export const worksSection = style([
   tile,
   {
     "@media": {
