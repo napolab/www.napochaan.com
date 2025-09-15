@@ -1,6 +1,7 @@
+import path from "node:path";
+
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import { createVanillaExtractPlugin } from "@vanilla-extract/next-plugin";
-import path from "path";
 
 import images from "./next-image.config.js";
 
