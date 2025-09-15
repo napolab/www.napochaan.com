@@ -15,12 +15,17 @@ defaults:
 jobs:
   analyze:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: ./.github/workflows/modules/setup-node
 
       - name: Restore next build
@@ -51,7 +56,7 @@ jobs:
           path: .next/analyze/__bundle_analysis.json
 
       - name: Download base branch bundle stats
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@bf251b5aa9c2f7eeb9f3b7ab534be7a1e95389c0 # v6.0.0
         if: success() && github.event.number
         with:
           workflow: nextjs_bundle_analysis.yml
@@ -85,7 +90,7 @@ jobs:
           body="${body//$'\r'/'%0D'}"
           echo ::set-output name=body::$body
       - name: Find Comment
-        uses: peter-evans/find-comment@v3
+        uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e # v3.1.0
         if: success() && github.event.number
         id: fc
         with:
@@ -93,14 +98,14 @@ jobs:
           body-includes: "<!-- __NEXTJS_BUNDLE -->"
 
       - name: Create Comment
-        uses: peter-evans/create-or-update-comment@v4.0.0
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
         if: success() && github.event.number && steps.fc.outputs.comment-id == 0
         with:
           issue-number: ${{ github.event.number }}
           body: ${{ steps.get-comment-body.outputs.body }}
 
       - name: Update Comment
-        uses: peter-evans/create-or-update-comment@v4.0.0
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
         if: success() && github.event.number && steps.fc.outputs.comment-id != 0
         with:
           issue-number: ${{ github.event.number }}
