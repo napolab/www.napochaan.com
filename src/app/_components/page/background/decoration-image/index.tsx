@@ -5,12 +5,12 @@ import * as styles from "./styles.css";
 
 import type { ReactNode } from "react";
 
-interface AnimatedDecorationImageProps {
+type DecorationImageProps = {
   contactInView: boolean;
   children: ReactNode;
-}
+};
 
-export const AnimatedDecorationImage = ({ contactInView, children }: AnimatedDecorationImageProps) => {
+export const DecorationImage = ({ contactInView, children }: DecorationImageProps) => {
   return (
     <motion.div
       className={styles.decorationImageRoot}
