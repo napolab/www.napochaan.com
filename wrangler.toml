@@ -102,7 +102,7 @@ database_name = "napochaan-next-tag-cache-staging"
 
 [[env.staging.services]]
 binding = "WORKER_SELF_REFERENCE"
-service = "www-napochaan-com-staging"
+service = "www-napochaan-com-production"
 
 [[env.staging.durable_objects.bindings]]
 name = "NEXT_CACHE_DO_QUEUE"
