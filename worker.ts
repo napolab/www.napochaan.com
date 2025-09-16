@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import { cache } from "hono/cache";
 import z from "zod";
 
-
 // @ts-ignore
 import handler from "./.open-next/worker.js";
 import nextImageConfig from "./next-image.config.js";
