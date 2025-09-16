@@ -1,0 +1,41 @@
+name: Security Analysis with zizmor
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: ["**"]
+    paths:
+      - ".github/workflows/**"
+      - ".github/actions/**"
+  schedule:
+    # Run weekly on Sundays at 00:00 UTC
+    - cron: "0 0 * * 0"
+
+jobs:
+  zizmor:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor security analysis
+        uses: zizmorcore/zizmor-action@e673c3917a1aef3c65c972347ed84ccd013ecda4 # v0.2.0
+        with:
+          inputs: .github/
+          online-audits: true
+          persona: regular
+          min-severity: low
+          min-confidence: medium
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

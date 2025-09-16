@@ -1,13 +1,10 @@
-import dynamic from "next/dynamic";
-import { forwardRef, memo, Suspense } from "react";
+import { forwardRef, memo, Suspense, lazy } from "react";
 
 import Fallback from "./fallback";
 
 import type { FC, ComponentPropsWithoutRef } from "react";
 
-const Client = dynamic(() => import("./client"), {
-  ssr: false,
-});
+const Client = lazy(() => import("./client"));
 
 type Props = Omit<ComponentPropsWithoutRef<"span">, "children" | "className" | "style"> & {
   children: string;
