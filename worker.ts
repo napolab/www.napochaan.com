@@ -87,8 +87,7 @@ app.get(
     return transform.response();
   },
 );
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-app.mount("/", handler.fetch as any);
+app.mount("/", handler.fetch);
 
 export default {
   ...app,
