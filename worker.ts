@@ -3,11 +3,11 @@ import { Hono } from "hono";
 import { cache } from "hono/cache";
 import z from "zod";
 
-import { isAllowedImageUrl } from "./src/utils/image-url-validator";
 
 // @ts-ignore
 import handler from "./.open-next/worker.js";
 import nextImageConfig from "./next-image.config.js";
+import { isAllowedImageUrl } from "./src/utils/image-url-validator";
 
 type HonoEnv = {
   Bindings: Env;
