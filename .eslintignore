@@ -1,9 +1,0 @@
-.next
-.vercel
-.lighthouseci
-node_modules
-out
-build
-dist
-coverage
-scripts

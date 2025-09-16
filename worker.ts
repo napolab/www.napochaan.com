@@ -6,6 +6,7 @@ import z from "zod";
 // @ts-ignore
 import handler from "./.open-next/worker.js";
 import nextImageConfig from "./next-image.config.js";
+import { isAllowedImageUrl } from "./src/utils/image-url-validator";
 
 type HonoEnv = {
   Bindings: Env;
@@ -30,52 +31,6 @@ const TransformOptions = z.object({
   q: z.coerce.number().min(0).max(100).optional(),
 });
 
-/**
- * Next.jsのremotePatternsに基づいてURLを検証する
- */
-function isAllowedImageUrl(url: string, origin: string): boolean {
-  try {
-    const parsedUrl = new URL(url, origin);
-
-    // 内部URLは常に許可
-    if (parsedUrl.origin === origin) {
-      return true;
-    }
-
-    // remotePatternに一致するかチェック
-    return (nextImageConfig?.remotePatterns ?? []).some((pattern) => {
-      // hostnameチェック（必須）
-      if (pattern.hostname !== parsedUrl.hostname) {
-        return false;
-      }
-
-      // protocolチェック（オプション）
-      if (pattern.protocol && pattern.protocol !== parsedUrl.protocol.slice(0, -1)) {
-        return false;
-      }
-
-      // portチェック（オプション）
-      if (pattern.port !== undefined && pattern.port.toString() !== parsedUrl.port) {
-        return false;
-      }
-
-      // pathnameチェック（オプション、glob patternサポート）
-      if (pattern.pathname !== undefined) {
-        const pathRegex = new RegExp(
-          pattern.pathname.replace(/\*\*/g, ".*").replace(/\*/g, "[^/]*").replace(/\?/g, "."),
-        );
-        if (!pathRegex.test(parsedUrl.pathname)) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  } catch {
-    return false;
-  }
-}
-
 app.get(
   "/_next/image",
   cache({
@@ -91,7 +46,7 @@ app.get(
     const url = new URL(query.url, c.req.url).toString();
 
     // remotePatterns による URL 検証
-    if (!isAllowedImageUrl(url, origin)) {
+    if (!isAllowedImageUrl(url, origin, nextImageConfig)) {
       return c.json({ error: "Image URL is not allowed by remote patterns" }, 400);
     }
 
@@ -132,8 +87,7 @@ app.get(
     return transform.response();
   },
 );
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-app.mount("/", handler.fetch as any);
+app.mount("/", handler.fetch);
 
 export default {
   ...app,

@@ -6,6 +6,8 @@ on:
       - main
       - gh-pages
       - renovate/**
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 jobs:
   lighthouse:
@@ -27,8 +29,104 @@ jobs:
         run: pnpm build
 
       - name: Lighthouse CI Action
+        id: lighthouse
         uses: treosh/lighthouse-ci-action@fcd65974f7c4c2bf0ee9d09b84d2489183c29726 # v12
         with:
           configPath: ./.lighthouserc.json
           uploadArtifacts: true
           temporaryPublicStorage: true
+
+      - name: Extract Lighthouse scores
+        id: lighthouse-scores
+        if: success() && github.event.number
+        env:
+          LIGHTHOUSE_MANIFEST: ${{ steps.lighthouse.outputs.manifest }}
+        run: |
+          echo 'Extracting scores from manifest...'
+          echo "manifest=$LIGHTHOUSE_MANIFEST"
+
+          # Parse scores from manifest JSON
+          performance=$(echo "$LIGHTHOUSE_MANIFEST" | jq -r '.[0].summary.performance * 100 // "N/A"')
+          accessibility=$(echo "$LIGHTHOUSE_MANIFEST" | jq -r '.[0].summary.accessibility * 100 // "N/A"')
+          bestPractices=$(echo "$LIGHTHOUSE_MANIFEST" | jq -r '.[0].summary."best-practices" * 100 // "N/A"')
+          seo=$(echo "$LIGHTHOUSE_MANIFEST" | jq -r '.[0].summary.seo * 100 // "N/A"')
+          pwa=$(echo "$LIGHTHOUSE_MANIFEST" | jq -r '.[0].summary.pwa * 100 // "N/A"')
+
+          echo "performance=$performance" >> $GITHUB_OUTPUT
+          echo "accessibility=$accessibility" >> $GITHUB_OUTPUT
+          echo "best_practices=$bestPractices" >> $GITHUB_OUTPUT
+          echo "seo=$seo" >> $GITHUB_OUTPUT
+          echo "pwa=$pwa" >> $GITHUB_OUTPUT
+
+      - name: Generate comment body
+        id: comment-body
+        if: success() && github.event.number
+        env:
+          PERF_SCORE: ${{ steps.lighthouse-scores.outputs.performance }}
+          A11Y_SCORE: ${{ steps.lighthouse-scores.outputs.accessibility }}
+          BP_SCORE: ${{ steps.lighthouse-scores.outputs.best_practices }}
+          SEO_SCORE: ${{ steps.lighthouse-scores.outputs.seo }}
+          PWA_SCORE: ${{ steps.lighthouse-scores.outputs.pwa }}
+          LINKS: ${{ steps.lighthouse.outputs.links }}
+        run: |
+          # Function to get emoji based on score
+          get_emoji() {
+            score=$1
+            if [ "$score" = "N/A" ]; then
+              echo "⚪"
+            elif [ "$score" -ge 90 ]; then
+              echo "🟢"
+            elif [ "$score" -ge 50 ]; then
+              echo "🟡"
+            else
+              echo "🔴"
+            fi
+          }
+
+          perf_emoji=$(get_emoji "$PERF_SCORE")
+          a11y_emoji=$(get_emoji "$A11Y_SCORE")
+          bp_emoji=$(get_emoji "$BP_SCORE")
+          seo_emoji=$(get_emoji "$SEO_SCORE")
+          pwa_emoji=$(get_emoji "$PWA_SCORE")
+
+          report_url=$(echo "$LINKS" | jq -r '.[0] // ""')
+
+          body="<!-- __LIGHTHOUSE_SCORE -->
+          ## 🏠 Lighthouse Score Report
+
+          | Category | Score | Status |
+          |----------|-------|--------|
+          | **Performance** | ${PERF_SCORE}% | $perf_emoji |
+          | **Accessibility** | ${A11Y_SCORE}% | $a11y_emoji |
+          | **Best Practices** | ${BP_SCORE}% | $bp_emoji |
+          | **SEO** | ${SEO_SCORE}% | $seo_emoji |
+          | **PWA** | ${PWA_SCORE}% | $pwa_emoji |
+
+          📊 [View detailed report]($report_url)
+
+          **Score Guide:**
+          - 🟢 90+ (Good)
+          - 🟡 50-89 (Needs improvement)
+          - 🔴 <50 (Poor)
+          - ⚪ N/A (Not available)"
+
+          echo "body<<EOF" >> $GITHUB_OUTPUT
+          echo "$body" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Find existing comment
+        uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e # v3.1.0
+        if: success() && github.event.number
+        id: fc
+        with:
+          issue-number: ${{ github.event.number }}
+          body-includes: "<!-- __LIGHTHOUSE_SCORE -->"
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        if: success() && github.event.number
+        with:
+          issue-number: ${{ github.event.number }}
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          body: ${{ steps.comment-body.outputs.body }}
+          edit-mode: replace

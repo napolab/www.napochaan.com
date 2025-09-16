@@ -54,19 +54,3 @@ jobs:
       - uses: ./.github/workflows/modules/setup-node
 
       - run: pnpm run type-check
-
-  next-on-pages:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    concurrency:
-      group: ${{ github.workflow }}-${{ github.ref }}-next-on-pages
-      cancel-in-progress: true
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          persist-credentials: false
-      - uses: ./.github/workflows/modules/setup-node
-
-      - run: pnpm exec next-on-pages

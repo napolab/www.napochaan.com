@@ -39,6 +39,7 @@ const config = [
       ".github/**",
       ".vercel/**",
       ".open-next/**",
+      ".lighthouseci/**",
       "wrangler-types-env.d.ts",
       "eslint.config.js",
       "scripts/**",

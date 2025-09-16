@@ -15,7 +15,7 @@
     "fmt": "npm-run-all -s 'fmt:*'",
     "fmt:eslint": "eslint . --fix",
     "fmt:prettier": "prettier --write .",
-    "test": "vitest --passWithNoTests",
+    "test": "vitest --passWithNoTests run",
     "type-check": "tsgo --noEmit",
     "knip": "knip",
     "typegen": "npm-run-all -p typegen:*",

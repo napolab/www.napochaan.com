@@ -61,6 +61,8 @@ export const FirstView = ({ tags }: Props) => {
               <li>TypeScript</li>
               <li>Cloudflare Workers</li>
               <li>Music(ボカロ)</li>
+              <li>DJ</li>
+              <li>VRChat</li>
               <li>ニーゴ(プロセカ)</li>
               <li>valorant</li>
               <li>東方</li>
