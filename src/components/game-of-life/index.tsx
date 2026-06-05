@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { useIsClient } from '@hooks/use-is-client';
 import { useLifeEngine } from './provider';
@@ -37,8 +37,6 @@ export const GameOfLife = () => {
   const isClient = useIsClient();
   const reduced = useMemo(() => (isClient ? matchMedia('(prefers-reduced-motion: reduce)').matches : false), [isClient]);
 
-  const [active, setActive] = useState(false);
-
   // Effect 1: Resize — sizes the canvas and calls engine.resize on window resize
   useEffect(() => {
     // USEEFFECT_JUSTIFICATION: Imperative canvas sizing + engine resize on window layout change
@@ -73,10 +71,10 @@ export const GameOfLife = () => {
     };
   }, [engine, isClient]);
 
-  // Effect 2: Animation loop — rAF + 7fps time-accumulator, calls engine.tick + draw
+  // Effect 2: Animation loop (rAF 7fps) + pause while the tab is hidden
   useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: Imperative rAF loop for canvas animation
-    if (!isClient || !active || reduced) return;
+    // USEEFFECT_JUSTIFICATION: Imperative rAF loop + visibilitychange subscription for canvas animation
+    if (!isClient || reduced) return;
 
     const canvas = canvasRef.current;
     if (canvas === null) return;
@@ -97,53 +95,28 @@ export const GameOfLife = () => {
       rafState.raf = requestAnimationFrame(tick);
     };
 
-    rafState.raf = requestAnimationFrame(tick);
-    return () => {
+    const start = () => {
+      rafState.last = 0;
+      rafState.raf = requestAnimationFrame(tick);
+    };
+    const stop = () => {
       cancelAnimationFrame(rafState.raf);
     };
-  }, [active, engine, isClient, reduced]);
-
-  // Effect 3: Visibility — pause when tab is hidden
-  useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: Required for document.visibilitychange imperative event subscription
-    if (!isClient || reduced) return;
-
     const onVisibilityChange = () => {
-      setActive(!document.hidden);
+      if (document.hidden) {
+        stop();
+        return;
+      }
+      start();
     };
 
+    start();
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
+      stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, [isClient, reduced]);
-
-  // Effect 4: IntersectionObserver — pause when off-screen, start when in view
-  useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: Required for IntersectionObserver imperative API
-    if (!isClient) return;
-
-    const canvas = canvasRef.current;
-    if (canvas === null) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (entry === undefined) return;
-        if (!entry.isIntersecting) {
-          setActive(false);
-        } else if (!reduced) {
-          setActive(true);
-        }
-      },
-      { threshold: 0 },
-    );
-
-    observer.observe(canvas);
-    return () => {
-      observer.disconnect();
-    };
-  }, [isClient, reduced]);
+  }, [engine, isClient, reduced]);
 
   return <canvas data-testid="game-of-life" aria-hidden="true" className={styles.root} ref={canvasRef} />;
 };
