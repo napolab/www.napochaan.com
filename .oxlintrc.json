@@ -3,6 +3,8 @@
   "plugins": ["react-perf"],
   "categories": {},
   "rules": {
+    "func-style": ["error", "expression"],
+    "prefer-arrow-callback": "error",
     "unicorn/filename-case": [
       "error",
       {

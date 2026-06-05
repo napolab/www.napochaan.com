@@ -46,7 +46,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
   };
 };
 
-export default async function SiteLayout({ children }: { children: ReactNode }) {
+const SiteLayout = async ({ children }: { children: ReactNode }) => {
   return (
     <html lang="ja" className={fontVariables}>
       <head>
@@ -57,4 +57,6 @@ export default async function SiteLayout({ children }: { children: ReactNode }) 
       </ThemeProvider>
     </html>
   );
-}
+};
+
+export default SiteLayout;
