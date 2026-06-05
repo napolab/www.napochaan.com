@@ -10,12 +10,12 @@ const TagShowcase = () => {
   return (
     <main className={wrap}>
       <h1 className={heading}>Tag</h1>
-      <section className={row}>
+      <section className={row} aria-label="Tones">
         <Tag tone="default">flyer</Tag>
         <Tag tone="blue">live</Tag>
         <Tag tone="outline">event</Tag>
       </section>
-      <section className={row}>
+      <section className={row} aria-label="Examples">
         <Tag tone="default">design</Tag>
         <Tag tone="blue">music</Tag>
         <Tag tone="outline">installation</Tag>

@@ -10,7 +10,7 @@ const ButtonShowcase = () => {
   return (
     <main className={wrap}>
       <h1 className={heading}>Button</h1>
-      <section className={row}>
+      <section className={row} aria-label="Variants">
         <Button variant="solid">solid</Button>
         <Button variant="outline">outline</Button>
         <Button variant="danger">danger</Button>

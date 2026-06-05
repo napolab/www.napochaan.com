@@ -12,7 +12,7 @@ const CardShowcase = () => {
   return (
     <main className={wrap}>
       <h1 className={heading}>Card</h1>
-      <section className={grid}>
+      <section className={grid} aria-label="Examples">
         <Card>
           <h3 className={cardHeading}>night vol.13</h3>
           <p className={cardBody}>2024.03.15 at Club Eleven</p>
