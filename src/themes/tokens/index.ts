@@ -109,12 +109,7 @@ export const tokens = defineTokens({
 
   radii: {
     none: { value: '0' },
-    sm: { value: '0.25rem' },
-    md: { value: '0.375rem' },
-    lg: { value: '0.5rem' },
-    xl: { value: '0.75rem' },
-    '2xl': { value: '1rem' },
-    full: { value: '9999px' },
+    pill: { value: '9999px' },
   },
 
   shadows: {
@@ -127,12 +122,14 @@ export const tokens = defineTokens({
 
   borderWidths: {
     none: { value: '0' },
-    thin: { value: '1px' },
-    medium: { value: '2px' },
-    thick: { value: '3px' },
+    hairline: { value: '1px' },
+    default: { value: '2px' },
+    strong: { value: '3px' },
   },
 
   sizes: {
+    gridCell: { value: '24px' },
+    band: { value: '24px' },
     targetMin: { value: '24px' },
     targetComfortable: { value: '44px' },
     headerHeight: { value: '72px' },
@@ -256,9 +253,10 @@ export const semanticTokens = defineSemanticTokens({
     },
   },
   spacing: {
-    page: { value: '{spacing.6}' },
-    section: { value: '{spacing.12}' },
-    element: { value: '{spacing.4}' },
-    inline: { value: '{spacing.2}' },
+    inline: { value: '{spacing.2}' }, // 8px
+    element: { value: '{spacing.3}' }, // 12px
+    block: { value: '{spacing.6}' }, // 24px = module
+    section: { value: '{spacing.12}' }, // 48px
+    page: { value: '{spacing.6}' }, // 24px
   },
 });

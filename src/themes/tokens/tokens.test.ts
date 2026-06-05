@@ -37,3 +37,18 @@ describe('raw ramp WCAG (on paper gray-1)', () => {
     expect(contrastRatio(val('gray', 12), val('red', 9))).toBeGreaterThanOrEqual(4.5);
   });
 });
+
+describe('shape tokens', () => {
+  it('radius is sharp by default + pill only', () => {
+    expect(tokens.radii.none.value).toBe('0');
+    expect(tokens.radii.pill.value).toBe('9999px');
+  });
+  it('border widths are hairline/default/strong', () => {
+    expect(tokens.borderWidths.hairline.value).toBe('1px');
+    expect(tokens.borderWidths.default.value).toBe('2px');
+    expect(tokens.borderWidths.strong.value).toBe('3px');
+  });
+  it('grid cell is the 24px module', () => {
+    expect(tokens.sizes.gridCell.value).toBe('24px');
+  });
+});
