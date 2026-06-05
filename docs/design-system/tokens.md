@@ -269,8 +269,33 @@ button 例: solid(blue-9/白文字) / danger(red-9/**黒文字**) / outline(2px 
 
 ---
 
+## 7. richtext / prose（確定 — Payload Lexical 描画指針）
+
+Payload の `RichText`（`@payloadcms/richtext-lexical/react`）に `JSXConvertersFunction` を渡し、各ノード/inline format を以下の styled 要素にマッピングする。本文行間は `lineHeights.jp`(1.9)。
+
+| semantic                   | スタイル指針                                                                                                                         |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| heading h1–h6              | font=display(digibop)。サイズ: h1→`fontSizes.h1` / h2→`h2` / h3→`h3`(23) / h4→`xl`(23) / h5→`lg`(19) / h6→`md`(16)。lineHeight tight |
+| paragraph                  | `md`(16) / lineHeight jp(1.9) / fg.default                                                                                           |
+| **strong（bold）**         | **fontWeight 500（medium）＋ color accent.text（青）**（M PLUS 1 は700不可。太さでなく色で強調）                                     |
+| em（italic）               | font-style italic                                                                                                                    |
+| underline                  | text-decoration underline（リンクと区別: リンクは色＋hover反転）                                                                     |
+| **strikethrough（s/del）** | line-through ＋ **color danger.text（赤）**                                                                                          |
+| inline code                | font mono / bg.subtle / borderWidth hairline / borderColor border.subtle / radius none / color fg.default / px inline                |
+| **code block（pre）**      | **暗ターミナル**: bg fg.default(ink) / color bg.canvas(明) / font mono / p element / 上部に lang ラベル可 / radius none              |
+| **blockquote**             | **ターミナル風**: font mono / color fg.muted / 行頭に `>`（`_before` で付与）/ 左 padding。枠より "コマンド出力" 感                  |
+| link                       | 既存 `Link`（accent.text・hover 反転）                                                                                               |
+| list（ul/ol）/ listitem    | prose 版: ul=▸(accent) / ol=`decimal-leading-zero`(01.) mono accent / lineHeight jp                                                  |
+| horizontalrule             | borderTop 2px ink もしくは dashed の区切り                                                                                           |
+| upload（画像）             | 既存 `Figure`（next/image + 2px枠 + figcaption）                                                                                     |
+
+実装: `src/components/rich-text/`（`RichText` ラッパ + converters + 要素 styles）。`Heading` は単体 primitive（`src/components/heading/`、level 1–6、prose 外でも使用）としても用意し、richtext の heading converter から再利用。要素ごとに class を付与（no-child-selectors 順守）。
+
+---
+
 ## TODO（残り）
 
+- [ ] Heading primitive + RichText 要素セット/converter を実装
 - [ ] 全部入り更新プロトタイプで component 群を視覚検証
 - [ ] tokens を Panda CSS 定義に実装（subagent 委譲・TDD）
 - [ ] 各 primitive/component を react-aria ベースで実装（小タスク分割 → difit review）
