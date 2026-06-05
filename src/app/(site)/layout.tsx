@@ -1,6 +1,7 @@
 import { getRequestOrigin } from '@utils/request-url';
 import { fontVariables } from '@themes/fonts';
 import { ThemeProvider } from '@themes/provider';
+import { SiteShell } from '@components/site-shell';
 
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
@@ -53,7 +54,9 @@ const SiteLayout = async ({ children }: { children: ReactNode }) => {
         <link rel="stylesheet" href="https://use.typekit.net/izz7men.css" />
       </head>
       <ThemeProvider asChild>
-        <body>{children}</body>
+        <body>
+          <SiteShell>{children}</SiteShell>
+        </body>
       </ThemeProvider>
     </html>
   );
