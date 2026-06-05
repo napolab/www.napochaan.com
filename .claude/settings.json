@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "deny": ["Bash(pnpm dev)", "Bash(pnpm dev:*)"]
+  }
+}
