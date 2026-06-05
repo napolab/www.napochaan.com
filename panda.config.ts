@@ -20,6 +20,7 @@ export default defineConfig({
       layerStyles: {
         focusRing: {
           value: {
+            // base = static dashed ring (reduced-motion fallback)
             outlineWidth: 'default',
             outlineStyle: 'dashed',
             outlineColor: 'accent.solid',
@@ -29,6 +30,9 @@ export default defineConfig({
         },
       },
       keyframes: {
+        marchingAnts: {
+          to: { backgroundPosition: '8px 0, -8px 100%, 0 -8px, 100% 8px' },
+        },
         fadeInUp: {
           '0%': { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
