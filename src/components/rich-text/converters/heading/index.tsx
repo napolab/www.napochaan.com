@@ -1,6 +1,6 @@
 import { Heading } from '@components/heading';
 
-import { headingText, slugifyHeading } from '../../heading-toc';
+import { headingText, slugifyHeading } from '../../toc';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
