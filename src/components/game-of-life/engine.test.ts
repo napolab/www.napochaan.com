@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createLifeEngine } from './engine';
 
@@ -36,5 +36,24 @@ describe('life engine', () => {
     expect(s.cols).toBe(8);
     expect(s.rows).toBe(3);
     expect(s.cells.length).toBe(24);
+  });
+
+  it('subscribe: listener receives incremented generation after tick', () => {
+    const e = createLifeEngine({ cols: 4, rows: 4, density: 0.5, rand: () => 0 });
+    const listener = vi.fn();
+    e.subscribe(listener);
+    e.tick();
+    expect(listener).toHaveBeenCalledOnce();
+    const [calledState] = listener.mock.calls[0] as [ReturnType<typeof e.getState>];
+    expect(calledState.generation).toBe(1);
+  });
+
+  it('subscribe: unsubscribe stops further listener calls', () => {
+    const e = createLifeEngine({ cols: 4, rows: 4, density: 0.5, rand: () => 0 });
+    const listener = vi.fn();
+    const unsubscribe = e.subscribe(listener);
+    unsubscribe();
+    e.tick();
+    expect(listener).not.toHaveBeenCalled();
   });
 });

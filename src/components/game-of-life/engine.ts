@@ -20,6 +20,7 @@ export type LifeEngine = {
   tick: () => LifeState;
   resize: (cols: number, rows: number) => void;
   getState: () => LifeState;
+  subscribe: (listener: (state: LifeState) => void) => () => void;
 };
 
 type InternalState = {
@@ -51,6 +52,22 @@ export const createLifeEngine = (options: LifeEngineOptions): LifeEngine => {
     stagnation: 0,
   };
 
+  // Cached snapshot — same reference until state actually changes (required for useSyncExternalStore)
+  const cache = { current: snapshot(state) };
+
+  const commit = (): LifeState => {
+    cache.current = snapshot(state);
+    return cache.current;
+  };
+
+  const listeners = new Set<(s: LifeState) => void>();
+
+  const notify = (s: LifeState) => {
+    for (const listener of listeners) {
+      listener(s);
+    }
+  };
+
   const reseed = () => {
     const { cols, rows } = state.grid;
     state.grid = seedRandom(createGrid(cols, rows), RESEED_DENSITY, rand);
@@ -69,7 +86,9 @@ export const createLifeEngine = (options: LifeEngineOptions): LifeEngine => {
     const threshold = state.grid.cells.length * 0.02;
     if (alive < threshold || state.stagnation > stagnationLimit) reseed();
 
-    return snapshot(state);
+    const s = commit();
+    notify(s);
+    return s;
   };
 
   const resize = (cols: number, rows: number) => {
@@ -77,9 +96,18 @@ export const createLifeEngine = (options: LifeEngineOptions): LifeEngine => {
     state.generation = 0;
     state.lastAlive = -1;
     state.stagnation = 0;
+    const s = commit();
+    notify(s);
   };
 
-  const getState = (): LifeState => snapshot(state);
+  const getState = (): LifeState => cache.current;
 
-  return { tick, resize, getState };
+  const subscribe = (listener: (s: LifeState) => void): (() => void) => {
+    listeners.add(listener);
+    return () => {
+      listeners.delete(listener);
+    };
+  };
+
+  return { tick, resize, getState, subscribe };
 };

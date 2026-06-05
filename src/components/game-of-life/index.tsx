@@ -1,15 +1,16 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-import { useRafLoop } from '@hooks/use-raf-loop';
-import { useWindowResize } from '@hooks/use-window-resize';
+import { useIsClient } from '@hooks/use-is-client';
+import { useLifeEngine } from '@components/life-engine-provider';
 
-import { createLifeEngine, type LifeEngine, type LifeState } from './engine';
+import type { LifeState } from './engine';
 import * as styles from './styles.css';
 
 const CELL = 24;
 const FPS = 7;
+const FRAME_INTERVAL = 1000 / FPS;
 
 const drawCells = (ctx: CanvasRenderingContext2D, state: LifeState) => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -24,83 +25,104 @@ const drawCells = (ctx: CanvasRenderingContext2D, state: LifeState) => {
   }
 };
 
-type EngineRef = {
-  engine: LifeEngine | null;
+type RafState = {
+  raf: number;
+  last: number;
+  acc: number;
 };
 
 export const GameOfLife = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engineRef = useRef<EngineRef>({ engine: null });
-
+  const engine = useLifeEngine();
+  const isClient = useIsClient();
   const reduced = useRef(typeof window !== 'undefined' ? matchMedia('(prefers-reduced-motion: reduce)').matches : false);
 
   const [active, setActive] = useState(false);
 
-  const resize = useCallback(() => {
-    // USEEFFECT_JUSTIFICATION: imperative canvas sizing and engine create/resize on layout change
+  // Effect 1: Resize — sizes the canvas and calls engine.resize on window resize
+  useEffect(() => {
+    // USEEFFECT_JUSTIFICATION: Imperative canvas sizing + engine resize on window layout change
+    if (!isClient) return;
+
     const canvas = canvasRef.current;
     if (canvas === null) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (ctx === null) return;
 
-    const dpr = Math.min(devicePixelRatio ?? 1, 2);
-    const w = innerWidth - 48;
-    const h = innerHeight - 48;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const resize = () => {
+      const ctx = canvas.getContext('2d', { alpha: true });
+      if (ctx === null) return;
 
-    const cols = Math.ceil(w / CELL) + 1;
-    const rows = Math.ceil(h / CELL) + 1;
+      const dpr = Math.min(devicePixelRatio ?? 1, 2);
+      const w = innerWidth - 48;
+      const h = innerHeight - 48;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    if (engineRef.current.engine === null) {
-      engineRef.current.engine = createLifeEngine({ cols, rows });
-    } else {
-      engineRef.current.engine.resize(cols, rows);
-    }
+      const cols = Math.ceil(w / CELL) + 1;
+      const rows = Math.ceil(h / CELL) + 1;
+      engine.resize(cols, rows);
+      drawCells(ctx, engine.getState());
+    };
 
-    const { engine } = engineRef.current;
-    drawCells(ctx, engine.getState());
-  }, []);
+    resize();
+    window.addEventListener('resize', resize, { passive: true });
+    return () => {
+      window.removeEventListener('resize', resize);
+    };
+  }, [engine, isClient]);
 
-  const tick = useCallback(() => {
+  // Effect 2: Animation loop — rAF + 7fps time-accumulator, calls engine.tick + draw
+  useEffect(() => {
+    // USEEFFECT_JUSTIFICATION: Imperative rAF loop for canvas animation
+    if (!isClient || !active || reduced.current) return;
+
     const canvas = canvasRef.current;
     if (canvas === null) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (ctx === null) return;
-    const { engine } = engineRef.current;
-    if (engine === null) return;
-    drawCells(ctx, engine.tick());
-  }, []);
 
-  useWindowResize(resize);
+    const rafState: RafState = { raf: 0, last: 0, acc: 0 };
 
-  useRafLoop(tick, { fps: FPS, active });
+    const tick = (t: number) => {
+      if (rafState.last === 0) rafState.last = t;
+      rafState.acc += t - rafState.last;
+      rafState.last = t;
+      if (rafState.acc >= FRAME_INTERVAL) {
+        rafState.acc %= FRAME_INTERVAL;
+        const ctx = canvas.getContext('2d', { alpha: true });
+        if (ctx !== null) {
+          drawCells(ctx, engine.tick());
+        }
+      }
+      rafState.raf = requestAnimationFrame(tick);
+    };
 
-  // Visibility change: pause when tab is hidden
+    rafState.raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(rafState.raf);
+    };
+  }, [active, engine, isClient]);
+
+  // Effect 3: Visibility — pause when tab is hidden
   useEffect(() => {
     // USEEFFECT_JUSTIFICATION: Required for document.visibilitychange imperative event subscription
-    if (reduced.current) return;
+    if (!isClient || reduced.current) return;
 
     const onVisibilityChange = () => {
-      if (document.hidden) {
-        setActive(false);
-      } else {
-        setActive(true);
-      }
+      setActive(!document.hidden);
     };
 
     document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, []);
+  }, [isClient]);
 
-  // IntersectionObserver: pause when off-screen; start when in view
+  // Effect 4: IntersectionObserver — pause when off-screen, start when in view
   useEffect(() => {
     // USEEFFECT_JUSTIFICATION: Required for IntersectionObserver imperative API
+    if (!isClient) return;
+
     const canvas = canvasRef.current;
     if (canvas === null) return;
 
@@ -121,7 +143,7 @@ export const GameOfLife = () => {
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [isClient]);
 
   return <canvas data-testid="game-of-life" aria-hidden="true" className={styles.root} ref={canvasRef} />;
 };
