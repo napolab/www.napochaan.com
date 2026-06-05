@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useIsClient } from '@hooks/use-is-client';
 import { useLifeEngine } from './provider';
@@ -35,7 +35,7 @@ export const GameOfLife = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engine = useLifeEngine();
   const isClient = useIsClient();
-  const reduced = useRef(typeof window !== 'undefined' ? matchMedia('(prefers-reduced-motion: reduce)').matches : false);
+  const reduced = useMemo(() => (isClient ? matchMedia('(prefers-reduced-motion: reduce)').matches : false), [isClient]);
 
   const [active, setActive] = useState(false);
 
@@ -76,7 +76,7 @@ export const GameOfLife = () => {
   // Effect 2: Animation loop — rAF + 7fps time-accumulator, calls engine.tick + draw
   useEffect(() => {
     // USEEFFECT_JUSTIFICATION: Imperative rAF loop for canvas animation
-    if (!isClient || !active || reduced.current) return;
+    if (!isClient || !active || reduced) return;
 
     const canvas = canvasRef.current;
     if (canvas === null) return;
@@ -101,12 +101,12 @@ export const GameOfLife = () => {
     return () => {
       cancelAnimationFrame(rafState.raf);
     };
-  }, [active, engine, isClient]);
+  }, [active, engine, isClient, reduced]);
 
   // Effect 3: Visibility — pause when tab is hidden
   useEffect(() => {
     // USEEFFECT_JUSTIFICATION: Required for document.visibilitychange imperative event subscription
-    if (!isClient || reduced.current) return;
+    if (!isClient || reduced) return;
 
     const onVisibilityChange = () => {
       setActive(!document.hidden);
@@ -116,7 +116,7 @@ export const GameOfLife = () => {
     return () => {
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, [isClient]);
+  }, [isClient, reduced]);
 
   // Effect 4: IntersectionObserver — pause when off-screen, start when in view
   useEffect(() => {
@@ -132,7 +132,7 @@ export const GameOfLife = () => {
         if (entry === undefined) return;
         if (!entry.isIntersecting) {
           setActive(false);
-        } else if (!reduced.current) {
+        } else if (!reduced) {
           setActive(true);
         }
       },
@@ -143,7 +143,7 @@ export const GameOfLife = () => {
     return () => {
       observer.disconnect();
     };
-  }, [isClient]);
+  }, [isClient, reduced]);
 
   return <canvas data-testid="game-of-life" aria-hidden="true" className={styles.root} ref={canvasRef} />;
 };
