@@ -1,9 +1,10 @@
 import { css } from '@styled/css';
 
-// The dot is an in-flow flex child centered by the row via `align-items: center` — no absolute
-// positioning, top calc, or optical nudge needed. The spine is drawn behind the row via the
-// <ol> _before at the dot's center x (half the dot width). The dot sits above the spine
-// (position: relative + z-index) so hollow dots mask the line behind them.
+// Rows use align-items: baseline so the date and label share a text baseline. The dot lives
+// INLINE at the start of the date with vertical-align: middle, so its center sits on the text's
+// x-height center (line-height-independent, unlike box centering). The spine is drawn behind via
+// the <ol> _before at the dot's center x (half the dot width); the dot has z-index so hollow
+// dots mask the line behind them.
 export const root = css({
   listStyle: 'none',
   position: 'relative',
@@ -23,14 +24,16 @@ export const root = css({
 
 export const item = css({
   display: 'flex',
-  alignItems: 'center',
+  alignItems: 'baseline',
   gap: '3',
 });
 
 export const dot = css({
+  display: 'inline-block',
+  verticalAlign: 'middle',
   position: 'relative',
   zIndex: '[1]',
-  flexShrink: '0',
+  marginRight: '2',
   width: '2',
   height: '2',
   borderRadius: 'pill',

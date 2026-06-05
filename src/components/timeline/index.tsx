@@ -19,8 +19,8 @@ export const Timeline = ({ items }: Props) => {
         const upcomingAttr = item.upcoming === true ? 'true' : undefined;
         return (
           <li key={item.id} data-testid={`timeline-item-${item.id}`} data-upcoming={upcomingAttr} className={styles.item}>
-            <span className={styles.dot} aria-hidden="true" data-upcoming={upcomingAttr} />
             <span className={styles.date} data-upcoming={upcomingAttr}>
+              <span className={styles.dot} aria-hidden="true" data-upcoming={upcomingAttr} />
               {item.date}
             </span>
             <p className={styles.content}>
