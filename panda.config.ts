@@ -24,7 +24,7 @@ export default defineConfig({
             outlineWidth: 'default',
             outlineStyle: 'dashed',
             outlineColor: 'accent.solid',
-            outlineOffset: '0.5',
+            outlineOffset: '[3px]',
             borderRadius: 'none',
           },
         },
