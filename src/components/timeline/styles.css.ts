@@ -1,9 +1,10 @@
 import { css } from '@styled/css';
 
-// Spine and dots share the same x (11px). The spine is drawn on the <ol> via _before;
-// each dot is absolutely positioned at the same 11px (relative to the <li>, whose box-left
-// equals the <ol> box-left) and centered on the line with translateX(-50%). This keeps the
-// dot on the line regardless of item padding.
+// Spine and dots share the same x: the gutter center = half of the item's padding-left
+// (var(--spacing-6) / 2), so they stay aligned if the padding token changes. The spine is
+// drawn on the <ol> via _before; each dot is absolutely positioned relative to its <li> with
+// left = gutter-center - half-dot, and top = (1lh - dot) / 2 (centers on the first line —
+// robust for multi-line items).
 export const root = css({
   listStyle: 'none',
   position: 'relative',
@@ -13,7 +14,7 @@ export const root = css({
   _before: {
     content: '""',
     position: 'absolute',
-    left: '[11px]',
+    left: '[calc(var(--spacing-6) / 2 - 0.5px)]',
     top: '0',
     bottom: '0',
     width: '[1px]',
@@ -31,13 +32,12 @@ export const item = css({
 
 export const dot = css({
   position: 'absolute',
-  left: '[11px]',
-  top: '0',
-  bottom: '0',
-  marginBlock: 'auto',
-  transform: '[translateX(-50%)]',
+  left: '[calc(var(--spacing-6) / 2 - var(--sizes-2) / 2)]',
+  top: '[calc((1lh - var(--sizes-2)) / 2)]',
   width: '2',
   height: '2',
+  fontSize: 'sm',
+  lineHeight: 'jp',
   borderRadius: 'pill',
   borderWidth: 'hairline',
   borderStyle: 'solid',
