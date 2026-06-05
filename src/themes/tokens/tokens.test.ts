@@ -38,6 +38,23 @@ describe('raw ramp WCAG (on paper gray-1)', () => {
   });
 });
 
+describe('typography tokens', () => {
+  it('text scale base + explosive display clamp', () => {
+    expect(tokens.fontSizes.md.value).toBe('1rem');
+    expect(tokens.fontSizes.xl.value).toBe('1.4375rem'); // 23px
+    expect(tokens.fontSizes.hero.value).toContain('clamp(');
+  });
+  it('editorial line-heights', () => {
+    expect(tokens.lineHeights.none.value).toBe('0.9');
+    expect(tokens.lineHeights.body.value).toBe('1.7');
+    expect(tokens.lineHeights.jp.value).toBe('1.9');
+  });
+  it('font families: display digibop, mono config-mono-vf', () => {
+    expect(tokens.fonts.display.value).toContain('digibop');
+    expect(tokens.fonts.mono.value).toContain('config-mono-vf');
+  });
+});
+
 describe('shape tokens', () => {
   it('radius is sharp by default + pill only', () => {
     expect(tokens.radii.none.value).toBe('0');

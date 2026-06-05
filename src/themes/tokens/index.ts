@@ -71,40 +71,39 @@ export const tokens = defineTokens({
   },
 
   fontSizes: {
-    xs: { value: '0.75rem' },
-    sm: { value: '0.875rem' },
-    md: { value: '1rem' },
-    lg: { value: '1.125rem' },
-    xl: { value: '1.333rem' },
-    '2xl': { value: '1.777rem' },
-    '3xl': { value: '2.369rem' },
-    '4xl': { value: '3.157rem' },
-    '5xl': { value: '4.209rem' },
-    '6xl': { value: '5.61rem' },
+    '2xs': { value: '0.6875rem' }, // 11
+    xs: { value: '0.75rem' }, // 12 caption/mono
+    sm: { value: '0.875rem' }, // 14
+    md: { value: '1rem' }, // 16 body
+    lg: { value: '1.1875rem' }, // 19
+    xl: { value: '1.4375rem' }, // 23 (= h3)
+    h3: { value: '1.4375rem' }, // 23
+    h2: { value: 'clamp(1.75rem, 3.5vw, 2.0625rem)' }, // 28→33
+    h1: { value: 'clamp(2.0625rem, 5vw, 3.1875rem)' }, // 33→51
+    display: { value: 'clamp(3.5rem, 9vw, 6rem)' }, // 56→96
+    hero: { value: 'clamp(4.5rem, 13vw, 10rem)' }, // 72→160
   },
 
   lineHeights: {
+    none: { value: '0.9' },
     tight: { value: '1.2' },
-    snug: { value: '1.375' },
-    normal: { value: '1.5' },
-    relaxed: { value: '1.625' },
-    loose: { value: '2' },
+    snug: { value: '1.4' },
+    body: { value: '1.7' },
+    jp: { value: '1.9' },
   },
 
   fontWeights: {
     normal: { value: '400' },
     medium: { value: '500' },
     semibold: { value: '600' },
-    bold: { value: '700' },
   },
 
   letterSpacings: {
-    tighter: { value: '-0.05em' },
-    tight: { value: '-0.025em' },
+    tighter: { value: '-0.04em' },
+    tight: { value: '-0.02em' },
     normal: { value: '0' },
-    wide: { value: '0.025em' },
-    wider: { value: '0.05em' },
-    widest: { value: '0.1em' },
+    wide: { value: '0.04em' },
+    wider: { value: '0.12em' },
   },
 
   radii: {
@@ -141,13 +140,9 @@ export const tokens = defineTokens({
   },
 
   fonts: {
-    body: {
-      value: 'var(--font-zen-kaku), var(--font-mplus1), system-ui, -apple-system, sans-serif',
-    },
-    heading: {
-      value: 'var(--font-mplus1), var(--font-zen-kaku), system-ui, -apple-system, sans-serif',
-    },
-    mono: { value: 'ui-monospace, "Cascadia Code", "Fira Code", monospace' },
+    display: { value: '"digibop", system-ui, sans-serif' },
+    body: { value: 'var(--font-mplus1), system-ui, -apple-system, sans-serif' },
+    mono: { value: '"config-mono-vf", ui-monospace, "Cascadia Code", monospace' },
   },
 
   zIndex: {
