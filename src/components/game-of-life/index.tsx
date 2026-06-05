@@ -59,11 +59,8 @@ export const GameOfLife = () => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const cols = Math.ceil(w / CELL) + 1;
       const rows = Math.ceil(h / CELL) + 1;
-      if (state.engine === null) {
-        state.engine = createLifeEngine({ cols, rows });
-      } else {
-        state.engine.resize(cols, rows);
-      }
+      if (state.engine === null) state.engine = createLifeEngine({ cols, rows });
+      else state.engine.resize(cols, rows);
       state.last = 0;
       state.acc = 0;
     };
@@ -103,11 +100,8 @@ export const GameOfLife = () => {
       (entries) => {
         const entry = entries[0];
         if (entry === undefined) return;
-        if (entry.isIntersecting) {
-          if (!reduced) start();
-        } else {
-          stop();
-        }
+        if (!entry.isIntersecting) return stop();
+        if (!reduced) start();
       },
       { threshold: 0 },
     );

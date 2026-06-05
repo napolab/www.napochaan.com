@@ -41,18 +41,19 @@ export const tableConverter: Partial<JSXConverters<NodeTypes>> = {
   tablecell: ({ node, nodesToJSX }) => {
     const colSpan = node.colSpan !== undefined && node.colSpan > 1 ? node.colSpan : undefined;
     const rowSpan = node.rowSpan !== undefined && node.rowSpan > 1 ? node.rowSpan : undefined;
+    const children = nodesToJSX({ nodes: node.children });
 
     if (node.headerState > 0) {
       return (
         <th className={styles.headerCell} scope={resolveScope(node.headerState)} colSpan={colSpan} rowSpan={rowSpan}>
-          {nodesToJSX({ nodes: node.children })}
+          {children}
         </th>
       );
     }
 
     return (
       <td className={styles.cell} colSpan={colSpan} rowSpan={rowSpan}>
-        {nodesToJSX({ nodes: node.children })}
+        {children}
       </td>
     );
   },

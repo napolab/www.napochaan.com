@@ -63,18 +63,11 @@ export const createLifeEngine = (options: LifeEngineOptions): LifeEngine => {
     state.generation++;
     const alive = countAlive(state.grid);
 
-    if (alive === state.lastAlive) {
-      state.stagnation++;
-    } else {
-      state.stagnation = 0;
-    }
+    state.stagnation = alive === state.lastAlive ? state.stagnation + 1 : 0;
     state.lastAlive = alive;
 
     const threshold = state.grid.cells.length * 0.02;
-    if (alive < threshold || state.stagnation > stagnationLimit) {
-      reseed();
-      return snapshot(state);
-    }
+    if (alive < threshold || state.stagnation > stagnationLimit) reseed();
 
     return snapshot(state);
   };
