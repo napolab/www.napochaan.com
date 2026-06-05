@@ -6,6 +6,8 @@ export const root = css({
   borderBlockStyle: 'solid',
   borderBlockColor: 'fg.default',
   bg: 'bg.canvas',
+  pointerEvents: 'none',
+  userSelect: 'none',
 });
 
 export const track = css({

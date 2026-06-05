@@ -7,7 +7,7 @@ export const root = css({
   borderBottomWidth: 'default',
   borderBottomStyle: 'solid',
   borderBottomColor: 'fg.default',
-  paddingBottom: '[6px]',
+  paddingBottom: '1.5',
 });
 
 export const no = css({
