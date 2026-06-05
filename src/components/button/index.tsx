@@ -12,7 +12,7 @@ type Props = Omit<AriaButtonProps, 'className'> & { variant?: Variant };
 
 export const Button = ({ variant = 'solid', children, ...rest }: Props) => {
   return (
-    <AriaButton {...rest} data-variant={variant} className={styles.button({ variant })}>
+    <AriaButton {...rest} data-variant={variant} className={styles.root}>
       {children}
     </AriaButton>
   );
