@@ -32,3 +32,6 @@ worker-configuration.d.ts
 tsconfig.tsbuildinfo
 .vitest-attachments
 .playwright-mcp
+
+# scratch design mockups (not tracked)
+.tmp-mockups/
