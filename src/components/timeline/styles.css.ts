@@ -33,7 +33,9 @@ export const item = css({
 export const dot = css({
   position: 'absolute',
   left: '[calc(var(--spacing-6) / 2 - var(--sizes-2) / 2)]',
-  top: '[calc((1lh - var(--sizes-2)) / 2)]',
+  // +2px optical nudge: with the large jp line-height, glyphs read slightly above the
+  // geometric line-box center, so the dot looks better a touch lower than dead-center.
+  top: '[calc((1lh - var(--sizes-2)) / 2 + 2px)]',
   width: '2',
   height: '2',
   fontSize: 'sm',
