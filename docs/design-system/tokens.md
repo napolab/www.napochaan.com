@@ -239,6 +239,8 @@ space: 0  1=4  2=8  3=12  4=16  6=24(module)  8=32  12=48  16=64  24=96
 | default | 2px | 枠・カード・button |
 | strong | 3px | 強調・focus ring |
 
+**focus-ring（確定）**: layerStyle `focusRing` = 2px dashed / accent.solid(blue-9) / offset 2px / radius none。全 interactive に `_focusVisible: { layerStyle: 'focusRing' }` で統一（システム/ターミナル調）。
+
 ---
 
 ## 6. コンポーネント（確定 — content 文脈駆動 [5]）

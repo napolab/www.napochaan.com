@@ -17,6 +17,17 @@ export default defineConfig({
     extend: {
       tokens,
       semanticTokens,
+      layerStyles: {
+        focusRing: {
+          value: {
+            outlineWidth: 'default',
+            outlineStyle: 'dashed',
+            outlineColor: 'accent.solid',
+            outlineOffset: '0.5',
+            borderRadius: 'none',
+          },
+        },
+      },
       keyframes: {
         fadeInUp: {
           '0%': { opacity: '0', transform: 'translateY(16px)' },

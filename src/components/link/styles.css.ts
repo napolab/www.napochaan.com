@@ -13,10 +13,5 @@ export const root = css({
     color: 'fg.onSolid',
     textDecorationLine: 'none',
   },
-  _focusVisible: {
-    outlineWidth: 'strong',
-    outlineStyle: 'solid',
-    outlineColor: 'border.focus',
-    outlineOffset: '0.5',
-  },
+  _focusVisible: { layerStyle: 'focusRing' },
 });

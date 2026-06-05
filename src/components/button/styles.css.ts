@@ -20,12 +20,7 @@ export const root = css({
   transitionDuration: 'snap',
   transitionTimingFunction: 'stepSnap',
   _hover: { transform: 'translate(3px, 3px)' },
-  _focusVisible: {
-    outlineWidth: 'strong',
-    outlineStyle: 'solid',
-    outlineColor: 'border.focus',
-    outlineOffset: '0.5',
-  },
+  _focusVisible: { layerStyle: 'focusRing' },
   _disabled: { opacity: 'disabled', cursor: 'not-allowed', _hover: { transform: 'none' } },
   '&[data-variant="solid"]': {
     bg: 'accent.solid',
