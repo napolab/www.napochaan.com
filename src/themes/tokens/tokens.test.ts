@@ -69,3 +69,14 @@ describe('shape tokens', () => {
     expect(tokens.sizes.gridCell.value).toBe('24px');
   });
 });
+
+describe('motion tokens', () => {
+  it('stepped easing for mechanical feel', () => {
+    expect(tokens.easings.stepSnap.value).toBe('steps(3, end)');
+    expect(tokens.easings.step1.value).toBe('steps(1)');
+  });
+  it('durations include glitch', () => {
+    expect(tokens.durations.base.value).toBe('150ms');
+    expect(tokens.durations.glitch.value).toBe('630ms');
+  });
+});

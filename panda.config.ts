@@ -22,6 +22,20 @@ export default defineConfig({
           '0%': { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        blink: {
+          '50%': { opacity: '0' },
+        },
+        glitchShift: {
+          '0%, 92%, 100%': { textShadow: 'none', transform: 'none' },
+          '93%': {
+            textShadow: '2px 0 var(--colors-red-9), -2px 0 var(--colors-blue-9)',
+            transform: 'translateX(1px)',
+          },
+          '97%': {
+            textShadow: '-1px 0 var(--colors-red-9), 1px 0 var(--colors-blue-9)',
+            transform: 'translateX(-1px)',
+          },
+        },
       },
     },
   },

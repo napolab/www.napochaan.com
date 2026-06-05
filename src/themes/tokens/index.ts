@@ -157,23 +157,18 @@ export const tokens = defineTokens({
   },
 
   durations: {
-    fastest: { value: '50ms' },
-    faster: { value: '100ms' },
-    fast: { value: '150ms' },
-    normal: { value: '200ms' },
-    slow: { value: '300ms' },
-    slower: { value: '500ms' },
-    slowest: { value: '700ms' },
+    instant: { value: '0ms' },
+    fast: { value: '90ms' },
+    base: { value: '150ms' },
+    snap: { value: '180ms' },
+    slow: { value: '280ms' },
+    glitch: { value: '630ms' },
   },
 
   easings: {
     linear: { value: 'linear' },
-    ease: { value: 'ease' },
-    easeIn: { value: 'ease-in' },
-    easeOut: { value: 'ease-out' },
-    easeInOut: { value: 'ease-in-out' },
-    outCubic: { value: 'cubic-bezier(0.33, 1, 0.68, 1)' },
-    inOutCubic: { value: 'cubic-bezier(0.65, 0, 0.35, 1)' },
+    step1: { value: 'steps(1)' },
+    stepSnap: { value: 'steps(3, end)' },
   },
 
   blurs: {
