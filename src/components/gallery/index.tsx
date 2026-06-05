@@ -26,7 +26,7 @@ export const Gallery = ({ items }: Props) => {
         <li key={item.id} className={styles.cell} data-span={item.span ?? 'square'}>
           <DialogTrigger>
             <Button className={styles.trigger} aria-label={item.alt}>
-              <Image src={item.src} alt={item.alt} width={item.width} height={item.height} />
+              <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.gridImage} />
             </Button>
             <Modal className={styles.modal}>
               <Dialog className={styles.dialog} aria-label={item.alt}>

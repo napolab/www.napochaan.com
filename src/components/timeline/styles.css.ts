@@ -30,7 +30,6 @@ export const item = css({
 
 export const dot = css({
   display: 'inline-block',
-  verticalAlign: 'middle',
   position: 'relative',
   zIndex: '[1]',
   marginRight: '2',
@@ -53,6 +52,7 @@ export const date = css({
   fontSize: 'xs',
   lineHeight: 'jp',
   color: 'fg.muted',
+
   '&[data-upcoming="true"]': {
     color: 'accent.text',
   },

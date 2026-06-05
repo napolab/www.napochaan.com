@@ -5,6 +5,7 @@ export const root = css({
   display: 'grid',
   gridTemplateColumns: 'repeat(6, 1fr)',
   gridAutoRows: '[78px]',
+  gridAutoFlow: 'dense',
   gap: '[2px]',
   borderWidth: 'hairline',
   borderStyle: 'solid',
@@ -29,6 +30,12 @@ export const cell = css({
     gridColumn: 'span 2',
     gridRow: 'span 3',
   },
+});
+
+export const gridImage = css({
+  width: 'full',
+  height: 'full',
+  objectFit: 'cover',
 });
 
 export const trigger = css({
