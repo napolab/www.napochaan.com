@@ -22,6 +22,8 @@ export const echoBlue = css({
   color: 'accent.solid',
   transform: '[translate(10px,10px)]',
   zIndex: '[1]',
+  userSelect: 'none',
+  pointerEvents: 'none',
 });
 
 export const echoOut = css({
@@ -31,4 +33,6 @@ export const echoOut = css({
   WebkitTextStroke: '[2px token(colors.gray.12)]',
   transform: '[translate(20px,20px)]',
   zIndex: '[0]',
+  userSelect: 'none',
+  pointerEvents: 'none',
 });

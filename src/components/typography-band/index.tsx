@@ -50,8 +50,9 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
         onUpdate: (self) => {
           const delta = self.getVelocity() * VELOCITY_SCALE;
 
-          pos.top = wrap(pos.top + delta, topHalf);
-          pos.bottom = wrap(pos.bottom - delta, topHalf);
+          // Clockwise rotation around the frame: top ← / right ↑ / bottom → / left ↓
+          pos.top = wrap(pos.top - delta, topHalf);
+          pos.bottom = wrap(pos.bottom + delta, topHalf);
           pos.left = wrap(pos.left + delta, leftHalf);
           pos.right = wrap(pos.right - delta, leftHalf);
 
