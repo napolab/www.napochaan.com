@@ -1,10 +1,9 @@
 import { css } from '@styled/css';
 
-// Spine and dots share the same x: the gutter center = half of the item's padding-left
-// (var(--spacing-6) / 2), so they stay aligned if the padding token changes. The spine is
-// drawn on the <ol> via _before; each dot is absolutely positioned relative to its <li> with
-// left = gutter-center - half-dot, and top = (1lh - dot) / 2 (centers on the first line —
-// robust for multi-line items).
+// The dot is an in-flow flex child centered by the row via `align-items: center` — no absolute
+// positioning, top calc, or optical nudge needed. The spine is drawn behind the row via the
+// <ol> _before at the dot's center x (half the dot width). The dot sits above the spine
+// (position: relative + z-index) so hollow dots mask the line behind them.
 export const root = css({
   listStyle: 'none',
   position: 'relative',
@@ -14,7 +13,7 @@ export const root = css({
   _before: {
     content: '""',
     position: 'absolute',
-    left: '[calc(var(--spacing-6) / 2 - 0.5px)]',
+    left: '[calc(var(--sizes-2) / 2 - 0.5px)]',
     top: '0',
     bottom: '0',
     width: '[1px]',
@@ -23,29 +22,22 @@ export const root = css({
 });
 
 export const item = css({
-  position: 'relative',
   display: 'flex',
-  alignItems: 'baseline',
+  alignItems: 'center',
   gap: '3',
-  pl: '6',
 });
 
 export const dot = css({
-  position: 'absolute',
-  left: '[calc(var(--spacing-6) / 2 - var(--sizes-2) / 2)]',
-  // +2px optical nudge: with the large jp line-height, glyphs read slightly above the
-  // geometric line-box center, so the dot looks better a touch lower than dead-center.
-  top: '[calc((1lh - var(--sizes-2)) / 2 + 2px)]',
+  position: 'relative',
+  zIndex: '[1]',
+  flexShrink: '0',
   width: '2',
   height: '2',
-  fontSize: 'sm',
-  lineHeight: 'jp',
   borderRadius: 'pill',
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'border.strong',
   bg: 'bg.canvas',
-  flexShrink: '0',
   '&[data-upcoming="true"]': {
     bg: 'accent.solid',
     borderColor: 'accent.solid',
@@ -53,18 +45,18 @@ export const dot = css({
 });
 
 export const date = css({
+  flexShrink: '0',
   fontFamily: 'mono',
   fontSize: 'xs',
   lineHeight: 'jp',
   color: 'fg.muted',
-  flexShrink: '0',
   '&[data-upcoming="true"]': {
     color: 'accent.text',
   },
 });
 
 // label + meta live inside `content` as INLINE text so they wrap together as one block;
-// `date` stays a fixed column. This avoids each piece wrapping as an independent flex child.
+// `date` stays a fixed column.
 export const content = css({
   flex: '1',
   minWidth: '0',
