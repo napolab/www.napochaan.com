@@ -1,22 +1,18 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 
 import { wrap } from './band-scroll';
 import * as styles from './styles.css';
 
+gsap.registerPlugin(ScrollTrigger);
+
 const DEFAULT_TEXT = 'NAPOCHAAN · DJ × VJ · GRAPHIC × DIGITAL · SINCE 2020 · 静かなインターネット · ';
 const REPEAT_COUNT = 20;
-
-type BandState = {
-  raf: number;
-  speed: number;
-  lastY: number;
-  posTop: number;
-  posBottom: number;
-  posLeft: number;
-  posRight: number;
-};
+const VELOCITY_SCALE = 0.04;
 
 type Props = {
   text?: string;
@@ -30,83 +26,66 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
   const trackLeftRef = useRef<HTMLDivElement>(null);
   const trackRightRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: Required for imperative rAF scroll-reactive animation loop
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduced) return;
+  useGSAP(() => {
+    const topTrack = trackTopRef.current;
+    const bottomTrack = trackBottomRef.current;
+    const leftTrack = trackLeftRef.current;
+    const rightTrack = trackRightRef.current;
 
-    const trackTop = trackTopRef.current;
-    const trackBottom = trackBottomRef.current;
-    const trackLeft = trackLeftRef.current;
-    const trackRight = trackRightRef.current;
+    if (!topTrack || !bottomTrack || !leftTrack || !rightTrack) return;
 
-    if (trackTop === null || trackBottom === null || trackLeft === null || trackRight === null) return;
+    const mm = gsap.matchMedia();
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const topHalf = topTrack.scrollWidth / 2;
+      const leftHalf = leftTrack.scrollHeight / 2;
 
-    const state: BandState = {
-      raf: 0,
-      speed: 0,
-      lastY: scrollY,
-      posTop: 0,
-      posBottom: 0,
-      posLeft: 0,
-      posRight: 0,
-    };
+      const moveTop = gsap.quickTo(topTrack, 'x', { duration: 0.6, ease: 'power2.out' });
+      const moveBottom = gsap.quickTo(bottomTrack, 'x', { duration: 0.6, ease: 'power2.out' });
+      const moveLeft = gsap.quickTo(leftTrack, 'y', { duration: 0.6, ease: 'power2.out' });
+      const moveRight = gsap.quickTo(rightTrack, 'y', { duration: 0.6, ease: 'power2.out' });
 
-    const onScroll = () => {
-      state.speed += scrollY - state.lastY;
-      state.lastY = scrollY;
-    };
+      const pos = { top: 0, bottom: 0, left: 0, right: 0 };
 
-    const frame = () => {
-      const halfH = trackTop.scrollWidth / 2;
-      const halfV = trackLeft.scrollHeight / 2;
-      const delta = state.speed * 0.6 + 0.25;
+      ScrollTrigger.create({
+        onUpdate: (self) => {
+          const delta = self.getVelocity() * VELOCITY_SCALE;
 
-      state.posTop = wrap(state.posTop + delta, halfH);
-      state.posBottom = wrap(state.posBottom - delta, halfH);
-      state.posLeft = wrap(state.posLeft + delta, halfV);
-      state.posRight = wrap(state.posRight - delta, halfV);
+          pos.top = wrap(pos.top + delta, topHalf);
+          pos.bottom = wrap(pos.bottom - delta, topHalf);
+          pos.left = wrap(pos.left + delta, leftHalf);
+          pos.right = wrap(pos.right - delta, leftHalf);
 
-      trackTop.style.transform = `translateX(${state.posTop}px)`;
-      trackBottom.style.transform = `translateX(${state.posBottom}px)`;
-      trackLeft.style.transform = `translateY(${state.posLeft}px)`;
-      trackRight.style.transform = `translateY(${state.posRight}px)`;
-
-      state.speed *= 0.88;
-      state.raf = requestAnimationFrame(frame);
-    };
-
-    addEventListener('scroll', onScroll, { passive: true });
-    state.raf = requestAnimationFrame(frame);
-
-    return () => {
-      cancelAnimationFrame(state.raf);
-      removeEventListener('scroll', onScroll);
-    };
-  }, []);
+          moveTop(pos.top);
+          moveBottom(pos.bottom);
+          moveLeft(pos.left);
+          moveRight(pos.right);
+        },
+      });
+    });
+  });
 
   return (
     <>
       <div className={styles.bandTop} data-testid="typography-band" aria-hidden="true">
-        <div className={styles.track} ref={trackTopRef}>
+        <div ref={trackTopRef} className={styles.track}>
           <span>{repeated}</span>
           <span>{repeated}</span>
         </div>
       </div>
       <div className={styles.bandBottom} data-testid="typography-band" aria-hidden="true">
-        <div className={styles.track} ref={trackBottomRef}>
+        <div ref={trackBottomRef} className={styles.track}>
           <span>{repeated}</span>
           <span>{repeated}</span>
         </div>
       </div>
       <div className={styles.bandLeft} data-testid="typography-band" aria-hidden="true">
-        <div className={styles.trackVertical} ref={trackLeftRef}>
+        <div ref={trackLeftRef} className={styles.trackVertical}>
           <span>{repeated}</span>
           <span>{repeated}</span>
         </div>
       </div>
       <div className={styles.bandRight} data-testid="typography-band" aria-hidden="true">
-        <div className={styles.trackVertical} ref={trackRightRef}>
+        <div ref={trackRightRef} className={styles.trackVertical}>
           <span>{repeated}</span>
           <span>{repeated}</span>
         </div>
