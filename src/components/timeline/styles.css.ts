@@ -32,7 +32,9 @@ export const item = css({
 export const dot = css({
   position: 'absolute',
   left: '[11px]',
-  top: '[0.45em]',
+  top: '0',
+  bottom: '0',
+  marginBlock: 'auto',
   transform: '[translateX(-50%)]',
   width: '2',
   height: '2',
