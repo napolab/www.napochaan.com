@@ -1,5 +1,5 @@
 import { GameOfLife } from '@components/game-of-life';
-import { LifeEngineProvider } from '@components/life-engine-provider';
+import { LifeEngineProvider } from '@components/game-of-life/provider';
 import { TypographyBand } from '@components/typography-band';
 
 import * as styles from './styles.css';

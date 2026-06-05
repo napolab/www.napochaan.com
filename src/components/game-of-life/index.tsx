@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useIsClient } from '@hooks/use-is-client';
-import { useLifeEngine } from '@components/life-engine-provider';
+import { useLifeEngine } from './provider';
 
 import type { LifeState } from './engine';
 import * as styles from './styles.css';

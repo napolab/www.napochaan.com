@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useSyncExternalStore } from 'react';
 
-import { createLifeEngine, type LifeEngine, type LifeState } from '@components/game-of-life/engine';
+import { createLifeEngine, type LifeEngine, type LifeState } from '../engine';
 
 import type { ReactNode } from 'react';
 
