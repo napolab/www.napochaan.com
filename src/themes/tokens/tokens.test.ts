@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { contrastRatio } from '../contrast';
-import { tokens } from './index';
+import { semanticTokens, tokens } from './index';
 
 const val = (group: 'gray' | 'blue' | 'red', step: number): string => {
   const scale = tokens.colors[group] as Record<number, { value: string } | undefined>;
@@ -78,5 +78,44 @@ describe('motion tokens', () => {
   it('durations include glitch', () => {
     expect(tokens.durations.base.value).toBe('150ms');
     expect(tokens.durations.glitch.value).toBe('630ms');
+  });
+});
+
+const resolve = (ref: string): string => {
+  const m = ref.match(/\{colors\.(\w+)\.(\d+)\}/);
+  if (m === null) throw new Error(`unresolvable: ${ref}`);
+  const group = m[1];
+  const step = m[2];
+  if (group === undefined || step === undefined) throw new Error(`unresolvable: ${ref}`);
+  const scale = tokens.colors[group as 'gray' | 'blue' | 'red'] as Record<number, { value: string } | undefined>;
+  const entry = scale[parseInt(step, 10)];
+  if (entry === undefined) throw new Error(`missing ${ref}`);
+  return entry.value;
+};
+
+const sem = (path: string): string => {
+  const node = path.split('.').reduce<unknown>((acc, k) => (acc as Record<string, unknown>)[k], semanticTokens.colors);
+  return (node as { value: string }).value;
+};
+
+describe('semantic tokens WCAG AA (light theme)', () => {
+  const canvas = resolve(sem('bg.canvas'));
+  it('fg.default on bg.canvas >= 4.5', () => {
+    expect(contrastRatio(resolve(sem('fg.default')), canvas)).toBeGreaterThanOrEqual(4.5);
+  });
+  it('fg.muted on bg.canvas >= 4.5', () => {
+    expect(contrastRatio(resolve(sem('fg.muted')), canvas)).toBeGreaterThanOrEqual(4.5);
+  });
+  it('accent.text on bg.canvas >= 4.5', () => {
+    expect(contrastRatio(resolve(sem('accent.text')), canvas)).toBeGreaterThanOrEqual(4.5);
+  });
+  it('danger.text on bg.canvas >= 4.5', () => {
+    expect(contrastRatio(resolve(sem('danger.text')), canvas)).toBeGreaterThanOrEqual(4.5);
+  });
+  it('fg.onSolid on accent.solid >= 4.5 (white on blue button)', () => {
+    expect(contrastRatio(resolve(sem('fg.onSolid')), resolve(sem('accent.solid')))).toBeGreaterThanOrEqual(4.5);
+  });
+  it('fg.onDanger on danger.solid >= 4.5 (black on red button)', () => {
+    expect(contrastRatio(resolve(sem('fg.onDanger')), resolve(sem('danger.solid')))).toBeGreaterThanOrEqual(4.5);
   });
 });

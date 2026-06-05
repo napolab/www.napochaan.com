@@ -181,65 +181,44 @@ export const tokens = defineTokens({
 });
 
 // ---------------------------------------------------------------------------
-// color-mix helper
-// ---------------------------------------------------------------------------
-const mix = (base: string, target: string, pct: number) => `color-mix(in oklch, ${base} ${pct}%, ${target})`;
-
-// ---------------------------------------------------------------------------
-// Semantic Tokens — dark-mode-first
+// Semantic Tokens — light-first
 // ---------------------------------------------------------------------------
 export const semanticTokens = defineSemanticTokens({
   colors: {
     bg: {
-      DEFAULT: { value: { base: '{colors.white}', _dark: '{colors.gray.12}' } },
-      subtle: { value: { base: '{colors.gray.2}', _dark: '{colors.gray.11}' } },
-      muted: { value: { base: '{colors.gray.3}', _dark: '{colors.gray.9}' } },
-      emphasis: { value: { base: '{colors.gray.9}', _dark: '{colors.gray.3}' } },
-      glass: {
-        value: {
-          base: mix('{colors.white}', 'transparent', 85),
-          _dark: mix('{colors.gray.12}', 'transparent', 85),
-        },
-      },
+      canvas: { value: '{colors.gray.1}' },
+      subtle: { value: '{colors.gray.2}' },
+      muted: { value: '{colors.gray.3}' },
+      emphasis: { value: '{colors.gray.5}' },
     },
     fg: {
-      DEFAULT: { value: { base: '{colors.gray.12}', _dark: '{colors.gray.1}' } },
-      muted: { value: { base: '{colors.gray.11}', _dark: '{colors.gray.8}' } },
-      subtle: { value: { base: '{colors.gray.9}', _dark: '{colors.gray.7}' } },
-      onEmphasis: { value: { base: '{colors.white}', _dark: '{colors.gray.12}' } },
+      default: { value: '{colors.gray.12}' },
+      muted: { value: '{colors.gray.11}' },
+      subtle: { value: '{colors.gray.9}' },
+      onSolid: { value: '{colors.gray.1}' },
+      onDanger: { value: '{colors.gray.12}' },
     },
     border: {
-      DEFAULT: { value: { base: '{colors.gray.6}', _dark: '{colors.gray.9}' } },
-      strong: { value: { base: '{colors.gray.8}', _dark: '{colors.gray.7}' } },
-      focus: { value: { base: '{colors.pink.9}', _dark: '{colors.pink.7}' } },
+      subtle: { value: '{colors.gray.6}' },
+      default: { value: '{colors.gray.7}' },
+      strong: { value: '{colors.gray.8}' },
+      focus: { value: '{colors.blue.7}' },
+    },
+    grid: {
+      line: { value: '{colors.gray.5}' },
     },
     accent: {
-      DEFAULT: { value: { base: '{colors.pink.9}', _dark: '{colors.pink.9}' } },
-      hover: {
-        value: {
-          base: mix('{colors.pink.9}', 'oklch(0 0 0)', 85),
-          _dark: mix('{colors.pink.9}', 'oklch(1 0 0)', 85),
-        },
-      },
-      subtle: {
-        value: {
-          base: mix('{colors.pink.9}', 'oklch(1 0 0)', 12),
-          _dark: mix('{colors.pink.9}', 'oklch(0 0 0)', 15),
-        },
-      },
-      fg: { value: { base: '{colors.pink.11}', _dark: '{colors.pink.5}' } },
+      solid: { value: '{colors.blue.9}' },
+      solidHover: { value: '{colors.blue.10}' },
+      text: { value: '{colors.blue.9}' },
+      border: { value: '{colors.blue.7}' },
     },
     danger: {
-      DEFAULT: { value: { base: '{colors.red.9}', _dark: '{colors.red.9}' } },
-      fg: { value: { base: '{colors.red.11}', _dark: '{colors.red.5}' } },
-    },
-    success: {
-      DEFAULT: { value: { base: '{colors.green.9}', _dark: '{colors.green.9}' } },
-      fg: { value: { base: '{colors.green.11}', _dark: '{colors.green.5}' } },
-    },
-    warning: {
-      DEFAULT: { value: { base: '{colors.yellow.9}', _dark: '{colors.yellow.9}' } },
-      fg: { value: { base: '{colors.yellow.11}', _dark: '{colors.yellow.5}' } },
+      solid: { value: '{colors.red.9}' },
+      solidHover: { value: '{colors.red.10}' },
+      text: { value: '{colors.red.11}' },
+      border: { value: '{colors.red.7}' },
+      spot: { value: '{colors.red.9}' },
     },
   },
   spacing: {
