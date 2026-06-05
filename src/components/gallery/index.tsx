@@ -1,10 +1,17 @@
 'use client';
 
+import { useMemo } from 'react';
 import { Button, Dialog, DialogTrigger, Modal } from 'react-aria-components';
 
 import { Image } from '@components/image';
 
 import * as styles from './styles.css';
+
+import type { CSSProperties } from 'react';
+
+// Named template areas defined by the gallery grid (see styles.css.ts). Each item
+// is placed into exactly one, guaranteeing the grid tiles with no empty cells.
+export type GalleryArea = 'lead' | 'sub' | 'wide' | 'square' | 'column' | 'inset';
 
 export type GalleryItem = {
   id: string;
@@ -12,36 +19,50 @@ export type GalleryItem = {
   alt: string;
   width: number;
   height: number;
-  span?: 'square' | 'portrait' | 'wide' | 'tall';
+  area: GalleryArea;
+  // Short label rendered as a corner tag over the cell (e.g. 'flyer / 04.24').
+  caption?: string;
+  // CSS object-position value (e.g. 'top', 'center', '50% 20%') that frames the
+  // cover-crop for this cell. Defaults to 'center'.
+  objectPosition?: string;
 };
 
 type Props = {
   items: GalleryItem[];
 };
 
+const GalleryCell = ({ item }: { item: GalleryItem }) => {
+  const cellStyle = useMemo(() => ({ '--gallery-area': item.area, '--gallery-object-position': item.objectPosition ?? 'center' }) as CSSProperties, [item.area, item.objectPosition]);
+
+  return (
+    <li className={styles.cell} style={cellStyle}>
+      <DialogTrigger>
+        <Button className={styles.trigger} aria-label={item.alt}>
+          <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.gridImage} />
+        </Button>
+        <Modal className={styles.modal}>
+          <Dialog className={styles.dialog} aria-label={item.alt}>
+            {({ close }) => (
+              <>
+                <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.modalImage} />
+                <Button onPress={close} className={styles.close}>
+                  close
+                </Button>
+              </>
+            )}
+          </Dialog>
+        </Modal>
+      </DialogTrigger>
+      {item.caption !== undefined ? <span className={styles.caption}>{item.caption}</span> : null}
+    </li>
+  );
+};
+
 export const Gallery = ({ items }: Props) => {
   return (
     <ul className={styles.root}>
       {items.map((item) => (
-        <li key={item.id} className={styles.cell} data-span={item.span ?? 'square'}>
-          <DialogTrigger>
-            <Button className={styles.trigger} aria-label={item.alt}>
-              <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.gridImage} />
-            </Button>
-            <Modal className={styles.modal}>
-              <Dialog className={styles.dialog} aria-label={item.alt}>
-                {({ close }) => (
-                  <>
-                    <Image src={item.src} alt={item.alt} width={item.width} height={item.height} />
-                    <Button onPress={close} className={styles.close}>
-                      close
-                    </Button>
-                  </>
-                )}
-              </Dialog>
-            </Modal>
-          </DialogTrigger>
-        </li>
+        <GalleryCell key={item.id} item={item} />
       ))}
     </ul>
   );

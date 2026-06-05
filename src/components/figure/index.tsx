@@ -19,7 +19,7 @@ type Props = {
 export const Figure = ({ src, alt, width, height, caption, placeholder, blurDataURL }: Props) => {
   return (
     <figure className={styles.root}>
-      <Image src={src} alt={alt} width={width} height={height} placeholder={placeholder} blurDataURL={blurDataURL} />
+      <Image src={src} alt={alt} width={width} height={height} placeholder={placeholder} blurDataURL={blurDataURL} className={styles.image} />
       {caption !== undefined && <figcaption className={styles.caption}>{caption}</figcaption>}
     </figure>
   );

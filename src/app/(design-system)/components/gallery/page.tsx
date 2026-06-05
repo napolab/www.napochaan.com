@@ -16,12 +16,30 @@ const heading = css({ fontFamily: 'display', fontSize: 'h2' });
 const caption = css({ fontFamily: 'mono', fontSize: 'xs', color: 'fg.muted', mb: '4', letterSpacing: 'wide', textTransform: 'uppercase' });
 
 const items: GalleryItem[] = [
-  { id: '1', src: flyerBooth0424.src, alt: 'Booth² 2026.04.24 イベントフライヤー', width: flyerBooth0424.width, height: flyerBooth0424.height, span: 'portrait' },
-  { id: '2', src: vrchatWide.src, alt: 'VRChat ライブ会場の光跡ショット', width: vrchatWide.width, height: vrchatWide.height, span: 'wide' },
-  { id: '3', src: vrchatSquare.src, alt: 'VRChat アバターのフレーミングポーズ', width: vrchatSquare.width, height: vrchatSquare.height, span: 'square' },
-  { id: '4', src: flyerBooth0523.src, alt: 'Booth² 2026.05.23 イベントフライヤー', width: flyerBooth0523.width, height: flyerBooth0523.height, span: 'tall' },
-  { id: '5', src: vrchatGlitch.src, alt: 'VRChat アバターのグリッチビジュアル', width: vrchatGlitch.width, height: vrchatGlitch.height, span: 'portrait' },
-  { id: '6', src: vrchatAlice.src, alt: 'VRChat アバター ALICE ポートレート', width: vrchatAlice.width, height: vrchatAlice.height, span: 'square' },
+  {
+    id: '1',
+    src: flyerBooth0424.src,
+    alt: 'Booth² 2026.04.24 イベントフライヤー',
+    width: flyerBooth0424.width,
+    height: flyerBooth0424.height,
+    area: 'lead',
+    caption: 'flyer / 04.24',
+    objectPosition: 'top',
+  },
+  { id: '2', src: vrchatWide.src, alt: 'VRChat ライブ会場の光跡ショット', width: vrchatWide.width, height: vrchatWide.height, area: 'wide', caption: 'VRChat' },
+  { id: '3', src: vrchatSquare.src, alt: 'VRChat アバターのフレーミングポーズ', width: vrchatSquare.width, height: vrchatSquare.height, area: 'square', caption: 'frame' },
+  { id: '4', src: vrchatAlice.src, alt: 'VRChat アバター ALICE ポートレート', width: vrchatAlice.width, height: vrchatAlice.height, area: 'inset', caption: 'ALICE', objectPosition: 'top' },
+  {
+    id: '5',
+    src: flyerBooth0523.src,
+    alt: 'Booth² 2026.05.23 イベントフライヤー',
+    width: flyerBooth0523.width,
+    height: flyerBooth0523.height,
+    area: 'sub',
+    caption: 'flyer / 05.23',
+    objectPosition: 'top',
+  },
+  { id: '6', src: vrchatGlitch.src, alt: 'VRChat アバターのグリッチビジュアル', width: vrchatGlitch.width, height: vrchatGlitch.height, area: 'column', caption: 'glitch', objectPosition: 'center' },
 ];
 
 const GalleryShowcase = () => {
@@ -29,7 +47,7 @@ const GalleryShowcase = () => {
     <main className={wrap}>
       <h1 className={heading}>Gallery</h1>
       <section aria-label="Photo grid">
-        <p className={caption}>grid-snap variable-span — click any image to open lightbox</p>
+        <p className={caption}>editorial tiled grid — click any image to open lightbox</p>
         <Gallery items={items} />
       </section>
     </main>

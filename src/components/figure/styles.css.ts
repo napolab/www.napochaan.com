@@ -9,6 +9,14 @@ export const root = css({
   m: '0',
 });
 
+// Fill the figure's content width so the image never leaves gaps when a wider
+// caption stretches the box. height: auto keeps the aspect ratio (no crop).
+export const image = css({
+  display: 'block',
+  width: 'full',
+  height: 'auto',
+});
+
 export const caption = css({
   display: 'block',
   fontFamily: 'mono',
