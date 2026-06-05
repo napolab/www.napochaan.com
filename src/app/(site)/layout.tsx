@@ -1,4 +1,3 @@
-import { clsx } from '@utils/clsx';
 import { getRequestOrigin } from '@utils/request-url';
 import { fontVariables } from '@themes/fonts';
 import { ThemeProvider } from '@themes/provider';
@@ -13,7 +12,7 @@ export const viewport: Viewport = {
   viewportFit: 'cover',
   initialScale: 1,
   width: 'device-width',
-  themeColor: 'oklch(0.550 0.2500 320)',
+  themeColor: 'oklch(0.490 0.287 266)',
 };
 
 export const generateMetadata = async (): Promise<Metadata> => {
@@ -49,7 +48,10 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 export default async function SiteLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ja" className={clsx('dark', fontVariables)}>
+    <html lang="ja" className={fontVariables}>
+      <head>
+        <link rel="stylesheet" href="https://use.typekit.net/izz7men.css" />
+      </head>
       <ThemeProvider asChild>
         <body>{children}</body>
       </ThemeProvider>
