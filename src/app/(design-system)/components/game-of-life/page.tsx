@@ -1,0 +1,26 @@
+import { css } from '@styled/css';
+
+import { GameOfLife } from '@components/game-of-life';
+
+const wrap = css({ position: 'relative', zIndex: 'dropdown', p: 'page' });
+const heading = css({ fontFamily: 'display', fontSize: 'h2' });
+const caption = css({ fontFamily: 'mono', fontSize: 'xs', color: 'fg.muted', marginTop: 'element' });
+
+const GameOfLifeShowcase = () => {
+  return (
+    <>
+      <GameOfLife />
+      <main className={wrap}>
+        <h1 className={heading}>GameOfLife</h1>
+        <section aria-label="Preview">
+          <p className={caption}>
+            A decorative Conway&apos;s Game of Life canvas rendered at position:fixed with inset:24px (inside the 4-edge typography band). It runs at ~7fps, pauses when the tab is hidden or the canvas
+            scrolls offscreen (IntersectionObserver), and draws one static generation under prefers-reduced-motion. All cleanup (rAF, event listeners, observer) runs on unmount.
+          </p>
+        </section>
+      </main>
+    </>
+  );
+};
+
+export default GameOfLifeShowcase;
