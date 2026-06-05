@@ -33,8 +33,9 @@ type RafState = {
 
 export const GameOfLife = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const engine = useLifeEngine();
   const isClient = useIsClient();
+
+  const engine = useLifeEngine();
   const reduced = useMemo(() => (isClient ? matchMedia('(prefers-reduced-motion: reduce)').matches : false), [isClient]);
 
   // Effect 1: Resize — sizes the canvas and calls engine.resize on window resize
@@ -79,39 +80,37 @@ export const GameOfLife = () => {
     const canvas = canvasRef.current;
     if (canvas === null) return;
 
-    const rafState: RafState = { raf: 0, last: 0, acc: 0 };
+    const state: RafState = { raf: 0, last: 0, acc: 0 };
 
     const tick = (t: number) => {
-      if (rafState.last === 0) rafState.last = t;
-      rafState.acc += t - rafState.last;
-      rafState.last = t;
-      if (rafState.acc >= FRAME_INTERVAL) {
-        rafState.acc %= FRAME_INTERVAL;
+      if (state.last === 0) state.last = t;
+      state.acc += t - state.last;
+      state.last = t;
+      if (state.acc >= FRAME_INTERVAL) {
+        state.acc %= FRAME_INTERVAL;
         const ctx = canvas.getContext('2d', { alpha: true });
         if (ctx !== null) {
           drawCells(ctx, engine.tick());
         }
       }
-      rafState.raf = requestAnimationFrame(tick);
+      state.raf = requestAnimationFrame(tick);
     };
 
     const start = () => {
-      rafState.last = 0;
-      rafState.raf = requestAnimationFrame(tick);
+      state.last = 0;
+      state.raf = requestAnimationFrame(tick);
     };
     const stop = () => {
-      cancelAnimationFrame(rafState.raf);
+      cancelAnimationFrame(state.raf);
     };
     const onVisibilityChange = () => {
-      if (document.hidden) {
-        stop();
-        return;
-      }
-      start();
+      const fn = document.hidden ? stop : start;
+      fn();
     };
 
     start();
     document.addEventListener('visibilitychange', onVisibilityChange);
+
     return () => {
       stop();
       document.removeEventListener('visibilitychange', onVisibilityChange);
