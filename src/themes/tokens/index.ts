@@ -1,67 +1,6 @@
 import { defineSemanticTokens, defineTokens } from '@pandacss/dev';
 
 // ---------------------------------------------------------------------------
-// oklch Scale Generator
-// ---------------------------------------------------------------------------
-// Shift the entire palette by changing Hue and Chroma alone.
-// Steps: 1-2 bg, 3-5 states, 6-8 borders, 9-10 fills, 11-12 text (Radix pattern)
-
-type ScaleEntry = { value: string };
-type Scale12 = Record<number, ScaleEntry>;
-
-const oklchScale = (hue: number, peakChroma: number, peakL = 0.45): Scale12 => {
-  const top = 0.99 - peakL;
-
-  const curve: [number, number][] = [
-    [peakL + top * 0.99, 0.015],
-    [peakL + top * 0.95, 0.04],
-    [peakL + top * 0.88, 0.09],
-    [peakL + top * 0.8, 0.15],
-    [peakL + top * 0.7, 0.23],
-    [peakL + top * 0.57, 0.35],
-    [peakL + top * 0.4, 0.52],
-    [peakL + top * 0.19, 0.76],
-    [peakL, 1.0],
-    [peakL * 0.88, 0.92],
-    [peakL * 0.75, 0.78],
-    [peakL * 0.5, 0.5],
-  ];
-
-  return Object.fromEntries(curve.map(([l, cr], i) => [i + 1, { value: `oklch(${l.toFixed(3)} ${(peakChroma * cr).toFixed(4)} ${hue})` }])) as Scale12;
-};
-
-const grayScale = (hue: number): Scale12 => {
-  const curve: [number, number][] = [
-    [0.99, 0.003],
-    [0.975, 0.005],
-    [0.94, 0.008],
-    [0.905, 0.01],
-    [0.865, 0.01],
-    [0.825, 0.01],
-    [0.755, 0.012],
-    [0.67, 0.013],
-    [0.555, 0.014],
-    [0.51, 0.014],
-    [0.42, 0.014],
-    [0.2, 0.015],
-  ];
-
-  return Object.fromEntries(curve.map(([l, c], i) => [i + 1, { value: `oklch(${l.toFixed(3)} ${c.toFixed(4)} ${hue})` }])) as Scale12;
-};
-
-// ---------------------------------------------------------------------------
-// Brand Hue Definitions
-// ---------------------------------------------------------------------------
-const HUE = {
-  brand: 320, // napochaan pink/magenta
-  violet: 290,
-  cyan: 210,
-  red: 27,
-  green: 145,
-  yellow: 80,
-} as const;
-
-// ---------------------------------------------------------------------------
 // Primitive Tokens
 // ---------------------------------------------------------------------------
 export const tokens = defineTokens({
@@ -69,13 +8,48 @@ export const tokens = defineTokens({
     white: { value: 'oklch(1.000 0 0)' },
     black: { value: 'oklch(0.000 0 0)' },
 
-    pink: oklchScale(HUE.brand, 0.25, 0.55),
-    gray: grayScale(HUE.brand),
-    violet: oklchScale(HUE.violet, 0.27, 0.45),
-    cyan: oklchScale(HUE.cyan, 0.14, 0.58),
-    red: oklchScale(HUE.red, 0.2, 0.52),
-    green: oklchScale(HUE.green, 0.17, 0.52),
-    yellow: oklchScale(HUE.yellow, 0.17, 0.7),
+    gray: {
+      1: { value: 'oklch(0.963 0.003 265)' },
+      2: { value: 'oklch(0.945 0.004 265)' },
+      3: { value: 'oklch(0.918 0.005 265)' },
+      4: { value: 'oklch(0.900 0.006 265)' },
+      5: { value: 'oklch(0.884 0.007 265)' },
+      6: { value: 'oklch(0.845 0.008 265)' },
+      7: { value: 'oklch(0.785 0.010 265)' },
+      8: { value: 'oklch(0.700 0.013 265)' },
+      9: { value: 'oklch(0.560 0.016 265)' },
+      10: { value: 'oklch(0.510 0.017 265)' },
+      11: { value: 'oklch(0.430 0.018 265)' },
+      12: { value: 'oklch(0.145 0.020 265)' },
+    },
+    blue: {
+      1: { value: 'oklch(0.972 0.012 266)' },
+      2: { value: 'oklch(0.955 0.024 266)' },
+      3: { value: 'oklch(0.925 0.046 266)' },
+      4: { value: 'oklch(0.892 0.070 266)' },
+      5: { value: 'oklch(0.850 0.100 266)' },
+      6: { value: 'oklch(0.788 0.142 266)' },
+      7: { value: 'oklch(0.700 0.192 266)' },
+      8: { value: 'oklch(0.600 0.245 266)' },
+      9: { value: 'oklch(0.490 0.287 266)' },
+      10: { value: 'oklch(0.450 0.270 266)' },
+      11: { value: 'oklch(0.520 0.225 266)' },
+      12: { value: 'oklch(0.330 0.150 266)' },
+    },
+    red: {
+      1: { value: 'oklch(0.972 0.013 25)' },
+      2: { value: 'oklch(0.957 0.024 25)' },
+      3: { value: 'oklch(0.930 0.044 25)' },
+      4: { value: 'oklch(0.898 0.066 25)' },
+      5: { value: 'oklch(0.858 0.098 25)' },
+      6: { value: 'oklch(0.800 0.140 25)' },
+      7: { value: 'oklch(0.728 0.182 25)' },
+      8: { value: 'oklch(0.672 0.225 25)' },
+      9: { value: 'oklch(0.630 0.256 25)' },
+      10: { value: 'oklch(0.585 0.250 25)' },
+      11: { value: 'oklch(0.530 0.205 25)' },
+      12: { value: 'oklch(0.350 0.130 25)' },
+    },
   },
 
   spacing: {
