@@ -1,0 +1,147 @@
+name = "napochaan-website"
+# account_id = "REPLACE_WITH_YOUR_CLOUDFLARE_ACCOUNT_ID" # TODO: set before deploy
+main = "./worker/worker.ts"
+compatibility_date = "2025-08-15"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+preview_urls = false
+
+[vars]
+BASE_URL = "http://localhost:3000"
+
+[[rules]]
+type = "Data"
+globs = ["**/*.ttf", "**/*.otf"]
+fallthrough = true
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[images]
+binding = "IMAGES"
+
+# ===== Payload CMS =====
+
+[[d1_databases]]
+binding = "D1"
+database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cms-dev
+database_name = "napochaan-cms-dev"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "napochaan-cms-dev" # TODO: wrangler r2 bucket create napochaan-cms-dev
+
+# ===== Cache (OpenNext) =====
+
+[[services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "napochaan-website"
+
+[[r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "napochaan-cache-dev" # TODO: wrangler r2 bucket create napochaan-cache-dev
+
+[[durable_objects.bindings]]
+name = "NEXT_CACHE_DO_QUEUE"
+class_name = "DOQueueHandler"
+
+[[d1_databases]]
+binding = "NEXT_TAG_CACHE_D1"
+database_name = "napochaan-cache-dev"
+database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cache-dev
+
+# ===== Durable Objects Migrations =====
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DOQueueHandler"]
+
+# ===== Test Environment =====
+# Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
+# `compatibility_date`, and `compatibility_flags` from the top level. Bindings
+# (D1/R2/DO/services) are NOT inherited, keeping the worker test runtime minimal.
+# `assets` IS inherited, so override it to a directory that exists at test time
+# (`.open-next/assets` is a build artifact that is absent during tests).
+[env.test]
+
+[env.test.assets]
+directory = "public"
+binding = "ASSETS"
+
+# ===== Staging Environment =====
+
+[env.staging]
+workers_dev = false
+preview_urls = false
+
+[env.staging.vars]
+BASE_URL = "https://stg.napochaan.com"
+
+[env.staging.images]
+binding = "IMAGES"
+
+[[env.staging.d1_databases]]
+binding = "D1"
+database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cms-staging
+database_name = "napochaan-cms-staging"
+remote = true
+
+[[env.staging.r2_buckets]]
+binding = "R2"
+bucket_name = "napochaan-cms-staging" # TODO: wrangler r2 bucket create napochaan-cms-staging
+
+[[env.staging.services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "napochaan-website-staging"
+
+[[env.staging.r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "napochaan-cache-staging" # TODO: wrangler r2 bucket create napochaan-cache-staging
+
+[[env.staging.durable_objects.bindings]]
+name = "NEXT_CACHE_DO_QUEUE"
+class_name = "DOQueueHandler"
+
+[[env.staging.d1_databases]]
+binding = "NEXT_TAG_CACHE_D1"
+database_name = "napochaan-cache-staging"
+database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cache-staging
+
+# ===== Production Environment =====
+
+[env.production]
+workers_dev = false
+preview_urls = false
+
+[env.production.vars]
+BASE_URL = "https://www.napochaan.com"
+
+[env.production.images]
+binding = "IMAGES"
+
+[[env.production.d1_databases]]
+binding = "D1"
+database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cms-production
+database_name = "napochaan-cms-production"
+remote = true
+
+[[env.production.r2_buckets]]
+binding = "R2"
+bucket_name = "napochaan-cms-production" # TODO: wrangler r2 bucket create napochaan-cms-production
+
+[[env.production.services]]
+binding = "WORKER_SELF_REFERENCE"
+service = "napochaan-website-production"
+
+[[env.production.r2_buckets]]
+binding = "NEXT_INC_CACHE_R2_BUCKET"
+bucket_name = "napochaan-cache-production" # TODO: wrangler r2 bucket create napochaan-cache-production
+
+[[env.production.durable_objects.bindings]]
+name = "NEXT_CACHE_DO_QUEUE"
+class_name = "DOQueueHandler"
+
+[[env.production.d1_databases]]
+binding = "NEXT_TAG_CACHE_D1"
+database_name = "napochaan-cache-production"
+database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cache-production

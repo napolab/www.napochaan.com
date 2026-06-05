@@ -1,0 +1,34 @@
+node_modules
+.next
+out
+dist
+styled-system
+
+# Cloudflare / OpenNext
+.open-next/
+.wrangler/
+.dev.vars
+.env
+.env.*
+cloudflare-env.d.ts
+worker-configuration.d.ts
+
+# Logs
+*.log
+
+# Screenshots (dogfooding artifacts)
+/*.png
+
+# Git worktrees
+.worktrees/
+.claude/worktrees/
+
+# Claude Code
+**/CLAUDE.md
+!/CLAUDE.md
+
+# Superpowers brainstorm artifacts
+.superpowers/brainstorm/
+tsconfig.tsbuildinfo
+.vitest-attachments
+.playwright-mcp

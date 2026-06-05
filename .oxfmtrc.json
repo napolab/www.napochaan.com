@@ -1,0 +1,9 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "tabWidth": 2,
+  "printWidth": 200,
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "all",
+  "ignorePatterns": ["styled-system/**/*", ".open-next/**/*", ".wrangler/**/*", ".next/**/*", ".claude/**/*", "**/CLAUDE.md", "migrations/**/*"]
+}

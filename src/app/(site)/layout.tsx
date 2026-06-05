@@ -1,0 +1,58 @@
+import { clsx } from '@utils/clsx';
+import { getRequestOrigin } from '@utils/request-url';
+import { fontVariables } from '@themes/fonts';
+import { ThemeProvider } from '@themes/provider';
+
+import type { Metadata, Viewport } from 'next';
+import type { ReactNode } from 'react';
+
+const siteName = 'napochaan';
+const description = 'napochaan の個人サイト。';
+
+export const viewport: Viewport = {
+  viewportFit: 'cover',
+  initialScale: 1,
+  width: 'device-width',
+  themeColor: 'oklch(0.550 0.2500 320)',
+};
+
+export const generateMetadata = async (): Promise<Metadata> => {
+  const origin = await getRequestOrigin();
+  const isProduction = origin === 'https://www.napochaan.com';
+
+  return {
+    title: {
+      default: siteName,
+      template: `%s — ${siteName}`,
+    },
+    description,
+    metadataBase: new URL(origin),
+    alternates: {
+      canonical: '/',
+    },
+    robots: isProduction ? undefined : { index: false, follow: false },
+    openGraph: {
+      type: 'website',
+      siteName,
+      title: siteName,
+      description,
+      url: origin,
+      locale: 'ja_JP',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteName,
+      description,
+    },
+  };
+};
+
+export default async function SiteLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="ja" className={clsx('dark', fontVariables)}>
+      <ThemeProvider asChild>
+        <body>{children}</body>
+      </ThemeProvider>
+    </html>
+  );
+}

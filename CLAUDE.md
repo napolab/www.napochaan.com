@@ -15,6 +15,8 @@
 - husky で commit 時に lint, typecheck を実行すること
 - 勝手に commit しないこと
 - 実装は小さいタスクに分けて実装すること。実装が終わったら difit を起動して私に review 依頼すること
+- review で繰り返し受けた内容は rules, skills にすることで永続化して
+    - review の内容はまず memory に記憶して繰り返し指摘されるものは skills にすること
 
 
 ## coding rules
