@@ -2,19 +2,31 @@
 
 import { useEffect, useRef } from 'react';
 
-import { createGrid, seedRandom, step, countAlive } from './life';
+import { createLifeEngine, type LifeEngine, type LifeState } from './engine';
 import * as styles from './styles.css';
 
-type LoopState = {
+type CanvasState = {
   raf: number;
   last: number;
   acc: number;
-  grid: ReturnType<typeof createGrid>;
+  engine: LifeEngine | null;
 };
 
 const CELL = 24;
 const FRAME_INTERVAL = 1000 / 7;
-const SEED_DENSITY = 0.16;
+
+const drawCells = (ctx: CanvasRenderingContext2D, state: LifeState) => {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  const { cols, cells } = state;
+  for (const i of cells.keys()) {
+    if (cells[i] !== 1) continue;
+    const cx = i % cols;
+    const cy = Math.floor(i / cols);
+    const red = (cx * 31 + cy * 17) % 23 === 0;
+    ctx.fillStyle = red ? 'rgba(255,0,43,0.10)' : 'rgba(26,52,255,0.11)';
+    ctx.fillRect(cx * CELL + 1, cy * CELL + 1, CELL - 2, CELL - 2);
+  }
+};
 
 export const GameOfLife = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -29,11 +41,11 @@ export const GameOfLife = () => {
 
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const state: LoopState = {
+    const state: CanvasState = {
       raf: 0,
       last: 0,
       acc: 0,
-      grid: createGrid(1, 1),
+      engine: null,
     };
 
     const resize = () => {
@@ -47,40 +59,22 @@ export const GameOfLife = () => {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const cols = Math.ceil(w / CELL) + 1;
       const rows = Math.ceil(h / CELL) + 1;
-      state.grid = seedRandom(createGrid(cols, rows), SEED_DENSITY, Math.random);
+      if (state.engine === null) {
+        state.engine = createLifeEngine({ cols, rows });
+      } else {
+        state.engine.resize(cols, rows);
+      }
       state.last = 0;
       state.acc = 0;
-    };
-
-    const draw = () => {
-      ctx.clearRect(0, 0, innerWidth, innerHeight);
-      const { cols, cells } = state.grid;
-      for (const i of cells.keys()) {
-        if (cells[i] !== 1) continue;
-        const cx = i % cols;
-        const cy = Math.floor(i / cols);
-        const red = (cx * 31 + cy * 17) % 23 === 0;
-        ctx.fillStyle = red ? 'rgba(255,0,43,0.10)' : 'rgba(26,52,255,0.11)';
-        ctx.fillRect(cx * CELL + 1, cy * CELL + 1, CELL - 2, CELL - 2);
-      }
-    };
-
-    const advance = () => {
-      state.grid = step(state.grid);
-      const alive = countAlive(state.grid);
-      if (alive < state.grid.cols * state.grid.rows * 0.02) {
-        state.grid = seedRandom(state.grid, SEED_DENSITY, Math.random);
-      }
     };
 
     const loop = (t: number) => {
       if (state.last === 0) state.last = t;
       state.acc += t - state.last;
       state.last = t;
-      if (state.acc >= FRAME_INTERVAL) {
+      if (state.acc >= FRAME_INTERVAL && state.engine !== null) {
         state.acc %= FRAME_INTERVAL;
-        advance();
-        draw();
+        drawCells(ctx, state.engine.tick());
       }
       state.raf = requestAnimationFrame(loop);
     };
@@ -97,7 +91,9 @@ export const GameOfLife = () => {
     };
 
     resize();
-    draw();
+    if (state.engine !== null) {
+      drawCells(ctx, state.engine.getState());
+    }
 
     if (!reduced) {
       start();
@@ -128,7 +124,9 @@ export const GameOfLife = () => {
     const onResize = () => {
       stop();
       resize();
-      draw();
+      if (state.engine !== null) {
+        drawCells(ctx, state.engine.getState());
+      }
       if (!reduced) start();
     };
 
