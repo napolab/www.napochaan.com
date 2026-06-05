@@ -1,19 +1,15 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+
+import { useRafLoop } from '@hooks/use-raf-loop';
+import { useWindowResize } from '@hooks/use-window-resize';
 
 import { createLifeEngine, type LifeEngine, type LifeState } from './engine';
 import * as styles from './styles.css';
 
-type CanvasState = {
-  raf: number;
-  last: number;
-  acc: number;
-  engine: LifeEngine | null;
-};
-
 const CELL = 24;
-const FRAME_INTERVAL = 1000 / 7;
+const FPS = 7;
 
 const drawCells = (ctx: CanvasRenderingContext2D, state: LifeState) => {
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -28,109 +24,101 @@ const drawCells = (ctx: CanvasRenderingContext2D, state: LifeState) => {
   }
 };
 
+type EngineRef = {
+  engine: LifeEngine | null;
+};
+
 export const GameOfLife = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const engineRef = useRef<EngineRef>({ engine: null });
 
-  useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: Required for imperative canvas 2D drawing and rAF loop
+  const reduced = useRef(typeof window !== 'undefined' ? matchMedia('(prefers-reduced-motion: reduce)').matches : false);
+
+  const [active, setActive] = useState(false);
+
+  const resize = useCallback(() => {
+    // USEEFFECT_JUSTIFICATION: imperative canvas sizing and engine create/resize on layout change
     const canvas = canvasRef.current;
     if (canvas === null) return;
-
     const ctx = canvas.getContext('2d', { alpha: true });
     if (ctx === null) return;
 
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const dpr = Math.min(devicePixelRatio ?? 1, 2);
+    const w = innerWidth - 48;
+    const h = innerHeight - 48;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${h}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const state: CanvasState = {
-      raf: 0,
-      last: 0,
-      acc: 0,
-      engine: null,
-    };
+    const cols = Math.ceil(w / CELL) + 1;
+    const rows = Math.ceil(h / CELL) + 1;
 
-    const resize = () => {
-      const dpr = Math.min(devicePixelRatio ?? 1, 2);
-      const w = innerWidth - 48;
-      const h = innerHeight - 48;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const cols = Math.ceil(w / CELL) + 1;
-      const rows = Math.ceil(h / CELL) + 1;
-      if (state.engine === null) state.engine = createLifeEngine({ cols, rows });
-      else state.engine.resize(cols, rows);
-      state.last = 0;
-      state.acc = 0;
-    };
+    if (engineRef.current.engine === null) {
+      engineRef.current.engine = createLifeEngine({ cols, rows });
+    } else {
+      engineRef.current.engine.resize(cols, rows);
+    }
 
-    const loop = (t: number) => {
-      if (state.last === 0) state.last = t;
-      state.acc += t - state.last;
-      state.last = t;
-      if (state.acc >= FRAME_INTERVAL && state.engine !== null) {
-        state.acc %= FRAME_INTERVAL;
-        drawCells(ctx, state.engine.tick());
+    const { engine } = engineRef.current;
+    drawCells(ctx, engine.getState());
+  }, []);
+
+  const tick = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (canvas === null) return;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (ctx === null) return;
+    const { engine } = engineRef.current;
+    if (engine === null) return;
+    drawCells(ctx, engine.tick());
+  }, []);
+
+  useWindowResize(resize);
+
+  useRafLoop(tick, { fps: FPS, active });
+
+  // Visibility change: pause when tab is hidden
+  useEffect(() => {
+    // USEEFFECT_JUSTIFICATION: Required for document.visibilitychange imperative event subscription
+    if (reduced.current) return;
+
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        setActive(false);
+      } else {
+        setActive(true);
       }
-      state.raf = requestAnimationFrame(loop);
     };
 
-    const start = () => {
-      if (state.raf !== 0) return;
-      state.last = 0;
-      state.raf = requestAnimationFrame(loop);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
+  }, []);
 
-    const stop = () => {
-      cancelAnimationFrame(state.raf);
-      state.raf = 0;
-    };
-
-    resize();
-    if (state.engine !== null) {
-      drawCells(ctx, state.engine.getState());
-    }
-
-    if (!reduced) {
-      start();
-    }
+  // IntersectionObserver: pause when off-screen; start when in view
+  useEffect(() => {
+    // USEEFFECT_JUSTIFICATION: Required for IntersectionObserver imperative API
+    const canvas = canvasRef.current;
+    if (canvas === null) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
         if (entry === undefined) return;
-        if (!entry.isIntersecting) return stop();
-        if (!reduced) start();
+        if (!entry.isIntersecting) {
+          setActive(false);
+        } else if (!reduced.current) {
+          setActive(true);
+        }
       },
       { threshold: 0 },
     );
+
     observer.observe(canvas);
-
-    const onVisibilityChange = () => {
-      if (document.hidden) {
-        stop();
-      } else if (!reduced) {
-        start();
-      }
-    };
-
-    const onResize = () => {
-      stop();
-      resize();
-      if (state.engine !== null) {
-        drawCells(ctx, state.engine.getState());
-      }
-      if (!reduced) start();
-    };
-
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    addEventListener('resize', onResize);
-
     return () => {
-      cancelAnimationFrame(state.raf);
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      removeEventListener('resize', onResize);
       observer.disconnect();
     };
   }, []);
