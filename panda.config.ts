@@ -51,6 +51,9 @@ export default defineConfig({
             transform: 'translateX(-1px)',
           },
         },
+        marquee: {
+          to: { transform: 'translateX(-50%)' },
+        },
       },
     },
   },
