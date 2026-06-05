@@ -1,9 +1,9 @@
-import * as styles from '../styles.css';
+import * as styles from './styles.css';
 
 import type { SerializedLexicalNode } from '@payloadcms/richtext-lexical/lexical';
 import type { JSXConverter, JSXConverters } from '@payloadcms/richtext-lexical/react';
 
-import type { NodeTypes } from './types';
+import type { NodeTypes } from '../types';
 
 // Lexical's `code` block node is not in Payload's DefaultNodeTypes (it comes
 // from @lexical/code). We register it via the string-keyed index signature so

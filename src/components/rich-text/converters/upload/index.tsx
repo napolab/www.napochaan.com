@@ -2,7 +2,7 @@ import { Figure } from '@components/figure';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
-import type { NodeTypes } from './types';
+import type { NodeTypes } from '../types';
 
 /**
  * Renders Lexical upload nodes using the project's `Figure` primitive.

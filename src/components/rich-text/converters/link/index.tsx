@@ -1,8 +1,8 @@
-import * as styles from '../styles.css';
+import * as styles from './styles.css';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
-import type { NodeTypes } from './types';
+import type { NodeTypes } from '../types';
 
 // Allow only safe URL schemes. `node.fields.url` is author-controlled (CMS),
 // and React does not sanitize the href scheme, so an authored `javascript:`/`data:`

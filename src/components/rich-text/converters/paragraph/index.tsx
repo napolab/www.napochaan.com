@@ -1,8 +1,8 @@
-import * as styles from '../styles.css';
+import * as styles from './styles.css';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
-import type { NodeTypes } from './types';
+import type { NodeTypes } from '../types';
 
 /**
  * Renders Lexical paragraph nodes as styled `<p>` elements.

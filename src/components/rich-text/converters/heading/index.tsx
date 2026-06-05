@@ -1,10 +1,10 @@
 import { Heading } from '@components/heading';
 
-import { headingText, slugifyHeading } from '../heading-toc';
+import { headingText, slugifyHeading } from '../../heading-toc';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
-import type { NodeTypes } from './types';
+import type { NodeTypes } from '../types';
 
 const tagToLevel = (tag: string): 1 | 2 | 3 | 4 | 5 | 6 => {
   switch (tag) {

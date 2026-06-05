@@ -1,9 +1,9 @@
-import * as styles from '../styles.css';
+import * as styles from './styles.css';
 
 import type { ReactNode } from 'react';
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
-import type { NodeTypes } from './types';
+import type { NodeTypes } from '../types';
 
 // Standard Lexical text-format bitmasks
 const IS_BOLD = 1;
