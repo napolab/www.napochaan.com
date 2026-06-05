@@ -55,7 +55,7 @@ export const dot = css({
 export const date = css({
   fontFamily: 'mono',
   fontSize: 'xs',
-  lineHeight: 'snug',
+  lineHeight: 'jp',
   color: 'fg.muted',
   flexShrink: '0',
   '&[data-upcoming="true"]': {
@@ -63,10 +63,18 @@ export const date = css({
   },
 });
 
+// label + meta live inside `content` as INLINE text so they wrap together as one block;
+// `date` stays a fixed column. This avoids each piece wrapping as an independent flex child.
+export const content = css({
+  flex: '1',
+  minWidth: '0',
+  margin: '0',
+  lineHeight: 'jp',
+});
+
 export const label = css({
   fontFamily: 'body',
   fontSize: 'sm',
-  lineHeight: 'jp',
   color: 'fg.default',
   '&[data-upcoming="true"]': {
     color: 'accent.text',
@@ -76,6 +84,6 @@ export const label = css({
 export const meta = css({
   fontFamily: 'mono',
   fontSize: 'xs',
-  lineHeight: 'snug',
   color: 'fg.muted',
+  whiteSpace: 'nowrap',
 });

@@ -23,10 +23,12 @@ export const Timeline = ({ items }: Props) => {
             <span className={styles.date} data-upcoming={upcomingAttr}>
               {item.date}
             </span>
-            <span className={styles.label} data-upcoming={upcomingAttr}>
-              {item.label}
-            </span>
-            {item.meta !== undefined ? <span className={styles.meta}>/ {item.meta}</span> : null}
+            <p className={styles.content}>
+              <span className={styles.label} data-upcoming={upcomingAttr}>
+                {item.label}
+              </span>
+              {item.meta !== undefined ? <span className={styles.meta}> / {item.meta}</span> : null}
+            </p>
           </li>
         );
       })}
