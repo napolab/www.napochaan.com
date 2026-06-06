@@ -10,7 +10,7 @@ type Snapshot = {
 const INITIAL: Snapshot = { displayText: '', isDone: false };
 
 // Plausible mistype characters typed during a "thinking" fumble before correction.
-const WRONG_CHARS = 'あいうえおかきくけこさしすせそたちつてとasdfghjkl';
+const WRONG_CHARS = 'あいうえおかきくけこさしすせそたちつてとabcdefghijklmnopqrstuvwxyz0123456789';
 const randomWrong = () => WRONG_CHARS[Math.floor(Math.random() * WRONG_CHARS.length)];
 
 type Phase = 'typing' | 'mistyping' | 'thinking' | 'deleting';
@@ -41,7 +41,7 @@ const createTypewriter = (fullText: string, options: Options) => {
 
   const nextDelay = () => {
     const base = speed * (1 - jitter + Math.random() * jitter * 2);
-    return Math.random() < pauseChance ? base + 320 + Math.random() * 460 : base;
+    return Math.random() < pauseChance ? base + 267 + Math.random() * 383 : base;
   };
 
   const schedule = (delay: number) => {
@@ -49,17 +49,18 @@ const createTypewriter = (fullText: string, options: Options) => {
   };
 
   const tick = () => {
+    m.timer = undefined;
     switch (m.phase) {
       case 'mistyping': {
         if (m.wrong.length < m.target) {
           m.wrong += randomWrong();
           emit(false);
-          schedule(speed * (0.5 + Math.random() * 0.5));
+          schedule(speed * (0.25 + Math.random() * 0.35));
           return;
         }
         // hesitate — "...あれ？"
         m.phase = 'thinking';
-        schedule(420 + Math.random() * 560);
+        schedule(350 + Math.random() * 467);
         return;
       }
       case 'thinking': {
@@ -86,7 +87,7 @@ const createTypewriter = (fullText: string, options: Options) => {
         const nextChar = fullText[m.index];
         if (nextChar !== ' ' && m.index < fullText.length - 1 && Math.random() < typoChance) {
           m.phase = 'mistyping';
-          m.target = 1 + Math.floor(Math.random() * 3); // fumble 1–3 wrong chars
+          m.target = 2 + Math.floor(Math.random() * 3); // fumble 2–4 wrong chars
           schedule(speed * 0.7);
           return;
         }
@@ -111,12 +112,14 @@ const createTypewriter = (fullText: string, options: Options) => {
     },
     finish: () => {
       if (m.timer !== undefined) clearTimeout(m.timer);
+      m.timer = undefined;
       m.index = fullText.length;
       m.wrong = '';
       emit(true);
     },
     stop: () => {
       if (m.timer !== undefined) clearTimeout(m.timer);
+      m.timer = undefined;
     },
   };
 };
@@ -130,7 +133,7 @@ type UseTypewriterOptions = {
 };
 
 export const useTypewriter = (fullText: string, options: UseTypewriterOptions = {}): Snapshot => {
-  const { speed = 55, jitter = 0.6, typoChance = 0.08, pauseChance = 0.06, startWhen = true } = options;
+  const { speed = 46, jitter = 0.6, typoChance = 0.08, pauseChance = 0.06, startWhen = true } = options;
   const [controller] = useState(() => createTypewriter(fullText, { speed, jitter, typoChance, pauseChance }));
   const snapshot = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getServerSnapshot);
 
