@@ -11,9 +11,8 @@ import * as s from './styles.css';
 
 import type { CSSProperties } from 'react';
 
-export type WorkRow = {
+type ArchiveItem = {
   id: string;
-  no: string;
   title: string;
   type: string;
   year: number;
@@ -21,7 +20,7 @@ export type WorkRow = {
 };
 
 type Props = {
-  works: readonly WorkRow[];
+  works: readonly ArchiveItem[];
 };
 
 // The per-spine vertical offset within the sticky stack, driven by the group's
@@ -38,7 +37,7 @@ const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})`
 // unstyled, so s.item fully owns the look. The thumb carries the work title as
 // alt. Rendered from a Server Component as a client leaf (children are
 // server-rendered).
-const WorkItem = ({ work }: { work: WorkRow }) => {
+const WorkItem = ({ work }: { work: ArchiveItem }) => {
   const { thumbnail } = work;
 
   return (

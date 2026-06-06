@@ -2,9 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { groupByYear } from './index';
 
-import type { WorkRow } from '../index';
-
-const works: readonly WorkRow[] = [
+const works = [
   { id: '1', no: '01', title: 'a', type: 'flyer', year: 2024 },
   { id: '2', no: '02', title: 'b', type: 'graphic', year: 2026 },
   { id: '3', no: '03', title: 'c', type: 'vj', year: 2025 },
@@ -40,7 +38,7 @@ describe('groupByYear', () => {
   });
 
   it('handles a single year', () => {
-    const single: readonly WorkRow[] = [{ id: '1', no: '01', title: 'a', type: 'flyer', year: 2025 }];
+    const single = [{ id: '1', no: '01', title: 'a', type: 'flyer', year: 2025 }];
     const groups = groupByYear(single);
 
     expect(groups).toHaveLength(1);

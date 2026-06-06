@@ -1,8 +1,6 @@
-import type { WorkRow } from '../index';
-
-export type YearGroup = {
+export type YearGroup<T> = {
   year: number;
-  items: WorkRow[];
+  items: T[];
 };
 
 // Group works by their `year`, ordered newest-first. Pure: builds a fresh map
@@ -10,7 +8,7 @@ export type YearGroup = {
 // coerces the numeric year into a string property key, so map each key back to a
 // number via parseInt and sort numerically. Membership order within a year
 // follows the input order.
-export const groupByYear = (works: readonly WorkRow[]): YearGroup[] => {
+export const groupByYear = <T extends { year: number }>(works: readonly T[]): YearGroup<T>[] => {
   const byYear = Object.groupBy(works, (work) => work.year);
 
   return Object.entries(byYear)

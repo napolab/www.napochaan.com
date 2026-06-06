@@ -4,9 +4,7 @@ import { page } from 'vitest/browser';
 
 import { WorksArchive } from './index';
 
-import type { WorkRow } from './index';
-
-const works: readonly WorkRow[] = [
+const works = [
   { id: '1', no: '01', title: 'night graphics vol.13', type: 'flyer', year: 2024 },
   { id: '2', no: '02', title: 'key visual', type: 'graphic', year: 2026 },
   { id: '3', no: '03', title: 'stage VJ set', type: 'vj', year: 2025 },
@@ -36,7 +34,7 @@ describe('WorksArchive', () => {
   });
 
   it('labels the thumbnail with the work title', async () => {
-    const withThumb: readonly WorkRow[] = [{ id: '9', no: '09', title: 'thumbed', type: 'flyer', year: 2026, thumbnail: { src: '/x.jpg', width: 80, height: 80 } }];
+    const withThumb = [{ id: '9', no: '09', title: 'thumbed', type: 'flyer', year: 2026, thumbnail: { src: '/x.jpg', width: 80, height: 80 } }];
     const { container } = await render(<WorksArchive works={withThumb} />);
 
     const img = container.querySelector('img');
