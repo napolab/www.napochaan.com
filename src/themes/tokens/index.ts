@@ -50,6 +50,14 @@ export const tokens = defineTokens({
       11: { value: 'oklch(0.530 0.205 25)' },
       12: { value: 'oklch(0.350 0.130 25)' },
     },
+    cursor: {
+      blue: { value: 'oklch(0.490 0.287 266)' },
+      red: { value: 'oklch(0.560 0.230 25)' },
+      violet: { value: 'oklch(0.500 0.250 305)' },
+      teal: { value: 'oklch(0.520 0.130 195)' },
+      magenta: { value: 'oklch(0.540 0.250 340)' },
+      green: { value: 'oklch(0.520 0.170 150)' },
+    },
   },
 
   spacing: {
