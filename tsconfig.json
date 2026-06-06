@@ -23,7 +23,9 @@
       "@utils/*": ["./src/utils/*"],
       "@payload-config": ["./src/payload.config.ts"],
       "@payload-types": ["./src/payload-types.ts"],
-      "@assets/*": ["./src/assets/*"]
+      "@assets/*": ["./src/assets/*"],
+      "@worker/*": ["./worker/*"],
+      "@lib/*": ["./src/lib/*"]
     },
     "plugins": [
       {
