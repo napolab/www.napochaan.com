@@ -10,30 +10,31 @@ import * as styles from './styles.css';
 const formatNow = () => dayjs().tz('Asia/Tokyo').format('HH:mm:ss');
 
 const listeners = new Set<() => void>();
-// Subscription store: these module-level cells are the single allowed `let`
-// exception — a useSyncExternalStore source needs a mutable cached snapshot
-// and a shared interval handle.
-let current = '--:--:--';
-let timer: ReturnType<typeof setInterval> | undefined;
+// Subscription store for useSyncExternalStore: a const cell object holds the
+// cached snapshot and the shared interval handle (mutated, never reassigned).
+const clockStore: { current: string; timer: ReturnType<typeof setInterval> | undefined } = {
+  current: '--:--:--',
+  timer: undefined,
+};
 
 const emit = () => {
-  current = formatNow();
+  clockStore.current = formatNow();
   for (const listener of listeners) listener();
 };
 
 const subscribeClock = (listener: () => void) => {
   listeners.add(listener);
-  if (timer === undefined) timer = setInterval(emit, 1000);
+  if (clockStore.timer === undefined) clockStore.timer = setInterval(emit, 1000);
   return () => {
     listeners.delete(listener);
-    if (listeners.size === 0 && timer !== undefined) {
-      clearInterval(timer);
-      timer = undefined;
+    if (listeners.size === 0 && clockStore.timer !== undefined) {
+      clearInterval(clockStore.timer);
+      clockStore.timer = undefined;
     }
   };
 };
 
-const getClock = () => current;
+const getClock = () => clockStore.current;
 const getServerClock = () => '--:--:--';
 
 const navItems = [
@@ -55,7 +56,7 @@ export const SysBar = () => {
       <header className={styles.root}>
         <nav className={styles.nav}>
           {navItems.map(({ label, href, active }) => (
-            <a key={label} href={href} className={styles.navLink} data-active={active || undefined}>
+            <a key={label} href={href} className={styles.navLink} data-active={active === true ? 'true' : undefined}>
               {label}
             </a>
           ))}
