@@ -27,6 +27,11 @@ export const globalCss: GlobalStyleObject = {
   // The focusRing layerStyle provides the static dashed fallback for reduced-motion.
   // Under motion-safe conditions, the outline is hidden and this ::after renders the animation.
   '@media (prefers-reduced-motion: no-preference)': {
+    // Smooth in-page navigation (e.g. the works year-heading anchors). Gated
+    // under motion-safe so reduced-motion users get instant jumps.
+    html: {
+      scrollBehavior: 'smooth',
+    },
     '*:focus-visible': {
       outlineStyle: 'none',
       position: 'relative',

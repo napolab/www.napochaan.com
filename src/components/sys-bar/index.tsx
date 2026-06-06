@@ -1,64 +1,40 @@
 'use client';
 
-import { useSyncExternalStore } from 'react';
+import { usePathname } from 'next/navigation';
+import { Link } from 'react-aria-components';
 
 import { useLifeState } from '@components/game-of-life/provider';
-import { dayjs } from '@utils/dayjs';
 
+import { isNavActive } from './is-nav-active';
 import * as styles from './styles.css';
+import { useClock } from './use-clock';
 
-const formatNow = () => dayjs().tz('Asia/Tokyo').format('HH:mm:ss');
-
-const listeners = new Set<() => void>();
-// Subscription store for useSyncExternalStore: a const cell object holds the
-// cached snapshot and the shared interval handle (mutated, never reassigned).
-const clockStore: { current: string; timer: ReturnType<typeof setInterval> | undefined } = {
-  current: '--:--:--',
-  timer: undefined,
-};
-
-const emit = () => {
-  clockStore.current = formatNow();
-  for (const listener of listeners) listener();
-};
-
-const subscribeClock = (listener: () => void) => {
-  listeners.add(listener);
-  if (clockStore.timer === undefined) clockStore.timer = setInterval(emit, 1000);
-  return () => {
-    listeners.delete(listener);
-    if (listeners.size === 0 && clockStore.timer !== undefined) {
-      clearInterval(clockStore.timer);
-      clockStore.timer = undefined;
-    }
-  };
-};
-
-const getClock = () => clockStore.current;
-const getServerClock = () => '--:--:--';
-
+// Transitional nav targets: 'index' and 'works' are real pages; the rest jump to
+// home-page sections until their own routes exist (see isNavActive — anchors are
+// never page-active).
 const navItems = [
-  { label: 'index', href: '/', active: true },
-  { label: 'about', href: '#about' },
-  { label: 'works', href: '#works' },
-  { label: 'log', href: '#log' },
-  { label: 'gallery', href: '#gallery' },
-  { label: 'blog', href: '#blog' },
+  { label: 'index', href: '/' },
+  { label: 'about', href: '/#about' },
+  { label: 'works', href: '/works' },
+  { label: 'log', href: '/#log' },
+  { label: 'gallery', href: '/#gallery' },
+  { label: 'blog', href: '/#blog' },
 ];
 
 export const SysBar = () => {
-  const clock = useSyncExternalStore(subscribeClock, getClock, getServerClock);
+  const clock = useClock();
   const state = useLifeState();
+  const pathname = usePathname();
   const gen = `${state.generation}`.padStart(4, '0');
 
   return (
     <>
       <header className={styles.root}>
         <nav className={styles.nav}>
-          {navItems.map(({ label, href, active }) => (
-            <a key={label} href={href} className={styles.navLink} data-active={active === true ? 'true' : undefined}>
+          {navItems.map(({ label, href }) => (
+            <Link key={label} href={href} className={styles.navLink} data-active={isNavActive(pathname, href) ? 'true' : undefined}>
               {label}
-            </a>
+            </Link>
           ))}
         </nav>
         <div className={styles.status}>

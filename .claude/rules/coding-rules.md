@@ -67,10 +67,10 @@ See: @.claude/rules/react.md#async-handler-rules-no-thencatch
 
 ## Tech Stack
 
-- **Framework**: vinext (Vite-based Next.js reimplementation)
+- **Framework**: Next.js 15 (App Router)
 - **UI**: React 19 + Panda CSS
 - **Accessibility**: react-aria-components
-- **Server Components**: @vitejs/plugin-rsc
-- **Build**: Vite 7
+- **Server Components**: Next.js App Router RSC
+- **Build / Deploy**: Next.js build → OpenNext (`@opennextjs/cloudflare`) → Wrangler (Cloudflare Workers)
 - **Linting**: oxlint + oxfmt
 - **Type Check**: @typescript/native-preview (tsgo)
