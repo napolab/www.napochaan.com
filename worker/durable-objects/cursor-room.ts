@@ -9,6 +9,14 @@ type CursorBindings = { Bindings: Cloudflare.Env };
 
 const send = (ws: WebSocket, msg: ServerMessage): void => ws.send(JSON.stringify(msg));
 
+const safeJsonParse = (raw: string): unknown => {
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return undefined;
+  }
+};
+
 export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
   protected count(): number {
     return this.ctx.getWebSockets().length;
@@ -46,7 +54,13 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     if (typeof message !== 'string') return;
     if (message === this.REQUEST_RESPONSE_PAIR.request) return;
 
-    const parsed = ClientMessage.safeParse(JSON.parse(message));
+    const json = safeJsonParse(message);
+    if (json === undefined) {
+      console.warn('[cursor] non-JSON client message ignored');
+      return;
+    }
+
+    const parsed = ClientMessage.safeParse(json);
     if (!parsed.success) {
       console.warn('[cursor] invalid client message', parsed.error.message);
       return;
