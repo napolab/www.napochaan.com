@@ -61,3 +61,77 @@ const square = {
 
 export const squareBlue = css({ ...square, bg: 'accent.solid' });
 export const squareRed = css({ ...square, bg: 'danger.solid' });
+
+// --- Loading skeleton -------------------------------------------------------
+// Mirrors the PageHeader vertical rhythm (same gap / bottom rule / padding) so
+// swapping the real header in does not shift layout (CLS guard). Decorative —
+// the whole tree is aria-hidden.
+//
+// Zero-JS exact sizing: each slot mirrors the REAL element's width-affecting
+// font props (fontFamily/fontSize/lineHeight/letterSpacing/textTransform/
+// fontWeight). In known-text mode it masks the real text (transparent ink on a
+// muted block) so the box reserves the exact width AND height with no DOM
+// measurement. In bar mode (`data-mode="bar"`) it falls back to a one-line-box
+// (`1lh`) of that font at a percentage width.
+export const skeletonRoot = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'block',
+  borderBottomWidth: 'default',
+  borderBottomStyle: 'solid',
+  borderBottomColor: 'border.subtle',
+  paddingBottom: 'block',
+});
+
+// Shared masked-block treatment. Known-text mode hugs the masked text
+// (`max-content`); bar mode overrides width + height via `data-mode="bar"`.
+const skeletonSlot = {
+  display: 'inline-block',
+  color: 'transparent',
+  bg: 'bg.muted',
+  borderRadius: 'none',
+  width: '[max-content]',
+} as const;
+
+// Breadcrumb row placeholder — mono caption (mirrors Breadcrumbs root).
+export const skeletonBreadcrumb = css({
+  ...skeletonSlot,
+  fontFamily: 'mono',
+  fontSize: 'xs',
+  lineHeight: 'snug',
+  '&[data-mode="bar"]': { height: '[1lh]', width: '[40%]' },
+});
+
+// Mono uppercase kicker placeholder (mirrors PageHeader kicker).
+export const skeletonKicker = css({
+  ...skeletonSlot,
+  fontFamily: 'mono',
+  fontSize: 'sm',
+  lineHeight: 'snug',
+  letterSpacing: 'wider',
+  textTransform: 'uppercase',
+  '&[data-mode="bar"]': { height: '[1lh]', width: '[28%]' },
+});
+
+// Hero-echo h1 placeholder — tracked-out display caps that grow h2 → h1
+// (mirrors Heading root + PageHeader title).
+export const skeletonTitle = css({
+  ...skeletonSlot,
+  fontFamily: 'display',
+  fontWeight: 'normal',
+  fontSize: { base: 'h2', desktop: 'h1' },
+  lineHeight: 'tight',
+  letterSpacing: 'wider',
+  textTransform: 'uppercase',
+  '&[data-mode="bar"]': { height: '[1lh]', width: '[60%]' },
+});
+
+// Blockquote lead placeholder — medium body that grows md → lg (mirrors lead).
+export const skeletonLead = css({
+  ...skeletonSlot,
+  fontFamily: 'body',
+  fontWeight: 'medium',
+  fontSize: { base: 'md', desktop: 'lg' },
+  lineHeight: 'jp',
+  '&[data-mode="bar"]': { height: '[1lh]', width: '[80%]' },
+});

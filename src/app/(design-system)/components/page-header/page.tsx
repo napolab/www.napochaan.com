@@ -1,6 +1,7 @@
 import { css } from '@styled/css';
 
 import { PageHeader } from '@components/page-header';
+import { PageHeaderSkeleton } from '@components/page-header/skeleton';
 
 const wrap = css({ display: 'flex', flexDirection: 'column', gap: 'section', p: 'page' });
 const heading = css({ fontFamily: 'display', fontSize: 'h2' });
@@ -9,6 +10,7 @@ const caption = css({ fontFamily: 'mono', fontSize: 'xs', color: 'fg.muted', mar
 const indexCrumbs = [{ href: '/', label: 'home' }, { label: 'archive' }] as const;
 const detailCrumbs = [{ href: '/', label: 'home' }, { href: '/works', label: 'works' }, { label: 'night vol.13' }] as const;
 const minimalCrumbs = [{ href: '/', label: 'home' }, { label: 'about' }] as const;
+const skeletonCrumbs = ['home', 'archive'] as const;
 
 const PageHeaderShowcase = () => {
   return (
@@ -33,6 +35,19 @@ const PageHeaderShowcase = () => {
       <section aria-label="Header without annotation">
         <PageHeader title="about" breadcrumbs={minimalCrumbs} kicker="// who · what · why" lead="napochaan のプロフィールと、いま夢中なこと。" />
         <p className={caption}>Kicker and lead present, no coords annotation.</p>
+      </section>
+      <section aria-label="Known-text loading skeleton">
+        <PageHeaderSkeleton breadcrumbs={skeletonCrumbs} kicker="// archive — graphic·vj·flyer" title="archive" lead="過去の制作物の記録。グリッドの上に並べた、影響と関係のログ。" />
+        <p className={caption}>
+          Known-text <code>PageHeaderSkeleton</code> — passes the static labels per slot. Each placeholder masks the real text, so it reserves the exact width and height with zero JS measurement.
+        </p>
+      </section>
+      <section aria-label="Dynamic loading skeleton">
+        <PageHeaderSkeleton />
+        <p className={caption}>
+          Bare <code>PageHeaderSkeleton</code> — no props, every slot falls back to a one-line (<code>1lh</code>) bar at a percentage width. Mirrors the header rhythm (breadcrumb, kicker, title, lead,
+          bottom rule) to prevent CLS while loading.
+        </p>
       </section>
     </main>
   );
