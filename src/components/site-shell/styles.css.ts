@@ -6,5 +6,7 @@ export const stage = css({
   maxWidth: '[1180px]',
   marginInline: 'auto',
   paddingBlock: '[calc(24px + 20px)]',
-  paddingInline: '[calc(24px + 24px)]',
+  // Clear the fixed 24px TypographyBand on each side, plus breathing room.
+  // Mobile keeps the gap tight (band + 8px) so content fits ≤375px; desktop widens it.
+  paddingInline: { base: '[calc(24px + 8px)]', desktop: '[calc(24px + 24px)]' },
 });

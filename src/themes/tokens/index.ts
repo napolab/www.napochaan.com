@@ -81,7 +81,7 @@ export const tokens = defineTokens({
     h2: { value: 'clamp(1.75rem, 3.5vw, 2.0625rem)' }, // 28→33
     h1: { value: 'clamp(2.0625rem, 5vw, 3.1875rem)' }, // 33→51
     display: { value: 'clamp(3.5rem, 9vw, 6rem)' }, // 56→96
-    hero: { value: 'clamp(4.5rem, 13vw, 10rem)' }, // 72→160
+    hero: { value: 'clamp(2.75rem, 13vw, 10rem)' }, // 44→160 (low floor so the wordmark fits ≤375px)
   },
 
   lineHeights: {
