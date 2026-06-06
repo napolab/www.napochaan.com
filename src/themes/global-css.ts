@@ -15,6 +15,10 @@ export const globalCss: GlobalStyleObject = {
   'h1, h2, h3, h4, h5, h6, p, li, dt, dd, th, td, label, figcaption, blockquote, caption': {
     wordBreak: 'auto-phrase',
   },
+  // Anchor-scroll targets clear the fixed top TypographyBand (24px) plus a gutter.
+  'section[id]': {
+    scrollMarginTop: '[calc(token(sizes.band) + token(spacing.6))]',
+  },
   'h1, h2, h3, h4, h5, h6': { fontFamily: 'display', fontWeight: 'normal' },
   h1: { lineHeight: 'tight', letterSpacing: 'tighter' },
   h2: { lineHeight: 'tight', letterSpacing: 'tight' },

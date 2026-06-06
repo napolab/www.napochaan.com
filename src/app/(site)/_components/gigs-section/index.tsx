@@ -23,7 +23,9 @@ const toTimelineItems = (gigs: Gig[]): TimelineItem[] => gigs.map((gig) => ({ id
 export const GigsSection = ({ id, gigs }: Props) => {
   return (
     <section id={id} className={styles.root}>
-      <SectionHeading no="03">gigs</SectionHeading>
+      <SectionHeading no="03" more="DJ / VJ →" moreHref="/gigs">
+        gigs
+      </SectionHeading>
       <Timeline items={toTimelineItems(gigs)} />
     </section>
   );

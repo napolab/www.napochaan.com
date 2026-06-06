@@ -10,7 +10,7 @@ import * as styles from './styles.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const DEFAULT_TEXT = 'NAPOCHAAN · DJ × VJ · GRAPHIC × DIGITAL · SINCE 2020 · 静かなインターネット · ';
+const DEFAULT_TEXT = 'NAPOCHAAN · DJ × VJ · GRAPHIC × DIGITAL · SINCE 2020 · ';
 const REPEAT_COUNT = 20;
 const VELOCITY_SCALE = 0.04;
 

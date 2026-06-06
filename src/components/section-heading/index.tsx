@@ -11,14 +11,24 @@ type Props = {
   level?: Level;
   children: ReactNode;
   more?: ReactNode;
+  moreHref?: string;
 };
 
-export const SectionHeading = ({ no, level, children, more }: Props) => {
+const MoreLabel = ({ href, children }: { href?: string; children: ReactNode }) => {
+  if (href === undefined) return <span className={styles.more}>{children}</span>;
+  return (
+    <a href={href} className={styles.more}>
+      {children}
+    </a>
+  );
+};
+
+export const SectionHeading = ({ no, level, children, more, moreHref }: Props) => {
   return (
     <div className={styles.root}>
       <span className={styles.no}>{no}</span>
       <Heading level={level ?? 2}>{children}</Heading>
-      {more !== undefined ? <span className={styles.more}>{more}</span> : null}
+      {more !== undefined ? <MoreLabel href={moreHref}>{more}</MoreLabel> : null}
     </div>
   );
 };

@@ -26,7 +26,9 @@ const columns = [
 export const WorksSection = ({ id, works }: Props) => {
   return (
     <section id={id} className={styles.root}>
-      <SectionHeading no="02">works</SectionHeading>
+      <SectionHeading no="02" more="実績 →" moreHref="/works">
+        works
+      </SectionHeading>
       <Table columns={columns} rows={works} />
     </section>
   );

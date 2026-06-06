@@ -5,8 +5,6 @@ export const root = css({
   display: 'flex',
   flexDirection: 'column',
   gap: 'block',
-  paddingBlock: 'section',
-  paddingInline: 'page',
 });
 
 export const kicker = css({

@@ -28,7 +28,9 @@ const NewsTitle = ({ title, href }: { title: string; href?: string }) => {
 export const NewsSection = ({ items }: Props) => {
   return (
     <section className={styles.root}>
-      <SectionHeading no="01">news</SectionHeading>
+      <SectionHeading no="01" more="お知らせ →" moreHref="/news">
+        news
+      </SectionHeading>
       <ol className={styles.log}>
         {items.map((item) => (
           <li key={item.id} className={styles.item}>

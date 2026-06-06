@@ -14,7 +14,9 @@ type Props = {
 export const AboutWhoami = ({ id, skills, now, likes, wants }: Props) => {
   return (
     <section id={id} className={styles.root}>
-      <SectionHeading no="00">about</SectionHeading>
+      <SectionHeading no="00" more="$ whoami" moreHref="/about">
+        about
+      </SectionHeading>
       <div className={styles.who}>
         <p className={styles.prompt}>$ whoami</p>
         <p className={styles.row}>

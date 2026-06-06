@@ -13,7 +13,9 @@ type Props = {
 export const GallerySection = ({ id, items }: Props) => {
   return (
     <section id={id} className={styles.root}>
-      <SectionHeading no="04">gallery</SectionHeading>
+      <SectionHeading no="04" more="flyer / VRChat →" moreHref="/gallery">
+        gallery
+      </SectionHeading>
       <Gallery items={items} />
     </section>
   );
