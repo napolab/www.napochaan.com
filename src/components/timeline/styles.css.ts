@@ -12,14 +12,16 @@ export const root = css({
   gridTemplateColumns: '[max-content 1fr]',
   rowGap: '4',
   columnGap: '3',
+  // 2px accent axis (not a thin gray line) so it reads as the deliberate timeline
+  // spine rather than a misaligned background grid line.
   _before: {
     content: '""',
     position: 'absolute',
-    left: '[calc(var(--sizes-2) / 2 - 0.5px)]',
+    left: '[calc(var(--sizes-2) / 2 - 1px)]',
     top: '0',
     bottom: '0',
-    width: '[1px]',
-    bg: 'border.default',
+    width: '[2px]',
+    bg: 'accent.solid',
   },
 });
 
