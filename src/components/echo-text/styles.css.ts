@@ -36,3 +36,9 @@ export const echoOut = css({
   userSelect: 'none',
   pointerEvents: 'none',
 });
+
+// Trailing accent period — upright (the wordmark is italic) and red.
+export const red = css({
+  color: 'danger.solid',
+  fontStyle: 'normal',
+});

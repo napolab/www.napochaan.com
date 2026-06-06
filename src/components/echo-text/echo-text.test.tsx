@@ -5,8 +5,13 @@ import { page } from 'vitest/browser';
 import { EchoText } from './index';
 
 describe('EchoText', () => {
-  it('renders the text (echo layers hidden from a11y)', async () => {
+  it('renders the wordmark with an accessible label', async () => {
     await render(<EchoText>napochaan</EchoText>);
     await expect.element(page.getByText('napochaan').first()).toBeInTheDocument();
+    await expect.element(page.getByRole('img', { name: 'napochaan' })).toBeInTheDocument();
+  });
+  it('renders the trailing red dot', async () => {
+    await render(<EchoText>napochaan</EchoText>);
+    await expect.element(page.getByText('.', { exact: true })).toBeInTheDocument();
   });
 });
