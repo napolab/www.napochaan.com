@@ -13,4 +13,13 @@ describe('SiteShell', () => {
     );
     await expect.element(page.getByText('hello')).toBeInTheDocument();
   });
+
+  it('renders the site footer', async () => {
+    await render(
+      <SiteShell>
+        <p>hello</p>
+      </SiteShell>,
+    );
+    await expect.element(page.getByRole('contentinfo')).toBeInTheDocument();
+  });
 });

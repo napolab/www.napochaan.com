@@ -3,16 +3,7 @@ import { css } from '@styled/css';
 export const main = css({
   display: 'flex',
   flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  minH: 'svh',
-  gap: '6',
-  paddingInline: 'page',
-  textAlign: 'center',
+  gap: 'section',
 });
 
-export const lead = css({
-  fontSize: 'lg',
-  color: 'fg.muted',
-  maxW: '[40ch]',
-});
+export const srOnly = css({ srOnly: true });

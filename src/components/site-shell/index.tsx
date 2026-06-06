@@ -1,5 +1,6 @@
 import { GameOfLife } from '@components/game-of-life';
 import { LifeEngineProvider } from '@components/game-of-life/provider';
+import { SiteFooter } from '@components/site-footer';
 import { TypographyBand } from '@components/typography-band';
 
 import * as styles from './styles.css';
@@ -12,6 +13,7 @@ export const SiteShell = ({ children }: { children: ReactNode }) => {
       <TypographyBand />
       <GameOfLife />
       <div className={styles.stage}>{children}</div>
+      <SiteFooter />
     </LifeEngineProvider>
   );
 };
