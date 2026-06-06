@@ -23,6 +23,7 @@
 
 - あなたは実装計画、ステークホルダーである私に対して要件のブレがなくなるまで AskUserQuestion で質問することに努め、実装は subagent に任せること
 - 関数は単一責任で実装すること
+- 同時に命令が複数来た時は Task で優先順位をつけて subagent に実装を任せること
 
 
 ## ui rules
@@ -47,6 +48,11 @@ issue, .claude/rules, skills やコードの参考にすること
 
 <--- ここから --->
 <--- ここまで --->
+
+### Cloudflare Durable Object を利用する際に使用できるライブラリ
+
+- https://github.com/napolab/durabcast
+
 
 ## comment rules
 - `<--- ここから --->` `<--- ここまで --->` と書かれている場合はその範囲は commit しないこと
