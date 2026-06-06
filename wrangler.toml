@@ -8,6 +8,7 @@ preview_urls = false
 
 [vars]
 BASE_URL = "http://localhost:3000"
+CURSOR_SALT = "dev-cursor-salt-change-me"
 
 [[rules]]
 type = "Data"
@@ -46,6 +47,10 @@ bucket_name = "napochaan-cache-dev" # TODO: wrangler r2 bucket create napochaan-
 name = "NEXT_CACHE_DO_QUEUE"
 class_name = "DOQueueHandler"
 
+[[durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
+
 [[d1_databases]]
 binding = "NEXT_TAG_CACHE_D1"
 database_name = "napochaan-cache-dev"
@@ -56,6 +61,10 @@ database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create 
 tag = "v1"
 new_sqlite_classes = ["DOQueueHandler"]
 
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["CursorRoom"]
+
 # ===== Test Environment =====
 # Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
 # `compatibility_date`, and `compatibility_flags` from the top level. Bindings
@@ -63,10 +72,25 @@ new_sqlite_classes = ["DOQueueHandler"]
 # `assets` IS inherited, so override it to a directory that exists at test time
 # (`.open-next/assets` is a build artifact that is absent during tests).
 [env.test]
+# Override `main` so the workers test pool does not import the OpenNext build
+# artifact (`.open-next/worker.js`), which is absent during tests. This entry
+# only re-exports the `CursorRoom` Durable Object.
+main = "./worker/worker.test-entry.ts"
+
+[env.test.vars]
+CURSOR_SALT = "test-cursor-salt"
 
 [env.test.assets]
 directory = "public"
 binding = "ASSETS"
+
+[[env.test.durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
+
+[[env.test.migrations]]
+tag = "v1"
+new_sqlite_classes = ["CursorRoom"]
 
 # ===== Staging Environment =====
 
@@ -76,6 +100,7 @@ preview_urls = false
 
 [env.staging.vars]
 BASE_URL = "https://stg.napochaan.com"
+CURSOR_SALT = "stg-cursor-salt-change-me"
 
 [env.staging.images]
 binding = "IMAGES"
@@ -102,6 +127,10 @@ bucket_name = "napochaan-cache-staging" # TODO: wrangler r2 bucket create napoch
 name = "NEXT_CACHE_DO_QUEUE"
 class_name = "DOQueueHandler"
 
+[[env.staging.durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
+
 [[env.staging.d1_databases]]
 binding = "NEXT_TAG_CACHE_D1"
 database_name = "napochaan-cache-staging"
@@ -115,6 +144,7 @@ preview_urls = false
 
 [env.production.vars]
 BASE_URL = "https://napochaan.com"
+CURSOR_SALT = "prod-cursor-salt-change-me"
 
 [env.production.images]
 binding = "IMAGES"
@@ -140,6 +170,10 @@ bucket_name = "napochaan-cache-production" # TODO: wrangler r2 bucket create nap
 [[env.production.durable_objects.bindings]]
 name = "NEXT_CACHE_DO_QUEUE"
 class_name = "DOQueueHandler"
+
+[[env.production.durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
 
 [[env.production.d1_databases]]
 binding = "NEXT_TAG_CACHE_D1"

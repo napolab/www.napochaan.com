@@ -5,6 +5,7 @@ import { createFactory } from 'hono/factory';
 import handler from '../.open-next/worker.js';
 
 import { imageHandlers } from './handlers/images';
+import { cursorRoutes } from './routes/cursors';
 
 type HonoEnv = {
   Bindings: Cloudflare.Env;
@@ -23,6 +24,8 @@ app.get(
   ...imageHandlers,
 );
 
+app.route('/', cursorRoutes);
+
 app.mount('/', handler.fetch as (request: Request, ...args: unknown[]) => Promise<Response>);
 
 export default {
@@ -31,3 +34,4 @@ export default {
 
 // @ts-ignore - Generated at build time by OpenNext
 export { DOQueueHandler } from '../.open-next/worker.js';
+export { CursorRoom } from './durable-objects/cursor-room';
