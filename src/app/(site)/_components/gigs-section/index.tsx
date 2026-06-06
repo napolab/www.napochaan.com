@@ -24,7 +24,7 @@ export const GigsSection = ({ id, gigs }: Props) => {
   return (
     <section id={id} className={styles.root}>
       <SectionHeading no="03" more="DJ / VJ →" moreHref="/gigs">
-        gigs
+        timeline
       </SectionHeading>
       <Timeline items={toTimelineItems(gigs)} />
     </section>

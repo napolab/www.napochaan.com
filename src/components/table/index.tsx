@@ -13,24 +13,27 @@ type Props = {
   caption?: string;
 };
 
+// Explicit ARIA roles preserve table semantics on mobile, where the layout
+// switches to display:block stacked cards (which would otherwise strip the
+// implicit table roles). Each cell carries data-label for its ::before field name.
 export const Table = ({ columns, rows, caption }: Props) => {
   return (
-    <table className={styles.root}>
+    <table role="table" className={styles.root}>
       {caption !== undefined && <caption className={styles.caption}>{caption}</caption>}
-      <thead>
-        <tr>
+      <thead role="rowgroup" className={styles.head}>
+        <tr role="row">
           {columns.map((column) => (
-            <th key={column.key} className={styles.headerCell} scope="col">
+            <th key={column.key} role="columnheader" className={styles.headerCell} scope="col">
               {column.label}
             </th>
           ))}
         </tr>
       </thead>
-      <tbody>
+      <tbody role="rowgroup" className={styles.body}>
         {rows.map((row, rowIndex) => (
-          <tr key={rowIndex} className={styles.row}>
+          <tr key={rowIndex} role="row" className={styles.row}>
             {columns.map((column) => (
-              <td key={column.key} className={styles.cell}>
+              <td key={column.key} role="cell" className={styles.cell} data-label={column.label}>
                 {row[column.key]}
               </td>
             ))}
