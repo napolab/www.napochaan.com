@@ -24,11 +24,12 @@ export const cursor = css({
   },
 });
 
-export const glyph = css({ fontSize: '[16px]', fontWeight: 'bold', lineHeight: 'none' });
+export const glyph = css({ fontSize: '[16px]', fontWeight: 'bold', lineHeight: 'none', color: 'var(--cursor-color)' });
 
 export const label = css({
   paddingInline: '[4px]',
   color: 'white',
+  background: 'var(--cursor-color)',
 });
 
 export const more = css({

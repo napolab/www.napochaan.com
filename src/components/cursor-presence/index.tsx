@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 import { toNormalized, type Rect } from '@lib/cursor/coordinate';
+import { pathToRoom } from '@lib/cursor/room';
 
 import { CursorLayer, type RemoteCursor } from './cursor-layer';
 import { PresenceContextProvider } from './presence-context';
@@ -22,6 +23,7 @@ const readRect = (): Rect | null => {
 
 export const CursorPresence = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
+  const room = useMemo(() => pathToRoom(pathname), [pathname]);
   const [enabled, setEnabled] = useState(true);
   const [count, setCount] = useState(0);
 
@@ -63,7 +65,7 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
     };
   }, [pathname]);
 
-  const socket = useCursorSocket(pathname, {
+  const socket = useCursorSocket(room, {
     onMessage: (msg) => {
       switch (msg.t) {
         case 'welcome':

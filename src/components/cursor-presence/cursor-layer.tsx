@@ -46,13 +46,12 @@ export const CursorLayer = ({ getRect, registerMove, registerPresence }: Props) 
         if (nodes.current.has(c.id)) continue;
         const node = document.createElement('div');
         node.className = styles.cursor;
+        node.style.setProperty('--cursor-color', colorVar(c.color));
         const glyph = document.createElement('span');
         glyph.className = styles.glyph;
-        glyph.style.color = colorVar(c.color);
         glyph.textContent = '✕';
         const label = document.createElement('span');
         label.className = styles.label;
-        label.style.background = colorVar(c.color);
         label.textContent = c.label;
         node.appendChild(glyph);
         node.appendChild(label);
