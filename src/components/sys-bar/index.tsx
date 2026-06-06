@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Button, Menu, MenuItem, MenuTrigger, Popover } from 'react-aria-components';
 
+import { usePresence } from '@components/cursor-presence/presence-context';
 import { useLifeState } from '@components/game-of-life/provider';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
@@ -43,6 +44,7 @@ export const SysBar = () => {
   const clock = useClock();
   const state = useLifeState();
   const pathname = usePathname();
+  const presence = usePresence();
   const gen = `${state.generation}`.padStart(4, '0');
 
   return (
@@ -79,6 +81,10 @@ export const SysBar = () => {
           <span className={styles.gen}>gen {gen}</span>
           <span>alive {state.alive}</span>
           <span className={styles.rec}>● rec</span>
+          <span className={styles.watching}>watching {presence.count}</span>
+          <button type="button" className={styles.toggle} onClick={presence.toggle}>
+            {presence.enabled ? 'cursors: on' : 'cursors: off'}
+          </button>
         </div>
       </header>
       <div className={styles.checker} aria-hidden />

@@ -118,6 +118,22 @@ export const rec = css({
   color: 'danger.text',
 });
 
+export const watching = css({
+  color: 'accent.text',
+});
+
+export const toggle = css({
+  fontFamily: 'mono',
+  fontSize: 'xs',
+  color: 'fg.muted',
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  padding: '0',
+  textDecoration: 'underline',
+  _hover: { color: 'accent.text' },
+});
+
 export const checker = css({
   height: '[16px]',
   marginBlock: 'element',
