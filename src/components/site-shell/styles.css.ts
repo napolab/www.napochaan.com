@@ -3,6 +3,10 @@ import { css } from '@styled/css';
 export const stage = css({
   position: 'relative',
   zIndex: 'base',
+  // Clip transient horizontal overflow (e.g. the EchoText glitch momentarily
+  // widening the wordmark) so it never reaches the viewport and judders the
+  // fixed TypographyBand. `clip` is paint-only and leaves vertical flow intact.
+  overflowX: 'clip',
   maxWidth: '[1180px]',
   marginInline: 'auto',
   paddingBlock: '[calc(24px + 20px)]',
