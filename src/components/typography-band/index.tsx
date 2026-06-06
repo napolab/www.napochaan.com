@@ -2,17 +2,23 @@
 
 import { useRef } from 'react';
 import gsap from 'gsap';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
 import { wrap } from './band-scroll';
 import * as styles from './styles.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 const DEFAULT_TEXT = 'NAPOCHAAN · DJ × VJ · GRAPHIC × DIGITAL · SINCE 2020 · ';
 const REPEAT_COUNT = 20;
 const VELOCITY_SCALE = 0.04;
+const BASE_DRIFT = 0.35; // constant px-per-60fps-frame so the band always moves
+const VEL_DECAY = 0.9; // scroll-velocity boost decays back to the base drift
+const FRAME_MS = 1000 / 60;
+const GRID = 24; // Game-of-Life cell size; snap scroll to its multiples on rest
+const SNAP_DELAY = 140;
 
 type Props = {
   text?: string;
@@ -39,29 +45,53 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
       const topHalf = topTrack.scrollWidth / 2;
       const leftHalf = leftTrack.scrollHeight / 2;
 
-      const moveTop = gsap.quickTo(topTrack, 'x', { duration: 0.6, ease: 'power2.out' });
-      const moveBottom = gsap.quickTo(bottomTrack, 'x', { duration: 0.6, ease: 'power2.out' });
-      const moveLeft = gsap.quickTo(leftTrack, 'y', { duration: 0.6, ease: 'power2.out' });
-      const moveRight = gsap.quickTo(rightTrack, 'y', { duration: 0.6, ease: 'power2.out' });
-
+      // pos accumulates a constant drift plus a decaying scroll-velocity boost.
+      // We render with gsap.set + wrap each frame (instant) so the duplicated
+      // track loops seamlessly — no smoothing across the wrap boundary, so the
+      // text never scrolls out and shows a blank gap before looping.
       const pos = { top: 0, bottom: 0, left: 0, right: 0 };
+      const boost = { value: 0 };
 
-      ScrollTrigger.create({
+      const trigger = ScrollTrigger.create({
         onUpdate: (self) => {
-          const delta = self.getVelocity() * VELOCITY_SCALE;
-
-          // Clockwise rotation around the frame: top ← / right ↑ / bottom → / left ↓
-          pos.top = wrap(pos.top - delta, topHalf);
-          pos.bottom = wrap(pos.bottom + delta, topHalf);
-          pos.left = wrap(pos.left + delta, leftHalf);
-          pos.right = wrap(pos.right - delta, leftHalf);
-
-          moveTop(pos.top);
-          moveBottom(pos.bottom);
-          moveLeft(pos.left);
-          moveRight(pos.right);
+          boost.value = self.getVelocity() * VELOCITY_SCALE;
         },
       });
+
+      const tick = (_time: number, deltaMs: number) => {
+        const step = (BASE_DRIFT + boost.value) * (deltaMs / FRAME_MS);
+        boost.value *= VEL_DECAY;
+        // Clockwise rotation around the frame: top ← / right ↑ / bottom → / left ↓
+        pos.top = wrap(pos.top - step, topHalf);
+        pos.bottom = wrap(pos.bottom + step, topHalf);
+        pos.left = wrap(pos.left + step, leftHalf);
+        pos.right = wrap(pos.right - step, leftHalf);
+        gsap.set(topTrack, { x: pos.top });
+        gsap.set(bottomTrack, { x: pos.bottom });
+        gsap.set(leftTrack, { y: pos.left });
+        gsap.set(rightTrack, { y: pos.right });
+      };
+      gsap.ticker.add(tick);
+
+      // Snap the page scroll to the Game-of-Life 24px grid once scrolling rests,
+      // so the scrolling content grid lines up with the fixed living grid.
+      const snap = { timer: undefined as ReturnType<typeof setTimeout> | undefined };
+      const onScroll = () => {
+        clearTimeout(snap.timer);
+        snap.timer = setTimeout(() => {
+          const y = window.scrollY;
+          const target = Math.round(y / GRID) * GRID;
+          if (Math.abs(target - y) > 0.5) gsap.to(window, { duration: 0.3, ease: 'power2.out', scrollTo: target });
+        }, SNAP_DELAY);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+
+      return () => {
+        gsap.ticker.remove(tick);
+        window.removeEventListener('scroll', onScroll);
+        clearTimeout(snap.timer);
+        trigger.kill();
+      };
     });
   });
 
