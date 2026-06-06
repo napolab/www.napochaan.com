@@ -31,8 +31,9 @@ export const NewsSection = ({ items }: Props) => {
       <SectionHeading no="01" more="お知らせ →" moreHref="/news">
         news
       </SectionHeading>
+      {/* news = curated important notices; the home feed shows the latest 3, full list at /news. */}
       <ol className={styles.log}>
-        {items.map((item) => (
+        {items.slice(0, 3).map((item) => (
           <li key={item.id} className={styles.item}>
             <span className={styles.date}>{item.date}</span>
             <Tag tone="outline">{item.category}</Tag>

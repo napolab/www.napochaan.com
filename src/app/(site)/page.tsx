@@ -7,7 +7,7 @@ import vrchatWide from '../(design-system)/_assets/vrchat-wide.jpg';
 import { AboutWhoami } from './_components/about-whoami';
 import { BlogIndex } from './_components/blog-index';
 import { GallerySection } from './_components/gallery-section';
-import { GigsSection } from './_components/gigs-section';
+import { LogSection } from './_components/log-section';
 import { Hero } from './_components/hero';
 import { NewsSection } from './_components/news-section';
 import { WorksSection } from './_components/works-section';
@@ -38,11 +38,13 @@ const works = [
   { id: '3', no: '03', title: 'VRChat stage VJ set', type: 'vj', year: '2025', thumbSrc: vrchatGlitch.src, thumbWidth: vrchatGlitch.width, thumbHeight: vrchatGlitch.height },
 ];
 
-const gigs = [
-  { id: '1', date: '06/14', event: 'next gig @ club (予定)', venue: 'Tokyo', upcoming: true },
-  { id: '2', date: '04/02', event: 'techno set @ venue', venue: 'DJ' },
-  { id: '3', date: '02/18', event: 'VJ @ event', venue: 'VJ' },
-  { id: '4', date: '2023.11', event: 'DJ @ club night', venue: 'DJ' },
+// Activity chronicle (年表): gigs + releases + works, not just performances.
+const activity = [
+  { id: '1', date: '06/14', title: 'next gig @ club (予定)', meta: 'Tokyo', upcoming: true },
+  { id: '2', date: '05/01', title: 'new EP 公開', meta: 'release' },
+  { id: '3', date: '04/02', title: 'techno set @ venue', meta: 'DJ' },
+  { id: '4', date: '03/10', title: 'night graphics vol.13', meta: 'flyer' },
+  { id: '5', date: '02/18', title: 'VJ @ event', meta: 'VJ' },
 ];
 
 const gallery: GalleryItem[] = [
@@ -102,7 +104,7 @@ const HomePage = () => (
     <AboutWhoami id="about" {...about} />
     <NewsSection items={news} />
     <WorksSection id="works" works={works} />
-    <GigsSection id="gigs" gigs={gigs} />
+    <LogSection id="log" entries={activity} />
     <GallerySection id="gallery" items={gallery} />
     <BlogIndex id="blog" posts={posts} />
   </main>

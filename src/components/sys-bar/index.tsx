@@ -41,7 +41,7 @@ const navItems = [
   { label: 'index', href: '/', active: true },
   { label: 'about', href: '#about' },
   { label: 'works', href: '#works' },
-  { label: 'live', href: '#gigs' },
+  { label: 'log', href: '#log' },
   { label: 'gallery', href: '#gallery' },
   { label: 'blog', href: '#blog' },
 ];
