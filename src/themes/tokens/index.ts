@@ -9,8 +9,8 @@ export const tokens = defineTokens({
     black: { value: 'oklch(0.000 0 0)' },
 
     gray: {
-      1: { value: 'oklch(0.963 0.003 265)' },
-      2: { value: 'oklch(0.945 0.004 265)' },
+      1: { value: 'oklch(0.952 0.004 265)' },
+      2: { value: 'oklch(0.934 0.005 265)' },
       3: { value: 'oklch(0.918 0.005 265)' },
       4: { value: 'oklch(0.900 0.006 265)' },
       5: { value: 'oklch(0.884 0.007 265)' },
@@ -20,7 +20,7 @@ export const tokens = defineTokens({
       9: { value: 'oklch(0.560 0.016 265)' },
       10: { value: 'oklch(0.510 0.017 265)' },
       11: { value: 'oklch(0.430 0.018 265)' },
-      12: { value: 'oklch(0.145 0.020 265)' },
+      12: { value: 'oklch(0.185 0.020 265)' },
     },
     blue: {
       1: { value: 'oklch(0.972 0.012 266)' },
