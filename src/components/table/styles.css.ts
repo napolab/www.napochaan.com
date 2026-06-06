@@ -88,6 +88,10 @@ export const cell = css({
   '&:last-child': {
     borderBottomWidth: 'none',
   },
+  // Columns flagged desktopOnly are dropped from the mobile stacked cards.
+  '&[data-desktop-only="true"]': {
+    display: { base: 'none', desktop: 'table-cell' },
+  },
   _before: {
     content: '[attr(data-label)]',
     display: { base: 'inline', desktop: 'none' },

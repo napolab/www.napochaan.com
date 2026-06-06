@@ -24,7 +24,7 @@ type Props = {
 
 const columns = [
   { key: 'thumb', label: '' },
-  { key: 'no', label: 'no' },
+  { key: 'no', label: 'no', desktopOnly: true },
   { key: 'title', label: 'title' },
   { key: 'type', label: 'type' },
   { key: 'year', label: 'year' },
