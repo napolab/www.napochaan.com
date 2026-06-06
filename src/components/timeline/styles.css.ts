@@ -13,7 +13,8 @@ export const root = css({
   rowGap: '4',
   columnGap: '3',
   // 2px accent axis (not a thin gray line) so it reads as the deliberate timeline
-  // spine rather than a misaligned background grid line.
+  // spine rather than a misaligned background grid line. Paler blue than the dots
+  // so the vivid dots stand out against it.
   _before: {
     content: '""',
     position: 'absolute',
@@ -21,7 +22,7 @@ export const root = css({
     top: '0',
     bottom: '0',
     width: '[2px]',
-    bg: 'accent.solid',
+    bg: 'accent.border',
   },
 });
 
