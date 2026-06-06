@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Button, Dialog, DialogTrigger, Modal } from 'react-aria-components';
+import { Button, Dialog, DialogTrigger, Modal, ModalOverlay } from 'react-aria-components';
 
 import { Image } from '@components/image';
 
@@ -24,7 +24,7 @@ export type GalleryItem = {
   caption?: string;
   // CSS object-position value (e.g. 'top', 'center', '50% 20%') that frames the
   // cover-crop for this cell. Defaults to 'center'.
-  objectPosition?: string;
+  objectPosition?: 'top' | 'bottom' | 'left' | 'right' | 'center' | `${number}% ${number}%` | `${number}%` | 'initial' | 'inherit' | (string & {});
 };
 
 type Props = {
@@ -40,18 +40,20 @@ const GalleryCell = ({ item }: { item: GalleryItem }) => {
         <Button className={styles.trigger} aria-label={item.alt}>
           <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.gridImage} />
         </Button>
-        <Modal className={styles.modal}>
-          <Dialog className={styles.dialog} aria-label={item.alt}>
-            {({ close }) => (
-              <>
-                <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.modalImage} />
-                <Button onPress={close} className={styles.close}>
-                  close
-                </Button>
-              </>
-            )}
-          </Dialog>
-        </Modal>
+        <ModalOverlay className={styles.overlay} isDismissable data-testid="gallery-overlay">
+          <Modal className={styles.modal}>
+            <Dialog className={styles.dialog} aria-label={item.alt}>
+              {({ close }) => (
+                <>
+                  <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.modalImage} />
+                  <Button onPress={close} className={styles.close}>
+                    close
+                  </Button>
+                </>
+              )}
+            </Dialog>
+          </Modal>
+        </ModalOverlay>
       </DialogTrigger>
       {item.caption !== undefined ? <span className={styles.caption}>{item.caption}</span> : null}
     </li>

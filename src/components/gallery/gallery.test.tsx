@@ -24,4 +24,19 @@ describe('Gallery', () => {
     await page.getByRole('button', { name: /flyer a/ }).click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
   });
+  it('closes the lightbox when the overlay backdrop is clicked', async () => {
+    await render(<Gallery items={items} />);
+    await page.getByRole('button', { name: /flyer a/ }).click();
+    await expect.element(page.getByRole('dialog')).toBeInTheDocument();
+
+    // Press the backdrop corner (outside the centered modal) with a full pointer
+    // sequence so react-aria's interact-outside dismissal fires.
+    const overlay = page.getByTestId('gallery-overlay').element();
+    const fire = (type: string) => overlay.dispatchEvent(new PointerEvent(type, { bubbles: true, cancelable: true, clientX: 4, clientY: 4, pointerId: 1, isPrimary: true, button: 0 }));
+    fire('pointerdown');
+    fire('pointerup');
+    overlay.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: 4, clientY: 4 }));
+
+    await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
+  });
 });

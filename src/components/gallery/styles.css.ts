@@ -76,7 +76,9 @@ export const caption = css({
   paddingBlock: '[1px]',
 });
 
-export const modal = css({
+// Dim backdrop that fills the viewport and centers the modal. isDismissable on the
+// ModalOverlay closes the lightbox when this backdrop (outside the Modal) is clicked.
+export const overlay = css({
   position: 'fixed',
   inset: '0',
   display: 'flex',
@@ -84,6 +86,12 @@ export const modal = css({
   justifyContent: 'center',
   bg: '[oklch(0 0 0 / 0.8)]',
   zIndex: 'modal',
+});
+
+export const modal = css({
+  display: 'flex',
+  maxW: '[90vw]',
+  maxH: '[90vh]',
 });
 
 export const dialog = css({
