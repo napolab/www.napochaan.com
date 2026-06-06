@@ -7,7 +7,7 @@ const DesignSystemLayout = ({ children }: { children: ReactNode }) => {
   return (
     <html lang="ja" className={fontVariables}>
       <head>
-        <link rel="stylesheet" href="https://use.typekit.net/izz7men.css" />
+        <link rel="stylesheet" href="https://use.typekit.net/vmz7pfu.css" />
       </head>
       <ThemeProvider asChild>
         <body>{children}</body>
