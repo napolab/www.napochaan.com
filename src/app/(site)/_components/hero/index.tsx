@@ -1,3 +1,4 @@
+import { Button } from '@components/button';
 import { EchoText } from '@components/echo-text';
 import { SystemAnnotation } from '@components/system-annotation';
 
@@ -19,9 +20,22 @@ export const Hero = ({ name = DEFAULT_NAME, lead = DEFAULT_LEAD }: Props) => {
       </SystemAnnotation>
       <p className={styles.kicker}>// DJ · VJ · graphic · digital — since 2020</p>
       <EchoText>{name}</EchoText>
-      <p className={styles.lead}>{lead}</p>
+      <p className={styles.lead}>
+        {lead}
+        <span className={styles.caret} aria-hidden="true" />
+      </p>
+      <div className={styles.buttons}>
+        <Button variant="solid">enter →</Button>
+        <Button variant="outline">works</Button>
+        <Button variant="danger">contact →</Button>
+      </div>
       <SystemAnnotation tone="danger" className={styles.annotationEnd}>
         ▸ not found
+      </SystemAnnotation>
+      <SystemAnnotation tone="muted" className={styles.annotationCoords}>
+        35.6595 / 139.7006
+        <span className={styles.squareBlue} aria-hidden="true" />
+        <span className={styles.squareRed} aria-hidden="true" />
       </SystemAnnotation>
     </header>
   );

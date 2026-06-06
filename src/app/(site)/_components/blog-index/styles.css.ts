@@ -30,7 +30,10 @@ export const index = css({
 });
 
 export const title = css({
-  fontFamily: 'display',
+  // digibop renders Latin poorly for long mixed titles — use the readable body
+  // face (M PLUS 1) at medium weight instead.
+  fontFamily: 'body',
+  fontWeight: 'medium',
   fontSize: 'lg',
   lineHeight: 'snug',
   color: 'fg.default',
