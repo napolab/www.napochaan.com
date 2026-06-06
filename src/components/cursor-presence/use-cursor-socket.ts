@@ -1,7 +1,7 @@
 'use client';
 
 import { hc } from 'hono/client';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
 import { ServerMessage, type ClientMessage } from '@lib/cursor/protocol';
@@ -68,5 +68,5 @@ export const useCursorSocket = (room: string, handlers: Handlers): CursorSocket 
     if (ws !== null && ws.readyState === ws.OPEN) ws.send(JSON.stringify(msg));
   }, []);
 
-  return { send };
+  return useMemo(() => ({ send }), [send]);
 };
