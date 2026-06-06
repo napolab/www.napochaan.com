@@ -19,14 +19,41 @@ export const kicker = css({
   color: 'accent.text',
 });
 
+// Markdown-style blockquote: an accent bar on the left, indented, medium weight.
 export const lead = css({
+  margin: '0',
+  borderLeftWidth: 'strong',
+  borderLeftStyle: 'solid',
+  borderLeftColor: 'accent.solid',
+  paddingLeft: 'element',
   fontFamily: 'body',
+  fontWeight: 'medium',
   // Smaller on mobile so the jump ratio against the large wordmark stays strong;
   // grows to lg on desktop.
   fontSize: { base: 'md', desktop: 'lg' },
   lineHeight: 'jp',
   color: 'fg.default',
   maxWidth: '[54ch]',
+});
+
+export const srOnly = css({ srOnly: true });
+
+// The hidden sizer reserves the final wrapped height; the typed text overlays it
+// absolutely so the typewriter (and its fumbles) never shift the buttons below.
+export const typeWrap = css({
+  position: 'relative',
+  display: 'block',
+});
+
+export const typeSizer = css({
+  visibility: 'hidden',
+});
+
+export const typed = css({
+  position: 'absolute',
+  top: '0',
+  left: '0',
+  width: 'full',
 });
 
 // Scattered decorative annotations are a desktop-only flourish — on mobile they

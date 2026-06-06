@@ -74,22 +74,47 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
       gsap.ticker.add(tick);
 
       // Snap the page scroll to the Game-of-Life 24px grid once scrolling rests,
-      // so the scrolling content grid lines up with the fixed living grid.
-      const snap = { timer: undefined as ReturnType<typeof setTimeout> | undefined };
+      // so the scrolling content grid lines up with the fixed living grid. The
+      // snap is interruptible: any real user input (wheel/touch/key) kills an
+      // in-flight snap and defers the next one, so it never fights the user.
+      const snap = { timer: undefined as ReturnType<typeof setTimeout> | undefined, tween: undefined as gsap.core.Tween | undefined };
+
+      const cancelSnap = () => {
+        snap.tween?.kill();
+        snap.tween = undefined;
+        clearTimeout(snap.timer);
+      };
+
       const onScroll = () => {
         clearTimeout(snap.timer);
         snap.timer = setTimeout(() => {
           const y = window.scrollY;
           const target = Math.round(y / GRID) * GRID;
-          if (Math.abs(target - y) > 0.5) gsap.to(window, { duration: 0.3, ease: 'power2.out', scrollTo: target });
+          if (Math.abs(target - y) > 0.5) {
+            snap.tween = gsap.to(window, {
+              duration: 0.3,
+              ease: 'power2.out',
+              scrollTo: target,
+              onComplete: () => {
+                snap.tween = undefined;
+              },
+            });
+          }
         }, SNAP_DELAY);
       };
+
       window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('wheel', cancelSnap, { passive: true });
+      window.addEventListener('touchstart', cancelSnap, { passive: true });
+      window.addEventListener('keydown', cancelSnap);
 
       return () => {
         gsap.ticker.remove(tick);
         window.removeEventListener('scroll', onScroll);
-        clearTimeout(snap.timer);
+        window.removeEventListener('wheel', cancelSnap);
+        window.removeEventListener('touchstart', cancelSnap);
+        window.removeEventListener('keydown', cancelSnap);
+        cancelSnap();
         trigger.kill();
       };
     });

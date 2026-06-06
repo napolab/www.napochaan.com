@@ -2,6 +2,7 @@ import { Button } from '@components/button';
 import { EchoText } from '@components/echo-text';
 import { SystemAnnotation } from '@components/system-annotation';
 
+import { LeadQuote } from './lead-quote';
 import * as styles from './styles.css';
 
 const DEFAULT_NAME = 'napochaan';
@@ -20,10 +21,7 @@ export const Hero = ({ name = DEFAULT_NAME, lead = DEFAULT_LEAD }: Props) => {
       </SystemAnnotation>
       <p className={styles.kicker}>// DJ · VJ · graphic · digital — since 2020</p>
       <EchoText>{name}</EchoText>
-      <p className={styles.lead}>
-        {lead}
-        <span className={styles.caret} aria-hidden="true" />
-      </p>
+      <LeadQuote text={lead} />
       <div className={styles.buttons}>
         <Button variant="solid">enter →</Button>
         <Button variant="outline">works</Button>
