@@ -14,14 +14,15 @@ type Gig = {
 };
 
 type Props = {
+  id?: string;
   gigs: Gig[];
 };
 
 const toTimelineItems = (gigs: Gig[]): TimelineItem[] => gigs.map((gig) => ({ id: gig.id, date: gig.date, label: gig.event, meta: gig.venue, upcoming: gig.upcoming }));
 
-export const GigsSection = ({ gigs }: Props) => {
+export const GigsSection = ({ id, gigs }: Props) => {
   return (
-    <section className={styles.root}>
+    <section id={id} className={styles.root}>
       <SectionHeading no="03">gigs</SectionHeading>
       <Timeline items={toTimelineItems(gigs)} />
     </section>

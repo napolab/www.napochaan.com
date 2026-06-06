@@ -17,12 +17,13 @@ type Post = {
 };
 
 type Props = {
+  id?: string;
   posts: Post[];
 };
 
-export const BlogIndex = ({ posts }: Props) => {
+export const BlogIndex = ({ id, posts }: Props) => {
   return (
-    <section className={styles.root}>
+    <section id={id} className={styles.root}>
       <SectionHeading no="05">blog</SectionHeading>
       <ol className={styles.list}>
         {posts.map((post) => (

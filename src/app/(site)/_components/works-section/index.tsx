@@ -12,6 +12,7 @@ type WorkRow = {
 };
 
 type Props = {
+  id?: string;
   works: WorkRow[];
 };
 
@@ -22,9 +23,9 @@ const columns = [
   { key: 'year', label: 'year' },
 ] as const;
 
-export const WorksSection = ({ works }: Props) => {
+export const WorksSection = ({ id, works }: Props) => {
   return (
-    <section className={styles.root}>
+    <section id={id} className={styles.root}>
       <SectionHeading no="02">works</SectionHeading>
       <Table columns={columns} rows={works} />
     </section>

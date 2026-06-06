@@ -6,12 +6,13 @@ import * as styles from './styles.css';
 import type { GalleryItem } from '@components/gallery';
 
 type Props = {
+  id?: string;
   items: GalleryItem[];
 };
 
-export const GallerySection = ({ items }: Props) => {
+export const GallerySection = ({ id, items }: Props) => {
   return (
-    <section className={styles.root}>
+    <section id={id} className={styles.root}>
       <SectionHeading no="04">gallery</SectionHeading>
       <Gallery items={items} />
     </section>

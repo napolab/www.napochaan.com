@@ -4,15 +4,16 @@ import { Tag } from '@components/tag';
 import * as styles from './styles.css';
 
 type Props = {
+  id?: string;
   skills: string[];
   now: string;
   likes: string;
   wants: string;
 };
 
-export const AboutWhoami = ({ skills, now, likes, wants }: Props) => {
+export const AboutWhoami = ({ id, skills, now, likes, wants }: Props) => {
   return (
-    <section className={styles.root}>
+    <section id={id} className={styles.root}>
       <SectionHeading no="00">about</SectionHeading>
       <div className={styles.who}>
         <p className={styles.prompt}>$ whoami</p>

@@ -8,6 +8,10 @@ export const globalCss: GlobalStyleObject = {
     colorScheme: 'light',
     lineHeight: 'jp',
   },
+  body: {
+    backgroundImage: '[linear-gradient(to right, token(colors.grid.line) 1px, transparent 1px), linear-gradient(to bottom, token(colors.grid.line) 1px, transparent 1px)]',
+    backgroundSize: '[24px 24px]',
+  },
   'h1, h2, h3, h4, h5, h6, p, li, dt, dd, th, td, label, figcaption, blockquote, caption': {
     wordBreak: 'auto-phrase',
   },

@@ -99,12 +99,12 @@ const HomePage = () => (
   <main id="main-content" className={s.main}>
     <h1 className={s.srOnly}>napochaan — DJ・VJ・グラフィック・デジタル</h1>
     <Hero />
-    <AboutWhoami {...about} />
+    <AboutWhoami id="about" {...about} />
     <NewsSection items={news} />
-    <WorksSection works={works} />
-    <GigsSection gigs={gigs} />
-    <GallerySection items={gallery} />
-    <BlogIndex posts={posts} />
+    <WorksSection id="works" works={works} />
+    <GigsSection id="gigs" gigs={gigs} />
+    <GallerySection id="gallery" items={gallery} />
+    <BlogIndex id="blog" posts={posts} />
   </main>
 );
 
