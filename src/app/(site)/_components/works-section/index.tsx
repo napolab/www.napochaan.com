@@ -1,0 +1,32 @@
+import { SectionHeading } from '@components/section-heading';
+import { Table } from '@components/table';
+
+import * as styles from './styles.css';
+
+type WorkRow = {
+  id: string;
+  no: string;
+  title: string;
+  type: string;
+  year: string;
+};
+
+type Props = {
+  works: WorkRow[];
+};
+
+const columns = [
+  { key: 'no', label: 'no' },
+  { key: 'title', label: 'title' },
+  { key: 'type', label: 'type' },
+  { key: 'year', label: 'year' },
+] as const;
+
+export const WorksSection = ({ works }: Props) => {
+  return (
+    <section className={styles.root}>
+      <SectionHeading no="02">works</SectionHeading>
+      <Table columns={columns} rows={works} />
+    </section>
+  );
+};
