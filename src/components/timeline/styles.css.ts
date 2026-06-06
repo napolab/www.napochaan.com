@@ -1,16 +1,17 @@
 import { css } from '@styled/css';
 
-// Rows use align-items: baseline so the date and label share a text baseline. The dot lives
-// INLINE at the start of the date with vertical-align: middle, so its center sits on the text's
-// x-height center (line-height-independent, unlike box centering). The spine is drawn behind via
-// the <ol> _before at the dot's center x (half the dot width); the dot has z-index so hollow
-// dots mask the line behind them.
+// The <ol> defines two column tracks (date | content); each <li> is a subgrid row
+// sharing those tracks, so the date column and content column align across every
+// row regardless of date width. align-items: baseline keeps date/label on one
+// baseline; the dot lives inline at the start of the date (vertical-align middle)
+// and the spine is the <ol> ::before drawn at the dot's center x.
 export const root = css({
   listStyle: 'none',
   position: 'relative',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4',
+  display: 'grid',
+  gridTemplateColumns: '[max-content 1fr]',
+  rowGap: '4',
+  columnGap: '3',
   _before: {
     content: '""',
     position: 'absolute',
@@ -23,9 +24,10 @@ export const root = css({
 });
 
 export const item = css({
-  display: 'flex',
+  display: 'grid',
+  gridTemplateColumns: 'subgrid',
+  gridColumn: '[span 2]',
   alignItems: 'baseline',
-  gap: '3',
 });
 
 export const dot = css({
@@ -47,24 +49,21 @@ export const dot = css({
 });
 
 export const date = css({
-  flexShrink: '0',
   fontFamily: 'mono',
   fontSize: 'xs',
   lineHeight: 'jp',
   color: 'fg.muted',
-
   '&[data-upcoming="true"]': {
     color: 'accent.text',
   },
 });
 
-// label + meta live inside `content` as INLINE text so they wrap together as one block;
-// `date` stays a fixed column.
+// label + meta wrap together inside `content`; snug line-height keeps a wrapped
+// meta line sitting tight under the label instead of floating (was jp = 1.9).
 export const content = css({
-  flex: '1',
   minWidth: '0',
   margin: '0',
-  lineHeight: 'jp',
+  lineHeight: 'snug',
 });
 
 export const label = css({
