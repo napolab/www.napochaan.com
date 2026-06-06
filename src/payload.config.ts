@@ -51,7 +51,7 @@ const getCloudflareContextFromWrangler = async (): Promise<CloudflareContext> =>
   });
 };
 
-const getBuildStubContext = (): CloudflareContext => ({ env: {} as Cloudflare.Env }) as CloudflareContext;
+const getBuildStubContext = (): CloudflareContext => ({ env: { D1: {} as D1Database, R2: {} as R2Bucket } as Cloudflare.Env }) as CloudflareContext;
 
 const resolveCloudflareContext = async (): Promise<CloudflareContext> => {
   if (isNextBuild) return getBuildStubContext();
