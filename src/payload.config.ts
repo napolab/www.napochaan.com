@@ -63,6 +63,12 @@ const cloudflare = await resolveCloudflareContext();
 
 const cfEnv = cloudflare.env as unknown as Cloudflare.Env;
 
+const d1 = cfEnv.D1;
+const r2 = cfEnv.R2;
+if (d1 === undefined || r2 === undefined) {
+  throw new Error('Cloudflare bindings D1/R2 are not available in this context');
+}
+
 // PAYLOAD_SECRET signs auth tokens, so it MUST be a real secret at runtime.
 // The placeholder is allowed ONLY during `next build` (so the build doesn't
 // require the secret) — at runtime a missing secret is a hard error, never sign
@@ -104,13 +110,13 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: sqliteD1Adapter({
-    binding: cfEnv.D1,
+    binding: d1,
     migrationDir: path.resolve(dirname, '..', 'migrations'),
     push: false,
   }),
   plugins: [
     r2Storage({
-      bucket: cfEnv.R2,
+      bucket: r2,
       collections: {
         media: true,
       },
