@@ -8,6 +8,9 @@ export const root = css({
   fontSize: 'hero',
   lineHeight: 'none',
   letterSpacing: 'tighter',
+  // Keep the wordmark on one line — wide scramble glyphs must never wrap (the
+  // stage's overflow-x: clip absorbs any transient width past the viewport).
+  whiteSpace: 'nowrap',
 });
 
 export const fill = css({

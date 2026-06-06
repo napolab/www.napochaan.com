@@ -20,7 +20,9 @@ export const kicker = css({
 
 export const lead = css({
   fontFamily: 'body',
-  fontSize: 'lg',
+  // Smaller on mobile so the jump ratio against the large wordmark stays strong;
+  // grows to lg on desktop.
+  fontSize: { base: 'md', desktop: 'lg' },
   lineHeight: 'jp',
   color: 'fg.default',
   maxWidth: '[54ch]',
