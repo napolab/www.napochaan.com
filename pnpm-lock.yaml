@@ -51,6 +51,9 @@ importers:
       dayjs:
         specifier: ^1.11.21
         version: 1.11.21
+      durabcast:
+        specifier: ^0.2.4
+        version: 0.2.4(hono@4.12.23)
       gsap:
         specifier: ^3.15.0
         version: 3.15.0
@@ -75,6 +78,9 @@ importers:
       react-dom:
         specifier: ^19.0.0
         version: 19.2.7(react@19.2.7)
+      reconnecting-websocket:
+        specifier: ^4.4.0
+        version: 4.4.0
       server-only:
         specifier: ^0.0.1
         version: 0.0.1
@@ -1975,6 +1981,12 @@ packages:
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
+
+  '@hono/zod-validator@0.4.3':
+    resolution: {integrity: sha512-xIgMYXDyJ4Hj6ekm9T9Y27s080Nl9NXHcJkOvkXPhubOLj8hZkOL8pDnnXfvCf5xEE8Q4oMFenQUZZREUY2gqQ==}
+    peerDependencies:
+      hono: '>=3.9.0'
+      zod: ^3.19.1
 
   '@hono/zod-validator@0.7.6':
     resolution: {integrity: sha512-Io1B6d011Gj1KknV4rXYz4le5+5EubcWEU/speUjuw9XMMIaP3n78yXLhjd2A3PXaXaUwEAluOiAyLqhBEJgsw==}
@@ -3893,6 +3905,12 @@ packages:
   duplexer@0.1.2:
     resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
 
+  durabcast@0.2.4:
+    resolution: {integrity: sha512-M0fqjRXDu0J2Wm7Nhdus7ilUxs1q9KuySHE1+jgYD5ltIUCSIWjSez+MkETjgUEaw8VE2xGS8GNW+IEtFQA5ow==}
+    engines: {node: 22.18.0}
+    peerDependencies:
+      hono: '>=4.3.0'
+
   ecdsa-sig-formatter@1.0.11:
     resolution: {integrity: sha512-nagl3RYrbNv6kQkeJIpt6NJZy8twLB/2vtz6yN9Z4vRKHN4/QZJIEbqohALSgwKdnksuY3k5Addp5lg8sVoVcQ==}
 
@@ -5355,6 +5373,9 @@ packages:
   real-require@0.2.0:
     resolution: {integrity: sha512-57frrGM/OCTLqLOAh0mhVA9VBMHd+9U7Zb2THMGdBUoZVOtGbJzjxsYGDJ3A9AYYCP4hn6y1TVbaOfzWtm5GFg==}
     engines: {node: '>= 12.13.0'}
+
+  reconnecting-websocket@4.4.0:
+    resolution: {integrity: sha512-D2E33ceRPga0NvTDhJmphEgJ7FUYF0v4lr1ki0csq06OdlxKfugGzN0dSkxM/NfqCxYELK4KcaTOUOjTV6Dcng==}
 
   regenerate-unicode-properties@10.2.2:
     resolution: {integrity: sha512-m03P+zhBeQd1RGnYxrGyDAPpWX/epKirLrp8e3qevZdVkKtnCrjjWczIbYc8+xd6vcTStVlqfycTx1KR4LOr0g==}
@@ -8142,6 +8163,11 @@ snapshots:
     dependencies:
       hono: 4.12.23
 
+  '@hono/zod-validator@0.4.3(hono@4.12.23)(zod@3.25.76)':
+    dependencies:
+      hono: 4.12.23
+      zod: 3.25.76
+
   '@hono/zod-validator@0.7.6(hono@4.12.23)(zod@3.25.76)':
     dependencies:
       hono: 4.12.23
@@ -10266,6 +10292,12 @@ snapshots:
 
   duplexer@0.1.2: {}
 
+  durabcast@0.2.4(hono@4.12.23):
+    dependencies:
+      '@hono/zod-validator': 0.4.3(hono@4.12.23)(zod@3.25.76)
+      hono: 4.12.23
+      zod: 3.25.76
+
   ecdsa-sig-formatter@1.0.11:
     dependencies:
       safe-buffer: 5.2.1
@@ -11994,6 +12026,8 @@ snapshots:
   readdirp@4.1.2: {}
 
   real-require@0.2.0: {}
+
+  reconnecting-websocket@4.4.0: {}
 
   regenerate-unicode-properties@10.2.2:
     dependencies:
