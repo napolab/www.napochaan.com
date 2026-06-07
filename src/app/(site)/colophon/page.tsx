@@ -37,21 +37,15 @@ const ColophonPage = () => {
       <PageHeader title={colophon.title} breadcrumbs={crumbs} kicker={colophon.kicker} lead={colophon.lead} annotation="壊して · ほどいて · 組み直す" />
 
       <section className={s.cell}>
-        <SectionHeading no="01" more="$ cat making.md">
-          site
+        <SectionHeading no="01" more="$ cat concept.md">
+          concept
         </SectionHeading>
-        <Manifesto items={colophon.site} />
+        <p className={s.intro}>{colophon.concept.intro}</p>
+        <Manifesto items={colophon.concept.points} />
       </section>
 
       <section className={s.cell}>
-        <SectionHeading no="02" more="$ cat code.md">
-          code
-        </SectionHeading>
-        <Manifesto items={colophon.code} />
-      </section>
-
-      <section className={s.cell}>
-        <SectionHeading no="03" more="$ cat type.md">
+        <SectionHeading no="02" more="$ cat type.md">
           type
         </SectionHeading>
         <p className={s.intro}>{colophon.typography.intro}</p>
@@ -61,7 +55,7 @@ const ColophonPage = () => {
       </section>
 
       <section className={s.cell}>
-        <SectionHeading no="04" more="$ ls components/">
+        <SectionHeading no="03" more="$ ls components/">
           ui
         </SectionHeading>
         <p className={s.intro}>{colophon.components.intro}</p>
@@ -80,7 +74,7 @@ const ColophonPage = () => {
       </section>
 
       <section className={s.cell}>
-        <SectionHeading no="05" more="$ ls stack/">
+        <SectionHeading no="04" more="$ ls stack/">
           stack
         </SectionHeading>
         <dl className={s.stack}>
@@ -94,7 +88,7 @@ const ColophonPage = () => {
       </section>
 
       <section className={s.cell}>
-        <SectionHeading no="06">source</SectionHeading>
+        <SectionHeading no="05">source</SectionHeading>
         <a className={s.source} href={colophon.source.href} target="_blank" rel="noopener noreferrer">
           <span className={s.sourceLabel}>
             <ScrambleText>{colophon.source.label}</ScrambleText>

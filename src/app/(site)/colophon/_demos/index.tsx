@@ -102,7 +102,7 @@ const paginationHref = (page: number): string => (page <= 1 ? '/works' : `/works
 // the page. Kept out of content.ts so the data file stays JSX-free.
 export const demos: Record<ComponentName, ReactNode> = {
   ScrambleText: <ScrambleText>static internet</ScrambleText>,
-  EchoText: <EchoText>napochaan</EchoText>,
+  EchoText: <EchoText size="compact">napochaan</EchoText>,
   Marquee: <Marquee>napochaan ✕ graphic · digital · since 2020 · </Marquee>,
   Heading: (
     <>

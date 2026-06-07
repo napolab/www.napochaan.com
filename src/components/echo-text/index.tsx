@@ -16,9 +16,13 @@ const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matc
 
 type Props = {
   children: string;
+  // Visual scale. 'hero' is the full display wordmark (default); 'compact' is a
+  // smaller h1-scale rendering with proportionally tighter echo offsets, for
+  // places that can't host the full-bleed size (e.g. the colophon demo cell).
+  size?: 'hero' | 'compact';
 };
 
-export const EchoText = ({ children }: Props) => {
+export const EchoText = ({ children, size = 'hero' }: Props) => {
   const rootRef = useRef<HTMLSpanElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
 
@@ -38,7 +42,7 @@ export const EchoText = ({ children }: Props) => {
   const handleEnter = contextSafe(decode);
 
   return (
-    <span ref={rootRef} className={styles.root} role="img" aria-label={children} onMouseEnter={handleEnter}>
+    <span ref={rootRef} data-size={size} className={styles.root} role="img" aria-label={children} onMouseEnter={handleEnter}>
       <span aria-hidden className={styles.echoOut}>
         {children}
       </span>
