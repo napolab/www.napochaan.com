@@ -22,50 +22,28 @@ const cell = {
   borderRadius: 'none',
 } as const;
 
-// These cells render as @components/link (which ships its own inline-link
-// colour). Panda atomic classes don't honour class-attribute order, so a bare
-// `color` would lose to Link's. The `:not([data-current])` / `:not([data-disabled])`
-// selectors bump specificity to 0-2-0 (above Link's 0-1-0), so this className
-// reliably overrides Link's colour back to the muted ledger treatment.
+// Ledger cells: the Link supplies the resting muted colour (tone="muted"),
+// no underline and no hover fill (fill={false}); this className only adds the
+// per-state ledger treatment on top (hover shift to accent, inverted current bar).
 export const link = css({
   ...cell,
-  textDecorationLine: 'none',
-  transitionProperty: '[background-color,color]',
-  transitionDuration: 'fast',
-  transitionTimingFunction: 'stepSnap',
-  _focusVisible: { layerStyle: 'focusRing' },
   '&:not([data-current="true"])': {
-    color: 'fg.muted',
-    _hover: {
-      // Cancel @components/link's accent.solid hover fill — without this the blue
-      // text would sit on a blue bar and vanish. The ledger hover is just the
-      // text shifting to accent.
-      bg: 'transparent',
-      color: 'accent.text',
-      textDecorationLine: 'underline',
-      textUnderlineOffset: '[2px]',
-    },
+    _hover: { color: 'accent.text', textDecorationLine: 'underline', textUnderlineOffset: '[2px]' },
   },
   // Current page adopts the sys-bar active treatment: inverted ink bar.
   '&[data-current="true"]': {
     color: 'fg.onSolid',
     bg: 'fg.default',
-    textDecorationLine: 'none',
   },
 });
 
 export const step = css({
   ...cell,
-  textDecorationLine: 'none',
-  transitionProperty: '[background-color,color]',
-  transitionDuration: 'fast',
-  transitionTimingFunction: 'stepSnap',
-  _focusVisible: { layerStyle: 'focusRing' },
   '&:not([data-disabled="true"])': {
-    color: 'fg.muted',
-    _hover: { bg: 'transparent', color: 'accent.text' },
+    _hover: { color: 'accent.text' },
   },
-  // Boundary step with nowhere to go: muted, non-interactive.
+  // Boundary step with nowhere to go: muted, non-interactive. The disabled step
+  // renders as a <span> (no Link), so it owns its colour here.
   '&[data-disabled="true"]': {
     color: 'fg.subtle',
     cursor: 'default',

@@ -22,7 +22,7 @@ const Step = (props: StepProps) => {
   switch (props.variant) {
     case 'link':
       return (
-        <Link href={props.href(props.page)} className={styles.step} aria-label={props.label} rel={props.rel}>
+        <Link href={props.href(props.page)} className={styles.step} aria-label={props.label} rel={props.rel} tone="muted" underline={false} fill={false}>
           {props.glyph}
         </Link>
       );
@@ -42,7 +42,7 @@ type PageLinkProps = {
 };
 
 const PageLink = ({ page, current, href }: PageLinkProps) => (
-  <Link href={href(page)} className={styles.link} aria-current={current ? 'page' : undefined} data-current={current ? 'true' : undefined}>
+  <Link href={href(page)} className={styles.link} aria-current={current ? 'page' : undefined} data-current={current ? 'true' : undefined} tone="muted" underline={false} fill={false}>
     {page}
   </Link>
 );
