@@ -16,17 +16,11 @@ export const no = css({
   color: 'accent.text',
 });
 
+// The hover affordance is the scramble alone (no colour/underline shift), keeping
+// the link in line with the site-wide treatment. Focus ring stays for keyboard.
 export const more = css({
   marginInlineStart: 'auto',
   fontFamily: 'mono',
   fontSize: 'xs',
-  color: 'fg.muted',
-  textDecorationLine: 'none',
   whiteSpace: 'nowrap',
-  _hover: {
-    color: 'accent.text',
-    textDecorationLine: 'underline',
-    textUnderlineOffset: '[2px]',
-  },
-  _focusVisible: { layerStyle: 'focusRing' },
 });

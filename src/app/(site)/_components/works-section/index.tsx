@@ -1,4 +1,6 @@
 import { Image } from '@components/image';
+import { Link } from '@components/link';
+import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
 import { Table } from '@components/table';
 
@@ -12,9 +14,7 @@ type WorkRow = {
   title: string;
   type: string;
   year: string;
-  thumbSrc?: string;
-  thumbWidth?: number;
-  thumbHeight?: number;
+  thumb?: { src: string; width: number; height: number };
 };
 
 type Props = {
@@ -35,13 +35,17 @@ const columns = [
 const toRows = (works: WorkRow[]): Record<string, ReactNode>[] =>
   works.map((work) => ({
     thumb:
-      work.thumbSrc !== undefined ? (
-        <Image src={work.thumbSrc} alt="" width={work.thumbWidth ?? 80} height={work.thumbHeight ?? 80} className={styles.thumb} />
+      work.thumb !== undefined ? (
+        <Image src={work.thumb.src} alt={work.title} width={work.thumb.width} height={work.thumb.height} className={styles.thumb} />
       ) : (
         <span className={styles.thumbPlaceholder} aria-hidden="true" />
       ),
     no: work.no,
-    title: work.title,
+    title: (
+      <Link href={`/works/${work.id}`} tone="accent" fill={false}>
+        <ScrambleText trigger="group">{work.title}</ScrambleText>
+      </Link>
+    ),
     type: work.type,
     year: work.year,
   }));

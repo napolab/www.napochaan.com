@@ -1,4 +1,4 @@
-import * as styles from './styles.css';
+import { Link } from '@components/link';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
@@ -17,21 +17,23 @@ const externalAttrs = (newTab: boolean | null | undefined): { target?: '_blank';
 
 /**
  * Overrides Payload's default `link` / `autolink` converters so authored links
- * carry the same WCAG-AA `link` styling as the auto-linked emails/URLs from
- * the text converter. Internal links fall back to '#'.
+ * (and auto-linked emails/URLs) render through the shared `Link` component — its
+ * default variants (accent + underline + hover fill) are the inline-link look, so
+ * there is no per-converter styling to keep in sync. Body links do not scramble.
+ * Internal links fall back to '#'.
  */
 export const linkConverter: Partial<JSXConverters<NodeTypes>> = {
   autolink: ({ node, nodesToJSX }) => (
-    <a className={styles.link} href={safeHref(node.fields.url ?? undefined)} {...externalAttrs(node.fields.newTab)}>
+    <Link href={safeHref(node.fields.url ?? undefined)} {...externalAttrs(node.fields.newTab)}>
       {nodesToJSX({ nodes: node.children })}
-    </a>
+    </Link>
   ),
   link: ({ node, nodesToJSX }) => {
     const href = node.fields.linkType === 'internal' ? '#' : safeHref(node.fields.url ?? undefined);
     return (
-      <a className={styles.link} href={href} {...externalAttrs(node.fields.newTab)}>
+      <Link href={href} {...externalAttrs(node.fields.newTab)}>
         {nodesToJSX({ nodes: node.children })}
-      </a>
+      </Link>
     );
   },
 };

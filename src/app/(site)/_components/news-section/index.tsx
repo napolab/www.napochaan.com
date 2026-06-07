@@ -1,4 +1,5 @@
 import { Link } from '@components/link';
+import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
 import { Tag } from '@components/tag';
 
@@ -19,8 +20,8 @@ type Props = {
 const NewsTitle = ({ title, href }: { title: string; href?: string }) => {
   if (href === undefined) return <span className={styles.title}>{title}</span>;
   return (
-    <Link href={href} className={styles.title}>
-      {title}
+    <Link href={href} tone="accent" fill={false} className={styles.titleLink}>
+      <ScrambleText trigger="group">{title}</ScrambleText>
     </Link>
   );
 };

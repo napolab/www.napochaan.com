@@ -1,3 +1,5 @@
+import { ScrambleText } from '@components/scramble-text';
+
 import * as styles from './styles.css';
 
 type Item = {
@@ -19,7 +21,9 @@ export const ContactList = ({ items }: Props) => {
       {items.map((item) => (
         <li key={item.label}>
           <a className={styles.link} href={item.href} target="_blank" rel="noopener noreferrer">
-            <span className={styles.label}>{item.label}</span>
+            <ScrambleText trigger="group" className={styles.label}>
+              {item.label}
+            </ScrambleText>
             <span className={styles.handle}>{item.handle}</span>
             <span aria-hidden="true">↗</span>
           </a>

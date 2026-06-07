@@ -22,19 +22,21 @@ export const kicker = css({
   color: 'accent.text',
 });
 
-// The page h1, owned fully by this class (plain <h1>, no Heading): mono system
-// caps that grow from h2 to h1. The class outranks the global `h1` element
-// styles, so font/tracking are reliable. `data-tracking="tight"` (0-2-0) pulls
-// the tracking in for long content titles.
+// The page h1, owned fully by this class (plain <h1>, no Heading): caps that
+// grow from h2 to h1, outranking the global `h1` element styles so font/tracking
+// are reliable. Index labels (works / news / blog / colophon) use the loud
+// digibop display face — short English words carry it. Long content titles opt
+// into mono + tighter tracking via `titleTracking="tight"` (digibop renders long
+// mixed-script titles poorly).
 export const title = css({
-  fontFamily: 'mono',
+  fontFamily: 'display',
   fontWeight: 'normal',
   lineHeight: 'tight',
   color: 'fg.default',
   textTransform: 'uppercase',
   letterSpacing: 'tighter',
   fontSize: { base: 'h2', desktop: 'h1' },
-  '&[data-tracking="tight"]': { letterSpacing: '[-0.06em]' },
+  '&[data-tracking="tight"]': { fontFamily: 'mono', letterSpacing: '[-0.06em]' },
 });
 
 // Markdown-style blockquote lead: accent bar on the left, indented, medium weight.

@@ -1,4 +1,5 @@
 import { Link } from '@components/link';
+import { ScrambleText } from '@components/scramble-text';
 import { Tag } from '@components/tag';
 import { dayjs } from '@utils/dayjs';
 
@@ -31,16 +32,16 @@ const NewsRow = ({ item }: { item: ArchiveItem }) => {
       <Tag tone="outline" className={s.category}>
         {item.category}
       </Tag>
-      <Link href={`/news/${item.id}`} className={s.title}>
-        {item.title}
+      <Link href={`/news/${item.id}`} tone="accent" fill={false} className={s.title}>
+        <ScrambleText trigger="group">{item.title}</ScrambleText>
       </Link>
     </li>
   );
 };
 
 // The full announcement archive grouped by year-month, newest first. A Server
-// Component — `@components/link` is a styled RSC anchor, so no client boundary is
-// needed.
+// Component — the title links are plain anchors; the only client island is the
+// ScrambleText that decodes the title on hover.
 export const NewsArchive = ({ groups }: Props) => {
   return (
     <div className={s.root}>

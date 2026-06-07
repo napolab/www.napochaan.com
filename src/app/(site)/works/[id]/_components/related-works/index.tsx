@@ -3,6 +3,7 @@
 import { Link } from 'react-aria-components';
 
 import { Image } from '@components/image';
+import { ScrambleText } from '@components/scramble-text';
 import { clsx } from '@utils/clsx';
 
 import * as s from './styles.css';
@@ -32,7 +33,9 @@ const RelatedItem = ({ work }: { work: RelatedWork }) => {
         ) : (
           <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.thumb} />
         )}
-        <span className={s.title}>{work.title}</span>
+        <ScrambleText trigger="group" className={s.title}>
+          {work.title}
+        </ScrambleText>
         <span className={s.type}>{work.type}</span>
       </Link>
     </li>

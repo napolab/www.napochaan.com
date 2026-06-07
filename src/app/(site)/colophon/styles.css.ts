@@ -63,7 +63,6 @@ export const source = css({
   transitionProperty: '[color,border-color]',
   transitionDuration: 'fast',
   transitionTimingFunction: 'stepSnap',
-  _hover: { color: 'accent.text', borderColor: 'accent.border' },
   _focusVisible: { layerStyle: 'focusRing' },
   '@media (prefers-reduced-motion: reduce)': { transitionDuration: 'instant' },
 });

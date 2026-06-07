@@ -30,6 +30,37 @@ const LinkShowcase = () => {
           </Link>
         </div>
       </section>
+      <section className={section}>
+        <h2>tone</h2>
+        <div className={row}>
+          <Link href="/works" tone="accent">
+            accent
+          </Link>
+          <Link href="/works" tone="muted">
+            muted
+          </Link>
+          <Link href="/works" tone="default">
+            default
+          </Link>
+        </div>
+      </section>
+      <section className={section}>
+        <h2>underline / fill</h2>
+        <div className={row}>
+          <Link href="/works" underline={false}>
+            no underline
+          </Link>
+          <Link href="/works" fill={false}>
+            no hover fill
+          </Link>
+          <Link href="/works" tone="muted" underline={false} fill={false}>
+            quiet (muted, no underline, no fill)
+          </Link>
+          <Link href="/works" tone="default" underline={false}>
+            default keeps underline
+          </Link>
+        </div>
+      </section>
     </main>
   );
 };

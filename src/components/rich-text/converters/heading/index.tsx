@@ -1,6 +1,7 @@
 import { Heading } from '@components/heading';
 
 import { headingText, slugifyHeading } from '../../toc';
+import * as styles from './styles.css';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
@@ -32,7 +33,7 @@ export const headingConverter: Partial<JSXConverters<NodeTypes>> = {
     const level = tagToLevel(node.tag);
     const slug = slugifyHeading(headingText(node));
     return (
-      <Heading level={level} id={slug !== '' ? slug : undefined}>
+      <Heading level={level} id={slug !== '' ? slug : undefined} className={styles.heading}>
         {nodesToJSX({ nodes: node.children })}
       </Heading>
     );

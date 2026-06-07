@@ -1,4 +1,5 @@
 import { Link } from '@components/link';
+import { ScrambleText } from '@components/scramble-text';
 
 import * as styles from './styles.css';
 
@@ -31,7 +32,9 @@ export const Breadcrumbs = ({ items }: Props) => {
 
           return (
             <li key={item.label} className={styles.item} data-first={`${isFirst}`}>
-              <Link href={item.href}>{item.label}</Link>
+              <Link href={item.href} tone="accent" fill={false}>
+                <ScrambleText trigger="group">{item.label}</ScrambleText>
+              </Link>
             </li>
           );
         })}

@@ -3,6 +3,7 @@ import { colophon } from './content';
 import * as s from './styles.css';
 
 import { PageHeader } from '@components/page-header';
+import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
 
 import type { Metadata } from 'next';
@@ -60,8 +61,12 @@ const ColophonPage = () => {
       <section className={s.cell}>
         <SectionHeading no="04">source</SectionHeading>
         <a className={s.source} href={colophon.source.href} target="_blank" rel="noopener noreferrer">
-          <span className={s.sourceLabel}>{colophon.source.label}</span>
-          <span className={s.sourceHandle}>{colophon.source.handle}</span>
+          <span className={s.sourceLabel}>
+            <ScrambleText trigger="group">{colophon.source.label}</ScrambleText>
+          </span>
+          <span className={s.sourceHandle}>
+            <ScrambleText trigger="group">{colophon.source.handle}</ScrambleText>
+          </span>
           <span aria-hidden="true">↗</span>
         </a>
       </section>

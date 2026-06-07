@@ -4,14 +4,15 @@ import { usePathname } from 'next/navigation';
 import { Link } from 'react-aria-components';
 
 import { useLifeState } from '@components/game-of-life/provider';
+import { ScrambleText } from '@components/scramble-text';
 
 import { isNavActive } from './is-nav-active';
 import * as styles from './styles.css';
 import { useClock } from './use-clock';
 
-// Transitional nav targets: 'index', 'about', 'works' and 'news' are real pages;
-// the rest jump to home-page sections until their own routes exist (see
-// isNavActive — anchors are never page-active).
+// Transitional nav targets: 'index', 'about', 'works', 'news' and 'blog' are
+// real pages; the rest jump to home-page sections until their own routes exist
+// (see isNavActive — anchors are never page-active).
 const navItems = [
   { label: 'index', href: '/' },
   { label: 'about', href: '/about' },
@@ -19,7 +20,7 @@ const navItems = [
   { label: 'news', href: '/news' },
   { label: 'log', href: '/#log' },
   { label: 'gallery', href: '/#gallery' },
-  { label: 'blog', href: '/#blog' },
+  { label: 'blog', href: '/blog' },
 ];
 
 export const SysBar = () => {
@@ -34,7 +35,7 @@ export const SysBar = () => {
         <nav className={styles.nav}>
           {navItems.map(({ label, href }) => (
             <Link key={label} href={href} className={styles.navLink} data-active={isNavActive(pathname, href) ? 'true' : undefined}>
-              {label}
+              <ScrambleText trigger="group">{label}</ScrambleText>
             </Link>
           ))}
         </nav>

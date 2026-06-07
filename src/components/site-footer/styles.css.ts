@@ -26,10 +26,3 @@ export const status = css({
 export const live = css({
   color: 'accent.text',
 });
-
-export const colophon = css({
-  color: 'fg.muted',
-  textDecorationLine: 'none',
-  _hover: { color: 'accent.text', textDecorationLine: 'underline', textUnderlineOffset: '[2px]' },
-  _focusVisible: { layerStyle: 'focusRing' },
-});

@@ -29,14 +29,16 @@ export const index = css({
   color: 'accent.text',
 });
 
+// Title link in the inline link colour (accent.text). The scramble is the only
+// hover affordance — no background fill. Hug the text (start-aligned, capped at
+// the container width so long titles still wrap) and reserve the focus ring.
 export const title = css({
-  // digibop renders Latin poorly for long mixed titles — use the readable body
-  // face (M PLUS 1) at medium weight instead.
+  alignSelf: 'start',
+  maxWidth: 'full',
   fontFamily: 'body',
   fontWeight: 'medium',
   fontSize: 'lg',
   lineHeight: 'snug',
-  color: 'fg.default',
 });
 
 export const meta = css({

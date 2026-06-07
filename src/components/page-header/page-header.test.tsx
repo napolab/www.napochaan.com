@@ -15,7 +15,8 @@ describe('PageHeader', () => {
   it('renders the breadcrumb trail', async () => {
     await render(<PageHeader title="archive" breadcrumbs={breadcrumbs} />);
     await expect.element(page.getByRole('navigation', { name: 'パンくず' })).toBeInTheDocument();
-    await expect.element(page.getByText('works')).toBeInTheDocument();
+    // The crumb link renders its label twice (ScrambleText width-reserving ghost + overlay).
+    await expect.element(page.getByText('works').first()).toBeInTheDocument();
   });
 
   it('renders the kicker when provided', async () => {

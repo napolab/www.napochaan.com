@@ -1,4 +1,5 @@
 import { Link } from '@components/link';
+import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
 import { SystemAnnotation } from '@components/system-annotation';
 import { Tag } from '@components/tag';
@@ -31,8 +32,8 @@ export const BlogIndex = ({ id, posts }: Props) => {
         {posts.map((post) => (
           <li key={post.id} className={styles.post}>
             <span className={styles.index}>{post.index}</span>
-            <Link href={post.href} className={styles.title}>
-              {post.title}
+            <Link href={post.href} tone="accent" fill={false} className={styles.title}>
+              <ScrambleText trigger="group">{post.title}</ScrambleText>
             </Link>
             <p className={styles.meta}>
               <Tag tone="outline">{post.source}</Tag>

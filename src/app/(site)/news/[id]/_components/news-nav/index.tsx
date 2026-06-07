@@ -1,3 +1,5 @@
+import { ScrambleText } from '@components/scramble-text';
+
 import * as s from './styles.css';
 
 type Side = 'prev' | 'next';
@@ -29,7 +31,9 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
               ‹
             </span>
           ) : null}
-          <span className={s.label}>{slot.item.title}</span>
+          <span className={s.label}>
+            <ScrambleText trigger="group">{slot.item.title}</ScrambleText>
+          </span>
           {slot.side === 'next' ? (
             <span className={s.arrow} aria-hidden="true">
               ›
@@ -50,7 +54,7 @@ export const NewsNav = ({ prev, next }: Props) => {
         <NavSlot slot={toSlot('next', next)} />
       </div>
       <a href="/news" className={s.back}>
-        ← news 一覧
+        ← <ScrambleText trigger="group">news 一覧</ScrambleText>
       </a>
     </nav>
   );

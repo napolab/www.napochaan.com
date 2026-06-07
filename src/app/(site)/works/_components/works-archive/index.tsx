@@ -4,6 +4,7 @@ import { Fragment } from 'react';
 import { Link } from 'react-aria-components';
 
 import { Image } from '@components/image';
+import { ScrambleText } from '@components/scramble-text';
 import { clsx } from '@utils/clsx';
 
 import { groupByYear } from './group-by-year';
@@ -49,7 +50,9 @@ const WorkItem = ({ work }: { work: ArchiveItem }) => {
         ) : (
           <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.thumb} />
         )}
-        <span className={s.title}>{work.title}</span>
+        <ScrambleText trigger="group" className={s.title}>
+          {work.title}
+        </ScrambleText>
         <span className={s.type}>{work.type}</span>
         <span className={s.arrow} aria-hidden="true">
           →
@@ -72,7 +75,7 @@ export const WorksArchive = ({ works }: Props) => {
           <span id={`year-${group.year}`} className={s.anchor} style={spineStyle(index)} aria-hidden="true" />
           <h2 id={`year-${group.year}-heading`} className={s.spine} style={spineStyle(index)}>
             <Link href={`#year-${group.year}`} className={s.spineLink}>
-              {group.year}
+              <ScrambleText trigger="group">{`${group.year}`}</ScrambleText>
             </Link>
           </h2>
           <ul className={s.rows} aria-labelledby={`year-${group.year}-heading`}>

@@ -31,10 +31,8 @@ export const navLink = css({
   color: 'fg.default',
   textDecoration: 'none',
   paddingInline: '[6px]',
-  _hover: {
-    color: 'accent.text',
-    textDecoration: 'underline',
-  },
+  // Hover affordance is the scramble alone; the active (current page) state keeps
+  // its inverted black box.
   '&[data-active]': {
     color: 'fg.onSolid',
     bg: 'fg.default',

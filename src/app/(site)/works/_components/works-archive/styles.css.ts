@@ -88,7 +88,6 @@ export const spineLink = css({
   textDecorationLine: 'none',
   color: 'fg.onSolid',
   outlineOffset: '[-3px]',
-  _hover: { textDecorationLine: 'underline', textUnderlineOffset: '[3px]' },
 });
 
 export const rows = css({

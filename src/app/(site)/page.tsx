@@ -33,9 +33,9 @@ const news = [
 ];
 
 const works = [
-  { id: '1', no: '01', title: 'night graphics vol.13', type: 'flyer', year: '2024', thumbSrc: flyerBooth0424.src, thumbWidth: flyerBooth0424.width, thumbHeight: flyerBooth0424.height },
-  { id: '2', no: '02', title: 'Booth² key visual', type: 'graphic', year: '2026', thumbSrc: vrchatSquare.src, thumbWidth: vrchatSquare.width, thumbHeight: vrchatSquare.height },
-  { id: '3', no: '03', title: 'VRChat stage VJ set', type: 'vj', year: '2025', thumbSrc: vrchatGlitch.src, thumbWidth: vrchatGlitch.width, thumbHeight: vrchatGlitch.height },
+  { id: '1', no: '01', title: 'night graphics vol.13', type: 'flyer', year: '2024', thumb: { src: flyerBooth0424.src, width: flyerBooth0424.width, height: flyerBooth0424.height } },
+  { id: '2', no: '02', title: 'Booth² key visual', type: 'graphic', year: '2026', thumb: { src: vrchatSquare.src, width: vrchatSquare.width, height: vrchatSquare.height } },
+  { id: '3', no: '03', title: 'VRChat stage VJ set', type: 'vj', year: '2025', thumb: { src: vrchatGlitch.src, width: vrchatGlitch.width, height: vrchatGlitch.height } },
 ];
 
 // Activity chronicle (年表): gigs + releases + works, not just performances.

@@ -61,14 +61,13 @@ export const category = css({
   justifySelf: 'center',
 });
 
+// Title link in the inline link colour (accent.text). The scramble is the only
+// hover affordance — no background fill — so hug the text (start-aligned, capped
+// at the column width so long titles still wrap) and reserve the focus ring.
 export const title = css({
-  // As a grid item the link is blockified and would stretch to fill the 1fr
-  // column, so its hover background bled across the whole row. Hug the text
-  // (start-aligned, capped at the column width so long titles still wrap).
   justifySelf: 'start',
   maxWidth: 'full',
   fontFamily: 'body',
   fontSize: 'md',
   lineHeight: 'snug',
-  color: 'fg.default',
 });

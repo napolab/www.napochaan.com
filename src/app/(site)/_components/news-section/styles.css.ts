@@ -30,9 +30,20 @@ export const date = css({
   color: 'accent.text',
 });
 
+// Plain (non-link) title — quiet ink for items without a destination.
 export const title = css({
   fontFamily: 'body',
   fontSize: 'md',
   lineHeight: 'snug',
   color: 'fg.default',
+});
+
+// Linked title in the inline link colour (accent.text). The scramble is the only
+// hover affordance — no background fill. Hug the text so the focus ring tracks it.
+export const titleLink = css({
+  alignSelf: 'start',
+  maxWidth: 'full',
+  fontFamily: 'body',
+  fontSize: 'md',
+  lineHeight: 'snug',
 });

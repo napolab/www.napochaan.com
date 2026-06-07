@@ -32,7 +32,6 @@ export const link = css({
   transitionProperty: '[color]',
   transitionDuration: 'fast',
   transitionTimingFunction: 'stepSnap',
-  _hover: { color: 'accent.text' },
   '&[data-side="next"]': { marginInlineStart: 'auto', textAlign: 'right' },
 });
 
@@ -47,6 +46,9 @@ export const label = css({
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
+  // Underline so the prev/next title reads as a link (its colour matches body text).
+  textDecorationLine: 'underline',
+  textUnderlineOffset: '[2px]',
 });
 
 // Empty side: holds the space-between layout balanced when one neighbour is
@@ -63,6 +65,7 @@ export const back = css({
   fontSize: 'xs',
   letterSpacing: 'wide',
   color: 'fg.subtle',
-  textDecorationLine: 'none',
-  _hover: { color: 'accent.text', textDecorationLine: 'underline', textUnderlineOffset: '[2px]' },
+  textDecorationLine: 'underline',
+  textUnderlineOffset: '[2px]',
+  _focusVisible: { layerStyle: 'focusRing' },
 });

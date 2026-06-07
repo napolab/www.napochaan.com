@@ -1,4 +1,6 @@
 import { Heading } from '@components/heading';
+import { Link } from '@components/link';
+import { ScrambleText } from '@components/scramble-text';
 
 import * as styles from './styles.css';
 
@@ -17,9 +19,9 @@ type Props = {
 const MoreLabel = ({ href, children }: { href?: string; children: ReactNode }) => {
   if (href === undefined) return <span className={styles.more}>{children}</span>;
   return (
-    <a href={href} className={styles.more}>
-      {children}
-    </a>
+    <Link href={href} tone="muted" underline={false} fill={false} className={styles.more}>
+      {typeof children === 'string' ? <ScrambleText trigger="group">{children}</ScrambleText> : children}
+    </Link>
   );
 };
 

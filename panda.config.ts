@@ -2,6 +2,7 @@ import { defineConfig } from '@pandacss/dev';
 
 import { breakpoints } from './src/themes/breakpoints';
 import { globalCss } from './src/themes/global-css';
+import { linkRecipe } from './src/themes/recipes';
 import { semanticTokens, tokens } from './src/themes/tokens';
 
 export default defineConfig({
@@ -12,11 +13,21 @@ export default defineConfig({
   exclude: [],
   outdir: 'styled-system',
   globalCss,
+  // The Link recipe's variants are chosen at runtime (component props), so force
+  // every combination to be generated rather than relying on static usage.
+  staticCss: {
+    recipes: {
+      link: ['*'],
+    },
+  },
   theme: {
     breakpoints,
     extend: {
       tokens,
       semanticTokens,
+      recipes: {
+        link: linkRecipe,
+      },
       layerStyles: {
         focusRing: {
           value: {

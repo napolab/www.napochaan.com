@@ -1,6 +1,8 @@
 'use client';
 
 import { Button } from '@components/button';
+import { Link } from '@components/link';
+import { ScrambleText } from '@components/scramble-text';
 
 import { ErrorScreen } from './_components/error-screen';
 import * as s from './_components/error-screen/styles.css';
@@ -15,9 +17,9 @@ const ErrorPage = ({ reset }: Props) => (
     <Button variant="danger" onPress={reset}>
       retry
     </Button>
-    <a href="/" className={s.homeLink}>
-      ← / へ戻る
-    </a>
+    <Link href="/" tone="accent" fill={false} className={s.homeLink}>
+      ← <ScrambleText trigger="group">/ へ戻る</ScrambleText>
+    </Link>
   </ErrorScreen>
 );
 
