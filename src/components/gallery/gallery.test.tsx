@@ -15,6 +15,14 @@ describe('Gallery', () => {
     await expect.element(page.getByRole('img', { name: 'flyer a' }).first()).toBeInTheDocument();
     await expect.element(page.getByRole('img', { name: 'photo b' }).first()).toBeInTheDocument();
   });
+  it('renders the grid image with a formatBlurURL blur placeholder', async () => {
+    await render(<Gallery items={items} />);
+    const img = page.getByRole('img', { name: 'flyer a' }).first().element();
+    const style = img.getAttribute('style') ?? '';
+    expect(style).toContain('blur=20');
+    // Placeholder source is kept tiny (small width), not the default 32.
+    expect(style).toContain('w=16');
+  });
   it('renders the corner caption label when provided', async () => {
     await render(<Gallery items={items} />);
     await expect.element(page.getByText('flyer / 01')).toBeInTheDocument();

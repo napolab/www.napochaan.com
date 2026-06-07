@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { Button, Dialog, DialogTrigger, Modal, ModalOverlay } from 'react-aria-components';
 
 import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
 
 import * as styles from './styles.css';
 
@@ -38,14 +39,22 @@ const GalleryCell = ({ item }: { item: GalleryItem }) => {
     <li className={styles.cell} style={cellStyle}>
       <DialogTrigger>
         <Button className={styles.trigger} aria-label={item.alt}>
-          <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.gridImage} />
+          <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.gridImage} placeholder="blur" blurDataURL={formatBlurURL(item.src, { width: 16, blur: 20 })} />
         </Button>
         <ModalOverlay className={styles.overlay} isDismissable data-testid="gallery-overlay">
           <Modal className={styles.modal}>
             <Dialog className={styles.dialog} aria-label={item.alt}>
               {({ close }) => (
                 <>
-                  <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.modalImage} />
+                  <Image
+                    src={item.src}
+                    alt={item.alt}
+                    width={item.width}
+                    height={item.height}
+                    className={styles.modalImage}
+                    placeholder="blur"
+                    blurDataURL={formatBlurURL(item.src, { width: 16, blur: 20 })}
+                  />
                   <Button onPress={close} className={styles.close}>
                     close
                   </Button>
