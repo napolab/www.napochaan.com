@@ -15,6 +15,10 @@ export const SiteFooter = ({ buildId }: Props) => {
         build {buildId ?? 'dev'} · <span className={styles.live}>life: running</span> ·{' '}
         <Link href="/colophon" tone="muted">
           <ScrambleText>colophon</ScrambleText>
+        </Link>{' '}
+        ·{' '}
+        <Link href="/components" tone="muted">
+          <ScrambleText>design-system</ScrambleText>
         </Link>
       </span>
     </footer>

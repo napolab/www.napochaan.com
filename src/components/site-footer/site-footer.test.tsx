@@ -10,4 +10,10 @@ describe('SiteFooter', () => {
     await expect.element(page.getByRole('contentinfo')).toBeInTheDocument();
     await expect.element(page.getByText(/napochaan/)).toBeInTheDocument();
   });
+
+  it('links to the colophon and the design-system', async () => {
+    await render(<SiteFooter />);
+    await expect.element(page.getByRole('link', { name: 'colophon' })).toHaveAttribute('href', '/colophon');
+    await expect.element(page.getByRole('link', { name: 'design-system' })).toHaveAttribute('href', '/components');
+  });
 });
