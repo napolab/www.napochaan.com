@@ -1,0 +1,74 @@
+import { notFound } from 'next/navigation';
+
+import { BlogNav } from './_components/blog-nav';
+import { Toc } from './_components/toc';
+import { adjacentPosts } from '../_lib/adjacent-posts';
+import { findPost } from '../_lib/find-post';
+import { posts } from '../sample-posts';
+import * as s from './styles.css';
+
+import { PageHeader } from '@components/page-header';
+import { RichText } from '@components/rich-text';
+import { extractHeadings } from '@components/rich-text/toc';
+import { dayjs } from '@utils/dayjs';
+
+import type { Metadata } from 'next';
+
+// Revalidate hourly — ISR. Detail pages are static (no searchParams), so this
+// drives the static cache for the pre-rendered sample ids.
+export const revalidate = 3600;
+
+// Pre-render every sample post id at build time. Replaced by a CMS query in a
+// later plan, but the shape stays the same.
+export const generateStaticParams = () => posts.map((post) => ({ id: post.id }));
+
+type Params = Promise<{ id: string }>;
+
+type Props = {
+  params: Params;
+};
+
+// Build the breadcrumb trail outside the component scope so the array isn't
+// re-created as an inline JSX prop (react-perf/jsx-no-new-array-as-prop).
+const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/blog', label: 'blog' }, { label: title }];
+
+export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
+  const { id } = await params;
+  const post = findPost(posts, id);
+
+  return {
+    get title() {
+      if (post === undefined) return 'blog';
+      return post.title;
+    },
+    get description() {
+      if (post === undefined) return '記事';
+      return post.excerpt;
+    },
+  };
+};
+
+const BlogDetailPage = async ({ params }: Props) => {
+  const { id } = await params;
+  const post = findPost(posts, id);
+  if (post === undefined) notFound();
+
+  const { prev, next } = adjacentPosts(posts, id);
+  const headings = extractHeadings(post.body ?? null);
+  const crumbs = buildCrumbs(post.title);
+
+  return (
+    <main id="main-content" className={s.main}>
+      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.source} · ${post.readMin} min · ${dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}`} titleTracking="tight" />
+      <div className={s.layout}>
+        <div className={s.tocCol}>
+          <Toc headings={headings} />
+        </div>
+        <div className={s.bodyCol}>{post.body === undefined ? null : <RichText data={post.body} />}</div>
+      </div>
+      <BlogNav prev={prev} next={next} />
+    </main>
+  );
+};
+
+export default BlogDetailPage;

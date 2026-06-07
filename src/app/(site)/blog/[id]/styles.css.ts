@@ -1,0 +1,33 @@
+import { css } from '@styled/css';
+
+export const main = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: { base: '8', desktop: 'section' },
+});
+
+// Single column on mobile (TOC above body in DOM order); two columns on desktop
+// with the body left and a fixed-width TOC rail right.
+export const layout = css({
+  display: 'grid',
+  gap: 'block',
+  gridTemplateColumns: { base: '[1fr]', desktop: '[1fr 14rem]' },
+  columnGap: { desktop: 'block' },
+});
+
+// Desktop: pin the body to column 1 / row 1 so it sits left of the TOC despite
+// coming second in the DOM.
+export const bodyCol = css({
+  minHeight: '[40vh]',
+  gridColumn: { desktop: '1' },
+  gridRow: { desktop: '1' },
+});
+
+// Desktop: TOC rail in column 2 / row 1, stuck below the fixed sys-bar band.
+export const tocCol = css({
+  gridColumn: { desktop: '2' },
+  gridRow: { desktop: '1' },
+  alignSelf: 'start',
+  position: { desktop: 'sticky' },
+  top: { desktop: '[calc(token(sizes.band) + token(spacing.6))]' },
+});

@@ -1,0 +1,40 @@
+import { Link } from '@components/link';
+import { ScrambleText } from '@components/scramble-text';
+
+import * as s from './styles.css';
+
+// Local prop shape — matches TocHeading from @components/rich-text/toc, declared
+// narrowly here so the component owns its own contract.
+type Heading = {
+  level: number;
+  text: string;
+  slug: string;
+};
+
+type Props = {
+  headings: readonly Heading[];
+};
+
+// In-page table of contents for the article body. A Server Component. These are
+// in-page fragment links (#slug), not navigation, so the Link's fill-on-hover
+// wash is disabled (fill={false}) and the scramble is the hover signal. h3
+// entries indent via a data-level attribute. Renders nothing when the body has
+// no headings.
+export const Toc = ({ headings }: Props) => {
+  if (headings.length === 0) return null;
+
+  return (
+    <nav className={s.root} aria-label="目次">
+      <p className={s.label}>contents</p>
+      <ol className={s.list}>
+        {headings.map((heading) => (
+          <li key={heading.slug} className={s.item} data-level={heading.level}>
+            <Link href={`#${heading.slug}`} tone="muted" underline={false} fill={false} className={s.link}>
+              <ScrambleText trigger="group">{heading.text}</ScrambleText>
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  );
+};
