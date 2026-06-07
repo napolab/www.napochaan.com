@@ -6,6 +6,7 @@ import { Whoami } from './_components/whoami';
 import { profile } from './profile';
 import * as s from './styles.css';
 
+import { Breadcrumbs } from '@components/breadcrumbs';
 import { RichText } from '@components/rich-text';
 import { SectionHeading } from '@components/section-heading';
 
@@ -24,6 +25,8 @@ const whoamiRows = [
   { term: 'team', description: profile.team },
 ];
 
+const crumbs = [{ href: '/', label: 'home' }, { label: 'about' }];
+
 export const generateMetadata = (): Metadata => {
   return {
     get title() {
@@ -38,6 +41,7 @@ export const generateMetadata = (): Metadata => {
 const AboutPage = () => {
   return (
     <main id="main-content" className={s.main}>
+      <Breadcrumbs items={crumbs} />
       <AboutMasthead name={profile.name} kicker="// フルスタックエンジニア · DJ · VJ — リアル / VR" lead={profile.tagline} />
 
       <div className={s.topGrid}>
