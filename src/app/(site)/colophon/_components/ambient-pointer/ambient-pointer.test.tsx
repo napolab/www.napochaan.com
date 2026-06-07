@@ -11,4 +11,14 @@ describe('AmbientPointer', () => {
     await expect.element(page.getByText('いま囲ってる枠', { exact: false })).toBeInTheDocument();
     await expect.element(page.getByText('TypographyBand', { exact: false })).toBeInTheDocument();
   });
+
+  it('renders as a list item', async () => {
+    await render(
+      <ul>
+        <AmbientPointer label="いま囲ってる枠" target="TypographyBand" />
+      </ul>,
+    );
+
+    await expect.element(page.getByRole('listitem')).toBeInTheDocument();
+  });
 });

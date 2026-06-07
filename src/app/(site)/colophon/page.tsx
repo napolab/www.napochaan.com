@@ -33,8 +33,11 @@ const timelineDemo: TimelineItem[] = [
 ];
 
 // Live demos keyed by component name, mapped against colophon.components.items.
-// Kept here (not in content.ts) so the data file stays JSX-free.
-const demos: Record<string, ReactNode> = {
+// Kept here (not in content.ts) so the data file stays JSX-free. The key type is
+// derived from the content so adding an item without a demo is a compile error.
+type ComponentName = (typeof colophon.components.items)[number]['name'];
+
+const demos: Record<ComponentName, ReactNode> = {
   ScrambleText: <ScrambleText>static internet</ScrambleText>,
   Marquee: <Marquee>napochaan ✕ graphic · digital · since 2020 · </Marquee>,
   EchoText: <EchoText>napochaan</EchoText>,

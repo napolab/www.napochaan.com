@@ -11,8 +11,10 @@ export const root = css({
 });
 
 export const name = css({
+  margin: '0',
   fontFamily: 'mono',
   fontSize: 'xs',
+  fontWeight: 'normal',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
   color: 'accent.text',

@@ -6,17 +6,19 @@ type Props = {
 
 // The type scale ladder. Each row renders a glyph specimen at the actual
 // fontSize token (data-token → fontSize) so the jump between steps is visible,
-// with the token name / px / ratio / role as the readable record.
+// with the token name as the term (dt) and px / ratio / role as its description
+// (dd). The specimen is decorative (aria-hidden) and sits outside the dt/dd pair
+// so the term→description relationship stays semantically intact.
 export const TypeScale = ({ rows }: Props) => {
   return (
     <dl className={styles.root}>
       {rows.map((entry) => (
         <div key={entry.token} className={styles.row}>
-          <dt className={styles.specimen} data-token={entry.token} aria-hidden="true">
+          <div className={styles.specimen} data-token={entry.token} aria-hidden="true">
             Ag
-          </dt>
+          </div>
+          <dt className={styles.token}>{entry.token}</dt>
           <dd className={styles.meta}>
-            <span className={styles.token}>{entry.token}</span>
             <span className={styles.figure}>{entry.px}</span>
             <span className={styles.figure}>{entry.ratio}</span>
             <span className={styles.role}>{entry.role}</span>

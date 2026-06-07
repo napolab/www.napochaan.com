@@ -13,10 +13,10 @@ type Props = {
 // The demo JSX is passed in by the page so this stays UI-only (no data coupling).
 export const ComponentDemo = ({ name, why, children }: Props) => {
   return (
-    <div className={styles.root}>
-      <span className={styles.name}>{name}</span>
+    <article className={styles.root}>
+      <h3 className={styles.name}>{name}</h3>
       <p className={styles.why}>{why}</p>
       <div className={styles.stage}>{children}</div>
-    </div>
+    </article>
   );
 };

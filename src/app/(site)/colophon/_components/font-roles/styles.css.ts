@@ -39,6 +39,7 @@ export const role = css({
 });
 
 export const why = css({
+  margin: '0',
   fontFamily: 'body',
   fontSize: 'sm',
   lineHeight: 'body',
