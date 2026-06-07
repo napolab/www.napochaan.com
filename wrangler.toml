@@ -114,7 +114,7 @@ workers_dev = false
 preview_urls = false
 
 [env.production.vars]
-BASE_URL = "https://www.napochaan.com"
+BASE_URL = "https://napochaan.com"
 
 [env.production.images]
 binding = "IMAGES"
