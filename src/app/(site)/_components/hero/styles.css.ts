@@ -36,6 +36,17 @@ export const lead = css({
   maxWidth: '[54ch]',
 });
 
+// Secondary catchcopy line under the lead — quieter mono, the breadth note below
+// the headline destruction promise.
+export const sub = css({
+  margin: '0',
+  fontFamily: 'mono',
+  fontSize: { base: 'sm', desktop: 'md' },
+  lineHeight: 'snug',
+  letterSpacing: 'wide',
+  color: 'fg.muted',
+});
+
 export const srOnly = css({ srOnly: true });
 
 // The hidden sizer reserves the final wrapped height; the typed text overlays it

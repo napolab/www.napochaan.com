@@ -14,7 +14,7 @@ import { useClock } from './use-clock';
 // never page-active).
 const navItems = [
   { label: 'index', href: '/' },
-  { label: 'about', href: '/#about' },
+  { label: 'about', href: '/about' },
   { label: 'works', href: '/works' },
   { label: 'log', href: '/#log' },
   { label: 'gallery', href: '/#gallery' },

@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { WorkDetail } from './index';
-import { richTextFromParagraphs } from '../../../_lib/sample-rich-text';
+import { richTextFromParagraphs } from '@utils/sample-rich-text';
 
 const work = {
   id: '7',

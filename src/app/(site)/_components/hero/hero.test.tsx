@@ -8,6 +8,6 @@ describe('Hero', () => {
   it('renders the wordmark and lead', async () => {
     await render(<Hero />);
     await expect.element(page.getByText('napochaan').first()).toBeInTheDocument();
-    await expect.element(page.getByText(/相互作用/).first()).toBeInTheDocument();
+    await expect.element(page.getByText(/破壊/).first()).toBeInTheDocument();
   });
 });

@@ -5,7 +5,7 @@ import vrchatGlitch from '../../(design-system)/_assets/vrchat-glitch.jpg';
 import vrchatSquare from '../../(design-system)/_assets/vrchat-square.jpg';
 import vrchatWide from '../../(design-system)/_assets/vrchat-wide.jpg';
 
-import { richTextFromParagraphs } from './_lib/sample-rich-text';
+import { richTextFromParagraphs } from '@utils/sample-rich-text';
 
 import type { WorkRow } from './_lib/work-row';
 

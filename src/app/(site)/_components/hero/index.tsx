@@ -6,7 +6,8 @@ import { LeadQuote } from './lead-quote';
 import * as styles from './styles.css';
 
 const DEFAULT_NAME = 'napochaan';
-const DEFAULT_LEAD = '相互作用するインターネットの実験場。影響と関係を、グリッドの上でデザインする。';
+const DEFAULT_LEAD = 'さまざまな「破壊」、承っております。';
+const SUB = 'リアルと VR の境界、ぜんぶ歪ませる。';
 
 type Props = {
   name?: string;
@@ -19,9 +20,10 @@ export const Hero = ({ name = DEFAULT_NAME, lead = DEFAULT_LEAD }: Props) => {
       <SystemAnnotation tone="accent" className={styles.annotationStart}>
         5470009
       </SystemAnnotation>
-      <p className={styles.kicker}>// DJ · VJ · graphic · digital — since 2020</p>
+      <p className={styles.kicker}>// おそろしき、なんでも屋 — engineer / DJ / VJ</p>
       <EchoText>{name}</EchoText>
       <LeadQuote text={lead} />
+      <p className={styles.sub}>{SUB}</p>
       <div className={styles.buttons}>
         <Button variant="solid">enter →</Button>
         <Button variant="outline">works</Button>
