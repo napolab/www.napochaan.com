@@ -39,8 +39,10 @@ describe('richTextFromParagraphs', () => {
   });
 });
 
-// Narrow each built node enough to assert on its discriminating fields.
-type NodeLike = { type: string; tag?: string; children: { text?: string }[] };
+// Narrow each built node (and its inline children) enough to assert on their
+// discriminating fields — same boundary-cast approach as above.
+type ChildLike = { type?: string; text?: string; fields?: { linkType: string; url: string; newTab: boolean }; children?: { text?: string }[] };
+type NodeLike = { type: string; tag?: string; children: ChildLike[] };
 const nodesOf = (state: SerializedEditorState): NodeLike[] => state.root.children as unknown as NodeLike[];
 
 describe('richTextFromBlocks', () => {
@@ -79,5 +81,39 @@ describe('richTextFromBlocks', () => {
     const headings = extractHeadings(state);
     expect(headings.map((h) => h.text)).toEqual(['First', 'Second']);
     expect(headings.map((h) => h.level)).toEqual([2, 3]);
+  });
+
+  it('turns a link segment in a p block into a custom link node carrying its fields and label', () => {
+    const state = richTextFromBlocks([{ type: 'p', text: [{ text: 'StudioGnu', href: 'https://studiognu.org', newTab: true }] }]);
+
+    const [node] = nodesOf(state);
+    expect(node?.type).toBe('paragraph');
+
+    const [child] = node?.children ?? [];
+    expect(child?.type).toBe('link');
+    expect(child?.fields?.linkType).toBe('custom');
+    expect(child?.fields?.url).toBe('https://studiognu.org');
+    expect(child?.fields?.newTab).toBe(true);
+    expect(child?.children?.[0]?.text).toBe('StudioGnu');
+  });
+
+  it('defaults newTab to false when omitted on a p-block link segment', () => {
+    const state = richTextFromBlocks([{ type: 'p', text: [{ text: 'home', href: '/' }] }]);
+
+    const [node] = nodesOf(state);
+    const [child] = node?.children ?? [];
+    expect(child?.fields?.newTab).toBe(false);
+  });
+
+  it('preserves child order and types for a mixed string/link/string p block', () => {
+    const state = richTextFromBlocks([{ type: 'p', text: ['before ', { text: 'link', href: 'https://example.com', newTab: true }, ' after'] }]);
+
+    const [node] = nodesOf(state);
+    const children = node?.children ?? [];
+
+    expect(children.map((child) => child.type)).toEqual(['text', 'link', 'text']);
+    expect(children[0]?.text).toBe('before ');
+    expect(children[1]?.children?.[0]?.text).toBe('link');
+    expect(children[2]?.text).toBe(' after');
   });
 });
