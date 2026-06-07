@@ -74,3 +74,30 @@ export const sourceLabel = css({
 export const sourceHandle = css({
   fontWeight: 'medium',
 });
+
+// Loose narrator intro line that opens the type / components sections.
+export const intro = css({
+  margin: '0',
+  fontFamily: 'body',
+  fontSize: { base: 'md', desktop: 'lg' },
+  lineHeight: 'body',
+  color: 'fg.muted',
+  maxWidth: '[64ch]',
+});
+
+// The ambient-chrome pointer list (TypographyBand / GameOfLife / SysBar).
+export const ambientList = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'inline',
+  margin: '0',
+  padding: '0',
+  listStyleType: 'none',
+});
+
+// The component catalog grid: one column on mobile, two from tablet up.
+export const demoGrid = css({
+  display: 'grid',
+  gridTemplateColumns: { base: '[1fr]', tablet: '[repeat(2, 1fr)]' },
+  gap: 'block',
+});
