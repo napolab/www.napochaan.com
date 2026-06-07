@@ -76,13 +76,17 @@ export const sourceHandle = css({
 });
 
 // Loose narrator intro line that opens the type / components sections.
+// Measure is a fixed rem (not ch) so it doesn't scale with font-size and stays
+// aligned with the manifesto descriptions below it; line-break:strict applies
+// Japanese kinsoku so phrases don't break awkwardly.
 export const intro = css({
   margin: '0',
   fontFamily: 'body',
   fontSize: { base: 'md', desktop: 'lg' },
   lineHeight: 'body',
   color: 'fg.muted',
-  maxWidth: '[64ch]',
+  maxWidth: '[40rem]',
+  lineBreak: 'strict',
 });
 
 // The ambient-chrome pointer list (TypographyBand / GameOfLife / SysBar).

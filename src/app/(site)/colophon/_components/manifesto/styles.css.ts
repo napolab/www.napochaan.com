@@ -27,5 +27,8 @@ export const description = css({
   fontSize: 'md',
   lineHeight: 'body',
   color: 'fg.muted',
-  maxWidth: '[64ch]',
+  // Fixed rem (not ch) so the measure matches the section intro above; strict
+  // line-break applies Japanese kinsoku for cleaner wrapping.
+  maxWidth: '[40rem]',
+  lineBreak: 'strict',
 });
