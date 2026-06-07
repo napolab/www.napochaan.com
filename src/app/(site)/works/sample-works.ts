@@ -1,9 +1,9 @@
-import flyerBooth0424 from '../../(design-system)/_assets/flyer-booth-0424.jpg';
-import flyerBooth0523 from '../../(design-system)/_assets/flyer-booth-0523.jpg';
-import vrchatAlice from '../../(design-system)/_assets/vrchat-alice.jpg';
-import vrchatGlitch from '../../(design-system)/_assets/vrchat-glitch.jpg';
-import vrchatSquare from '../../(design-system)/_assets/vrchat-square.jpg';
-import vrchatWide from '../../(design-system)/_assets/vrchat-wide.jpg';
+import flyerBooth0424 from '../_assets/flyer-booth-0424.jpg';
+import flyerBooth0523 from '../_assets/flyer-booth-0523.jpg';
+import vrchatAlice from '../_assets/vrchat-alice.jpg';
+import vrchatGlitch from '../_assets/vrchat-glitch.jpg';
+import vrchatSquare from '../_assets/vrchat-square.jpg';
+import vrchatWide from '../_assets/vrchat-wide.jpg';
 
 import { richTextFromParagraphs } from '@utils/sample-rich-text';
 

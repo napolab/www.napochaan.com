@@ -1,12 +1,8 @@
-import { css } from '@styled/css';
-
-import { RichText } from '@components/rich-text';
-
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 
-const wrap = css({ display: 'flex', flexDirection: 'column', gap: 'block', p: 'page' });
-const sectionStyle = css({ display: 'flex', flexDirection: 'column', gap: 'element', maxWidth: '[800px]' });
-
+// A lexical document exercising every node the RichText renderer supports —
+// headings, inline formats, links, lists, blockquote, and a horizontal rule.
+// Used only by the colophon RichText demo.
 const makeText = (text: string, format = 0) => ({
   type: 'text',
   text,
@@ -131,7 +127,6 @@ const raw: unknown = {
       },
       {
         type: 'horizontalrule',
-        type_: 'horizontalrule',
         version: 1,
       },
       {
@@ -147,17 +142,4 @@ const raw: unknown = {
   },
 };
 
-const sampleData = raw as SerializedEditorState;
-
-const RichTextShowcase = () => {
-  return (
-    <main className={wrap}>
-      <h1 className={css({ fontFamily: 'display', fontSize: 'h2' })}>RichText</h1>
-      <section className={sectionStyle} aria-label="RichText node showcase">
-        <RichText data={sampleData} />
-      </section>
-    </main>
-  );
-};
-
-export default RichTextShowcase;
+export const richTextSample = raw as SerializedEditorState;

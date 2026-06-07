@@ -130,11 +130,12 @@ export const cardTitle = css({ fontSize: "lg" });
 
 ## Design System Catalog
 
-Every component in `src/components/` MUST have a corresponding showcase page at `src/app/(design-system)/components/<component-name>/page.tsx`.
+Every component in `src/components/` MUST be showcased in the consolidated design-system page at `src/app/(site)/colophon/`. There are no per-component sub-path routes (the old `(design-system)/components/<name>` route group was removed and aggregated here).
 
-- The showcase page demonstrates the component's variants, states, and usage
-- To discover available components, check `src/app/(design-system)/components/` first
-- Creating a new component without its showcase page is incomplete
+- **Flow components** (render in normal layout): add a demo to `src/app/(site)/colophon/_demos/index.tsx` keyed by the component name, and an entry to `components.items` (`{ name, why }`) in `colophon/content.ts`. The key type is derived from the content, so a name without a demo — or a demo without a content entry — is a compile error.
+- **Page chrome** (fixed / structural — `TypographyBand`, `GameOfLife`, `SysBar`, `SiteShell`, `PageHeader`, `SiteFooter`): do NOT box a live copy. Add a pointer to the real instance via `components.ambient` (`{ label, target }`) — the page renders inside `SiteShell`, so the live chrome is already on screen.
+- Heavy demos (e.g. `Gallery`) are code-split + wrapped in `<Suspense>` (see `_demos/gallery-lazy.tsx`).
+- Creating a new component without its catalog entry is incomplete.
 
 ## Accessibility
 
