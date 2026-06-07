@@ -47,9 +47,3 @@ export const value = css({
   fontSize: 'sm',
   color: 'fg.default',
 });
-
-export const pills = css({
-  display: 'flex',
-  flexWrap: 'wrap',
-  gap: 'inline',
-});

@@ -20,10 +20,10 @@ export const revalidate = 3600;
 
 // Sample data — replaced by Payload CMS in a later plan.
 const about = {
-  skills: ['TypeScript', 'React', 'Panda CSS', 'Cloudflare'],
+  skills: ['TypeScript', 'React', 'Hono', 'Cloudflare', 'WebGPU'],
   now: 'DJ / VJ / グラフィック制作',
-  likes: 'techno · 方眼 · glitch · VRChat',
-  wants: '動く背景でインターネットを実験したい',
+  likes: '音楽 · glitch · VRChat · コラージュ · 崩壊(pixelsort・datamosh)',
+  wants: '後悔を、残さない。ぼくも、周りも。',
 };
 
 const news = [

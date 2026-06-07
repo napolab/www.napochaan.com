@@ -1,5 +1,4 @@
 import { SectionHeading } from '@components/section-heading';
-import { Tag } from '@components/tag';
 
 import * as styles from './styles.css';
 
@@ -21,13 +20,7 @@ export const AboutWhoami = ({ id, skills, now, likes, wants }: Props) => {
         <p className={styles.prompt}>$ whoami</p>
         <p className={styles.row}>
           <span className={styles.key}>skills</span>
-          <span className={styles.pills}>
-            {skills.map((skill) => (
-              <Tag key={skill} tone="blue">
-                {skill}
-              </Tag>
-            ))}
-          </span>
+          <span className={styles.value}>{skills.join(' · ')}</span>
         </p>
         <p className={styles.row}>
           <span className={styles.key}>now</span>
