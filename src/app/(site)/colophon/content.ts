@@ -5,7 +5,7 @@
 export const colophon = {
   title: 'colophon',
   kicker: '// このサイトについて',
-  lead: 'このサイト、こうやって作ってるんだよなぁ。考えてることぜんぶ置いとくね。',
+  lead: 'このサイト、こうやって作ってるんだよなぁ。設計も思想も、ぜんぶここに置いとくね。',
   site: [
     {
       term: '機械的なUIを、徹底的に避ける。',
@@ -72,7 +72,7 @@ export const colophon = {
     },
   ],
   typography: {
-    intro: '文字の大きさ、けっこう考えて決めてるんだよなぁ。本文を基準に、見出しへ一気に跳ばす。',
+    intro: '文字の大きさ、けっこう本気で決めてるんだよなぁ。本文を基準にして、見出しは一気にジャンプさせてる。',
     scale: [
       { token: 'md', px: '16px', ratio: '1.00x', role: '本文' },
       { token: 'h3', px: '23px', ratio: '×1.44', role: '小見出し' },
@@ -82,26 +82,26 @@ export const colophon = {
       { token: 'hero', px: '56→160px', ratio: 'clamp 15vw', role: 'ヒーロー' },
     ],
     fonts: [
-      { family: 'digibop', role: 'display', why: '黒グロテスクの打撃力。見出しで殴る役なんだよなぁ。' },
-      { family: 'M PLUS 1', role: 'body', why: '和文の可読性。next/font で安定して届く。' },
-      { family: 'config-mono-vf', role: 'mono', why: 'システム文字の地の声。数値も注釈もコマンドもこれ。' },
+      { family: 'digibop', role: 'display', why: '黒グロテスクの打撃力がすごい。見出しで殴る役なんだよなぁ。' },
+      { family: 'M PLUS 1', role: 'body', why: '和文がちゃんと読める。next/font で安定して届くのも効いてる。' },
+      { family: 'config-mono-vf', role: 'mono', why: 'システム文字の地の声。数値も注釈もコマンドも、ぜんぶこれで喋らせてる。' },
     ],
-    bandNote: 'いま画面を囲ってる枠、あれが TypographyBand なんだよなぁ。',
+    bandNote: 'いま画面を囲ってるこの枠、あれが TypographyBand なんだよなぁ。',
   },
   components: {
-    intro: 'このページ自体が design-system の中で動いてるんだよなぁ。囲まれてる枠も、背景も、ヘッダーも、ぜんぶ部品。',
+    intro: 'このページ自体が design-system の上で動いてるんだよなぁ。囲ってる枠も、背景も、ヘッダーも、ぜんぶ部品でできてる。',
     ambient: [
       { label: 'いま囲ってる枠', target: 'TypographyBand' },
       { label: '背後で蠢くセル', target: 'GameOfLife' },
       { label: '上のヘッダー', target: 'SysBar' },
     ],
     items: [
-      { name: 'ScrambleText', why: 'hover すると文字が解ける。news / blog のタイトルに効かせてる。' },
-      { name: 'Marquee', why: '横に流れる帯。継ぎ目のない2トラックループなんだよなぁ。' },
-      { name: 'EchoText', why: '多層エコーの見出し。輪郭・青・本体を重ねて T2 みたいに光らせる。' },
-      { name: 'Timeline', why: '年表。これからの予定だけ accent で立てる。' },
-      { name: 'Card', why: 'コンテンツの最小枠。as で要素を差し替えられる。' },
-      { name: 'SystemAnnotation', why: 'mono の注釈。muted / accent / danger の3色で状態を言う。' },
+      { name: 'ScrambleText', why: 'hover すると文字がほどける。news / blog のタイトルに効かせてるんだよなぁ。' },
+      { name: 'Marquee', why: '横に流れる帯。2トラックで継ぎ目なくループさせてるんだよなぁ。' },
+      { name: 'EchoText', why: '多層エコーの見出し。輪郭・青・本体を重ねて T2 みたいに光らせてる。' },
+      { name: 'Timeline', why: '年表。これからの予定だけ accent で立ててるんだよなぁ。' },
+      { name: 'Card', why: 'コンテンツの最小枠。as で中の要素を差し替えられるようにしてる。' },
+      { name: 'SystemAnnotation', why: 'mono の注釈。muted / accent / danger の3色で状態を喋らせてるんだよなぁ。' },
     ],
   },
   stack: [
