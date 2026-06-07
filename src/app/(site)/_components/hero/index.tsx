@@ -7,7 +7,7 @@ import * as styles from './styles.css';
 
 const DEFAULT_NAME = 'napochaan';
 const DEFAULT_LEAD = 'さまざまな「破壊」、承っております。';
-const SUB = 'リアルと VR の境界、ぜんぶ歪ませる。';
+const SUB = 'も～っと！ドパガキ！！！！！！！！！！！！！！(11期)';
 
 type Props = {
   name?: string;
