@@ -96,8 +96,11 @@ export const ambientList = css({
 });
 
 // The component catalog grid: one column on mobile, two from tablet up.
+// minmax(0, 1fr) lets a track shrink below its content's intrinsic width, so a
+// wide demo scrolls inside its cell (overflowX on ComponentDemo's stage) instead
+// of pushing the grid past the page and getting clipped.
 export const demoGrid = css({
   display: 'grid',
-  gridTemplateColumns: { base: '[1fr]', tablet: '[repeat(2, 1fr)]' },
+  gridTemplateColumns: { base: '[minmax(0, 1fr)]', tablet: '[repeat(2, minmax(0, 1fr))]' },
   gap: 'block',
 });

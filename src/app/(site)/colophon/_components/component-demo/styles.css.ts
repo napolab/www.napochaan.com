@@ -29,12 +29,13 @@ export const why = css({
   maxWidth: '[60ch]',
 });
 
-// The live demo stage. overflow:hidden keeps wide demos (Marquee, hero type)
-// from forcing horizontal page scroll.
+// The live demo stage. Wide demos (Table, EchoText display type) scroll inside
+// the cell instead of being clipped; the SiteShell stage already clips at the
+// viewport, so no page-level horizontal scroll leaks out.
 export const stage = css({
   display: 'flex',
   flexDirection: 'column',
   gap: 'element',
   paddingBlock: 'element',
-  overflow: 'hidden',
+  overflowX: 'auto',
 });
