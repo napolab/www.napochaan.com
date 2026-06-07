@@ -12,14 +12,8 @@ export const root = css({
   // Keep the wordmark on one line — wide scramble glyphs must never wrap (the
   // stage's overflow-x: clip absorbs any transient width past the viewport).
   whiteSpace: 'nowrap',
-  // Echo offsets as inherited custom properties so the size variant can scale
-  // them with the type (children read these without a descendant selector).
-  '--echo-near': '10px',
-  '--echo-far': '20px',
   '&[data-size="compact"]': {
     fontSize: 'h1',
-    '--echo-near': '5px',
-    '--echo-far': '10px',
   },
 });
 
@@ -37,7 +31,11 @@ export const echoBlue = css({
   inset: '0',
   color: 'accent.solid',
   WebkitTextStroke: '[1.5px token(colors.blue.9)]',
-  transform: '[translate(var(--echo-near), var(--echo-near))]',
+  // Literal translate (not a CSS var): WebKit/iOS Safari doesn't resolve an
+  // unregistered custom property as a length inside translate(), which collapsed
+  // all echo layers on top of each other. data-size scales the offset instead.
+  transform: '[translate(10px,10px)]',
+  '&[data-size="compact"]': { transform: '[translate(5px,5px)]' },
   zIndex: '[1]',
   userSelect: 'none',
   pointerEvents: 'none',
@@ -48,7 +46,8 @@ export const echoOut = css({
   inset: '0',
   color: 'transparent',
   WebkitTextStroke: '[2px token(colors.gray.12)]',
-  transform: '[translate(var(--echo-far), var(--echo-far))]',
+  transform: '[translate(20px,20px)]',
+  '&[data-size="compact"]': { transform: '[translate(10px,10px)]' },
   zIndex: '[0]',
   userSelect: 'none',
   pointerEvents: 'none',

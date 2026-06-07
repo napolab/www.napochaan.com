@@ -43,10 +43,10 @@ export const EchoText = ({ children, size = 'hero' }: Props) => {
 
   return (
     <span ref={rootRef} data-size={size} className={styles.root} role="img" aria-label={children} onMouseEnter={handleEnter}>
-      <span aria-hidden className={styles.echoOut}>
+      <span aria-hidden data-size={size} className={styles.echoOut}>
         {children}
       </span>
-      <span aria-hidden className={styles.echoBlue}>
+      <span aria-hidden data-size={size} className={styles.echoBlue}>
         {children}
       </span>
       <span aria-hidden className={styles.fill}>
