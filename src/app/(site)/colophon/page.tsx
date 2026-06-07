@@ -1,18 +1,51 @@
+import { AmbientPointer } from './_components/ambient-pointer';
+import { ComponentDemo } from './_components/component-demo';
+import { FontRoles } from './_components/font-roles';
 import { Manifesto } from './_components/manifesto';
+import { TypeScale } from './_components/type-scale';
 import { colophon } from './content';
 import * as s from './styles.css';
 
+import { Card } from '@components/card';
+import { EchoText } from '@components/echo-text';
+import { Marquee } from '@components/marquee';
 import { PageHeader } from '@components/page-header';
 import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
+import { SystemAnnotation } from '@components/system-annotation';
+import { Timeline } from '@components/timeline';
 
+import type { TimelineItem } from '@components/timeline';
 import type { Metadata } from 'next';
+import type { ReactNode } from 'react';
 
 // Revalidate hourly — ISR. Static page; its content is sourced from the repo's
 // own rules, not the CMS.
 export const revalidate = 3600;
 
 const crumbs = [{ href: '/', label: 'home' }, { label: 'colophon' }];
+
+// Sample data for the Timeline live demo (catalog illustration only).
+const timelineDemo: TimelineItem[] = [
+  { id: '1', date: '06/14', label: 'night vol.19 @ club eleven', meta: 'Tokyo', upcoming: true },
+  { id: '2', date: '05/03', label: 'dawn session @ rooftop', meta: 'DJ set' },
+  { id: '3', date: '04/12', label: 'ambient night @ gallery', meta: 'live' },
+];
+
+// Live demos keyed by component name, mapped against colophon.components.items.
+// Kept here (not in content.ts) so the data file stays JSX-free.
+const demos: Record<string, ReactNode> = {
+  ScrambleText: <ScrambleText>static internet</ScrambleText>,
+  Marquee: <Marquee>napochaan ✕ graphic · digital · since 2020 · </Marquee>,
+  EchoText: <EchoText>napochaan</EchoText>,
+  Timeline: <Timeline items={timelineDemo} />,
+  Card: <Card as="div">night vol.13 — 2024.03.15 at Club Eleven</Card>,
+  SystemAnnotation: (
+    <>
+      <SystemAnnotation tone="muted">sys.log: ready</SystemAnnotation> <SystemAnnotation tone="accent">status: ok</SystemAnnotation> <SystemAnnotation tone="danger">err: 404</SystemAnnotation>
+    </>
+  ),
+};
 
 export const generateMetadata = (): Metadata => {
   return {
@@ -45,7 +78,36 @@ const ColophonPage = () => {
       </section>
 
       <section className={s.cell}>
-        <SectionHeading no="03" more="$ ls stack/">
+        <SectionHeading no="03" more="$ cat type.md">
+          type
+        </SectionHeading>
+        <p className={s.intro}>{colophon.typography.intro}</p>
+        <TypeScale rows={colophon.typography.scale} />
+        <FontRoles fonts={colophon.typography.fonts} />
+        <SystemAnnotation tone="muted">{colophon.typography.bandNote}</SystemAnnotation>
+      </section>
+
+      <section className={s.cell}>
+        <SectionHeading no="04" more="$ ls components/">
+          ui
+        </SectionHeading>
+        <p className={s.intro}>{colophon.components.intro}</p>
+        <ul className={s.ambientList}>
+          {colophon.components.ambient.map((item) => (
+            <AmbientPointer key={item.target} label={item.label} target={item.target} />
+          ))}
+        </ul>
+        <div className={s.demoGrid}>
+          {colophon.components.items.map((item) => (
+            <ComponentDemo key={item.name} name={item.name} why={item.why}>
+              {demos[item.name]}
+            </ComponentDemo>
+          ))}
+        </div>
+      </section>
+
+      <section className={s.cell}>
+        <SectionHeading no="05" more="$ ls stack/">
           stack
         </SectionHeading>
         <dl className={s.stack}>
@@ -59,7 +121,7 @@ const ColophonPage = () => {
       </section>
 
       <section className={s.cell}>
-        <SectionHeading no="04">source</SectionHeading>
+        <SectionHeading no="06">source</SectionHeading>
         <a className={s.source} href={colophon.source.href} target="_blank" rel="noopener noreferrer">
           <span className={s.sourceLabel}>
             <ScrambleText>{colophon.source.label}</ScrambleText>
