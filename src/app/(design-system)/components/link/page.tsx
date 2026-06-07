@@ -48,16 +48,13 @@ const LinkShowcase = () => {
         </div>
       </section>
       <section className={section}>
-        <h2>underline / fill</h2>
+        <h2>underline</h2>
         <div className={row}>
           <Link href="/works" underline={false}>
             no underline
           </Link>
-          <Link href="/works" fill={false}>
-            no hover fill
-          </Link>
-          <Link href="/works" tone="muted" underline={false} fill={false}>
-            quiet (muted, no underline, no fill)
+          <Link href="/works" tone="muted" underline={false}>
+            quiet (muted, no underline)
           </Link>
           <Link href="/works" tone="default" underline={false}>
             default keeps underline

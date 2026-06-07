@@ -4,10 +4,10 @@ import { defineRecipe } from '@pandacss/dev';
 // generates every variant up-front — the variants are chosen at runtime via the
 // Link component's props, which an atomic recipe's static analysis cannot see.
 //
-// `tone` picks the text colour, `underline` toggles the resting underline, and
-// `fill` toggles the saturated hover wash (the legacy inline-link affordance) —
-// turn it off where the site-wide scramble is the hover signal instead. Defaults
-// reproduce the original fixed link (accent + underline + fill).
+// `tone` picks the text colour and `underline` toggles the resting underline.
+// The hover affordance site-wide is the scramble, so the recipe has no hover
+// treatment of its own (the one exception — rich-text body links, which don't
+// scramble — adds its saturated hover via a local style).
 export const linkRecipe = defineRecipe({
   className: 'link',
   base: {
@@ -28,10 +28,6 @@ export const linkRecipe = defineRecipe({
       true: { textDecorationLine: 'underline', textUnderlineOffset: '[2px]' },
       false: { textDecorationLine: 'none' },
     },
-    fill: {
-      true: { _hover: { bg: 'accent.solid', color: 'fg.onSolid', textDecorationLine: 'none' } },
-      false: {},
-    },
     // The shared focus ring. Turn off (`focusRing={false}`) for whole-card links
     // that draw their own inset indicator (clipped containers), so the two don't
     // double up.
@@ -51,7 +47,6 @@ export const linkRecipe = defineRecipe({
   defaultVariants: {
     tone: 'accent',
     underline: true,
-    fill: true,
     focusRing: true,
   },
 });

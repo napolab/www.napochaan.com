@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { useLifeState } from '@components/game-of-life/provider';
@@ -23,6 +24,20 @@ const navItems = [
   { label: 'blog', href: '/blog' },
 ];
 
+// One nav item. Holds its own ref so the ScrambleText (trigger="group") has an
+// explicit hover host — the whole padded slot, not just the label text.
+const NavLink = ({ label, href, active }: { label: string; href: string; active: boolean }) => {
+  const [el, setEl] = useState<HTMLAnchorElement | null>(null);
+
+  return (
+    <Link ref={setEl} href={href} className={styles.navLink} data-active={active ? 'true' : undefined} tone="inherit" underline={false}>
+      <ScrambleText trigger="group" host={el}>
+        {label}
+      </ScrambleText>
+    </Link>
+  );
+};
+
 export const SysBar = () => {
   const clock = useClock();
   const state = useLifeState();
@@ -34,9 +49,7 @@ export const SysBar = () => {
       <header className={styles.root}>
         <nav className={styles.nav}>
           {navItems.map(({ label, href }) => (
-            <Link key={label} href={href} className={styles.navLink} data-active={isNavActive(pathname, href) ? 'true' : undefined} tone="inherit" underline={false} fill={false}>
-              <ScrambleText trigger="group">{label}</ScrambleText>
-            </Link>
+            <NavLink key={label} label={label} href={href} active={isNavActive(pathname, href)} />
           ))}
         </nav>
         <div className={styles.status}>

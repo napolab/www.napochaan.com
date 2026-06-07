@@ -26,14 +26,14 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
       return <span className={s.empty} aria-hidden="true" />;
     case 'present':
       return (
-        <Link href={`/news/${slot.item.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false} fill={false}>
+        <Link href={`/news/${slot.item.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false}>
           {slot.side === 'prev' ? (
             <span className={s.arrow} aria-hidden="true">
               ‹
             </span>
           ) : null}
           <span className={s.label}>
-            <ScrambleText trigger="group">{slot.item.title}</ScrambleText>
+            <ScrambleText>{slot.item.title}</ScrambleText>
           </span>
           {slot.side === 'next' ? (
             <span className={s.arrow} aria-hidden="true">
@@ -54,8 +54,8 @@ export const NewsNav = ({ prev, next }: Props) => {
         <NavSlot slot={toSlot('prev', prev)} />
         <NavSlot slot={toSlot('next', next)} />
       </div>
-      <Link href="/news" className={s.back} tone="subtle" fill={false}>
-        ← <ScrambleText trigger="group">news 一覧</ScrambleText>
+      <Link href="/news" className={s.back} tone="subtle">
+        ← <ScrambleText>news 一覧</ScrambleText>
       </Link>
     </nav>
   );

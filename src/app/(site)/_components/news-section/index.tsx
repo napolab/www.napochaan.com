@@ -20,8 +20,8 @@ type Props = {
 const NewsTitle = ({ title, href }: { title: string; href?: string }) => {
   if (href === undefined) return <span className={styles.title}>{title}</span>;
   return (
-    <Link href={href} tone="accent" fill={false} className={styles.titleLink}>
-      <ScrambleText trigger="group">{title}</ScrambleText>
+    <Link href={href} tone="accent" className={styles.titleLink}>
+      <ScrambleText>{title}</ScrambleText>
     </Link>
   );
 };

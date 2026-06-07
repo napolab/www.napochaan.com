@@ -28,14 +28,14 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
       return <span className={s.empty} aria-hidden="true" />;
     case 'present':
       return (
-        <Link href={`/works/${slot.work.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false} fill={false}>
+        <Link href={`/works/${slot.work.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false}>
           {slot.side === 'prev' ? (
             <span className={s.arrow} aria-hidden="true">
               ‹
             </span>
           ) : null}
           <span className={s.label}>
-            <ScrambleText trigger="group">{slot.work.title}</ScrambleText>
+            <ScrambleText>{slot.work.title}</ScrambleText>
           </span>
           {slot.side === 'next' ? (
             <span className={s.arrow} aria-hidden="true">

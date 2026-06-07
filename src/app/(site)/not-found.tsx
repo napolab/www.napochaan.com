@@ -6,8 +6,8 @@ import * as s from './_components/error-screen/styles.css';
 
 const NotFound = () => (
   <ErrorScreen code="404" kind="not found" lead="お探しのページは存在しないか、移動した可能性があります。" tag="▸ not found">
-    <Link href="/" tone="accent" fill={false} className={s.homeLink}>
-      ← <ScrambleText trigger="group">/ へ戻る</ScrambleText>
+    <Link href="/" tone="accent" className={s.homeLink}>
+      ← <ScrambleText>/ へ戻る</ScrambleText>
     </Link>
   </ErrorScreen>
 );

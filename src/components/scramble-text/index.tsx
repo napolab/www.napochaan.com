@@ -19,14 +19,21 @@ const DURATION = 0.5;
 
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-type Props = {
+type BaseProps = {
   children: string;
   className?: string;
-  // 'self'  — scramble when this text is hovered (the text itself is the link).
-  // 'group' — scramble when the nearest ancestor <a> is hovered (whole-card link),
-  //           so hovering anywhere on a card decodes its title.
-  trigger?: 'self' | 'group';
 };
+
+// The hover host is always passed as a value — never resolved by walking up the
+// DOM — so when a scramble misfires the trigger source is obvious:
+//   'self' (default) — the text scrambles on its own hover (the text IS the link).
+//   'group'          — the text scrambles when `host` is hovered (a whole-card
+//                      link larger than its title). Pass the host element via a
+//                      callback ref + useState so it flows as a value: when the
+//                      ancestor mounts, `host` updates and useGSAP re-binds (a
+//                      RefObject would still be null in this child's effect, since
+//                      an ancestor's ref is committed after the child's effects).
+type Props = BaseProps & ({ trigger?: 'self' } | { trigger: 'group'; host: HTMLElement | null });
 
 // Inline text that decodes through glitch glyphs on hover (a terminal/command-line
 // reveal). Client Component — the scramble needs GSAP. The text is rendered as a
@@ -34,22 +41,24 @@ type Props = {
 // glyphs never reflow surrounding layout (see styles). `aria-label` pins the
 // accessible name to the text so an ancestor link's name stays stable while the
 // glyphs churn (and reduced-motion users just see the plain text).
-export const ScrambleText = ({ children, className, trigger = 'self' }: Props) => {
+export const ScrambleText = (props: Props) => {
+  const { children, className } = props;
   const rootRef = useRef<HTMLSpanElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
 
+  // For 'self' the host is the text's own span (resolved at effect time); for
+  // 'group' it is the passed element. Tracked in deps so a late-arriving host
+  // re-binds the listener.
+  const host = props.trigger === 'group' ? props.host : null;
+
   useGSAP(
     (_context, contextSafe) => {
-      const root = rootRef.current;
-      if (root === null) return;
       if (contextSafe === undefined) return;
-      // For a whole-card link, listen on the nearest <a> so the card's hover
-      // drives the title; otherwise listen on the text itself.
-      const host = trigger === 'group' ? root.closest('a') : root;
-      if (host === null) return;
+      const target = props.trigger === 'group' ? props.host : rootRef.current;
+      if (target === null) return;
 
-      // contextSafe so the tween created in this listener (which runs after
-      // useGSAP) is still added to the scope and reverted on cleanup.
+      // contextSafe so the tween created in this listener is added to the scope
+      // and reverted on cleanup.
       const decode = contextSafe(() => {
         if (reduced()) return;
         // revealDelay holds a short full scramble before decoding; low speed
@@ -62,10 +71,10 @@ export const ScrambleText = ({ children, className, trigger = 'self' }: Props) =
         });
       });
 
-      host.addEventListener('mouseenter', decode);
-      return () => host.removeEventListener('mouseenter', decode);
+      target.addEventListener('mouseenter', decode);
+      return () => target.removeEventListener('mouseenter', decode);
     },
-    { scope: rootRef, dependencies: [children, trigger] },
+    { scope: rootRef, dependencies: [children, host] },
   );
 
   return (

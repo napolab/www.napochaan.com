@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+
 import { css } from '@styled/css';
 
 import { ScrambleText } from '@components/scramble-text';
@@ -7,8 +11,8 @@ const heading = css({ fontFamily: 'display', fontSize: 'h2' });
 const caption = css({ fontFamily: 'mono', fontSize: 'xs', color: 'fg.muted', marginTop: 'element' });
 const preview = css({ display: 'flex', flexDirection: 'column', gap: 'block', p: 'section' });
 
-// A whole-card link so the `group` trigger has an <a> ancestor to listen on.
-const card = css({
+// A whole-card link so the `group` trigger has a host element to reference.
+const cardStyle = css({
   display: 'flex',
   flexDirection: 'column',
   gap: 'inline',
@@ -23,6 +27,8 @@ const cardMeta = css({ fontFamily: 'mono', fontSize: 'xs', color: 'fg.muted' });
 const selfLink = css({ fontFamily: 'body', fontSize: 'lg', color: 'accent.text' });
 
 const ScrambleTextShowcase = () => {
+  const [card, setCard] = useState<HTMLAnchorElement | null>(null);
+
   return (
     <main className={wrap}>
       <h1 className={heading}>ScrambleText</h1>
@@ -30,25 +36,22 @@ const ScrambleTextShowcase = () => {
       <section aria-label="self trigger">
         <div className={preview}>
           <a href="#x" className={selfLink}>
-            <ScrambleText trigger="self">hover this title</ScrambleText>
+            <ScrambleText>hover this title</ScrambleText>
           </a>
         </div>
-        <p className={caption}>trigger="self" — the text decodes on its own hover. Used where the title text is itself the link (news / blog list rows).</p>
+        <p className={caption}>default (trigger=&quot;self&quot;) — the text decodes on its own hover. Used where the title text is itself the link (news / blog list rows).</p>
       </section>
 
       <section aria-label="group trigger">
         <div className={preview}>
-          <a href="#y" className={card} aria-label="static internet">
-            <ScrambleText trigger="group" className={titleInk}>
+          <a ref={setCard} href="#y" className={cardStyle} aria-label="static internet">
+            <ScrambleText trigger="group" host={card} className={titleInk}>
               static internet
             </ScrambleText>
             <span className={cardMeta}>hover anywhere on the card</span>
           </a>
         </div>
-        <p className={caption}>
-          trigger="group" — the title decodes when the nearest ancestor &lt;a&gt; is hovered. Used for whole-card links (works archive / related rails). The card aria-label keeps the accessible name
-          stable.
-        </p>
+        <p className={caption}>trigger=&quot;group&quot; + groupRef — the title decodes when the referenced element (the whole card) is hovered. The host is passed explicitly; no DOM traversal.</p>
       </section>
     </main>
   );

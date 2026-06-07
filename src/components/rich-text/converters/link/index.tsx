@@ -1,5 +1,7 @@
 import { Link } from '@components/link';
 
+import * as styles from './styles.css';
+
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
 import type { NodeTypes } from '../types';
@@ -17,21 +19,20 @@ const externalAttrs = (newTab: boolean | null | undefined): { target?: '_blank';
 
 /**
  * Overrides Payload's default `link` / `autolink` converters so authored links
- * (and auto-linked emails/URLs) render through the shared `Link` component — its
- * default variants (accent + underline + hover fill) are the inline-link look, so
- * there is no per-converter styling to keep in sync. Body links do not scramble.
- * Internal links fall back to '#'.
+ * (and auto-linked emails/URLs) render through the shared `Link` (accent +
+ * underline) plus a local `fillHover` — body links do not scramble, so the
+ * saturated hover wash is their affordance. Internal links fall back to '#'.
  */
 export const linkConverter: Partial<JSXConverters<NodeTypes>> = {
   autolink: ({ node, nodesToJSX }) => (
-    <Link href={safeHref(node.fields.url ?? undefined)} {...externalAttrs(node.fields.newTab)}>
+    <Link className={styles.fillHover} href={safeHref(node.fields.url ?? undefined)} {...externalAttrs(node.fields.newTab)}>
       {nodesToJSX({ nodes: node.children })}
     </Link>
   ),
   link: ({ node, nodesToJSX }) => {
     const href = node.fields.linkType === 'internal' ? '#' : safeHref(node.fields.url ?? undefined);
     return (
-      <Link href={href} {...externalAttrs(node.fields.newTab)}>
+      <Link className={styles.fillHover} href={href} {...externalAttrs(node.fields.newTab)}>
         {nodesToJSX({ nodes: node.children })}
       </Link>
     );

@@ -62,10 +62,10 @@ const ColophonPage = () => {
         <SectionHeading no="04">source</SectionHeading>
         <a className={s.source} href={colophon.source.href} target="_blank" rel="noopener noreferrer">
           <span className={s.sourceLabel}>
-            <ScrambleText trigger="group">{colophon.source.label}</ScrambleText>
+            <ScrambleText>{colophon.source.label}</ScrambleText>
           </span>
           <span className={s.sourceHandle}>
-            <ScrambleText trigger="group">{colophon.source.handle}</ScrambleText>
+            <ScrambleText>{colophon.source.handle}</ScrambleText>
           </span>
           <span aria-hidden="true">↗</span>
         </a>

@@ -42,8 +42,8 @@ const toRows = (works: WorkRow[]): Record<string, ReactNode>[] =>
       ),
     no: work.no,
     title: (
-      <Link href={`/works/${work.id}`} tone="accent" fill={false}>
-        <ScrambleText trigger="group">{work.title}</ScrambleText>
+      <Link href={`/works/${work.id}`} tone="accent">
+        <ScrambleText>{work.title}</ScrambleText>
       </Link>
     ),
     type: work.type,

@@ -32,8 +32,8 @@ export const BlogIndex = ({ id, posts }: Props) => {
         {posts.map((post) => (
           <li key={post.id} className={styles.post}>
             <span className={styles.index}>{post.index}</span>
-            <Link href={post.href} tone="accent" fill={false} className={styles.title}>
-              <ScrambleText trigger="group">{post.title}</ScrambleText>
+            <Link href={post.href} tone="accent" className={styles.title}>
+              <ScrambleText>{post.title}</ScrambleText>
             </Link>
             <p className={styles.meta}>
               <Tag tone="outline">{post.source}</Tag>

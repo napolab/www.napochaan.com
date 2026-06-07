@@ -32,8 +32,8 @@ export const Breadcrumbs = ({ items }: Props) => {
 
           return (
             <li key={item.label} className={styles.item} data-first={`${isFirst}`}>
-              <Link href={item.href} tone="accent" fill={false}>
-                <ScrambleText trigger="group">{item.label}</ScrambleText>
+              <Link href={item.href} tone="accent">
+                <ScrambleText>{item.label}</ScrambleText>
               </Link>
             </li>
           );

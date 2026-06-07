@@ -13,8 +13,8 @@ export const SiteFooter = ({ buildId }: Props) => {
       <span>© 2026 napochaan — graphic / digital</span>
       <span className={styles.status}>
         build {buildId ?? 'dev'} · <span className={styles.live}>life: running</span> ·{' '}
-        <Link href="/colophon" tone="muted" fill={false}>
-          <ScrambleText trigger="group">colophon</ScrambleText>
+        <Link href="/colophon" tone="muted">
+          <ScrambleText>colophon</ScrambleText>
         </Link>
       </span>
     </footer>

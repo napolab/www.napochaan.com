@@ -17,8 +17,8 @@ const ErrorPage = ({ reset }: Props) => (
     <Button variant="danger" onPress={reset}>
       retry
     </Button>
-    <Link href="/" tone="accent" fill={false} className={s.homeLink}>
-      ← <ScrambleText trigger="group">/ へ戻る</ScrambleText>
+    <Link href="/" tone="accent" className={s.homeLink}>
+      ← <ScrambleText>/ へ戻る</ScrambleText>
     </Link>
   </ErrorScreen>
 );

@@ -14,7 +14,7 @@ describe('ScrambleText', () => {
   it('keeps the text as the accessible name even inside a link', async () => {
     await render(
       <a href="/x" aria-label="archive">
-        <ScrambleText trigger="group">archive</ScrambleText>
+        <ScrambleText>archive</ScrambleText>
       </a>,
     );
     await expect.element(page.getByRole('link', { name: 'archive' })).toBeInTheDocument();

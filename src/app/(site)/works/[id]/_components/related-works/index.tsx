@@ -1,5 +1,7 @@
 'use client';
 
+import { useState } from 'react';
+
 import { Image } from '@components/image';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
@@ -24,17 +26,20 @@ type Props = {
 // present/absent branch and the per-item link stay a small client leaf.
 const RelatedItem = ({ work }: { work: RelatedWork }) => {
   const { thumbnail } = work;
+  const [card, setCard] = useState<HTMLAnchorElement | null>(null);
 
   return (
     <li>
-      <Link href={`/works/${work.id}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} fill={false}>
+      <Link ref={setCard} href={`/works/${work.id}`} className={clsx(s.item, 'group')} tone="inherit" underline={false}>
         {thumbnail === undefined ? (
           <span className={s.thumbPlaceholder} aria-hidden="true" />
         ) : (
           <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.thumb} />
         )}
-        <span className={clsx(link({ tone: 'accent', underline: true, fill: false, focusRing: false }), s.title)}>
-          <ScrambleText trigger="group">{work.title}</ScrambleText>
+        <span className={clsx(link({ tone: 'accent', underline: true, focusRing: false }), s.title)}>
+          <ScrambleText trigger="group" host={card}>
+            {work.title}
+          </ScrambleText>
         </span>
         <span className={s.type}>{work.type}</span>
       </Link>

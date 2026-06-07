@@ -26,14 +26,14 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
       return <span className={s.empty} aria-hidden="true" />;
     case 'present':
       return (
-        <Link href={`/blog/${slot.item.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false} fill={false}>
+        <Link href={`/blog/${slot.item.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false}>
           {slot.side === 'prev' ? (
             <span className={s.arrow} aria-hidden="true">
               ‹
             </span>
           ) : null}
           <span className={s.label}>
-            <ScrambleText trigger="group">{slot.item.title}</ScrambleText>
+            <ScrambleText>{slot.item.title}</ScrambleText>
           </span>
           {slot.side === 'next' ? (
             <span className={s.arrow} aria-hidden="true">
@@ -46,7 +46,7 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
 };
 
 // Prev / next navigation between adjacent posts, plus a back link to the index. A
-// Server Component built on the shared `Link` (fill disabled; scramble is the hover).
+// Server Component built on the shared `Link`; the scramble is the hover signal.
 export const BlogNav = ({ prev, next }: Props) => {
   return (
     <nav className={s.root} aria-label="blog pagination">
@@ -54,8 +54,8 @@ export const BlogNav = ({ prev, next }: Props) => {
         <NavSlot slot={toSlot('prev', prev)} />
         <NavSlot slot={toSlot('next', next)} />
       </div>
-      <Link href="/blog" className={s.back} tone="subtle" fill={false}>
-        ← <ScrambleText trigger="group">blog 一覧</ScrambleText>
+      <Link href="/blog" className={s.back} tone="subtle">
+        ← <ScrambleText>blog 一覧</ScrambleText>
       </Link>
     </nav>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 
 import { Image } from '@components/image';
 import { Link } from '@components/link';
@@ -41,18 +41,21 @@ const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})`
 // row reads as a link; the whole card stays the click target.
 const WorkItem = ({ work }: { work: ArchiveItem }) => {
   const { thumbnail } = work;
+  const [card, setCard] = useState<HTMLAnchorElement | null>(null);
 
   return (
     <li>
-      <Link href={`/works/${work.id}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} fill={false} focusRing={false}>
+      <Link ref={setCard} href={`/works/${work.id}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} focusRing={false}>
         {thumbnail === undefined ? null : <span className={s.ambient} aria-hidden="true" style={ambientStyle(thumbnail.src)} />}
         {thumbnail === undefined ? (
           <span className={s.thumbPlaceholder} aria-hidden="true" />
         ) : (
           <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.thumb} />
         )}
-        <span className={clsx(link({ tone: 'accent', underline: true, fill: false, focusRing: false }), s.title)}>
-          <ScrambleText trigger="group">{work.title}</ScrambleText>
+        <span className={clsx(link({ tone: 'accent', underline: true, focusRing: false }), s.title)}>
+          <ScrambleText trigger="group" host={card}>
+            {work.title}
+          </ScrambleText>
         </span>
         <span className={s.type}>{work.type}</span>
         <span className={s.arrow} aria-hidden="true">
@@ -75,8 +78,8 @@ export const WorksArchive = ({ works }: Props) => {
               pinned; this marker scrolls to the section start. */}
           <span id={`year-${group.year}`} className={s.anchor} style={spineStyle(index)} aria-hidden="true" />
           <h2 id={`year-${group.year}-heading`} className={s.spine} style={spineStyle(index)}>
-            <Link href={`#year-${group.year}`} className={s.spineLink} tone="inherit" underline={false} fill={false} focusRing={false}>
-              <ScrambleText trigger="group">{`${group.year}`}</ScrambleText>
+            <Link href={`#year-${group.year}`} className={s.spineLink} tone="inherit" underline={false} focusRing={false}>
+              <ScrambleText>{`${group.year}`}</ScrambleText>
             </Link>
           </h2>
           <ul className={s.rows} aria-labelledby={`year-${group.year}-heading`}>

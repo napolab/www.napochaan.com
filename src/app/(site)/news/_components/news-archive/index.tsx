@@ -32,8 +32,8 @@ const NewsRow = ({ item }: { item: ArchiveItem }) => {
       <Tag tone="outline" className={s.category}>
         {item.category}
       </Tag>
-      <Link href={`/news/${item.id}`} tone="accent" fill={false} className={s.title}>
-        <ScrambleText trigger="group">{item.title}</ScrambleText>
+      <Link href={`/news/${item.id}`} tone="accent" className={s.title}>
+        <ScrambleText>{item.title}</ScrambleText>
       </Link>
     </li>
   );

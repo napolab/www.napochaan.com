@@ -1,3 +1,7 @@
+'use client';
+
+import { useState } from 'react';
+
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 import { SystemAnnotation } from '@components/system-annotation';
@@ -23,11 +27,15 @@ type Post = {
 // trigger listens on this card's <a>, so hovering anywhere decodes the title.
 // `aria-label` keeps the link's accessible name the title while the glyphs churn.
 export const PostCard = ({ post }: { post: Post }) => {
+  const [card, setCard] = useState<HTMLAnchorElement | null>(null);
+
   return (
-    <Link className={s.card} aria-label={post.title} href={`/blog/${post.id}`} tone="inherit" underline={false} fill={false}>
+    <Link ref={setCard} className={s.card} aria-label={post.title} href={`/blog/${post.id}`} tone="inherit" underline={false}>
       <span className={s.index}>{post.index}</span>
-      <span className={clsx(link({ tone: 'accent', underline: true, fill: false, focusRing: false }), s.title)}>
-        <ScrambleText trigger="group">{post.title}</ScrambleText>
+      <span className={clsx(link({ tone: 'accent', underline: true, focusRing: false }), s.title)}>
+        <ScrambleText trigger="group" host={card}>
+          {post.title}
+        </ScrambleText>
       </span>
       <p className={s.meta}>
         <Tag tone="outline">{post.source}</Tag>

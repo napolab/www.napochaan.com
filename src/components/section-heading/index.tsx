@@ -19,8 +19,8 @@ type Props = {
 const MoreLabel = ({ href, children }: { href?: string; children: ReactNode }) => {
   if (href === undefined) return <span className={styles.more}>{children}</span>;
   return (
-    <Link href={href} tone="muted" underline={false} fill={false} className={styles.more}>
-      {typeof children === 'string' ? <ScrambleText trigger="group">{children}</ScrambleText> : children}
+    <Link href={href} tone="muted" underline={false} className={styles.more}>
+      {typeof children === 'string' ? <ScrambleText>{children}</ScrambleText> : children}
     </Link>
   );
 };
