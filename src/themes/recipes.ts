@@ -28,12 +28,14 @@ export const linkRecipe = defineRecipe({
       true: { textDecorationLine: 'underline', textUnderlineOffset: '[2px]' },
       false: { textDecorationLine: 'none' },
     },
-    // The shared focus ring. Turn off (`focusRing={false}`) for whole-card links
-    // that draw their own inset indicator (clipped containers), so the two don't
-    // double up.
-    focusRing: {
-      true: { _focusVisible: { layerStyle: 'focusRing' } },
-      false: {},
+    // The shared focus ring sits 3px *outside* the element. Set
+    // `hideOutsideFocusRing` for whole-card links / full-width bars that draw
+    // their own inset ring instead (an outside ring would be clipped there) — it
+    // suppresses this one so the two don't double up. Focus stays visible via the
+    // element's own indicator.
+    hideOutsideFocusRing: {
+      false: { _focusVisible: { layerStyle: 'focusRing' } },
+      true: {},
     },
   },
   // A default-toned link is the same colour as body text, so the underline is its
@@ -47,6 +49,6 @@ export const linkRecipe = defineRecipe({
   defaultVariants: {
     tone: 'accent',
     underline: true,
-    focusRing: true,
+    hideOutsideFocusRing: false,
   },
 });

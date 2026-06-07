@@ -88,7 +88,7 @@ export const spineLink = css({
   textDecorationLine: 'none',
   color: 'fg.onSolid',
   // Inset focus ring (the bar is full-width; an outset ring would be clipped).
-  // The Link's own ring is disabled via focusRing={false}.
+  // The Link's own ring is disabled via hideOutsideFocusRing.
   _focusVisible: { layerStyle: 'focusRing', outlineOffset: '[-3px]' },
 });
 

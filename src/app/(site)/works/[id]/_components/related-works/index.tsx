@@ -36,7 +36,7 @@ const RelatedItem = ({ work }: { work: RelatedWork }) => {
         ) : (
           <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.thumb} />
         )}
-        <span className={clsx(link({ tone: 'accent', underline: true, focusRing: false }), s.title)}>
+        <span className={clsx(link({ tone: 'accent', underline: true, hideOutsideFocusRing: true }), s.title)}>
           <ScrambleText trigger="group" host={card}>
             {work.title}
           </ScrambleText>

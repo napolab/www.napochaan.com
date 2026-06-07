@@ -14,11 +14,12 @@ type Props = AnchorHTMLAttributes<HTMLAnchorElement> & {
   tone?: Tone;
   // Resting underline. Default true.
   underline?: boolean;
-  // The shared focus ring. Default true; set false for whole-card links that draw
-  // their own inset focus indicator.
-  focusRing?: boolean;
+  // Suppress the recipe's shared focus ring (which sits 3px outside the element).
+  // Default false. Set it on whole-card links / full-width bars that draw their
+  // own inset focus indicator, where an outside ring would be clipped.
+  hideOutsideFocusRing?: boolean;
 };
 
-export const Link = ({ ref, className, tone, underline, focusRing, ...rest }: Props) => {
-  return <a ref={ref} {...rest} className={clsx(link({ tone, underline, focusRing }), className)} />;
+export const Link = ({ ref, className, tone, underline, hideOutsideFocusRing, ...rest }: Props) => {
+  return <a ref={ref} {...rest} className={clsx(link({ tone, underline, hideOutsideFocusRing }), className)} />;
 };
