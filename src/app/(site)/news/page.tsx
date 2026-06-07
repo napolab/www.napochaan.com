@@ -55,7 +55,7 @@ const NewsPage = async ({ searchParams }: Props) => {
 
   return (
     <main id="main-content" className={s.main}>
-      <PageHeader title="news" breadcrumbs={crumbs} kicker="// お知らせ" />
+      <PageHeader title="news" breadcrumbs={crumbs} kicker="// お知らせ" lead="近況すぎ〜↑" />
       <NewsArchive groups={groups} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={newsHref} /> : null}
     </main>

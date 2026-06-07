@@ -34,7 +34,7 @@ const WorksPage = async ({ searchParams }: Props) => {
 
   return (
     <main id="main-content" className={s.main}>
-      <PageHeader title="works" breadcrumbs={worksCrumbs} kicker="// archive — flyer·graphic·vj" lead="制作物のアーカイブ。グリッドの上に並べた proof のログ。" />
+      <PageHeader title="works" breadcrumbs={worksCrumbs} kicker="// archive — dev·vrchat·video·graphic" lead="なにかを作るって楽しいんだよなぁ〜😁" />
       <WorksArchive works={pageWorks} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={worksHref} /> : null}
     </main>

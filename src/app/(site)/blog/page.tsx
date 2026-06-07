@@ -52,7 +52,7 @@ const BlogPage = async ({ searchParams }: Props) => {
 
   return (
     <main id="main-content" className={s.main}>
-      <PageHeader title="blog" breadcrumbs={crumbs} kicker="// 記事" />
+      <PageHeader title="blog" breadcrumbs={crumbs} kicker="// 記事" lead="あ、ほんと(発見)" />
       <PostList posts={pagePosts} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={blogHref} /> : null}
     </main>
