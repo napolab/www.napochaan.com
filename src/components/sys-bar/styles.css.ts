@@ -19,6 +19,13 @@ export const nav = css({
 });
 
 export const navLink = css({
+  // Fixed-width slots so the active (black) highlight box is the same size on
+  // every item and never resizes as the current page changes. Sized to fit the
+  // longest label ("gallery"); text centered within the slot.
+  flex: 'none',
+  width: '[9ch]',
+  minWidth: '[9ch]',
+  textAlign: 'center',
   fontFamily: 'mono',
   fontSize: 'sm',
   color: 'fg.default',

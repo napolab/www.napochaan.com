@@ -1,5 +1,4 @@
 import { Breadcrumbs } from '@components/breadcrumbs';
-import { Heading } from '@components/heading';
 import { SystemAnnotation } from '@components/system-annotation';
 
 import * as styles from './styles.css';
@@ -15,16 +14,21 @@ type Props = {
   kicker?: string;
   lead?: string;
   annotation?: string;
+  // 'tight' pulls the title tracking in for long, content titles (e.g. a news
+  // detail title) where the default label tracking reads too spread.
+  titleTracking?: 'wide' | 'tight';
 };
 
-export const PageHeader = ({ title, breadcrumbs, kicker, lead, annotation }: Props) => {
+export const PageHeader = ({ title, breadcrumbs, kicker, lead, annotation, titleTracking }: Props) => {
   return (
     <header className={styles.root}>
       <Breadcrumbs items={breadcrumbs} />
       {kicker !== undefined ? <p className={styles.kicker}>{kicker}</p> : null}
-      <Heading level={1} className={styles.title}>
+      {/* Plain h1 (not Heading) so this class owns the type fully — no display
+          font / tracking inherited from the Heading defaults to fight. */}
+      <h1 className={styles.title} data-tracking={titleTracking}>
         {title}
-      </Heading>
+      </h1>
       {lead !== undefined ? <p className={styles.lead}>{lead}</p> : null}
       {annotation !== undefined ? (
         <SystemAnnotation tone="muted" className={styles.annotation}>

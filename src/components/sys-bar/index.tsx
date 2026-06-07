@@ -9,13 +9,14 @@ import { isNavActive } from './is-nav-active';
 import * as styles from './styles.css';
 import { useClock } from './use-clock';
 
-// Transitional nav targets: 'index' and 'works' are real pages; the rest jump to
-// home-page sections until their own routes exist (see isNavActive — anchors are
-// never page-active).
+// Transitional nav targets: 'index', 'about', 'works' and 'news' are real pages;
+// the rest jump to home-page sections until their own routes exist (see
+// isNavActive — anchors are never page-active).
 const navItems = [
   { label: 'index', href: '/' },
   { label: 'about', href: '/about' },
   { label: 'works', href: '/works' },
+  { label: 'news', href: '/news' },
   { label: 'log', href: '/#log' },
   { label: 'gallery', href: '/#gallery' },
   { label: 'blog', href: '/#blog' },

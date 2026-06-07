@@ -22,11 +22,19 @@ export const kicker = css({
   color: 'accent.text',
 });
 
-// Hero-echo title: the page h1, tracked-out display caps that grow from h2 to h1.
+// The page h1, owned fully by this class (plain <h1>, no Heading): mono system
+// caps that grow from h2 to h1. The class outranks the global `h1` element
+// styles, so font/tracking are reliable. `data-tracking="tight"` (0-2-0) pulls
+// the tracking in for long content titles.
 export const title = css({
+  fontFamily: 'mono',
+  fontWeight: 'normal',
+  lineHeight: 'tight',
+  color: 'fg.default',
   textTransform: 'uppercase',
-  letterSpacing: 'wider',
+  letterSpacing: 'tighter',
   fontSize: { base: 'h2', desktop: 'h1' },
+  '&[data-tracking="tight"]': { letterSpacing: '[-0.06em]' },
 });
 
 // Markdown-style blockquote lead: accent bar on the left, indented, medium weight.
