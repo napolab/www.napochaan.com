@@ -42,6 +42,9 @@ const LinkShowcase = () => {
           <Link href="/works" tone="default">
             default
           </Link>
+          <Link href="/works" tone="subtle">
+            subtle
+          </Link>
         </div>
       </section>
       <section className={section}>

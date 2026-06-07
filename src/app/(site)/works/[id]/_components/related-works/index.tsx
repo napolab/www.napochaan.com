@@ -1,9 +1,9 @@
 'use client';
 
-import { Link } from 'react-aria-components';
-
 import { Image } from '@components/image';
+import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
+import { link } from '@styled/recipes';
 import { clsx } from '@utils/clsx';
 
 import * as s from './styles.css';
@@ -27,15 +27,15 @@ const RelatedItem = ({ work }: { work: RelatedWork }) => {
 
   return (
     <li>
-      <Link href={`/works/${work.id}`} className={clsx(s.item, 'group')}>
+      <Link href={`/works/${work.id}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} fill={false}>
         {thumbnail === undefined ? (
           <span className={s.thumbPlaceholder} aria-hidden="true" />
         ) : (
           <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.thumb} />
         )}
-        <ScrambleText trigger="group" className={s.title}>
-          {work.title}
-        </ScrambleText>
+        <span className={clsx(link({ tone: 'accent', underline: true, fill: false, focusRing: false }), s.title)}>
+          <ScrambleText trigger="group">{work.title}</ScrambleText>
+        </span>
         <span className={s.type}>{work.type}</span>
       </Link>
     </li>

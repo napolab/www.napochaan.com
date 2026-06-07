@@ -1,3 +1,4 @@
+import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 
 import * as s from './styles.css';
@@ -25,7 +26,7 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
       return <span className={s.empty} aria-hidden="true" />;
     case 'present':
       return (
-        <a href={`/blog/${slot.item.id}`} className={s.link} data-side={slot.side}>
+        <Link href={`/blog/${slot.item.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false} fill={false}>
           {slot.side === 'prev' ? (
             <span className={s.arrow} aria-hidden="true">
               ‹
@@ -39,14 +40,13 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
               ›
             </span>
           ) : null}
-        </a>
+        </Link>
       );
   }
 };
 
 // Prev / next navigation between adjacent posts, plus a back link to the index. A
-// Server Component. Uses plain `<a>` (not @components/link) — the styled link's
-// fill-on-hover treatment bleeds across nav rows.
+// Server Component built on the shared `Link` (fill disabled; scramble is the hover).
 export const BlogNav = ({ prev, next }: Props) => {
   return (
     <nav className={s.root} aria-label="blog pagination">
@@ -54,9 +54,9 @@ export const BlogNav = ({ prev, next }: Props) => {
         <NavSlot slot={toSlot('prev', prev)} />
         <NavSlot slot={toSlot('next', next)} />
       </div>
-      <a href="/blog" className={s.back}>
+      <Link href="/blog" className={s.back} tone="subtle" fill={false}>
         ← <ScrambleText trigger="group">blog 一覧</ScrambleText>
-      </a>
+      </Link>
     </nav>
   );
 };

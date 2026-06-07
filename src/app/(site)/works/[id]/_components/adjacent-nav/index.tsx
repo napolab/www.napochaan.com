@@ -1,7 +1,6 @@
 'use client';
 
-import { Link } from 'react-aria-components';
-
+import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 
 import * as s from './styles.css';
@@ -29,7 +28,7 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
       return <span className={s.empty} aria-hidden="true" />;
     case 'present':
       return (
-        <Link href={`/works/${slot.work.id}`} className={s.link} data-side={slot.side}>
+        <Link href={`/works/${slot.work.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false} fill={false}>
           {slot.side === 'prev' ? (
             <span className={s.arrow} aria-hidden="true">
               ‹

@@ -1,9 +1,9 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { Link } from 'react-aria-components';
 
 import { useLifeState } from '@components/game-of-life/provider';
+import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 
 import { isNavActive } from './is-nav-active';
@@ -34,7 +34,7 @@ export const SysBar = () => {
       <header className={styles.root}>
         <nav className={styles.nav}>
           {navItems.map(({ label, href }) => (
-            <Link key={label} href={href} className={styles.navLink} data-active={isNavActive(pathname, href) ? 'true' : undefined}>
+            <Link key={label} href={href} className={styles.navLink} data-active={isNavActive(pathname, href) ? 'true' : undefined} tone="inherit" underline={false} fill={false}>
               <ScrambleText trigger="group">{label}</ScrambleText>
             </Link>
           ))}

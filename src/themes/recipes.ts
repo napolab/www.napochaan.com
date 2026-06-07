@@ -15,13 +15,13 @@ export const linkRecipe = defineRecipe({
     transitionProperty: '[background-color,color]',
     transitionDuration: 'fast',
     transitionTimingFunction: 'stepSnap',
-    _focusVisible: { layerStyle: 'focusRing' },
   },
   variants: {
     tone: {
       accent: { color: 'accent.text' },
       muted: { color: 'fg.muted' },
       default: { color: 'fg.default' },
+      subtle: { color: 'fg.subtle' },
       inherit: { color: '[inherit]' },
     },
     underline: {
@@ -30,6 +30,13 @@ export const linkRecipe = defineRecipe({
     },
     fill: {
       true: { _hover: { bg: 'accent.solid', color: 'fg.onSolid', textDecorationLine: 'none' } },
+      false: {},
+    },
+    // The shared focus ring. Turn off (`focusRing={false}`) for whole-card links
+    // that draw their own inset indicator (clipped containers), so the two don't
+    // double up.
+    focusRing: {
+      true: { _focusVisible: { layerStyle: 'focusRing' } },
       false: {},
     },
   },
@@ -45,5 +52,6 @@ export const linkRecipe = defineRecipe({
     tone: 'accent',
     underline: true,
     fill: true,
+    focusRing: true,
   },
 });

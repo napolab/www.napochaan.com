@@ -1,3 +1,4 @@
+import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 
 import * as s from './styles.css';
@@ -25,7 +26,7 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
       return <span className={s.empty} aria-hidden="true" />;
     case 'present':
       return (
-        <a href={`/news/${slot.item.id}`} className={s.link} data-side={slot.side}>
+        <Link href={`/news/${slot.item.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false} fill={false}>
           {slot.side === 'prev' ? (
             <span className={s.arrow} aria-hidden="true">
               ‹
@@ -39,7 +40,7 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
               ›
             </span>
           ) : null}
-        </a>
+        </Link>
       );
   }
 };
@@ -53,9 +54,9 @@ export const NewsNav = ({ prev, next }: Props) => {
         <NavSlot slot={toSlot('prev', prev)} />
         <NavSlot slot={toSlot('next', next)} />
       </div>
-      <a href="/news" className={s.back}>
+      <Link href="/news" className={s.back} tone="subtle" fill={false}>
         ← <ScrambleText trigger="group">news 一覧</ScrambleText>
-      </a>
+      </Link>
     </nav>
   );
 };

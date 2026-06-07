@@ -32,7 +32,6 @@ export const title = css({
   fontWeight: 'medium',
   fontSize: 'lg',
   lineHeight: 'snug',
-  color: 'accent.text',
 });
 
 export const meta = css({

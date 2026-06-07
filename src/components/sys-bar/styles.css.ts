@@ -28,8 +28,6 @@ export const navLink = css({
   textAlign: 'center',
   fontFamily: 'mono',
   fontSize: 'sm',
-  color: 'fg.default',
-  textDecoration: 'none',
   paddingInline: '[6px]',
   // Hover affordance is the scramble alone; the active (current page) state keeps
   // its inverted black box.

@@ -87,7 +87,9 @@ export const spineLink = css({
   paddingInline: 'page',
   textDecorationLine: 'none',
   color: 'fg.onSolid',
-  outlineOffset: '[-3px]',
+  // Inset focus ring (the bar is full-width; an outset ring would be clipped).
+  // The Link's own ring is disabled via focusRing={false}.
+  _focusVisible: { layerStyle: 'focusRing', outlineOffset: '[-3px]' },
 });
 
 export const rows = css({
@@ -167,16 +169,13 @@ export const thumbPlaceholder = css({
   borderColor: 'border.default',
 });
 
+// Layout only — colour + underline come from the `link` recipe applied alongside
+// this class (the title reads as an inline link).
 export const title = css({
   flex: '1',
   minWidth: '0',
   fontFamily: 'body',
   fontSize: 'md',
-  color: 'fg.default',
-  transitionProperty: '[color]',
-  transitionDuration: 'fast',
-  transitionTimingFunction: 'stepSnap',
-  _groupHover: { color: 'accent.text' },
 });
 
 export const type = css({

@@ -1,6 +1,9 @@
+import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 import { SystemAnnotation } from '@components/system-annotation';
 import { Tag } from '@components/tag';
+import { link } from '@styled/recipes';
+import { clsx } from '@utils/clsx';
 import { dayjs } from '@utils/dayjs';
 
 import * as s from './styles.css';
@@ -21,17 +24,17 @@ type Post = {
 // `aria-label` keeps the link's accessible name the title while the glyphs churn.
 export const PostCard = ({ post }: { post: Post }) => {
   return (
-    <a href={`/blog/${post.id}`} className={s.card} aria-label={post.title}>
+    <Link className={s.card} aria-label={post.title} href={`/blog/${post.id}`} tone="inherit" underline={false} fill={false}>
       <span className={s.index}>{post.index}</span>
-      <ScrambleText trigger="group" className={s.title}>
-        {post.title}
-      </ScrambleText>
+      <span className={clsx(link({ tone: 'accent', underline: true, fill: false, focusRing: false }), s.title)}>
+        <ScrambleText trigger="group">{post.title}</ScrambleText>
+      </span>
       <p className={s.meta}>
         <Tag tone="outline">{post.source}</Tag>
         <SystemAnnotation>{`${post.readMin} min`}</SystemAnnotation>
         <SystemAnnotation>{dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}</SystemAnnotation>
       </p>
       <p className={s.excerpt}>{post.excerpt}</p>
-    </a>
+    </Link>
   );
 };

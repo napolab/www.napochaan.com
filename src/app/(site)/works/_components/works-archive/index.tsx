@@ -1,10 +1,11 @@
 'use client';
 
 import { Fragment } from 'react';
-import { Link } from 'react-aria-components';
 
 import { Image } from '@components/image';
+import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
+import { link } from '@styled/recipes';
 import { clsx } from '@utils/clsx';
 
 import { groupByYear } from './group-by-year';
@@ -33,26 +34,26 @@ const spineStyle = (index: number): CSSProperties => ({ '--spine-index': index }
 // fixed s.ambient layer can paint this row's thumb on hover.
 const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})` }) as CSSProperties;
 
-// A single work row rendered as a block link to its detail page. Uses the
-// react-aria Link (client-routes through the app's RouterProvider) — it ships
-// unstyled, so s.item fully owns the look. The thumb carries the work title as
-// alt. Rendered from a Server Component as a client leaf (children are
-// server-rendered).
+// A single work row rendered as a block link to its detail page via the shared
+// `Link` (a plain styled anchor). `focusRing={false}` defers to s.item's own inset
+// focus indicator (the row spans a clip box); `tone="inherit"` keeps s.item's
+// colour. The title itself wears the inline-link look (accent + underline) so the
+// row reads as a link; the whole card stays the click target.
 const WorkItem = ({ work }: { work: ArchiveItem }) => {
   const { thumbnail } = work;
 
   return (
     <li>
-      <Link href={`/works/${work.id}`} className={clsx(s.item, 'group')}>
+      <Link href={`/works/${work.id}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} fill={false} focusRing={false}>
         {thumbnail === undefined ? null : <span className={s.ambient} aria-hidden="true" style={ambientStyle(thumbnail.src)} />}
         {thumbnail === undefined ? (
           <span className={s.thumbPlaceholder} aria-hidden="true" />
         ) : (
           <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.thumb} />
         )}
-        <ScrambleText trigger="group" className={s.title}>
-          {work.title}
-        </ScrambleText>
+        <span className={clsx(link({ tone: 'accent', underline: true, fill: false, focusRing: false }), s.title)}>
+          <ScrambleText trigger="group">{work.title}</ScrambleText>
+        </span>
         <span className={s.type}>{work.type}</span>
         <span className={s.arrow} aria-hidden="true">
           →
@@ -74,7 +75,7 @@ export const WorksArchive = ({ works }: Props) => {
               pinned; this marker scrolls to the section start. */}
           <span id={`year-${group.year}`} className={s.anchor} style={spineStyle(index)} aria-hidden="true" />
           <h2 id={`year-${group.year}-heading`} className={s.spine} style={spineStyle(index)}>
-            <Link href={`#year-${group.year}`} className={s.spineLink}>
+            <Link href={`#year-${group.year}`} className={s.spineLink} tone="inherit" underline={false} fill={false} focusRing={false}>
               <ScrambleText trigger="group">{`${group.year}`}</ScrambleText>
             </Link>
           </h2>

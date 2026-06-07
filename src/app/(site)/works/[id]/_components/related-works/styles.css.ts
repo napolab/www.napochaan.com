@@ -36,14 +36,6 @@ export const item = css({
   transitionProperty: '[color]',
   transitionDuration: 'fast',
   transitionTimingFunction: 'stepSnap',
-  '@media (prefers-reduced-motion: reduce)': {
-    '&:focus-visible': {
-      outlineWidth: 'default',
-      outlineStyle: 'dashed',
-      outlineColor: 'accent.solid',
-      outlineOffset: '[-3px]',
-    },
-  },
 });
 
 export const thumb = css({
@@ -73,11 +65,6 @@ export const thumbPlaceholder = css({
 export const title = css({
   fontFamily: 'body',
   fontSize: 'sm',
-  color: 'fg.default',
-  transitionProperty: '[color]',
-  transitionDuration: 'fast',
-  transitionTimingFunction: 'stepSnap',
-  _groupHover: { color: 'accent.text' },
 });
 
 export const type = css({

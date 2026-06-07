@@ -25,8 +25,6 @@ export const link = css({
   gap: 'inline',
   maxWidth: '[50%]',
   minWidth: '0',
-  textDecorationLine: 'none',
-  color: 'fg.default',
   fontFamily: 'body',
   fontSize: 'sm',
   transitionProperty: '[color]',
@@ -64,8 +62,5 @@ export const back = css({
   fontFamily: 'mono',
   fontSize: 'xs',
   letterSpacing: 'wide',
-  color: 'fg.subtle',
-  textDecorationLine: 'underline',
   textUnderlineOffset: '[2px]',
-  _focusVisible: { layerStyle: 'focusRing' },
 });
