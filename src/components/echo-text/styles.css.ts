@@ -47,6 +47,6 @@ export const echoOut = css({
 
 // Trailing accent period — upright (the wordmark is italic) and red.
 export const red = css({
-  color: 'danger.solid',
+  color: 'danger.spot',
   fontStyle: 'normal',
 });

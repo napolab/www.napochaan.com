@@ -101,7 +101,7 @@ const square = {
 } as const;
 
 export const squareBlue = css({ ...square, bg: 'accent.solid' });
-export const squareRed = css({ ...square, bg: 'danger.solid' });
+export const squareRed = css({ ...square, bg: 'danger.spot' });
 
 // Blinking terminal caret appended after the lead (paused under reduced-motion).
 export const caret = css({

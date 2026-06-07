@@ -115,7 +115,13 @@ describe('semantic tokens WCAG AA (light theme)', () => {
   it('fg.onSolid on accent.solid >= 4.5 (white on blue button)', () => {
     expect(contrastRatio(resolve(sem('fg.onSolid')), resolve(sem('accent.solid')))).toBeGreaterThanOrEqual(4.5);
   });
-  it('fg.onDanger on danger.solid >= 4.5 (black on red button)', () => {
-    expect(contrastRatio(resolve(sem('fg.onDanger')), resolve(sem('danger.solid')))).toBeGreaterThanOrEqual(4.5);
+  it('fg.onDanger on danger.solid >= 5.0 (light label on deep-red button)', () => {
+    expect(contrastRatio(resolve(sem('fg.onDanger')), resolve(sem('danger.solid')))).toBeGreaterThanOrEqual(5.0);
+  });
+  it('fg.onDanger on danger.solidHover >= 4.5 (light label on hover state)', () => {
+    expect(contrastRatio(resolve(sem('fg.onDanger')), resolve(sem('danger.solidHover')))).toBeGreaterThanOrEqual(4.5);
+  });
+  it('danger.spot preserves the vivid decorative red (red-9)', () => {
+    expect(sem('danger.spot')).toBe('{colors.red.9}');
   });
 });

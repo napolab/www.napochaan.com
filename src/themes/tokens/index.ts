@@ -196,7 +196,7 @@ export const semanticTokens = defineSemanticTokens({
       muted: { value: '{colors.gray.11}' },
       subtle: { value: '{colors.gray.9}' },
       onSolid: { value: '{colors.gray.1}' },
-      onDanger: { value: '{colors.gray.12}' },
+      onDanger: { value: '{colors.gray.1}' },
     },
     border: {
       subtle: { value: '{colors.gray.6}' },
@@ -214,8 +214,8 @@ export const semanticTokens = defineSemanticTokens({
       border: { value: '{colors.blue.7}' },
     },
     danger: {
-      solid: { value: '{colors.red.9}' },
-      solidHover: { value: '{colors.red.10}' },
+      solid: { value: '{colors.red.11}' },
+      solidHover: { value: '{colors.red.12}' },
       text: { value: '{colors.red.11}' },
       border: { value: '{colors.red.7}' },
       spot: { value: '{colors.red.9}' },

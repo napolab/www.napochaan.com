@@ -19,7 +19,7 @@ export const dot = css({
     bg: 'accent.solid',
   },
   '&[data-tone="danger"]': {
-    bg: 'danger.solid',
+    bg: 'danger.spot',
   },
   '&[data-tone="neutral"]': {
     bg: 'fg.muted',

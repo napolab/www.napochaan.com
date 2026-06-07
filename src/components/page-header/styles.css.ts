@@ -70,7 +70,7 @@ const square = {
 } as const;
 
 export const squareBlue = css({ ...square, bg: 'accent.solid' });
-export const squareRed = css({ ...square, bg: 'danger.solid' });
+export const squareRed = css({ ...square, bg: 'danger.spot' });
 
 // --- Loading skeleton -------------------------------------------------------
 // Mirrors the PageHeader vertical rhythm (same gap / bottom rule / padding) so
