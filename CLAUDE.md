@@ -43,8 +43,8 @@
 
 ## ref repository
 
-ここに書かれているリポジトリには gh コマンドで参照すること
-issue, .claude/rules, skills やコードの参考にすること
+ここに書かれているリポジトリには gh コマンドで参照し、既存実装を参照する前に ref repository の内容を先に探すこと
+issue, .claude/rules, skills やコードが参考になる。
 
 <--- ここから --->
 <--- ここまで --->
@@ -58,11 +58,11 @@ issue, .claude/rules, skills やコードの参考にすること
 - `<--- ここから --->` `<--- ここまで --->` と書かれている場合はその範囲は commit しないこと
 
 ## resources rules
-- mockup 用の画像が必要な時は **Codex CLI の組み込み画像生成スキル `$imagegen`** を使うこと（`$gen_image` ではない）。
+- mockup 用の画像が必要な時は Codex CLI の組み込み画像生成スキル `$imagegen` を使うこと
 - 使い方:
     - headless（推奨）: `codex exec "<生成したい画像の説明> $imagegen"`
     - 対話: `codex "<説明> $imagegen"`
     - 参照画像を渡す: `codex -i ref.png "<説明> $imagegen"` / `codex --image a.png,b.jpg "<説明>"`
-- モデルは `gpt-image-2`。生成画像は `~/.codex/generated_images/`（`$CODEX_HOME/generated_images/`）に保存される。
-- 出力先パス・サイズ・品質・透過・枚数は **プロンプト内に自然言語で**指定する（`--out`/`--size` 等のフラグは不要）。
-- 用途: アイコン・バナー・イラスト・スプライト・プレースホルダ等のモックアップ素材。
+- モデルは `gpt-image-2`。生成画像は `~/.codex/generated_images/`（`$CODEX_HOME/generated_images/`）に保存される
+- 出力先パス・サイズ・品質・透過・枚数は プロンプト内に自然言語で指定する（`--out`/`--size` 等のフラグは不要）
+- 用途: アイコン・バナー・イラスト・スプライト・プレースホルダ等のモックアップ素材
