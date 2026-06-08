@@ -22,6 +22,7 @@ import { Tag } from '@components/tag';
 import { Timeline } from '@components/timeline';
 
 import { colophon } from '../content';
+import { GalleryArchiveLazy } from './gallery-archive-lazy';
 import { GalleryLazy } from './gallery-lazy';
 import { richTextSample } from './rich-text-sample';
 
@@ -125,6 +126,11 @@ export const demos: Record<ComponentName, ReactNode> = {
   Gallery: (
     <Suspense fallback={<SystemAnnotation tone="muted">loading gallery…</SystemAnnotation>}>
       <GalleryLazy items={galleryItems} />
+    </Suspense>
+  ),
+  GalleryArchive: (
+    <Suspense fallback={<SystemAnnotation tone="muted">loading gallery…</SystemAnnotation>}>
+      <GalleryArchiveLazy photos={galleryItems} />
     </Suspense>
   ),
   Timeline: <Timeline items={timelineItems} />,
