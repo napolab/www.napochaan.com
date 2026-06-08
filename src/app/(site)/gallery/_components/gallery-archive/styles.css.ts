@@ -127,9 +127,9 @@ export const blankMark = css({
   height: 'full',
 });
 
-// A standing display-face word (digibop) over the ✕ — set vertically and deliberately
-// oversized so it bleeds off the cell (clipped by `blank`'s overflow). nowrap keeps it
-// a single column. Latin only, so the display face renders (it carries no JP glyphs).
+// A standing display-face word (digibop) over the ✕ — set vertically, sized to sit
+// inside the cell now that the horizontal mono line carries the density. nowrap keeps
+// it one column. Latin only, so the display face renders (it carries no JP glyphs).
 export const blankText = css({
   position: 'absolute',
   inset: '0',
@@ -140,8 +140,8 @@ export const blankText = css({
   textOrientation: 'upright',
   whiteSpace: 'nowrap',
   fontFamily: 'display',
-  fontSize: '[clamp(2.5rem, 11vw, 6rem)]',
-  lineHeight: '[0.85]',
+  fontSize: '[clamp(1rem, 3vw, 1.75rem)]',
+  lineHeight: '[0.95]',
   textTransform: 'uppercase',
   color: 'fg.muted',
   userSelect: 'none',
