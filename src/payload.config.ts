@@ -11,6 +11,7 @@ import { buildConfig } from 'payload';
 import { Media } from './collections/media';
 import { News } from './collections/news';
 import { Users } from './collections/users';
+import { Works } from './collections/works';
 import { createPreviewURLFactory, draftPreviewRoute } from './lib/payload/create-preview-url-factory';
 
 import type { CloudflareContext } from '@opennextjs/cloudflare';
@@ -101,8 +102,13 @@ export default buildConfig({
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
           buildPath: (data) => `/news/preview/${data.id}`,
         }),
+        draftPreviewRoute({
+          slug: 'works',
+          previewSecret: cfEnv.PREVIEW_SECRET ?? '',
+          buildPath: (data) => `/works/${data.id}`,
+        }),
       ]),
-      collections: ['news'],
+      collections: ['news', 'works'],
     },
     get autoLogin() {
       if (process.env.NODE_ENV !== 'development') return false;
@@ -116,7 +122,7 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, News],
+  collections: [Users, Media, News, Works],
   editor: lexicalEditor(),
   secret,
   typescript: {
@@ -135,7 +141,7 @@ export default buildConfig({
       },
     }),
     seoPlugin({
-      collections: ['news'],
+      collections: ['news', 'works'],
       uploadsCollection: 'media',
       tabbedUI: true,
       generateTitle: ({ doc }) => `napochaan — ${doc.title as string}`,
