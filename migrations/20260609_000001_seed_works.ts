@@ -18,6 +18,45 @@ const ensureMedia = async (payload: MigrateUpArgs['payload'], alt: string, filen
   return created.id as number
 }
 
+// Mapping from work `no` to { alt, file } for 1-A history thumbnails (nos 09-42)
+// alt = work title (meaningful + dedupes by alt in ensureMedia)
+const historyThumbnailMap = new Map<string, { alt: string; file: string }>([
+  ['09', { alt: 'PAE2.0 ドットレカギミック制作', file: 'histories/pixelartexhibision2.0.png' }],
+  ['10', { alt: 'まだ知らない君がいる 映像提供', file: 'histories/mada-shiranai-kimi.png' }],
+  ['11', { alt: 'ボカコレ2025夏 アーカイブ作成', file: 'histories/vocacolle-2025-summer.png' }],
+  ['12', { alt: 'おてぃる誕生日 モザイクアート制作', file: 'histories/ristill-birthday-2025.jpg' }],
+  ['13', { alt: 'VRChat イベントポスター制作', file: 'histories/vrchat-event-poster.png' }],
+  ['14', { alt: 'AKAGE オマージュ動画制作', file: 'histories/akage-homage.png' }],
+  ['15', { alt: 'UMANITY HP 制作', file: 'histories/umanity.jpg' }],
+  ['16', { alt: 'ヘイロー化ギミック booth 販売', file: 'histories/halo-gimmick.png' }],
+  ['17', { alt: 'W♭Y♭K M♭C K システム作成', file: 'histories/WYKMCK.jpeg' }],
+  ['18', { alt: 'DEMiXUS システム作成', file: 'histories/DEMiXUS.jpeg' }],
+  ['19', { alt: '燭 / MusicVideo Coding Advisor', file: 'histories/tomoshibi.png' }],
+  ['20', { alt: '工房祭ステージシステム実装', file: 'histories/five-blocker.png' }],
+  ['21', { alt: 'Workers Tech Talk #3 登壇', file: 'histories/cloudflare-workers-tech-talk-3.png' }],
+  ['22', { alt: 'Hono Conf 2024 登壇（初登壇）', file: 'histories/hono-conference-2024.png' }],
+  ['23', { alt: 'flat-工房 HP 制作サポート', file: 'histories/flatkobo-hp.png' }],
+  ['24', { alt: '彼方 DL ページ作成', file: 'histories/kanata.png' }],
+  ['25', { alt: 'ボカコレ2024冬 ランキングの作成', file: 'histories/vocacolle-2024.png' }],
+  ['26', { alt: 'StudioGnu HP の作成', file: 'histories/www.studiognu.org_ja.png' }],
+  ['27', { alt: '楽曲「デュレエ」関連データ解析', file: 'histories/duree.jpg' }],
+  ['28', { alt: '「多面体、鏡面」システム作成', file: 'histories/OKIAF.png' }],
+  ['29', { alt: '第一象徴体系 LP 作成', file: 'histories/1st-album.hakualab.org.png' }],
+  ['30', { alt: 'オリジナル名刺の作成', file: 'histories/meishi-v1.jpg' }],
+  ['31', { alt: 'ボカコレランキングアーカイブの作成', file: 'histories/vocacolle-2023.jpg' }],
+  ['32', { alt: '熱異常 / シャノン REMIX テクニカルサポート', file: 'histories/netuijou-remix.jpg' }],
+  ['33', { alt: 'napochaan.com の作成（旧バージョン）', file: 'histories/napochaan-ogp.png' }],
+  ['34', { alt: 'LGTM ジェネレータ', file: 'histories/lgtm-napochaan-com.png' }],
+  ['35', { alt: '買取アプリの開発', file: 'histories/flat-kaitori.png' }],
+  ['36', { alt: 'ネットショップ UI 開発', file: 'histories/flat-shop.jpg' }],
+  ['37', { alt: 'Project BLUE Official HP 作成', file: 'histories/projectblue-hp.png' }],
+  ['38', { alt: '447Records TANA の開発', file: 'histories/447pro-tana.jpg' }],
+  ['39', { alt: 'instructors ページの開発', file: 'histories/soelu-instructor.png' }],
+  ['40', { alt: 'lessons ページの開発', file: 'histories/soelu-lesson.jpg' }],
+  ['41', { alt: '名取さなさんのファンアプリ作成（その1）', file: 'histories/natori-ar.jpg' }],
+  ['42', { alt: '名取さなさんのファンアプリ作成（その2・別アプリ）', file: 'histories/natori-task.jpg' }],
+])
+
 const worksData = [
   // --- 1-C: X-discovered works (newest first within 1-C block) ---
   {
@@ -124,7 +163,6 @@ const worksData = [
     date: '2025-06-01', // date: inferred (from tweet context, VRChat event poster)
     url: 'https://x.com/napochaan_vrc2/status/1929843195313377560',
     description: 'VRChat の個人イベント用ポスター・ロゴを制作した。可愛らしさと情報の伝わりやすさを重視したレイアウトを心がけた。',
-    thumbnail: true,
   },
   {
     no: '14',
@@ -364,11 +402,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   const existing = await payload.find({ collection: 'works', limit: 1 })
   if (existing.docs.length > 0) return
 
-  const posterMediaId = await ensureMedia(payload, 'ちこく×おてぃる お悩み相談かふぇ ポスター', 'flyer-otiru-soudan.png')
+  // Pre-create all history thumbnail media rows (idempotent by alt)
+  const thumbnailIds = new Map<string, number>()
+  for (const [no, { alt, file }] of historyThumbnailMap.entries()) {
+    const mediaId = await ensureMedia(payload, alt, file)
+    thumbnailIds.set(no, mediaId)
+  }
 
   for (const work of worksData) {
-    const hasThumbnail = 'thumbnail' in work && work.thumbnail === true
-    const thumbnail = hasThumbnail ? posterMediaId : undefined
+    const thumbnail = thumbnailIds.get(work.no)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await payload.create({
       collection: 'works',
