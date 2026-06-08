@@ -72,6 +72,7 @@ export interface Config {
     news: News;
     works: Work;
     blog: Blog;
+    gallery: Gallery;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +85,7 @@ export interface Config {
     news: NewsSelect<false> | NewsSelect<true>;
     works: WorksSelect<false> | WorksSelect<true>;
     blog: BlogSelect<false> | BlogSelect<true>;
+    gallery: GallerySelect<false> | GallerySelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -299,6 +301,37 @@ export interface Blog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery".
+ */
+export interface Gallery {
+  id: number;
+  image: number | Media;
+  /**
+   * 'flyer / 05.23' のような短い表示ラベル。
+   */
+  caption?: string | null;
+  /**
+   * 空なら画像（media）側の alt を使います。
+   */
+  alt?: string | null;
+  /**
+   * 昇順。masonry の表示順。未設定は最後。
+   */
+  order?: number | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -340,6 +373,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'blog';
         value: number | Blog;
+      } | null)
+    | ({
+        relationTo: 'gallery';
+        value: number | Gallery;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -479,6 +516,26 @@ export interface BlogSelect<T extends boolean = true> {
   publishedAt?: T;
   excerpt?: T;
   body?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gallery_select".
+ */
+export interface GallerySelect<T extends boolean = true> {
+  image?: T;
+  caption?: T;
+  alt?: T;
+  order?: T;
   meta?:
     | T
     | {
