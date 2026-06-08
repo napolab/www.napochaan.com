@@ -104,8 +104,8 @@ export const caption = css({
 });
 
 // Filler for empty grid space (ragged bottom / internal gaps left by the skyline).
-// Paper base crossed by one big ✕ (the design-system motif) that reaches the cell
-// corners. `color` drives the SVG stroke via currentColor. Decorative (aria-hidden);
+// Paper base crossed by one big ✕ that reaches the cell corners (the design-system
+// motif). `color` drives the SVG stroke via currentColor. Decorative (aria-hidden);
 // positioned by the same --cell-* vars as photo cells.
 export const blank = css({
   position: 'absolute',
@@ -114,6 +114,7 @@ export const blank = css({
   width: '[var(--cell-w)]',
   height: '[var(--cell-h)]',
   pointerEvents: 'none',
+  overflow: 'hidden',
   bg: 'bg.canvas',
   color: 'grid.line',
 });
@@ -124,4 +125,23 @@ export const blankMark = css({
   display: 'block',
   width: 'full',
   height: 'full',
+});
+
+// A standing display-face word (digibop) over the ✕ — set vertically and deliberately
+// oversized so it bleeds off the cell (clipped by `blank`'s overflow). Latin only, so
+// the display face renders (it carries no JP glyphs).
+export const blankText = css({
+  position: 'absolute',
+  inset: '0',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  writingMode: 'vertical-rl',
+  textOrientation: 'upright',
+  fontFamily: 'display',
+  fontSize: '[clamp(2.5rem, 11vw, 6rem)]',
+  lineHeight: '[0.85]',
+  textTransform: 'uppercase',
+  color: 'fg.muted',
+  userSelect: 'none',
 });

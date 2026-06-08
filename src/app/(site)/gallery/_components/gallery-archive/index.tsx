@@ -30,6 +30,10 @@ type Props = {
 
 const GAP = 2;
 
+// Latin-only system noise standing in each blank as a mock ad headline. Picked by the
+// blank's index (deterministic — blanks only exist client-side, so no SSR mismatch).
+const AD_FILLERS = ['NOT FOUND', 'AD SPACE', 'COMING SOON', 'NO SIGNAL', 'SOLD OUT', 'FOR RENT', 'SINCE 2020', 'VACANCY', '404'] as const;
+
 // The absolute-position bridge: skyline output is published as CSS custom
 // properties (the only style-prop bridge the project allows), consumed by s.cell.
 const cellVars = (place: Placement): CSSProperties => ({ '--cell-x': `${place.x}px`, '--cell-y': `${place.y}px`, '--cell-w': `${place.width}px`, '--cell-h': `${place.height}px` }) as CSSProperties;
@@ -92,12 +96,13 @@ export const GalleryArchive = ({ photos }: Props) => {
           </li>
         );
       })}
-      {blanks.map((blank) => (
+      {blanks.map((blank, index) => (
         <li key={blank.id} className={styles.blank} style={cellVars(blank)} aria-hidden="true">
           <svg className={styles.blankMark} viewBox="0 0 100 100" preserveAspectRatio="none">
-            <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
-            <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+            <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+            <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
           </svg>
+          <span className={styles.blankText}>{AD_FILLERS[index % AD_FILLERS.length]}</span>
         </li>
       ))}
     </ul>
