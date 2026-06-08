@@ -10,7 +10,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       name: 'naporitan',
       aka: 'napochaan / naporin / @naporin24690',
       now: 'プログラマー / フルスタックエンジニア · DJ · VJ',
-      team: 'StudioGnu',
+      team: 'StudioGnu / Booth²Booth',
       tagline: 'おそろしき、なんでも屋。',
       bio: richTextFromBlocks([
         {
@@ -52,12 +52,13 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       ]) as unknown as Record<string, unknown>,
       love: ['dubstep', 'brostep', 'riddim', 'color bass', 'hi-tech', 'jersey club', 'hyperpop', 'jesus club', 'hyperflip', 'bairefunk'].map((v) => ({ value: v })),
       skillGroups: [
-        { category: 'lang', items: ['TypeScript', 'Rust', 'Python', 'Ruby', 'Swift', 'C#', 'Haskell', 'WebAssembly'].map((v) => ({ value: v })) },
+        { category: 'lang', items: ['TypeScript', 'Rust', 'Python', 'Ruby', 'Swift', 'C#', 'UdonSharp', 'Haskell', 'WebAssembly'].map((v) => ({ value: v })) },
         { category: 'frontend', items: ['React', 'Next.js', 'Remix', 'CSS', 'vanilla-extract', 'React Native', 'Expo'].map((v) => ({ value: v })) },
         { category: 'backend', items: ['Hono', 'NestJS', 'GraphQL', 'Flask', 'FastAPI', 'Rails'].map((v) => ({ value: v })) },
         { category: 'infra', items: ['Cloudflare', 'Durable Objects', 'D1', 'R2', 'Firebase', 'Vercel'].map((v) => ({ value: v })) },
         { category: 'data', items: ['Yjs', 'Drizzle', 'Prisma', 'pandas', 'NumPy', 'scikit-learn'].map((v) => ({ value: v })) },
-        { category: 'graphics', items: ['WebGPU', 'WGSL', 'Unity', 'UdonSharp'].map((v) => ({ value: v })) },
+        { category: 'graphics', items: ['WebGPU', 'WGSL'].map((v) => ({ value: v })) },
+        { category: 'software', items: ['Unity', 'Figma', 'Photoshop'].map((v) => ({ value: v })) },
       ],
       contacts: [
         { label: 'x', handle: '@naporin24690', href: 'https://x.com/naporin24690' },
