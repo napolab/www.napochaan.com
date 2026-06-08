@@ -1,3 +1,5 @@
+import { PhrasedText } from '@components/phrased-text';
+
 import * as styles from './styles.css';
 
 import type { ReactNode } from 'react';
@@ -55,18 +57,19 @@ const renderMatch = (match: RegExpMatchArray, index: number): LinkPart => {
 
 /**
  * Splits a plain text run into segments, auto-linking email addresses and http(s) URLs.
- * Returns the original string untouched when there is nothing to link.
+ * Every non-link segment is wrapped in `PhrasedText` so its prose breaks between 文節
+ * (BudouX) on all browsers — replacing the Chromium-only `word-break: auto-phrase`.
  */
 const linkify = (text: string): ReactNode => {
   const matches = [...text.matchAll(LINK_RE)];
-  if (matches.length === 0) return text;
+  if (matches.length === 0) return <PhrasedText>{text}</PhrasedText>;
 
   const { parts, last } = matches.reduce<{ parts: ReactNode[]; last: number }>(
     (acc, match, index) => {
       const start = match.index ?? 0;
       if (start < acc.last) return acc;
       const before = text.slice(acc.last, start);
-      const lead = before === '' ? [] : [before];
+      const lead = before === '' ? [] : [<PhrasedText key={`text-${index}`}>{before}</PhrasedText>];
       const { node, consumed } = renderMatch(match, index);
       return { parts: [...acc.parts, ...lead, node], last: start + consumed };
     },
@@ -74,7 +77,7 @@ const linkify = (text: string): ReactNode => {
   );
 
   const tail = text.slice(last);
-  return tail === '' ? parts : [...parts, tail];
+  return tail === '' ? parts : [...parts, <PhrasedText key="text-tail">{tail}</PhrasedText>];
 };
 
 // Format flag → wrapper. Applied in ascending bitmask order.

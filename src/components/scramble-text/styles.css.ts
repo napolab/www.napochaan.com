@@ -21,16 +21,26 @@ export const ghost = css({
   visibility: 'hidden',
 });
 
-// Animated overlay. `nowrap` keeps the scramble on a single visual line: when a
-// block glyph is wider than the resolved character it spills horizontally (the
-// layer is absolute, so nothing reflows) instead of breaking to a new line. At
-// rest the fill is the resolved text, which fits the ghost box exactly.
+// Animated overlay. At rest it wraps exactly like the ghost (same text, same
+// `width: full` box) so it overlays the ghost line-for-line — critical for
+// multi-line titles (news/works/blog), which must wrap within their column
+// instead of spilling a single line out past the viewport.
+//
+// While decoding (`data-scrambling`, set for the tween's duration) it switches to
+// `nowrap`: the churning block glyphs are wider than the resolved characters, so
+// without this they would re-break the line as they flicker. `nowrap` pins the
+// scramble to a single line that spills horizontally (the layer is absolute, so
+// nothing reflows); when the decode completes the attribute drops and the
+// resolved text settles back into its wrapped layout. Mobile has no hover, so the
+// scramble never fires there and the title simply wraps.
 export const fill = css({
   position: 'absolute',
   insetBlockStart: '0',
   insetInlineStart: '0',
   width: 'full',
-  whiteSpace: 'nowrap',
   textDecorationLine: '[inherit]',
   textUnderlineOffset: '[inherit]',
+  '&[data-scrambling]': {
+    whiteSpace: 'nowrap',
+  },
 });

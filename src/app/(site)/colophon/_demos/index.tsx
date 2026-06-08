@@ -12,6 +12,7 @@ import { Link } from '@components/link';
 import { DescriptionList, List } from '@components/list';
 import { Marquee } from '@components/marquee';
 import { Pagination } from '@components/pagination';
+import { PhrasedText } from '@components/phrased-text';
 import { RichText } from '@components/rich-text';
 import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
@@ -118,6 +119,7 @@ export const demos: Record<ComponentName, ReactNode> = {
     </SectionHeading>
   ),
   RichText: <RichText data={richTextSample} />,
+  PhrasedText: <PhrasedText>文章は、読みやすい位置でちゃんと折り返したいんだよなぁ。</PhrasedText>,
   Card: <Card as="div">night vol.13 — 2024.03.15 at Club Eleven</Card>,
   Figure: <Figure src={vrchatSquare.src} alt="VRChat アバターのフレーミングポーズ" width={160} height={160} caption="frame" />,
   Gallery: (

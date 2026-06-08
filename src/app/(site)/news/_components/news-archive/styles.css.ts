@@ -40,7 +40,11 @@ export const row = css({
   display: 'grid',
   gridColumn: '[1 / -1]',
   gridTemplateColumns: '[subgrid]',
-  alignItems: 'baseline',
+  // Top-align, not baseline: the title is an inline-block scramble whose baseline
+  // is its *last* line, so on a wrapped (2-line) title `baseline` would drop the
+  // date + tag down to the title's second line. `start` pins them to the first
+  // line where they read as the row's leading metadata.
+  alignItems: 'start',
   paddingBlock: 'element',
   borderBottomWidth: 'hairline',
   borderBottomStyle: 'dashed',

@@ -37,6 +37,7 @@
     "@payloadcms/richtext-lexical": "3.81.0",
     "@payloadcms/storage-r2": "3.81.0",
     "@radix-ui/react-slot": "^1.2.4",
+    "budoux": "^0.8.4",
     "dayjs": "^1.11.21",
     "gsap": "^3.15.0",
     "hono": "^4.12.23",

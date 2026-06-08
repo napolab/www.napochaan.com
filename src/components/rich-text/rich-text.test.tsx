@@ -154,4 +154,18 @@ describe('RichText', () => {
     render(<RichText data={state([quote([text('A wise quote.')])])} />);
     await expect.element(page.getByText('A wise quote.')).toBeInTheDocument();
   });
+
+  it('inserts BudouX phrase breaks (<wbr>) into Japanese prose', async () => {
+    render(<RichText data={state([paragraph([text('今日は天気です。')])])} />);
+    const prose = page.getByText('今日は天気です。').first();
+    await expect.element(prose).toBeVisible();
+    expect(prose.element().querySelectorAll('wbr').length).toBeGreaterThan(0);
+  });
+
+  it('does not phrase-break inline code', async () => {
+    render(<RichText data={state([paragraph([text('const x = 1', 16)])])} />);
+    const code = page.getByText('const x = 1').first();
+    await expect.element(code).toBeVisible();
+    expect(code.element().querySelectorAll('wbr').length).toBe(0);
+  });
 });

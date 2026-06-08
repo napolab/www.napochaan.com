@@ -2,8 +2,11 @@ import { css } from '@styled/css';
 
 export const root = css({
   display: 'flex',
+  // Mobile stacks the menu trigger over the status line (two rows, never
+  // wrapping); desktop puts the inline nav and status on one row.
+  flexDirection: { base: 'column', desktop: 'row' },
   justifyContent: 'space-between',
-  alignItems: 'center',
+  alignItems: { base: 'start', desktop: 'center' },
   gap: '4',
   flexWrap: 'wrap',
   borderBottomWidth: 'default',
@@ -12,10 +15,71 @@ export const root = css({
   paddingBlock: 'element',
 });
 
+// Inline nav is desktop-only; below 768px the seven fixed slots would wrap.
 export const nav = css({
-  display: 'flex',
+  display: { base: 'none', desktop: 'flex' },
   gap: '[18px]',
   flexWrap: 'wrap',
+});
+
+// The mobile trigger mirrors the nav: shown only where the inline nav is hidden.
+export const menuRoot = css({
+  display: { base: 'block', desktop: 'none' },
+});
+
+export const menuButton = css({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '2',
+  fontFamily: 'mono',
+  fontSize: 'sm',
+  paddingBlock: '[2px]',
+  paddingInline: '[8px]',
+  color: 'fg.default',
+  bg: 'transparent',
+  borderWidth: 'default',
+  borderStyle: 'solid',
+  borderColor: 'fg.default',
+  cursor: 'pointer',
+  '&[data-hovered]': { bg: 'fg.default', color: 'fg.onSolid' },
+  '&[data-pressed]': { bg: 'fg.default', color: 'fg.onSolid' },
+});
+
+// react-aria Popover — a bordered terminal panel anchored under the trigger.
+// An explicit literal width (not min-width, not a token var) so the panel can
+// never collapse to the trigger's narrow width: iOS Safari sizes react-aria
+// popovers off `--trigger-width` (~75px here), and min-width did not reliably
+// override that. A fixed 12rem comfortably fits the longest label ("gallery"),
+// and the viewport cap keeps it on-screen on the smallest phones.
+export const popover = css({
+  width: '[12rem]',
+  maxWidth: '[calc(100vw - 3rem)]',
+  bg: 'bg.canvas',
+  borderWidth: 'default',
+  borderStyle: 'solid',
+  borderColor: 'fg.default',
+});
+
+export const menu = css({
+  display: 'flex',
+  flexDirection: 'column',
+  padding: '[4px]',
+  outlineStyle: 'none',
+});
+
+export const menuItem = css({
+  fontFamily: 'mono',
+  fontSize: 'sm',
+  paddingBlock: '[6px]',
+  paddingInline: '[10px]',
+  color: 'fg.default',
+  textAlign: 'start',
+  cursor: 'pointer',
+  outlineStyle: 'none',
+  '&[data-hovered]': { bg: 'bg.subtle' },
+  '&[data-focused]': { bg: 'bg.subtle' },
+  // Current page — same inverted slot the inline nav uses for the active item.
+  '&[data-active]': { color: 'fg.onSolid', bg: 'fg.default' },
 });
 
 export const navLink = css({

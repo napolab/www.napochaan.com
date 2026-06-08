@@ -1,4 +1,5 @@
 import { EchoText } from '@components/echo-text';
+import { PhrasedText } from '@components/phrased-text';
 import { SystemAnnotation } from '@components/system-annotation';
 
 import * as styles from './styles.css';
@@ -23,7 +24,9 @@ export const AboutMasthead = ({ name, kicker, lead }: Props) => {
       <h1 className={styles.title}>
         <EchoText>{name}</EchoText>
       </h1>
-      <p className={styles.lead}>{lead}</p>
+      <p className={styles.lead}>
+        <PhrasedText>{lead}</PhrasedText>
+      </p>
       <SystemAnnotation tone="danger" className={styles.annotationEnd}>
         ▸ whoami
       </SystemAnnotation>

@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { Button, Menu, MenuItem, MenuTrigger, Popover } from 'react-aria-components';
 
 import { useLifeState } from '@components/game-of-life/provider';
 import { Link } from '@components/link';
@@ -47,11 +48,32 @@ export const SysBar = () => {
   return (
     <>
       <header className={styles.root}>
-        <nav className={styles.nav}>
+        {/* Desktop (≥768px): inline slots. Hidden below, where 7 slots would wrap. */}
+        <nav className={styles.nav} aria-label="グローバルナビゲーション">
           {navItems.map(({ label, href }) => (
             <NavLink key={label} label={label} href={href} active={isNavActive(pathname, href)} />
           ))}
         </nav>
+        {/* Mobile (<768px): a single trigger that opens the same targets in a
+            react-aria Menu popover, so the bar never wraps to a second nav row. */}
+        <div className={styles.menuRoot}>
+          <MenuTrigger>
+            {/* aria-label names the trigger (and, through it, the popover) so the
+                decorative ≡ glyph never leaks into the accessible name. */}
+            <Button className={styles.menuButton} aria-label="グローバルナビゲーション">
+              <span aria-hidden="true">≡</span> menu
+            </Button>
+            <Popover className={styles.popover}>
+              <Menu className={styles.menu} aria-label="グローバルナビゲーション">
+                {navItems.map(({ label, href }) => (
+                  <MenuItem key={label} href={href} className={styles.menuItem} data-active={isNavActive(pathname, href) ? 'true' : undefined}>
+                    {label}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </Popover>
+          </MenuTrigger>
+        </div>
         <div className={styles.status}>
           <span>{clock}</span>
           <span className={styles.gen}>gen {gen}</span>

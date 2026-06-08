@@ -16,7 +16,24 @@ const EngineDisplay = () => {
   return <div data-testid="engine">{engine !== null && engine !== undefined ? 'has-engine' : 'no-engine'}</div>;
 };
 
+const AliveDisplay = () => {
+  const state = useLifeState();
+  return <div data-testid="alive">{`${state.alive}`}</div>;
+};
+
 describe('LifeEngineProvider', () => {
+  it('seeds a deterministic empty placeholder so SSR and client hydration agree', async () => {
+    // No engine prop → the default placeholder. It must report 0 alive cells with
+    // no Math.random at construction; a random seed would make the server- and
+    // client-rendered bar text differ and throw a hydration mismatch.
+    render(
+      <LifeEngineProvider>
+        <AliveDisplay />
+      </LifeEngineProvider>,
+    );
+    await expect.element(page.getByTestId('alive')).toHaveTextContent('0');
+  });
+
   it('renders generation from useLifeState', async () => {
     const engine = createLifeEngine({ cols: 4, rows: 4 });
     render(

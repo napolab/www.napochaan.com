@@ -61,13 +61,21 @@ export const ScrambleText = (props: Props) => {
       // and reverted on cleanup.
       const decode = contextSafe(() => {
         if (reduced()) return;
+        const fill = fillRef.current;
+        if (fill === null) return;
         // revealDelay holds a short full scramble before decoding; low speed
         // keeps the glyph refresh chunky (digital) rather than a smooth blur;
         // tweenLength off since the text length never changes.
-        gsap.to(fillRef.current, {
+        // data-scrambling pins the fill to a single line for the decode (see
+        // styles) so the wider block glyphs never force a wrap; it drops on
+        // complete and the resolved text settles back into its wrapped layout.
+        gsap.to(fill, {
           duration: DURATION,
           ease: 'none',
           scrambleText: { text: children, chars: CHARS, speed: 0.5, revealDelay: 0.1, tweenLength: false },
+          onStart: () => fill.setAttribute('data-scrambling', 'true'),
+          onComplete: () => fill.removeAttribute('data-scrambling'),
+          onInterrupt: () => fill.removeAttribute('data-scrambling'),
         });
       });
 
