@@ -85,6 +85,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
   	\`latest\` integer,
+  	\`autosave\` integer,
   	FOREIGN KEY (\`parent_id\`) REFERENCES \`news\`(\`id\`) ON UPDATE no action ON DELETE set null,
   	FOREIGN KEY (\`version_meta_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
@@ -97,24 +98,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE INDEX \`_news_v_created_at_idx\` ON \`_news_v\` (\`created_at\`);`)
   await db.run(sql`CREATE INDEX \`_news_v_updated_at_idx\` ON \`_news_v\` (\`updated_at\`);`)
   await db.run(sql`CREATE INDEX \`_news_v_latest_idx\` ON \`_news_v\` (\`latest\`);`)
-  await db.run(sql`CREATE TABLE \`pages\` (
-  	\`id\` integer PRIMARY KEY NOT NULL,
-  	\`title\` text NOT NULL,
-  	\`slug\` text NOT NULL,
-  	\`content\` text,
-  	\`excerpt\` text,
-  	\`meta_title\` text,
-  	\`meta_description\` text,
-  	\`meta_image_id\` integer,
-  	\`updated_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
-  	\`created_at\` text DEFAULT (strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) NOT NULL,
-  	FOREIGN KEY (\`meta_image_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE set null
-  );
-  `)
-  await db.run(sql`CREATE UNIQUE INDEX \`pages_slug_idx\` ON \`pages\` (\`slug\`);`)
-  await db.run(sql`CREATE INDEX \`pages_meta_meta_image_idx\` ON \`pages\` (\`meta_image_id\`);`)
-  await db.run(sql`CREATE INDEX \`pages_updated_at_idx\` ON \`pages\` (\`updated_at\`);`)
-  await db.run(sql`CREATE INDEX \`pages_created_at_idx\` ON \`pages\` (\`created_at\`);`)
+  await db.run(sql`CREATE INDEX \`_news_v_autosave_idx\` ON \`_news_v\` (\`autosave\`);`)
   await db.run(sql`CREATE TABLE \`payload_kv\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`key\` text NOT NULL,
@@ -140,12 +124,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`users_id\` integer,
   	\`media_id\` integer,
   	\`news_id\` integer,
-  	\`pages_id\` integer,
   	FOREIGN KEY (\`parent_id\`) REFERENCES \`payload_locked_documents\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`users_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade,
   	FOREIGN KEY (\`media_id\`) REFERENCES \`media\`(\`id\`) ON UPDATE no action ON DELETE cascade,
-  	FOREIGN KEY (\`news_id\`) REFERENCES \`news\`(\`id\`) ON UPDATE no action ON DELETE cascade,
-  	FOREIGN KEY (\`pages_id\`) REFERENCES \`pages\`(\`id\`) ON UPDATE no action ON DELETE cascade
+  	FOREIGN KEY (\`news_id\`) REFERENCES \`news\`(\`id\`) ON UPDATE no action ON DELETE cascade
   );
   `)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_order_idx\` ON \`payload_locked_documents_rels\` (\`order\`);`)
@@ -154,7 +136,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_users_id_idx\` ON \`payload_locked_documents_rels\` (\`users_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_media_id_idx\` ON \`payload_locked_documents_rels\` (\`media_id\`);`)
   await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_news_id_idx\` ON \`payload_locked_documents_rels\` (\`news_id\`);`)
-  await db.run(sql`CREATE INDEX \`payload_locked_documents_rels_pages_id_idx\` ON \`payload_locked_documents_rels\` (\`pages_id\`);`)
   await db.run(sql`CREATE TABLE \`payload_preferences\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`key\` text,
@@ -198,7 +179,6 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.run(sql`DROP TABLE \`media\`;`)
   await db.run(sql`DROP TABLE \`news\`;`)
   await db.run(sql`DROP TABLE \`_news_v\`;`)
-  await db.run(sql`DROP TABLE \`pages\`;`)
   await db.run(sql`DROP TABLE \`payload_kv\`;`)
   await db.run(sql`DROP TABLE \`payload_locked_documents\`;`)
   await db.run(sql`DROP TABLE \`payload_locked_documents_rels\`;`)

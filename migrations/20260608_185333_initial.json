@@ -570,6 +570,13 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "autosave": {
+          "name": "autosave",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -628,6 +635,13 @@
             "latest"
           ],
           "isUnique": false
+        },
+        "_news_v_autosave_idx": {
+          "name": "_news_v_autosave_idx",
+          "columns": [
+            "autosave"
+          ],
+          "isUnique": false
         }
       },
       "foreignKeys": {
@@ -650,131 +664,6 @@
           "tableTo": "media",
           "columnsFrom": [
             "version_meta_image_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "checkConstraints": {}
-    },
-    "pages": {
-      "name": "pages",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
-          "primaryKey": true,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "slug": {
-          "name": "slug",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "content": {
-          "name": "content",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "excerpt": {
-          "name": "excerpt",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "meta_title": {
-          "name": "meta_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "meta_description": {
-          "name": "meta_description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "meta_image_id": {
-          "name": "meta_image_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))"
-        }
-      },
-      "indexes": {
-        "pages_slug_idx": {
-          "name": "pages_slug_idx",
-          "columns": [
-            "slug"
-          ],
-          "isUnique": true
-        },
-        "pages_meta_meta_image_idx": {
-          "name": "pages_meta_meta_image_idx",
-          "columns": [
-            "meta_image_id"
-          ],
-          "isUnique": false
-        },
-        "pages_updated_at_idx": {
-          "name": "pages_updated_at_idx",
-          "columns": [
-            "updated_at"
-          ],
-          "isUnique": false
-        },
-        "pages_created_at_idx": {
-          "name": "pages_created_at_idx",
-          "columns": [
-            "created_at"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "pages_meta_image_id_media_id_fk": {
-          "name": "pages_meta_image_id_media_id_fk",
-          "tableFrom": "pages",
-          "tableTo": "media",
-          "columnsFrom": [
-            "meta_image_id"
           ],
           "columnsTo": [
             "id"
@@ -939,13 +828,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "pages_id": {
-          "name": "pages_id",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {
@@ -988,13 +870,6 @@
           "name": "payload_locked_documents_rels_news_id_idx",
           "columns": [
             "news_id"
-          ],
-          "isUnique": false
-        },
-        "payload_locked_documents_rels_pages_id_idx": {
-          "name": "payload_locked_documents_rels_pages_id_idx",
-          "columns": [
-            "pages_id"
           ],
           "isUnique": false
         }
@@ -1045,19 +920,6 @@
           "tableTo": "news",
           "columnsFrom": [
             "news_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "payload_locked_documents_rels_pages_fk": {
-          "name": "payload_locked_documents_rels_pages_fk",
-          "tableFrom": "payload_locked_documents_rels",
-          "tableTo": "pages",
-          "columnsFrom": [
-            "pages_id"
           ],
           "columnsTo": [
             "id"
@@ -1312,6 +1174,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "72f4da10-dbc2-401f-abcc-ffa11e245db8",
+  "id": "0eeebd82-65cd-4d4a-98d6-5125c5a6f380",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }
