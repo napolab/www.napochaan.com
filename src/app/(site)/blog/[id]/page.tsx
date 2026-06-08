@@ -3,9 +3,9 @@ import { notFound } from 'next/navigation';
 import { BlogNav } from './_components/blog-nav';
 import { Toc } from './_components/toc';
 import { adjacentPosts } from '../_lib/adjacent-posts';
-import { findPost } from '../_lib/find-post';
-import { posts } from '../sample-posts';
 import * as s from './styles.css';
+
+import { findBlogById, findBlogList } from '@lib/payload/blog';
 
 import { PageHeader } from '@components/page-header';
 import { RichText } from '@components/rich-text';
@@ -18,9 +18,10 @@ import type { Metadata } from 'next';
 // drives the static cache for the pre-rendered sample ids.
 export const revalidate = 3600;
 
-// Pre-render every sample post id at build time. Replaced by a CMS query in a
-// later plan, but the shape stays the same.
-export const generateStaticParams = () => posts.map((post) => ({ id: post.id }));
+export const generateStaticParams = async () => {
+  const posts = await findBlogList();
+  return posts.map((post) => ({ id: post.id }));
+};
 
 type Params = Promise<{ id: string }>;
 
@@ -34,7 +35,7 @@ const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const { id } = await params;
-  const post = findPost(posts, id);
+  const post = await findBlogById(id);
 
   return {
     get title() {
@@ -50,9 +51,10 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 
 const BlogDetailPage = async ({ params }: Props) => {
   const { id } = await params;
-  const post = findPost(posts, id);
+  const post = await findBlogById(id);
   if (post === undefined) notFound();
 
+  const posts = await findBlogList();
   const { prev, next } = adjacentPosts(posts, id);
   const headings = extractHeadings(post.body ?? null);
   const crumbs = buildCrumbs(post.title);

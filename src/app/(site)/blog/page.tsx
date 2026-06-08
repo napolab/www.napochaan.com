@@ -1,10 +1,10 @@
 import { PostList } from './_components/post-list';
-import { posts } from './sample-posts';
 import * as s from './styles.css';
 
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 import { dayjs } from '@utils/dayjs';
+import { findBlogList } from '@lib/payload/blog';
 
 import type { Metadata } from 'next';
 
@@ -22,9 +22,6 @@ const crumbs = [{ href: '/', label: 'home' }, { label: 'blog' }];
 // The feed owns its URL shape: page 1 is the bare path, deeper pages carry
 // ?page=N (Pagination doesn't hard-code it).
 const blogHref = (page: number): string => (page <= 1 ? '/blog' : `/blog?page=${page}`);
-
-// Full feed flattened newest-first, so a page slice reads in chronological order.
-const sortedPosts = [...posts].sort((a, b) => dayjs(b.date).tz('Asia/Tokyo').valueOf() - dayjs(a.date).tz('Asia/Tokyo').valueOf());
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
@@ -45,6 +42,8 @@ export const generateMetadata = (): Metadata => {
 
 const BlogPage = async ({ searchParams }: Props) => {
   const { page: raw } = await searchParams;
+  const posts = await findBlogList();
+  const sortedPosts = [...posts].sort((a, b) => dayjs(b.date).tz('Asia/Tokyo').valueOf() - dayjs(a.date).tz('Asia/Tokyo').valueOf());
   const totalPages = Math.max(1, Math.ceil(sortedPosts.length / PAGE_SIZE));
   const requested = typeof raw === 'string' ? parseInt(raw, 10) : 1;
   const page = Number.isNaN(requested) ? 1 : Math.min(Math.max(requested, 1), totalPages);
