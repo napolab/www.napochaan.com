@@ -16,12 +16,20 @@ export const Media: CollectionConfig = {
   hooks: {
     afterChange: [
       () => {
-        revalidatePath('/');
+        try {
+          revalidatePath('/');
+        } catch {
+          // revalidatePath throws outside a Next request context (e.g. CLI seed). Safe to swallow.
+        }
       },
     ],
     afterDelete: [
       () => {
-        revalidatePath('/');
+        try {
+          revalidatePath('/');
+        } catch {
+          // revalidatePath throws outside a Next request context (e.g. CLI seed). Safe to swallow.
+        }
       },
     ],
   },
