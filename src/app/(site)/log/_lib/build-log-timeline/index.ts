@@ -85,8 +85,11 @@ const toWorkEntry = (work: WorkRow): SortableEntry => {
 };
 
 // Manual log entries are dated, so they sort alongside news/posts by sortDate.
-const toManualEntry = (item: LogManualItem): SortableEntry => {
+// A gig dated strictly after `now` (day precision, Asia/Tokyo) is `upcoming`, which
+// the timeline renders with a filled dot.
+const toManualEntry = (item: LogManualItem, now: string): SortableEntry => {
   const at = dayjs(item.date).tz('Asia/Tokyo');
+  const today = dayjs(now).tz('Asia/Tokyo');
 
   return {
     id: `log-${item.id}`,
@@ -94,7 +97,7 @@ const toManualEntry = (item: LogManualItem): SortableEntry => {
     date: at.format('MM.DD'),
     meta: item.meta,
     title: item.title,
-    upcoming: false,
+    upcoming: at.startOf('day').isAfter(today.startOf('day')),
     href: item.url,
     sortDate: item.date,
   };
@@ -131,7 +134,7 @@ export const buildLogTimeline = (news: readonly NewsItem[], works: readonly Work
   const newsEntries = news.filter(isChronicleNews).map((item) => toNewsEntry(item, now));
   const postEntries = posts.map(toPostEntry);
   const workEntries = works.map(toWorkEntry);
-  const manualEntries = logs.map(toManualEntry);
+  const manualEntries = logs.map((item) => toManualEntry(item, now));
   // Works first so the canonical 制作実績 entry (accurate type label) wins when the same
   // item is also seeded as a news announcement or a manual gig log (matched by href).
   const entries = dedupeByHref([...workEntries, ...newsEntries, ...postEntries, ...manualEntries]);

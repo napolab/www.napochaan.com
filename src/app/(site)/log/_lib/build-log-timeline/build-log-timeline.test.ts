@@ -244,6 +244,17 @@ describe('buildLogTimeline manual entries', () => {
   it('keeps working when no manual entries are passed (default param)', () => {
     expect(() => buildLogTimeline([], [], [], now)).not.toThrow();
   });
+
+  it('marks a future-dated gig as upcoming and a past one as not', () => {
+    const logs: LogManualItem[] = [
+      { id: 'future', title: 'VJ at fest', date: '2026-07-26', meta: 'VJ' },
+      { id: 'past', title: 'DJ set', date: '2026-05-01', meta: 'DJ' },
+    ];
+    const items = buildLogTimeline([], [], [], now, logs).find((g) => g.year === 2026)?.items ?? [];
+
+    expect(items.find((item) => item.id === 'log-future')?.upcoming).toBe(true);
+    expect(items.find((item) => item.id === 'log-past')?.upcoming).toBe(false);
+  });
 });
 
 describe('buildLogTimeline href dedup', () => {
