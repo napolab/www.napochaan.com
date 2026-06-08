@@ -8,6 +8,7 @@ import { Divider } from '@components/divider';
 import { EchoText } from '@components/echo-text';
 import { Figure } from '@components/figure';
 import { Heading } from '@components/heading';
+import { formatBlurURL } from '@components/image/helper';
 import { Link } from '@components/link';
 import { DescriptionList, List } from '@components/list';
 import { Marquee } from '@components/marquee';
@@ -30,12 +31,12 @@ import { GameOfLifeDemo } from './game-of-life-demo';
 import { richTextSample } from './rich-text-sample';
 import { TypographyBandDemo } from './typography-band-demo';
 
-import flyerBooth0424 from '../../_assets/flyer-booth-0424.jpg';
-import flyerBooth0523 from '../../_assets/flyer-booth-0523.jpg';
-import vrchatAlice from '../../_assets/vrchat-alice.jpg';
-import vrchatGlitch from '../../_assets/vrchat-glitch.jpg';
-import vrchatSquare from '../../_assets/vrchat-square.jpg';
-import vrchatWide from '../../_assets/vrchat-wide.jpg';
+import flyerBooth0424 from '@assets/flyer-booth-0424.jpg';
+import flyerBooth0523 from '@assets/flyer-booth-0523.jpg';
+import vrchatAlice from '@assets/vrchat-alice.jpg';
+import vrchatGlitch from '@assets/vrchat-glitch.jpg';
+import vrchatSquare from '@assets/vrchat-square.jpg';
+import vrchatWide from '@assets/vrchat-wide.jpg';
 
 import type { GalleryItem } from '@components/gallery';
 import type { TimelineItem } from '@components/timeline';
@@ -132,7 +133,17 @@ export const demos: Record<ComponentName, ReactNode> = {
   RichText: <RichText data={richTextSample} />,
   PhrasedText: <PhrasedText>文章は、読みやすい位置でちゃんと折り返したいんだよなぁ。</PhrasedText>,
   Card: <Card as="div">night vol.13 — 2024.03.15 at Club Eleven</Card>,
-  Figure: <Figure src={vrchatSquare.src} alt="VRChat アバターのフレーミングポーズ" width={160} height={160} caption="frame" />,
+  Figure: (
+    <Figure
+      src={vrchatSquare.src}
+      alt="VRChat アバターのフレーミングポーズ"
+      width={vrchatSquare.width}
+      height={vrchatSquare.height}
+      caption="frame"
+      placeholder="blur"
+      blurDataURL={formatBlurURL(vrchatSquare.src, { blur: 10, width: 32, quality: 30 })}
+    />
+  ),
   Gallery: (
     <Suspense fallback={<SystemAnnotation tone="muted">loading gallery…</SystemAnnotation>}>
       <GalleryLazy items={galleryItems} />

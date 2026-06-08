@@ -1,9 +1,9 @@
-import flyerBooth0424 from './_assets/flyer-booth-0424.jpg';
-import flyerBooth0523 from './_assets/flyer-booth-0523.jpg';
-import vrchatAlice from './_assets/vrchat-alice.jpg';
-import vrchatGlitch from './_assets/vrchat-glitch.jpg';
-import vrchatSquare from './_assets/vrchat-square.jpg';
-import vrchatWide from './_assets/vrchat-wide.jpg';
+import flyerBooth0424 from '@assets/flyer-booth-0424.jpg';
+import flyerBooth0523 from '@assets/flyer-booth-0523.jpg';
+import vrchatAlice from '@assets/vrchat-alice.jpg';
+import vrchatGlitch from '@assets/vrchat-glitch.jpg';
+import vrchatSquare from '@assets/vrchat-square.jpg';
+import vrchatWide from '@assets/vrchat-wide.jpg';
 import { AboutWhoami } from './_components/about-whoami';
 import { BlogIndex } from './_components/blog-index';
 import { GallerySection } from './_components/gallery-section';

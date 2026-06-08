@@ -1,18 +1,18 @@
-import flyerBooth0424 from '../_assets/flyer-booth-0424.jpg';
-import flyerBooth0523 from '../_assets/flyer-booth-0523.jpg';
-import galleryFlyerAmbient from '../_assets/gallery-flyer-ambient.jpg';
-import galleryFlyerDnb from '../_assets/gallery-flyer-dnb.jpg';
-import galleryFlyerTechno from '../_assets/gallery-flyer-techno.jpg';
-import galleryVrchatAvatar from '../_assets/gallery-vrchat-avatar.jpg';
-import galleryVrchatBooth from '../_assets/gallery-vrchat-booth.jpg';
-import galleryVrchatCrowd from '../_assets/gallery-vrchat-crowd.jpg';
-import galleryVrchatFrame from '../_assets/gallery-vrchat-frame.jpg';
-import galleryVrchatStage from '../_assets/gallery-vrchat-stage.jpg';
-import galleryVrchatVertical from '../_assets/gallery-vrchat-vertical.jpg';
-import vrchatAlice from '../_assets/vrchat-alice.jpg';
-import vrchatGlitch from '../_assets/vrchat-glitch.jpg';
-import vrchatSquare from '../_assets/vrchat-square.jpg';
-import vrchatWide from '../_assets/vrchat-wide.jpg';
+import flyerBooth0424 from '@assets/flyer-booth-0424.jpg';
+import flyerBooth0523 from '@assets/flyer-booth-0523.jpg';
+import galleryFlyerAmbient from '@assets/gallery-flyer-ambient.jpg';
+import galleryFlyerDnb from '@assets/gallery-flyer-dnb.jpg';
+import galleryFlyerTechno from '@assets/gallery-flyer-techno.jpg';
+import galleryVrchatAvatar from '@assets/gallery-vrchat-avatar.jpg';
+import galleryVrchatBooth from '@assets/gallery-vrchat-booth.jpg';
+import galleryVrchatCrowd from '@assets/gallery-vrchat-crowd.jpg';
+import galleryVrchatFrame from '@assets/gallery-vrchat-frame.jpg';
+import galleryVrchatStage from '@assets/gallery-vrchat-stage.jpg';
+import galleryVrchatVertical from '@assets/gallery-vrchat-vertical.jpg';
+import vrchatAlice from '@assets/vrchat-alice.jpg';
+import vrchatGlitch from '@assets/vrchat-glitch.jpg';
+import vrchatSquare from '@assets/vrchat-square.jpg';
+import vrchatWide from '@assets/vrchat-wide.jpg';
 
 import type { GalleryPhoto } from '@components/gallery-archive';
 
