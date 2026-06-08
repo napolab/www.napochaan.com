@@ -95,4 +95,28 @@ describe('createRssDocument', () => {
     // The channel always carries a description; only the item-level one is omitted.
     expect(without).toContain('      <link>https://www.napochaan.com/news/abc</link>\n    </item>');
   });
+
+  it('emits an <enclosure> element when an item has one', () => {
+    const xml = createRssDocument({
+      channel: { title: 'g', link: 'https://x.test/gallery', description: 'd' },
+      items: [
+        {
+          title: 'flyer',
+          link: 'https://x.test/gallery',
+          enclosure: { url: 'https://x.test/img.jpg', type: 'image/jpeg', length: 0 },
+        },
+      ],
+    });
+
+    expect(xml).toContain('<enclosure url="https://x.test/img.jpg" length="0" type="image/jpeg"/>');
+  });
+
+  it('omits <enclosure> when absent', () => {
+    const xml = createRssDocument({
+      channel: { title: 'g', link: 'https://x.test', description: 'd' },
+      items: [{ title: 't', link: 'https://x.test/1' }],
+    });
+
+    expect(xml).not.toContain('<enclosure');
+  });
 });

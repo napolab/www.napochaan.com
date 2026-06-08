@@ -16,8 +16,10 @@ const buildItem = (item: ItemData): string => {
   const pubDateLine = item.pubDate === undefined ? undefined : `      <pubDate>${toRfc822(item.pubDate)}</pubDate>`;
   const categoryLine = item.category === undefined ? undefined : `      <category>${escapeXml(item.category)}</category>`;
   const descriptionLine = item.description === undefined ? undefined : `      <description>${escapeXml(item.description)}</description>`;
+  const enclosureLine =
+    item.enclosure === undefined ? undefined : `      <enclosure url="${escapeXml(item.enclosure.url)}" length="${item.enclosure.length}" type="${escapeXml(item.enclosure.type)}"/>`;
 
-  const lines = [`      <title>${escapeXml(item.title)}</title>`, `      <link>${escapeXml(item.link)}</link>`, guidLine, pubDateLine, categoryLine, descriptionLine].filter(
+  const lines = [`      <title>${escapeXml(item.title)}</title>`, `      <link>${escapeXml(item.link)}</link>`, guidLine, pubDateLine, categoryLine, descriptionLine, enclosureLine].filter(
     (line): line is string => line !== undefined,
   );
 
