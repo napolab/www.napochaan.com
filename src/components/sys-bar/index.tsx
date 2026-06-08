@@ -38,8 +38,8 @@ const NavLink = ({ label, href, active }: { label: string; href: string; active:
   );
 };
 
-export const SysBar = () => {
-  const clock = useClock();
+export const SysBar = ({ initialTime }: { initialTime: string }) => {
+  const clock = useClock(initialTime);
   const state = useLifeState();
   const pathname = usePathname();
   const presence = usePresence();

@@ -5,7 +5,7 @@ import { page } from 'vitest/browser';
 import { useClock } from './index';
 
 const ClockProbe = () => {
-  const clock = useClock();
+  const clock = useClock('12:34:56');
   return <output>{clock}</output>;
 };
 

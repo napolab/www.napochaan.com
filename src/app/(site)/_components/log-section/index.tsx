@@ -13,6 +13,9 @@ type LogEntry = {
   title: string;
   meta?: string;
   upcoming?: boolean;
+  // Where the entry title links — its source detail page (/works/:id, /news/:id)
+  // or an external URL. Omit to render the title as plain text.
+  href?: string;
 };
 
 type Props = {
@@ -20,7 +23,8 @@ type Props = {
   entries: LogEntry[];
 };
 
-const toTimelineItems = (entries: LogEntry[]): TimelineItem[] => entries.map((entry) => ({ id: entry.id, date: entry.date, label: entry.title, meta: entry.meta, upcoming: entry.upcoming }));
+const toTimelineItems = (entries: LogEntry[]): TimelineItem[] =>
+  entries.map((entry) => ({ id: entry.id, date: entry.date, label: entry.title, meta: entry.meta, upcoming: entry.upcoming, href: entry.href }));
 
 export const LogSection = ({ id, entries }: Props) => {
   return (

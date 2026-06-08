@@ -40,11 +40,11 @@ const works = [
 
 // Activity chronicle (年表): gigs + releases + works, not just performances.
 const activity = [
-  { id: '1', date: '06/14', title: 'next gig @ club (予定)', meta: 'Tokyo', upcoming: true },
-  { id: '2', date: '05/01', title: 'new EP 公開', meta: 'release' },
-  { id: '3', date: '04/02', title: 'techno set @ venue', meta: 'DJ' },
-  { id: '4', date: '03/10', title: 'night graphics vol.13', meta: 'flyer' },
-  { id: '5', date: '02/18', title: 'VJ @ event', meta: 'VJ' },
+  { id: '1', date: '06/14', title: 'next gig @ club (予定)', meta: 'Tokyo', upcoming: true, href: '/news/2' },
+  { id: '2', date: '05/01', title: 'new EP 公開', meta: 'release', href: '/news/3' },
+  { id: '3', date: '04/02', title: 'techno set @ venue', meta: 'DJ', href: '/works/9' },
+  { id: '4', date: '03/10', title: 'night graphics vol.13', meta: 'flyer', href: '/works/6' },
+  { id: '5', date: '02/18', title: 'VJ @ event', meta: 'VJ', href: '/works/11' },
 ];
 
 const gallery: GalleryItem[] = [

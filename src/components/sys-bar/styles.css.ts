@@ -2,18 +2,19 @@ import { css } from '@styled/css';
 
 export const root = css({
   display: 'flex',
-  // Mobile stacks the menu trigger over the status line (two rows, never
-  // wrapping); desktop puts the inline nav and status on one row.
-  flexDirection: { base: 'column', desktop: 'row' },
-  justifyContent: 'space-between',
-  alignItems: { base: 'start', desktop: 'center' },
+  // Always a two-row stack — nav/menu on the first row, the live status on the
+  // second — at every width. Desktop used to put nav + status on one wrapping
+  // row, but the row only split onto a second line *after* hydration (mono font
+  // swap + live values widen it past the container), so the bar visibly jumped
+  // from one row to two. Stacking from the start makes the 2nd row deterministic.
+  flexDirection: 'column',
+  alignItems: 'start',
   gap: '4',
-  // Wrap only in the desktop row (where nav + status may overflow onto a second
-  // line). In the mobile COLUMN, wrap must stay off: a column flex container that
-  // is allowed to wrap breaks the menu/status stack into two *columns* whenever
-  // the header is given a height shorter than its content (e.g. a transient
-  // reflow / iOS dynamic toolbar), which makes `cursors: …` jump up beside `menu`.
-  flexWrap: { base: 'nowrap', desktop: 'wrap' },
+  // nowrap at every width: a column flex container that is allowed to wrap breaks
+  // the stack into two *columns* whenever the header is given a height shorter
+  // than its content (e.g. a transient reflow / iOS dynamic toolbar), which makes
+  // `cursors: …` jump up beside the nav/menu row.
+  flexWrap: 'nowrap',
   borderBottomWidth: 'default',
   borderBottomStyle: 'solid',
   borderBottomColor: 'fg.default',
