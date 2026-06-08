@@ -1,22 +1,22 @@
-import { Gallery } from '@components/gallery';
+import { GalleryArchive } from '@components/gallery-archive';
 import { SectionHeading } from '@components/section-heading';
 
 import * as styles from './styles.css';
 
-import type { GalleryItem } from '@components/gallery';
+import type { GalleryPhoto } from '@components/gallery-archive';
 
 type Props = {
   id?: string;
-  items: GalleryItem[];
+  photos: readonly GalleryPhoto[];
 };
 
-export const GallerySection = ({ id, items }: Props) => {
+export const GallerySection = ({ id, photos }: Props) => {
   return (
     <section id={id} className={styles.root}>
       <SectionHeading no="04" href="/gallery" more="flyer / VRChat →" moreHref="/gallery">
         gallery
       </SectionHeading>
-      <Gallery items={items} />
+      <GalleryArchive photos={photos} />
     </section>
   );
 };

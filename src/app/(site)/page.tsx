@@ -1,9 +1,3 @@
-import flyerBooth0424 from '@assets/flyer-booth-0424.jpg';
-import flyerBooth0523 from '@assets/flyer-booth-0523.jpg';
-import vrchatAlice from '@assets/vrchat-alice.jpg';
-import vrchatGlitch from '@assets/vrchat-glitch.jpg';
-import vrchatSquare from '@assets/vrchat-square.jpg';
-import vrchatWide from '@assets/vrchat-wide.jpg';
 import { AboutWhoami } from './_components/about-whoami';
 import { BlogIndex } from './_components/blog-index';
 import { GallerySection } from './_components/gallery-section';
@@ -11,11 +5,17 @@ import { LogSection } from './_components/log-section';
 import { Hero } from './_components/hero';
 import { NewsSection } from './_components/news-section';
 import { WorksSection } from './_components/works-section';
-import { findLatestNews } from '@lib/payload/news';
+import { buildLogTimeline } from './log/_lib/build-log-timeline';
+import { fetchExternalPosts } from './log/_lib/fetch-external-posts';
+import { findBlogList } from '@lib/payload/blog';
+import { findGalleryList } from '@lib/payload/gallery';
+import { findLatestNews, findNewsList } from '@lib/payload/news';
+import { findLogList } from '@lib/payload/logs';
+import { findWorksList } from '@lib/payload/works';
+import { dayjs } from '@utils/dayjs';
 import * as s from './styles.css';
 
 import type { NewsItem } from './news/_lib/news-item';
-import type { GalleryItem } from '@components/gallery';
 
 // Revalidate hourly so OpenNext serves the page via ISR.
 export const revalidate = 3600;
@@ -48,74 +48,27 @@ const about = {
   wants: '後悔を、残さない。ぼくも、周りも。',
 };
 
-const works = [
-  { id: '1', no: '01', title: 'night graphics vol.13', type: 'flyer', year: '2024', thumb: { src: flyerBooth0424.src, width: flyerBooth0424.width, height: flyerBooth0424.height } },
-  { id: '2', no: '02', title: 'Booth² key visual', type: 'graphic', year: '2026', thumb: { src: vrchatSquare.src, width: vrchatSquare.width, height: vrchatSquare.height } },
-  { id: '3', no: '03', title: 'VRChat stage VJ set', type: 'vj', year: '2025', thumb: { src: vrchatGlitch.src, width: vrchatGlitch.width, height: vrchatGlitch.height } },
-];
-
-// Activity chronicle (年表): gigs + releases + works, not just performances.
-const activity = [
-  { id: '1', date: '06/14', title: 'next gig @ club (予定)', meta: 'Tokyo', upcoming: true, href: '/news/2' },
-  { id: '2', date: '05/01', title: 'new EP 公開', meta: 'release', href: '/news/3' },
-  { id: '3', date: '04/02', title: 'techno set @ venue', meta: 'DJ', href: '/works/9' },
-  { id: '4', date: '03/10', title: 'night graphics vol.13', meta: 'flyer', href: '/works/6' },
-  { id: '5', date: '02/18', title: 'VJ @ event', meta: 'VJ', href: '/works/11' },
-];
-
-const gallery: GalleryItem[] = [
-  {
-    id: '1',
-    src: flyerBooth0424.src,
-    alt: 'Booth² 2026.04.24 イベントフライヤー',
-    width: flyerBooth0424.width,
-    height: flyerBooth0424.height,
-    area: 'lead',
-    caption: 'flyer / 04.24',
-    objectPosition: 'top',
-  },
-  { id: '2', src: vrchatWide.src, alt: 'VRChat ライブ会場の光跡ショット', width: vrchatWide.width, height: vrchatWide.height, area: 'wide', caption: 'VRChat' },
-  { id: '3', src: vrchatSquare.src, alt: 'VRChat アバターのフレーミングポーズ', width: vrchatSquare.width, height: vrchatSquare.height, area: 'square', caption: 'frame' },
-  { id: '4', src: vrchatAlice.src, alt: 'VRChat アバター ALICE ポートレート', width: vrchatAlice.width, height: vrchatAlice.height, area: 'inset', caption: 'ALICE', objectPosition: 'top' },
-  {
-    id: '5',
-    src: flyerBooth0523.src,
-    alt: 'Booth² 2026.05.23 イベントフライヤー',
-    width: flyerBooth0523.width,
-    height: flyerBooth0523.height,
-    area: 'sub',
-    caption: 'flyer / 05.23',
-    objectPosition: 'top',
-  },
-  { id: '6', src: vrchatGlitch.src, alt: 'VRChat アバターのグリッチビジュアル', width: vrchatGlitch.width, height: vrchatGlitch.height, area: 'column', caption: 'glitch' },
-];
-
-const posts = [
-  {
-    id: '1',
-    index: '01',
-    title: '静かなインターネットの話',
-    source: '静か',
-    readMin: 5,
-    date: '2026.05.20',
-    excerpt: '個人サイトを作り直しながら考える、自分のためのインターネットについて。',
-    href: '/blog/1',
-  },
-  {
-    id: '2',
-    index: '02',
-    title: 'Panda CSS で作る design token',
-    source: 'zenn',
-    readMin: 8,
-    date: '2026.05.10',
-    excerpt: 'OKLCH と semantic token で WCAG AA を機械的に担保する話。',
-    href: '/blog/2',
-  },
-];
+// Number of latest log entries shown in the home teaser.
+const HOME_LOG_LIMIT = 5;
 
 const HomePage = async () => {
-  const latest = await findLatestNews(3);
+  const [latest, allNews, works, blogPosts, galleryPhotos, logs, externalPosts] = await Promise.all([
+    findLatestNews(3),
+    findNewsList(),
+    findWorksList(),
+    findBlogList(),
+    findGalleryList(),
+    findLogList(),
+    fetchExternalPosts(),
+  ]);
+
   const newsItems = toFeedItems(latest);
+  const now = dayjs().tz('Asia/Tokyo').toISOString();
+  // Build the full timeline from all news/works/posts; take the N newest entries for the home teaser.
+  const logGroups = buildLogTimeline(allNews, works, externalPosts, now, logs);
+  const logEntries = logGroups.flatMap((group) => group.items).slice(0, HOME_LOG_LIMIT);
+  const homePosts = [...blogPosts].slice(0, 3);
+  const homeWorks = [...works].slice(0, 3);
 
   return (
     <main id="main-content" className={s.main}>
@@ -123,10 +76,10 @@ const HomePage = async () => {
       <Hero />
       <AboutWhoami id="about" {...about} />
       <NewsSection items={newsItems} />
-      <WorksSection id="works" works={works} />
-      <LogSection id="log" entries={activity} />
-      <GallerySection id="gallery" items={gallery} />
-      <BlogIndex id="blog" posts={posts} />
+      <WorksSection id="works" works={homeWorks} />
+      <LogSection id="log" entries={logEntries} />
+      <GallerySection id="gallery" photos={galleryPhotos} />
+      <BlogIndex id="blog" posts={homePosts} />
     </main>
   );
 };

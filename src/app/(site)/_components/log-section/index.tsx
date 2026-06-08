@@ -3,27 +3,15 @@ import { Timeline } from '@components/timeline';
 
 import * as styles from './styles.css';
 
+import type { LogEntry } from '../../log/_lib/build-log-timeline';
 import type { TimelineItem } from '@components/timeline';
-
-// Activity chronicle (年表): any notable activity over time — gigs, releases,
-// works… (not just performances). See the news-vs-log content rule.
-type LogEntry = {
-  id: string;
-  date: string;
-  title: string;
-  meta?: string;
-  upcoming?: boolean;
-  // Where the entry title links — its source detail page (/works/:id, /news/:id)
-  // or an external URL. Omit to render the title as plain text.
-  href?: string;
-};
 
 type Props = {
   id?: string;
-  entries: LogEntry[];
+  entries: readonly LogEntry[];
 };
 
-const toTimelineItems = (entries: LogEntry[]): TimelineItem[] =>
+const toTimelineItems = (entries: readonly LogEntry[]): TimelineItem[] =>
   entries.map((entry) => ({ id: entry.id, date: entry.date, label: entry.title, meta: entry.meta, upcoming: entry.upcoming, href: entry.href }));
 
 export const LogSection = ({ id, entries }: Props) => {

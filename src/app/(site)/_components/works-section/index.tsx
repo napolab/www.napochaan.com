@@ -6,20 +6,12 @@ import { Table } from '@components/table';
 
 import * as styles from './styles.css';
 
+import type { WorkRow } from '../../works/_lib/work-row';
 import type { ReactNode } from 'react';
-
-type WorkRow = {
-  id: string;
-  no: string;
-  title: string;
-  type: string;
-  year: string;
-  thumb?: { src: string; width: number; height: number };
-};
 
 type Props = {
   id?: string;
-  works: WorkRow[];
+  works: readonly WorkRow[];
 };
 
 const columns = [
@@ -32,11 +24,11 @@ const columns = [
 
 // Module-level helper (not an inline array prop) so the contact-sheet rows don't
 // trip the no-new-array-as-prop lint in this Server Component.
-const toRows = (works: WorkRow[]): Record<string, ReactNode>[] =>
+const toRows = (works: readonly WorkRow[]): Record<string, ReactNode>[] =>
   works.map((work) => ({
     thumb:
-      work.thumb !== undefined ? (
-        <Image src={work.thumb.src} alt={work.title} width={work.thumb.width} height={work.thumb.height} className={styles.thumb} />
+      work.thumbnail !== undefined ? (
+        <Image src={work.thumbnail.src} alt={work.title} width={work.thumbnail.width} height={work.thumbnail.height} className={styles.thumb} />
       ) : (
         <span className={styles.thumbPlaceholder} aria-hidden="true" />
       ),
@@ -47,7 +39,7 @@ const toRows = (works: WorkRow[]): Record<string, ReactNode>[] =>
       </Link>
     ),
     type: work.type,
-    year: work.year,
+    year: `${work.year}`,
   }));
 
 export const WorksSection = ({ id, works }: Props) => {

@@ -4,7 +4,7 @@ import { page } from 'vitest/browser';
 
 import { LogSection } from './index';
 
-const entries = [{ id: '1', date: '06/14', title: 'next gig @ club', meta: 'Tokyo', upcoming: true }];
+const entries = [{ id: '1', year: 2026, date: '06/14', title: 'next gig @ club', meta: 'Tokyo', upcoming: true }];
 
 describe('LogSection', () => {
   it('renders entries in a timeline under the log heading', async () => {
