@@ -63,6 +63,7 @@ export const colophon = {
     items: [
       { name: 'ScrambleText', why: 'hover すると文字がほどけて組み直る。news / blog のタイトルに効かせてるやつ。' },
       { name: 'EchoText', why: '多層エコーの見出し。輪郭・青・本体を重ねて、T2 みたいに光らせてる。' },
+      { name: 'TypewriterText', why: 'lead を1文字ずつ打つやつ。たまに打ち間違えて、悩んで、消して直す。top も下層も、導入文ぜんぶこれで喋らせてる。' },
       { name: 'Marquee', why: '横に流れる帯。2トラックで継ぎ目なくループさせてる。' },
       { name: 'Heading', why: '見出しのレベル本体。h1 / h2 はページと節に取ってあるから、ここは h3 以降。' },
       { name: 'SectionHeading', why: '番号付きの節見出し。mono の連番に 2px の罫線で締める。' },

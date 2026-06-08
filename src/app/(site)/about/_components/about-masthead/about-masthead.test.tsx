@@ -15,6 +15,7 @@ describe('AboutMasthead', () => {
     await render(<AboutMasthead name="naporitan" kicker="// programmer · since 2020" lead="ReactとTypeScriptのオタク" />);
 
     await expect.element(page.getByText('// programmer · since 2020')).toBeInTheDocument();
-    await expect.element(page.getByText('ReactとTypeScriptのオタク')).toBeInTheDocument();
+    // TypewriterText keeps an srOnly copy plus the typed overlay, so scope to the first match.
+    await expect.element(page.getByText('ReactとTypeScriptのオタク').first()).toBeInTheDocument();
   });
 });

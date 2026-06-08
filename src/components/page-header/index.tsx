@@ -1,5 +1,6 @@
 import { Breadcrumbs } from '@components/breadcrumbs';
 import { SystemAnnotation } from '@components/system-annotation';
+import { TypewriterText } from '@components/typewriter-text';
 
 import * as styles from './styles.css';
 
@@ -29,7 +30,11 @@ export const PageHeader = ({ title, breadcrumbs, kicker, lead, annotation, title
       <h1 className={styles.title} data-tracking={titleTracking}>
         {title}
       </h1>
-      {lead !== undefined ? <p className={styles.lead}>{lead}</p> : null}
+      {lead !== undefined ? (
+        <p className={styles.lead}>
+          <TypewriterText>{lead}</TypewriterText>
+        </p>
+      ) : null}
       {annotation !== undefined ? (
         <SystemAnnotation tone="muted" className={styles.annotation}>
           {annotation}

@@ -20,6 +20,7 @@ import { SystemAnnotation } from '@components/system-annotation';
 import { Table } from '@components/table';
 import { Tag } from '@components/tag';
 import { Timeline } from '@components/timeline';
+import { TypewriterText } from '@components/typewriter-text';
 
 import { colophon } from '../content';
 import { GalleryLazy } from './gallery-lazy';
@@ -104,6 +105,7 @@ const paginationHref = (page: number): string => (page <= 1 ? '/works' : `/works
 export const demos: Record<ComponentName, ReactNode> = {
   ScrambleText: <ScrambleText>static internet</ScrambleText>,
   EchoText: <EchoText size="compact">napochaan</EchoText>,
+  TypewriterText: <TypewriterText>さまざまな「破壊」、承っております。</TypewriterText>,
   Marquee: <Marquee>napochaan ✕ graphic · digital · since 2020 · </Marquee>,
   Heading: (
     <>
@@ -138,7 +140,9 @@ export const demos: Record<ComponentName, ReactNode> = {
   ),
   Badge: (
     <>
-      <Badge tone="accent">now playing</Badge> <Badge tone="danger">rec</Badge> <Badge tone="neutral">offline</Badge>
+      <Badge tone="accent">now playing</Badge>
+      <Badge tone="danger">rec</Badge>
+      <Badge tone="neutral">offline</Badge>
     </>
   ),
   Tag: (
@@ -148,12 +152,16 @@ export const demos: Record<ComponentName, ReactNode> = {
   ),
   SystemAnnotation: (
     <>
-      <SystemAnnotation tone="muted">sys.log: ready</SystemAnnotation> <SystemAnnotation tone="accent">status: ok</SystemAnnotation> <SystemAnnotation tone="danger">err: 404</SystemAnnotation>
+      <SystemAnnotation tone="muted">sys.log: ready</SystemAnnotation>
+      <SystemAnnotation tone="accent">status: ok</SystemAnnotation>
+      <SystemAnnotation tone="danger">err: 404</SystemAnnotation>
     </>
   ),
   Button: (
     <>
-      <Button variant="solid">solid</Button> <Button variant="outline">outline</Button> <Button variant="danger">danger</Button>
+      <Button variant="solid">solid</Button>
+      <Button variant="outline">outline</Button>
+      <Button variant="danger">danger</Button>
     </>
   ),
   Link: (

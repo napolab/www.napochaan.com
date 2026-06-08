@@ -31,7 +31,8 @@ describe('PageHeader', () => {
 
   it('renders the lead when provided', async () => {
     await render(<PageHeader title="archive" breadcrumbs={breadcrumbs} lead="過去の制作物の記録。" />);
-    await expect.element(page.getByText('過去の制作物の記録。')).toBeInTheDocument();
+    // TypewriterText keeps an srOnly copy plus the typed overlay, so scope to the first match.
+    await expect.element(page.getByText('過去の制作物の記録。').first()).toBeInTheDocument();
   });
 
   it('omits the lead when not provided', async () => {
