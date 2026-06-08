@@ -14,7 +14,7 @@ type NewsItem = {
 };
 
 type Props = {
-  items: NewsItem[];
+  items: readonly NewsItem[];
 };
 
 const NewsTitle = ({ title, href }: { title: string; href?: string }) => {

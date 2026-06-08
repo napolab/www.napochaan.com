@@ -2,23 +2,24 @@ import { notFound } from 'next/navigation';
 
 import { NewsNav } from './_components/news-nav';
 import { adjacentNews } from '../_lib/adjacent-news';
-import { findNews } from '../_lib/find-news';
-import { news } from '../sample-news';
 import * as s from './styles.css';
 
+import { LivePreviewListener } from '@components/live-preview';
 import { PageHeader } from '@components/page-header';
 import { RichText } from '@components/rich-text';
+import { findNewsById, findNewsList } from '@lib/payload/news';
 import { dayjs } from '@utils/dayjs';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly — ISR. Detail pages are static (no searchParams), so this
-// drives the static cache for the pre-rendered sample ids.
+// Revalidate hourly — ISR. Detail pages render on demand and are then cached;
+// the collection's afterChange hook revalidates `/news/{id}` on every edit.
 export const revalidate = 3600;
 
-// Pre-render every sample news id at build time. Replaced by a CMS query in a
-// later plan, but the shape stays the same.
-export const generateStaticParams = () => news.map((item) => ({ id: item.id }));
+// Build the news ids on demand (build phase can't read Payload). `dynamicParams`
+// lets any published id be served + cached via on-demand ISR.
+export const generateStaticParams = (): { id: string }[] => [];
+export const dynamicParams = true;
 
 type Params = Promise<{ id: string }>;
 
@@ -32,7 +33,7 @@ const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const { id } = await params;
-  const item = findNews(news, id);
+  const item = await findNewsById(id);
 
   return {
     get title() {
@@ -48,14 +49,16 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 
 const NewsDetailPage = async ({ params }: Props) => {
   const { id } = await params;
-  const item = findNews(news, id);
+  const item = await findNewsById(id);
   if (item === undefined) notFound();
 
-  const { prev, next } = adjacentNews(news, id);
+  const list = await findNewsList();
+  const { prev, next } = adjacentNews(list, id);
   const crumbs = buildCrumbs(item.title);
 
   return (
     <main id="main-content" className={s.main}>
+      <LivePreviewListener />
       <PageHeader title={item.title} breadcrumbs={crumbs} kicker={`// ${dayjs(item.date).tz('Asia/Tokyo').format('YYYY.MM.DD')} · ${item.category}`} titleTracking="tight" />
       <div className={s.body}>{item.body === undefined ? null : <RichText data={item.body} />}</div>
       <NewsNav prev={prev} next={next} />

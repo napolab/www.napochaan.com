@@ -1,11 +1,10 @@
 import { NewsArchive } from './_components/news-archive';
 import { groupNewsByYearMonth } from './_lib/group-by-year-month';
-import { news } from './sample-news';
 import * as s from './styles.css';
 
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
-import { dayjs } from '@utils/dayjs';
+import { findNewsList } from '@lib/payload/news';
 
 import type { Metadata } from 'next';
 
@@ -24,10 +23,6 @@ const crumbs = [{ href: '/', label: 'home' }, { label: 'news' }];
 // ?page=N (Pagination doesn't hard-code it).
 const newsHref = (page: number): string => (page <= 1 ? '/news' : `/news?page=${page}`);
 
-// Full feed flattened newest-first, so a page slice crosses year-month groups
-// cleanly before the slice is re-grouped for display.
-const sortedNews = [...news].sort((a, b) => dayjs(b.date).tz('Asia/Tokyo').valueOf() - dayjs(a.date).tz('Asia/Tokyo').valueOf());
-
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 type Props = {
@@ -42,11 +37,14 @@ export const generateMetadata = (): Metadata => {
     get description() {
       return 'お知らせ — 制作・出演・公開のアナウンス。';
     },
+    alternates: { types: { 'application/rss+xml': [{ url: '/news/rss.xml', title: 'napochaan — news' }] } },
   };
 };
 
 const NewsPage = async ({ searchParams }: Props) => {
   const { page: raw } = await searchParams;
+  // Already published + newest-first from the data layer.
+  const sortedNews = await findNewsList();
   const totalPages = Math.max(1, Math.ceil(sortedNews.length / PAGE_SIZE));
   const requested = typeof raw === 'string' ? parseInt(raw, 10) : 1;
   const page = Number.isNaN(requested) ? 1 : Math.min(Math.max(requested, 1), totalPages);
@@ -56,6 +54,11 @@ const NewsPage = async ({ searchParams }: Props) => {
   return (
     <main id="main-content" className={s.main}>
       <PageHeader title="news" breadcrumbs={crumbs} kicker="// お知らせ" lead="近況すぎ〜↑" />
+      <div className={s.feedRow}>
+        <a className={s.feedLink} href="/news/rss.xml" aria-label="news の RSS フィード">
+          rss · feed ↗
+        </a>
+      </div>
       <NewsArchive groups={groups} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={newsHref} /> : null}
     </main>

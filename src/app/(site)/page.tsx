@@ -11,12 +11,34 @@ import { LogSection } from './_components/log-section';
 import { Hero } from './_components/hero';
 import { NewsSection } from './_components/news-section';
 import { WorksSection } from './_components/works-section';
+import { findLatestNews } from '@lib/payload/news';
 import * as s from './styles.css';
 
+import type { NewsItem } from './news/_lib/news-item';
 import type { GalleryItem } from '@components/gallery';
 
 // Revalidate hourly so OpenNext serves the page via ISR.
 export const revalidate = 3600;
+
+type NewsFeedItem = {
+  id: string;
+  date: string;
+  category: string;
+  title: string;
+  href: string;
+};
+
+// External url when set, otherwise the internal detail page. Named module-scope
+// helpers keep the mapping out of JSX (react-perf/jsx-no-new-array-as-prop).
+const toFeedItem = (item: NewsItem): NewsFeedItem => ({
+  id: item.id,
+  date: item.date,
+  category: item.category,
+  title: item.title,
+  href: item.url ?? `/news/${item.id}`,
+});
+
+const toFeedItems = (items: readonly NewsItem[]): readonly NewsFeedItem[] => items.map(toFeedItem);
 
 // Sample data — replaced by Payload CMS in a later plan.
 const about = {
@@ -25,12 +47,6 @@ const about = {
   likes: '音楽 · glitch · VRChat · コラージュ · 崩壊(pixelsort・datamosh)',
   wants: '後悔を、残さない。ぼくも、周りも。',
 };
-
-const news = [
-  { id: '1', date: '2026.06.05', category: 'site', title: 'サイトを rebuild 中。design system を刷新しています', href: '/news/1' },
-  { id: '2', date: '2026.06.01', category: 'live', title: '次回 DJ 出演が決定しました', href: '/news/2' },
-  { id: '3', date: '2026.05.20', category: 'blog', title: '静かなインターネットの話を書きました', href: '/news/3' },
-];
 
 const works = [
   { id: '1', no: '01', title: 'night graphics vol.13', type: 'flyer', year: '2024', thumb: { src: flyerBooth0424.src, width: flyerBooth0424.width, height: flyerBooth0424.height } },
@@ -97,17 +113,22 @@ const posts = [
   },
 ];
 
-const HomePage = () => (
-  <main id="main-content" className={s.main}>
-    <h1 className={s.srOnly}>napochaan — DJ・VJ・グラフィック・デジタル</h1>
-    <Hero />
-    <AboutWhoami id="about" {...about} />
-    <NewsSection items={news} />
-    <WorksSection id="works" works={works} />
-    <LogSection id="log" entries={activity} />
-    <GallerySection id="gallery" items={gallery} />
-    <BlogIndex id="blog" posts={posts} />
-  </main>
-);
+const HomePage = async () => {
+  const latest = await findLatestNews(3);
+  const newsItems = toFeedItems(latest);
+
+  return (
+    <main id="main-content" className={s.main}>
+      <h1 className={s.srOnly}>napochaan — DJ・VJ・グラフィック・デジタル</h1>
+      <Hero />
+      <AboutWhoami id="about" {...about} />
+      <NewsSection items={newsItems} />
+      <WorksSection id="works" works={works} />
+      <LogSection id="log" entries={activity} />
+      <GallerySection id="gallery" items={gallery} />
+      <BlogIndex id="blog" posts={posts} />
+    </main>
+  );
+};
 
 export default HomePage;
