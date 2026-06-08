@@ -57,6 +57,7 @@ export const colophon = {
       { label: 'このページを包む殻', target: 'SiteShell' },
       { label: '上の見出しブロック', target: 'PageHeader' },
       { label: 'いちばん下のフッター', target: 'SiteFooter' },
+      { label: '同じページを見てる人のカーソル', target: 'CursorPresence' },
     ],
     // フロー要素 — 生デモは _demos に置き、name で対応付ける。
     items: [
