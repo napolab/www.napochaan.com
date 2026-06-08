@@ -1,6 +1,7 @@
 import { WorksArchive } from './_components/works-archive';
-import { works } from './sample-works';
 import * as s from './styles.css';
+
+import { findWorksList } from '@lib/payload/works';
 
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
@@ -27,6 +28,7 @@ type Props = {
 
 const WorksPage = async ({ searchParams }: Props) => {
   const { page: raw } = await searchParams;
+  const works = await findWorksList();
   const totalPages = Math.max(1, Math.ceil(works.length / PAGE_SIZE));
   const requested = typeof raw === 'string' ? parseInt(raw, 10) : 1;
   const page = Number.isNaN(requested) ? 1 : Math.min(Math.max(requested, 1), totalPages);

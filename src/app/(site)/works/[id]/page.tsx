@@ -4,10 +4,10 @@ import { AdjacentNav } from './_components/adjacent-nav';
 import { RelatedWorks } from './_components/related-works';
 import { WorkDetail } from './_components/work-detail';
 import { adjacentWorks } from '../_lib/adjacent-works';
-import { findWork } from '../_lib/find-work';
 import { relatedWorks } from '../_lib/related-works';
-import { works } from '../sample-works';
 import * as s from './styles.css';
+
+import { findWorkById, findWorksList } from '@lib/payload/works';
 
 import { PageHeader } from '@components/page-header';
 
@@ -17,9 +17,10 @@ import type { Metadata } from 'next';
 // drives the static cache for the pre-rendered sample ids.
 export const revalidate = 3600;
 
-// Pre-render every sample work id at build time. Replaced by a CMS query in a
-// later plan, but the shape stays the same.
-export const generateStaticParams = () => works.map((work) => ({ id: work.id }));
+export const generateStaticParams = async () => {
+  const works = await findWorksList();
+  return works.map((work) => ({ id: work.id }));
+};
 
 type Params = Promise<{ id: string }>;
 
@@ -33,7 +34,7 @@ const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const { id } = await params;
-  const work = findWork(works, id);
+  const work = await findWorkById(id);
 
   return {
     get title() {
@@ -48,9 +49,10 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 
 const WorkDetailPage = async ({ params }: Props) => {
   const { id } = await params;
-  const work = findWork(works, id);
+  const work = await findWorkById(id);
   if (work === undefined) notFound();
 
+  const works = await findWorksList();
   const { prev, next } = adjacentWorks(works, id);
   const related = relatedWorks(works, work);
   const crumbs = buildCrumbs(work.title);
