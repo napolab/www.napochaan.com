@@ -3,14 +3,15 @@ import { css } from '@styled/css';
 // Masonry container. Two modes via data-mode:
 //  - flow: SSR / pre-measure fallback. CSS multi-columns, no JS needed.
 //  - packed: skyline result applied; cells are absolutely positioned, height fixed.
-// The ink background shows through the 2px seams as crisp grid lines (editorial parity).
+// The grid-line background shows through the 2px seams as light blueprint rules,
+// keeping the white-base "方眼紙" mood (photos read as floating on a drafting grid).
 export const root = css({
   listStyle: 'none',
   position: 'relative',
   borderWidth: 'default',
   borderStyle: 'solid',
-  borderColor: 'fg.default',
-  bg: 'fg.default',
+  borderColor: 'grid.line',
+  bg: 'grid.line',
   '&[data-mode=flow]': {
     columnCount: 2,
     columnGap: '[2px]',
