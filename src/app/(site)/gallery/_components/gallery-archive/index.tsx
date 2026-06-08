@@ -93,7 +93,12 @@ export const GalleryArchive = ({ photos }: Props) => {
         );
       })}
       {blanks.map((blank) => (
-        <li key={blank.id} className={styles.blank} style={cellVars(blank)} aria-hidden="true" />
+        <li key={blank.id} className={styles.blank} style={cellVars(blank)} aria-hidden="true">
+          <svg className={styles.blankMark} viewBox="0 0 100 100" preserveAspectRatio="none">
+            <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+            <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+          </svg>
+        </li>
       ))}
     </ul>
   );

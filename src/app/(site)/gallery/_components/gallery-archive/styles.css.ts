@@ -103,9 +103,10 @@ export const caption = css({
   paddingBlock: '[1px]',
 });
 
-// Crosshatch filler for empty grid space (ragged bottom / internal gaps left by the
-// skyline). Paper base + two perpendicular grid-line hatches read as a drafting fill.
-// Decorative only (aria-hidden); positioned by the same --cell-* vars as photo cells.
+// Filler for empty grid space (ragged bottom / internal gaps left by the skyline).
+// Paper base crossed by one big ✕ (the design-system motif) that reaches the cell
+// corners. `color` drives the SVG stroke via currentColor. Decorative (aria-hidden);
+// positioned by the same --cell-* vars as photo cells.
 export const blank = css({
   position: 'absolute',
   left: '[var(--cell-x)]',
@@ -114,6 +115,13 @@ export const blank = css({
   height: '[var(--cell-h)]',
   pointerEvents: 'none',
   bg: 'bg.canvas',
-  backgroundImage:
-    '[repeating-linear-gradient(45deg, var(--colors-grid-line) 0, var(--colors-grid-line) 1px, transparent 1px, transparent 6px), repeating-linear-gradient(-45deg, var(--colors-grid-line) 0, var(--colors-grid-line) 1px, transparent 1px, transparent 6px)]',
+  color: 'grid.line',
+});
+
+// The ✕ glyph. preserveAspectRatio="none" stretches the 0–100 viewBox to fill any
+// cell shape; non-scaling-stroke (set on the lines) keeps the stroke an even width.
+export const blankMark = css({
+  display: 'block',
+  width: 'full',
+  height: 'full',
 });
