@@ -4,8 +4,18 @@ import { findGalleryList } from '@lib/payload/gallery';
 
 import * as s from './styles.css';
 
+import type { Metadata } from 'next';
+
 // Revalidate hourly so OpenNext serves the page via ISR.
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  alternates: {
+    types: {
+      'application/rss+xml': [{ url: '/gallery/rss.xml', title: 'napochaan — gallery' }],
+    },
+  },
+};
 
 const galleryCrumbs = [{ href: '/', label: 'home' }, { label: 'gallery' }] as const;
 

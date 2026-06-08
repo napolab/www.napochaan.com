@@ -6,11 +6,21 @@ import { findWorksList } from '@lib/payload/works';
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 
+import type { Metadata } from 'next';
+
 // Revalidate hourly. NOTE: reading `searchParams` below opts this route into
 // dynamic rendering, so this `revalidate` value no longer drives static ISR
 // caching — it is harmless and kept for parity with the home page. Remove it if a
 // future build emits a "dynamic route ignores revalidate" warning.
 export const revalidate = 3600;
+
+export const metadata: Metadata = {
+  alternates: {
+    types: {
+      'application/rss+xml': [{ url: '/works/rss.xml', title: 'napochaan — works' }],
+    },
+  },
+};
 
 const PAGE_SIZE = 50;
 

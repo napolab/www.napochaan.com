@@ -25,6 +25,11 @@ export const generateMetadata = (): Metadata => {
     get description() {
       return '活動年表 — DJ・VJ・リリース・制作物の記録。';
     },
+    alternates: {
+      types: {
+        'application/rss+xml': [{ url: '/log/rss.xml', title: 'napochaan — log' }],
+      },
+    },
   };
 };
 

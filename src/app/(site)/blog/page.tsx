@@ -37,6 +37,11 @@ export const generateMetadata = (): Metadata => {
     get description() {
       return '記事 — プログラミング・DJ・VJ についての覚え書き。';
     },
+    alternates: {
+      types: {
+        'application/rss+xml': [{ url: '/blog/rss.xml', title: 'napochaan — blog' }],
+      },
+    },
   };
 };
 
