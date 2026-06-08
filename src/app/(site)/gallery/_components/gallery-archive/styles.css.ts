@@ -140,24 +140,38 @@ export const blankText = css({
   textOrientation: 'upright',
   whiteSpace: 'nowrap',
   fontFamily: 'display',
-  fontSize: '[clamp(1rem, 3vw, 1.75rem)]',
+  fontSize: '[clamp(1.25rem, 3.5vw, 2rem)]',
   lineHeight: '[0.95]',
   textTransform: 'uppercase',
-  color: 'fg.muted',
+  color: 'fg.default',
   userSelect: 'none',
 });
 
-// A horizontal mono "small print" line crossing the standing word — adds the dense,
-// busy ad-slot feel. Pinned bottom-left, single line (nowrap), clipped by the cell.
+// Horizontal black mono "small print" pinned bottom-left — a coordinate/system code,
+// the dense flyer noise under the standing word. Single line (nowrap), clipped.
 export const blankTag = css({
   position: 'absolute',
   left: '[6px]',
   bottom: '[5px]',
   fontFamily: 'mono',
-  fontSize: '[13px]',
+  fontSize: '[12px]',
   letterSpacing: 'wide',
   whiteSpace: 'nowrap',
   textTransform: 'uppercase',
-  color: 'fg.muted',
+  color: 'fg.default',
+  userSelect: 'none',
+});
+
+// A second mono code top-left, in electric blue — the flyer's accent annotation.
+export const blankCode = css({
+  position: 'absolute',
+  top: '[6px]',
+  left: '[6px]',
+  fontFamily: 'mono',
+  fontSize: '[11px]',
+  letterSpacing: 'wide',
+  whiteSpace: 'nowrap',
+  textTransform: 'uppercase',
+  color: 'accent.text',
   userSelect: 'none',
 });

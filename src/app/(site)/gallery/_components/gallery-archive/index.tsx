@@ -34,7 +34,8 @@ const GAP = 2;
 // crossed by a horizontal mono "small-print" line. Both picked by the blank's index
 // (deterministic — blanks only exist client-side, so no SSR mismatch).
 const AD_FILLERS = ['NOT FOUND', 'AD SPACE', 'COMING SOON', 'NO SIGNAL', 'SOLD OUT', 'FOR RENT', 'SINCE 2020', 'VACANCY', '404'] as const;
-const BLANK_TAGS = ['5470009', 'SINCE 2020', '00:25 AM', 'NO SIGNAL', 'GEN 0427', 'AD / 2026', '404'] as const;
+const BLANK_TAGS = ['X 5470.009', 'N35 40.7009', 'SINCE 2020', 'GEN 0427', '00:25 AM', 'E139 42.0041', '404 VACANT'] as const;
+const BLANK_CODES = ['SYS_001', 'CORE_02', 'LOC_02', 'T:128.00', 'P:01', '∠90.00°', 'SYS_009'] as const;
 
 // The absolute-position bridge: skyline output is published as CSS custom
 // properties (the only style-prop bridge the project allows), consumed by s.cell.
@@ -104,6 +105,7 @@ export const GalleryArchive = ({ photos }: Props) => {
             <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
             <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
           </svg>
+          <span className={styles.blankCode}>{BLANK_CODES[index % BLANK_CODES.length]}</span>
           <span className={styles.blankText}>{AD_FILLERS[index % AD_FILLERS.length]}</span>
           <span className={styles.blankTag}>{BLANK_TAGS[index % BLANK_TAGS.length]}</span>
         </li>
