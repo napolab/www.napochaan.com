@@ -21,6 +21,8 @@ const ensureMedia = async (payload: MigrateUpArgs['payload'], alt: string, filen
 // Mapping from work `no` to { alt, file } for 1-A history thumbnails (nos 09-42)
 // alt = work title (meaningful + dedupes by alt in ensureMedia)
 const historyThumbnailMap = new Map<string, { alt: string; file: string }>([
+  ['01', { alt: 'napochaan.com リニューアル', file: 'histories/napochaan-renewal-ogp.png' }],
+  ['02', { alt: 'Booth2Booth 公式サイト', file: 'histories/booth2booth-ogp.jpg' }],
   ['09', { alt: 'PAE2.0 ドットレカギミック制作', file: 'histories/pixelartexhibision2.0.png' }],
   ['10', { alt: 'まだ知らない君がいる 映像提供', file: 'histories/mada-shiranai-kimi.png' }],
   ['11', { alt: 'ボカコレ2025夏 アーカイブ作成', file: 'histories/vocacolle-2025-summer.png' }],
