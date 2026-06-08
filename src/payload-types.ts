@@ -73,6 +73,7 @@ export interface Config {
     works: Work;
     blog: Blog;
     gallery: Gallery;
+    logs: Log;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     works: WorksSelect<false> | WorksSelect<true>;
     blog: BlogSelect<false> | BlogSelect<true>;
     gallery: GallerySelect<false> | GallerySelect<true>;
+    logs: LogsSelect<false> | LogsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -332,6 +334,26 @@ export interface Gallery {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "logs".
+ */
+export interface Log {
+  id: number;
+  title: string;
+  date: string;
+  /**
+   * 年表に表示する種別ラベル（例: 'milestone'）。
+   */
+  meta: string;
+  /**
+   * 設定するとタイトルがこの URL へのリンクになります。
+   */
+  url?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -377,6 +399,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'gallery';
         value: number | Gallery;
+      } | null)
+    | ({
+        relationTo: 'logs';
+        value: number | Log;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -543,6 +569,19 @@ export interface GallerySelect<T extends boolean = true> {
         description?: T;
         image?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "logs_select".
+ */
+export interface LogsSelect<T extends boolean = true> {
+  title?: T;
+  date?: T;
+  meta?: T;
+  url?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;

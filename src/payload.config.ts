@@ -10,6 +10,7 @@ import { buildConfig } from 'payload';
 
 import { Blog } from './collections/blog';
 import { Gallery } from './collections/gallery';
+import { Logs } from './collections/logs';
 import { Media } from './collections/media';
 import { News } from './collections/news';
 import { Users } from './collections/users';
@@ -119,8 +120,13 @@ export default buildConfig({
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
           buildPath: () => '/gallery',
         }),
+        draftPreviewRoute({
+          slug: 'logs',
+          previewSecret: cfEnv.PREVIEW_SECRET ?? '',
+          buildPath: () => '/log',
+        }),
       ]),
-      collections: ['news', 'works', 'blog', 'gallery'],
+      collections: ['news', 'works', 'blog', 'gallery', 'logs'],
     },
     get autoLogin() {
       if (process.env.NODE_ENV !== 'development') return false;
@@ -134,7 +140,7 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, News, Works, Blog, Gallery],
+  collections: [Users, Media, News, Works, Blog, Gallery, Logs],
   editor: lexicalEditor(),
   secret,
   typescript: {
