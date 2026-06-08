@@ -12,7 +12,6 @@ const body = {
 const base = {
   id: 3,
   title: 'Panda CSS で作る design token',
-  source: 'zenn',
   publishedAt: '2026-05-10T00:00:00.000Z',
   excerpt: 'OKLCH の話',
   body,
@@ -26,7 +25,6 @@ describe('toBlogPost', () => {
     expect(post.id).toBe('3');
     expect(post.index).toBe('02');
     expect(post.title).toBe('Panda CSS で作る design token');
-    expect(post.source).toBe('zenn');
     expect(post.date).toBe('2026-05-10');
     expect(post.excerpt).toBe('OKLCH の話');
   });

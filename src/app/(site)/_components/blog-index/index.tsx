@@ -2,7 +2,6 @@ import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
 import { SystemAnnotation } from '@components/system-annotation';
-import { Tag } from '@components/tag';
 
 import * as styles from './styles.css';
 
@@ -10,7 +9,6 @@ type Post = {
   id: string;
   index: string;
   title: string;
-  source: string;
   readMin: number;
   date: string;
   excerpt: string;
@@ -36,7 +34,6 @@ export const BlogIndex = ({ id, posts }: Props) => {
               <ScrambleText>{post.title}</ScrambleText>
             </Link>
             <p className={styles.meta}>
-              <Tag tone="outline">{post.source}</Tag>
               <SystemAnnotation>{`${post.readMin} min`}</SystemAnnotation>
               <SystemAnnotation>{post.date}</SystemAnnotation>
             </p>

@@ -61,7 +61,7 @@ const BlogDetailPage = async ({ params }: Props) => {
 
   return (
     <main id="main-content" className={s.main}>
-      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.source} · ${post.readMin} min · ${dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}`} titleTracking="tight" />
+      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}`} titleTracking="tight" />
       <div className={s.layout}>
         <div className={s.tocCol}>
           <Toc headings={headings} />

@@ -4,7 +4,7 @@ import { adjacentPosts } from './index';
 
 import type { Post } from '../post';
 
-const post = (id: string, date: string): Post => ({ id, index: id, title: `t${id}`, source: 'zenn', readMin: 1, date, excerpt: '' });
+const post = (id: string, date: string): Post => ({ id, index: id, title: `t${id}`, readMin: 1, date, excerpt: '' });
 
 // Feed deliberately out of order to prove the helper sorts by date descending.
 const feed = [post('b', '2026-01-01'), post('a', '2026-03-01'), post('c', '2025-12-01')];

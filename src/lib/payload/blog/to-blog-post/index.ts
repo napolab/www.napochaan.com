@@ -16,7 +16,6 @@ export const toBlogPost = (doc: Blog, index: string): Post => {
     id: `${doc.id}`,
     index,
     title: doc.title,
-    source: doc.source,
     date: dayjs(doc.publishedAt).tz('Asia/Tokyo').format('YYYY-MM-DD'),
     excerpt: doc.excerpt,
     readMin: readingMinutes(extractPlainText(body)),

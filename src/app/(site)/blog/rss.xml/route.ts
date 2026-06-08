@@ -15,7 +15,6 @@ export const GET = async (): Promise<Response> => {
     link: `${origin}/blog/${post.id}`,
     guid: `${origin}/blog/${post.id}`,
     pubDate: post.date,
-    category: post.source,
     description: post.excerpt,
   }));
 

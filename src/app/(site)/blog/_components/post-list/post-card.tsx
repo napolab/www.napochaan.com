@@ -5,7 +5,6 @@ import { useState } from 'react';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 import { SystemAnnotation } from '@components/system-annotation';
-import { Tag } from '@components/tag';
 import { link } from '@styled/recipes';
 import { clsx } from '@utils/clsx';
 import { dayjs } from '@utils/dayjs';
@@ -16,7 +15,6 @@ type Post = {
   id: string;
   index: string;
   title: string;
-  source: string;
   readMin: number;
   date: string;
   excerpt: string;
@@ -38,7 +36,6 @@ export const PostCard = ({ post }: { post: Post }) => {
         </ScrambleText>
       </span>
       <p className={s.meta}>
-        <Tag tone="outline">{post.source}</Tag>
         <SystemAnnotation>{`${post.readMin} min`}</SystemAnnotation>
         <SystemAnnotation>{dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}</SystemAnnotation>
       </p>

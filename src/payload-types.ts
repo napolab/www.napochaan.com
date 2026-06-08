@@ -275,8 +275,10 @@ export interface Work {
 export interface Blog {
   id: number;
   title: string;
-  source: 'zenn' | 'sizu';
   publishedAt: string;
+  /**
+   * 一覧・ホームのティーザー・RSS・SNS共有で表示される短い紹介文。本文の冒頭の貼り付けではなく、記事を一言で説明する独立した要約として書く。
+   */
   excerpt: string;
   body: {
     root: {
@@ -542,7 +544,6 @@ export interface WorksSelect<T extends boolean = true> {
  */
 export interface BlogSelect<T extends boolean = true> {
   title?: T;
-  source?: T;
   publishedAt?: T;
   excerpt?: T;
   body?: T;

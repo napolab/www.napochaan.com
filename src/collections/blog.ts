@@ -13,7 +13,7 @@ export const Blog = {
   labels: { singular: 'ブログ', plural: 'ブログ' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'source', 'publishedAt', '_status'],
+    defaultColumns: ['title', 'publishedAt', '_status'],
   },
   access: {
     read: ({ req: { user } }) => (user !== null ? true : { _status: { equals: 'published' } }),
@@ -29,24 +29,21 @@ export const Blog = {
   fields: [
     { name: 'title', label: 'タイトル', type: 'text', required: true },
     {
-      name: 'source',
-      label: 'クロス投稿先',
-      type: 'select',
-      required: true,
-      options: [
-        { label: 'Zenn', value: 'zenn' },
-        { label: 'しずかなインターネット', value: 'sizu' },
-      ],
-      admin: { position: 'sidebar' },
-    },
-    {
       name: 'publishedAt',
       label: '公開日',
       type: 'date',
       required: true,
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayOnly', displayFormat: 'yyyy-MM-dd' } },
     },
-    { name: 'excerpt', label: '抜粋', type: 'textarea', required: true },
+    {
+      name: 'excerpt',
+      label: '抜粋',
+      type: 'textarea',
+      required: true,
+      admin: {
+        description: '一覧・ホームのティーザー・RSS・SNS共有で表示される短い紹介文。本文の冒頭の貼り付けではなく、記事を一言で説明する独立した要約として書く。',
+      },
+    },
     { name: 'body', label: '本文', type: 'richText', required: true },
   ],
 } satisfies CollectionConfig;

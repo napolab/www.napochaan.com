@@ -6,7 +6,6 @@ type Row = {
   id: string;
   index: string;
   title: string;
-  source: string;
   readMin: number;
   date: string;
   excerpt: string;
