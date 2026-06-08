@@ -1,16 +1,13 @@
-'use client';
-
-import { useEffect, useRef, useState } from 'react';
-
 import { Lightbox } from '@components/gallery/lightbox';
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
 import { computeBlanks } from './skyline/compute-blanks';
-import { resolveColumns, spanForAspect } from './skyline/layout';
+import { spanForAspect } from './skyline/layout';
 import { pack } from './skyline/pack';
 import * as styles from './styles.css';
 
+import type { Blank } from './skyline/compute-blanks';
 import type { Placement } from './skyline/pack';
 import type { CSSProperties } from 'react';
 
@@ -28,96 +25,87 @@ type Props = {
   photos: GalleryPhoto[];
 };
 
-const GAP = 2;
+// Column counts per breakpoint: base (mobile) / tablet / desktop. The packing is run
+// once for each on the server; CSS picks the matching cw-unit coordinates per cell, so
+// the layout needs no measurement and never shifts. No 'use client' — pure render.
+const COLUMN_COUNTS = [2, 3, 4] as const;
 
-// A 2-digit reference number for each blank (deterministic by index).
+// Publish each photo's cw-unit position/size for all three column counts; the cell CSS
+// selects the active set per breakpoint and scales it with --cw (= 100cqw / cols).
+const cellVars = (p2: Placement, p3: Placement, p4: Placement): CSSProperties =>
+  ({
+    '--col-2': `${p2.col}`,
+    '--span-2': `${p2.span}`,
+    '--y-2': `${p2.y}`,
+    '--h-2': `${p2.height}`,
+    '--col-3': `${p3.col}`,
+    '--span-3': `${p3.span}`,
+    '--y-3': `${p3.y}`,
+    '--h-3': `${p3.height}`,
+    '--col-4': `${p4.col}`,
+    '--span-4': `${p4.span}`,
+    '--y-4': `${p4.y}`,
+    '--h-4': `${p4.height}`,
+  }) as CSSProperties;
+
+// A blank belongs to one breakpoint's layout, so it carries a single position.
+const blankVars = (blank: Blank): CSSProperties => ({ '--col': `${blank.col}`, '--y': `${blank.y}`, '--h': `${blank.height}` }) as CSSProperties;
+
+const totalVars = (totals: readonly number[]): CSSProperties => ({ '--total-2': `${totals[0]}`, '--total-3': `${totals[1]}`, '--total-4': `${totals[2]}` }) as CSSProperties;
+
 const refNo = (index: number): string => `${index + 1}`.padStart(2, '0');
 
-// The absolute-position bridge: skyline output is published as CSS custom
-// properties (the only style-prop bridge the project allows), consumed by s.cell.
-const cellVars = (place: Placement): CSSProperties => ({ '--cell-x': `${place.x}px`, '--cell-y': `${place.y}px`, '--cell-w': `${place.width}px`, '--cell-h': `${place.height}px` }) as CSSProperties;
-
-const totalVars = (totalHeight: number): CSSProperties => ({ '--total-h': `${totalHeight}px` }) as CSSProperties;
-
-// Photo cell style: always publish the aspect ratio (so the flow fallback reserves
-// each cell's height and nothing shifts on image load); add the packed position/size
-// vars once the width has been measured.
-const photoCellStyle = (photo: GalleryPhoto, place: Placement | undefined): CSSProperties =>
-  ({ '--cell-ar': `${photo.width} / ${photo.height}`, ...(place === undefined ? {} : cellVars(place)) }) as CSSProperties;
+const FALLBACK: Placement = { id: '', col: 0, span: 1, y: 0, height: 1 };
 
 export const GalleryArchive = ({ photos }: Props) => {
-  const ref = useRef<HTMLUListElement | null>(null);
-  const [width, setWidth] = useState<number | null>(null);
+  const items = photos.map((photo) => ({ id: photo.id, ratio: photo.height / photo.width, span: spanForAspect(photo.width / photo.height) }));
 
-  useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: Required for imperative ResizeObserver DOM measurement.
-    // Cannot use Suspense as this is direct DOM measurement for layout calculation.
-    const el = ref.current;
-    if (el === null) return;
+  const layouts = COLUMN_COUNTS.map((cols) => {
+    const result = pack(items, cols);
 
-    const observer = new ResizeObserver((entries) => {
-      const measured = entries[0]?.contentRect.width;
-      if (typeof measured === 'number') setWidth(measured);
-    });
-    observer.observe(el);
+    return { result, blanks: computeBlanks(result.placements, cols, result.totalHeight) };
+  });
 
-    return () => observer.disconnect();
-  }, []);
-
-  const columns = width === null ? 0 : resolveColumns(width);
-  const result =
-    width === null
-      ? null
-      : pack(
-          photos.map((photo) => ({ id: photo.id, width: photo.width, height: photo.height, span: spanForAspect(photo.width / photo.height) })),
-          { width, gap: GAP, columns },
-        );
-
-  const placementOf = (id: string): Placement | undefined => result?.placements.find((p) => p.id === id);
-
-  // Crosshatch fillers for the ragged bottom and any internal gaps the skyline left,
-  // so empty space reads as a drafting hatch rather than blank grid.
-  const blanks = result === null || width === null ? [] : computeBlanks(result.placements, { columns, width, gap: GAP, totalHeight: result.totalHeight });
+  // Every photo is placed in every layout; the fallback only keeps the types total.
+  const placementOf = (id: string, layoutIndex: number): Placement => layouts[layoutIndex]?.result.placements.find((p) => p.id === id) ?? FALLBACK;
 
   return (
-    <ul ref={ref} className={styles.root} data-mode={result === null ? 'flow' : 'packed'} style={result === null ? undefined : totalVars(result.totalHeight)}>
-      {photos.map((photo) => {
-        const place = placementOf(photo.id);
-
-        return (
-          <li key={photo.id} className={styles.cell} style={photoCellStyle(photo, place)}>
-            <Lightbox src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} triggerClassName={styles.trigger}>
-              <Image
-                src={photo.src}
-                alt={photo.alt}
-                fill
-                sizes="(min-width: 768px) 25vw, (min-width: 480px) 33vw, 50vw"
-                className={styles.image}
-                placeholder="blur"
-                blurDataURL={formatBlurURL(photo.src, { blur: 10, width: 32, quality: 30 })}
-              />
-            </Lightbox>
-            {photo.caption !== undefined ? <span className={styles.caption}>{photo.caption}</span> : null}
-          </li>
-        );
-      })}
-      {blanks.map((blank, index) => (
-        <li key={blank.id} className={styles.blank} style={cellVars(blank)} aria-hidden="true">
-          <span className={styles.corner} data-pos="tl">
-            +
-          </span>
-          <span className={styles.corner} data-pos="tr">
-            +
-          </span>
-          <span className={styles.corner} data-pos="bl">
-            +
-          </span>
-          <span className={styles.corner} data-pos="br">
-            +
-          </span>
-          <span className={styles.blankDim}>{`${Math.round(blank.width)}×${Math.round(blank.height)}\nNO.${refNo(index)}`}</span>
+    <ul className={styles.root} style={totalVars(layouts.map((layout) => layout.result.totalHeight))}>
+      {photos.map((photo) => (
+        <li key={photo.id} className={styles.cell} style={cellVars(placementOf(photo.id, 0), placementOf(photo.id, 1), placementOf(photo.id, 2))}>
+          <Lightbox src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} triggerClassName={styles.trigger}>
+            <Image
+              src={photo.src}
+              alt={photo.alt}
+              fill
+              sizes="(min-width: 768px) 25vw, (min-width: 480px) 33vw, 50vw"
+              className={styles.image}
+              placeholder="blur"
+              blurDataURL={formatBlurURL(photo.src, { blur: 10, width: 32, quality: 30 })}
+            />
+          </Lightbox>
+          {photo.caption !== undefined ? <span className={styles.caption}>{photo.caption}</span> : null}
         </li>
       ))}
+      {layouts.flatMap((layout, bp) =>
+        layout.blanks.map((blank, index) => (
+          <li key={`${bp}-${blank.id}`} className={styles.blank} data-bp={bp} style={blankVars(blank)} aria-hidden="true">
+            <span className={styles.corner} data-pos="tl">
+              +
+            </span>
+            <span className={styles.corner} data-pos="tr">
+              +
+            </span>
+            <span className={styles.corner} data-pos="bl">
+              +
+            </span>
+            <span className={styles.corner} data-pos="br">
+              +
+            </span>
+            <span className={styles.blankDim}>{`NO.${refNo(index)}\nVACANT`}</span>
+          </li>
+        )),
+      )}
     </ul>
   );
 };

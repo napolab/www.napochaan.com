@@ -7,42 +7,42 @@ import type { Placement } from './pack';
 describe('computeBlanks', () => {
   it('returns no blanks when every column is filled to totalHeight', () => {
     const placements: Placement[] = [
-      { id: 'a', x: 0, y: 0, width: 100, height: 200 },
-      { id: 'b', x: 102, y: 0, width: 100, height: 200 },
+      { id: 'a', col: 0, span: 1, y: 0, height: 2 },
+      { id: 'b', col: 1, span: 1, y: 0, height: 2 },
     ];
-    expect(computeBlanks(placements, { columns: 2, width: 202, gap: 2, totalHeight: 200 })).toEqual([]);
+    expect(computeBlanks(placements, 2, 2)).toEqual([]);
   });
 
-  it('ignores the normal 2px seam between stacked photos', () => {
+  it('ignores a column with no gap (stacked to the bottom)', () => {
     const placements: Placement[] = [
-      { id: 'a', x: 0, y: 0, width: 100, height: 100 },
-      { id: 'b', x: 0, y: 102, width: 100, height: 98 },
+      { id: 'a', col: 0, span: 1, y: 0, height: 1 },
+      { id: 'b', col: 0, span: 1, y: 1, height: 1 },
     ];
-    expect(computeBlanks(placements, { columns: 1, width: 100, gap: 2, totalHeight: 200 })).toEqual([]);
+    expect(computeBlanks(placements, 1, 2)).toEqual([]);
   });
 
-  it('fills the ragged bottom of a shorter column, inset by a seam', () => {
+  it('fills the ragged bottom of a shorter column', () => {
     const placements: Placement[] = [
-      { id: 'a', x: 0, y: 0, width: 100, height: 200 },
-      { id: 'b', x: 102, y: 0, width: 100, height: 80 },
+      { id: 'a', col: 0, span: 1, y: 0, height: 2 },
+      { id: 'b', col: 1, span: 1, y: 0, height: 0.8 },
     ];
-    const blanks = computeBlanks(placements, { columns: 2, width: 202, gap: 2, totalHeight: 200 });
+    const blanks = computeBlanks(placements, 2, 2);
     expect(blanks).toHaveLength(1);
-    expect(blanks[0]).toMatchObject({ x: 102, width: 100 });
-    expect(blanks[0]?.y).toBeCloseTo(82);
-    expect(blanks[0]?.height).toBeCloseTo(118);
+    expect(blanks[0]).toMatchObject({ col: 1 });
+    expect(blanks[0]?.y).toBeCloseTo(0.8);
+    expect(blanks[0]?.height).toBeCloseTo(1.2);
   });
 
   it('fills an internal gap left beside a wide span item', () => {
     const placements: Placement[] = [
-      { id: 'tall', x: 0, y: 0, width: 100, height: 150 },
-      { id: 'short', x: 102, y: 0, width: 100, height: 50 },
-      { id: 'wide', x: 0, y: 152, width: 202, height: 60 },
+      { id: 'tall', col: 0, span: 1, y: 0, height: 1.5 },
+      { id: 'short', col: 1, span: 1, y: 0, height: 0.5 },
+      { id: 'wide', col: 0, span: 2, y: 1.5, height: 0.6 },
     ];
-    const blanks = computeBlanks(placements, { columns: 2, width: 202, gap: 2, totalHeight: 212 });
+    const blanks = computeBlanks(placements, 2, 2.1);
     expect(blanks).toHaveLength(1);
-    expect(blanks[0]).toMatchObject({ x: 102, width: 100 });
-    expect(blanks[0]?.y).toBeCloseTo(52);
-    expect(blanks[0]?.height).toBeCloseTo(100);
+    expect(blanks[0]).toMatchObject({ col: 1 });
+    expect(blanks[0]?.y).toBeCloseTo(0.5);
+    expect(blanks[0]?.height).toBeCloseTo(1.0);
   });
 });

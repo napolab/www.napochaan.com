@@ -26,9 +26,13 @@ describe('GalleryArchive', () => {
     await expect.element(page.getByText('VRChat')).toBeInTheDocument();
   });
 
-  it('switches to packed mode after measuring the container width', async () => {
+  it('publishes the precomputed column-width layout (no measurement needed)', async () => {
     const { container } = await render(<GalleryArchive photos={photos} />);
-    await expect.poll(() => container.querySelector('ul')?.getAttribute('data-mode')).toBe('packed');
+    const root = container.querySelector('ul');
+    const style = root?.getAttribute('style') ?? '';
+    // The three column-count totals are emitted up front for CSS to scale.
+    expect(style).toContain('--total-2');
+    expect(style).toContain('--total-4');
   });
 
   it('opens a lightbox dialog when a photo is activated', async () => {

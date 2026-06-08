@@ -4,70 +4,63 @@ import { pack } from './pack';
 
 import type { PackItem, Placement } from './pack';
 
-// True if two placement rectangles overlap (touching edges is allowed).
-const overlaps = (a: Placement, b: Placement): boolean => a.x < b.x + b.width && b.x < a.x + a.width && a.y < b.y + b.height && b.y < a.y + a.height;
+// Two cells overlap if their cw-unit rectangles intersect (touching edges is allowed).
+const overlaps = (a: Placement, b: Placement): boolean => a.col < b.col + b.span && b.col < a.col + a.span && a.y < b.y + b.height && b.y < a.y + a.height;
 
-const square = (id: string): PackItem => ({ id, width: 100, height: 100, span: 1 });
+const square = (id: string): PackItem => ({ id, ratio: 1, span: 1 });
 
 describe('pack', () => {
   it('returns nothing for an empty list', () => {
-    expect(pack([], { width: 800, gap: 2, columns: 4 })).toEqual({ placements: [], totalHeight: 0 });
+    expect(pack([], 4)).toEqual({ placements: [], totalHeight: 0 });
   });
 
-  it('places a single 1-span item at the origin with the column width', () => {
-    const { placements } = pack([square('a')], { width: 800, gap: 2, columns: 4 });
-    const colW = (800 - 3 * 2) / 4;
-    expect(placements).toHaveLength(1);
-    expect(placements[0]).toMatchObject({ id: 'a', x: 0, y: 0, width: colW });
-    expect(placements[0]?.height).toBeCloseTo(colW);
+  it('places a single square at the origin one cw tall', () => {
+    const { placements, totalHeight } = pack([square('a')], 4);
+    expect(placements).toEqual([{ id: 'a', col: 0, span: 1, y: 0, height: 1 }]);
+    expect(totalHeight).toBe(1);
   });
 
-  it('preserves source order in the output', () => {
-    const { placements } = pack([square('a'), square('b'), square('c')], { width: 800, gap: 2, columns: 4 });
+  it('preserves source order', () => {
+    const { placements } = pack([square('a'), square('b'), square('c')], 4);
     expect(placements.map((p) => p.id)).toEqual(['a', 'b', 'c']);
   });
 
-  it('lays the first N equal items across the top row, left to right', () => {
-    const { placements } = pack([square('a'), square('b'), square('c'), square('d')], { width: 800, gap: 2, columns: 4 });
+  it('lays the first N squares across the top row, left to right', () => {
+    const { placements } = pack([square('a'), square('b'), square('c'), square('d')], 4);
     expect(placements.every((p) => p.y === 0)).toBe(true);
-    const xs = placements.map((p) => p.x);
-    expect([...xs].sort((m, n) => m - n)).toEqual(xs);
-    expect(new Set(xs).size).toBe(xs.length);
+    expect(placements.map((p) => p.col)).toEqual([0, 1, 2, 3]);
   });
 
-  it('drops the overflow item under the shortest (leftmost) column', () => {
-    const items = [square('a'), square('b'), square('c'), square('d'), square('e')];
-    const { placements } = pack(items, { width: 800, gap: 2, columns: 4 });
-    const colW = (800 - 3 * 2) / 4;
+  it('drops the overflow square under the shortest (leftmost) column', () => {
+    const { placements } = pack([square('a'), square('b'), square('c'), square('d'), square('e')], 4);
     const e = placements.find((p) => p.id === 'e');
-    expect(e?.x).toBe(0);
-    expect(e?.y).toBeCloseTo(colW + 2);
+    expect(e).toMatchObject({ col: 0, y: 1 });
   });
 
-  it('gives a wide item (span 2) twice the column width plus the inner gap', () => {
-    const wide: PackItem = { id: 'w', width: 160, height: 90, span: 2 };
-    const { placements } = pack([wide], { width: 800, gap: 2, columns: 4 });
-    const colW = (800 - 3 * 2) / 4;
-    expect(placements[0]?.width).toBeCloseTo(2 * colW + 2);
+  it('makes a wide (span 2) cell height span * ratio', () => {
+    const wide: PackItem = { id: 'w', ratio: 9 / 16, span: 2 };
+    const { placements } = pack([wide], 4);
+    expect(placements[0]).toMatchObject({ col: 0, span: 2, y: 0 });
+    expect(placements[0]?.height).toBeCloseTo(2 * (9 / 16));
   });
 
   it('clamps span to the column count (span 3 in a 2-column grid = full width)', () => {
-    const wide: PackItem = { id: 'w', width: 160, height: 90, span: 3 };
-    const { placements } = pack([wide], { width: 480, gap: 2, columns: 2 });
-    expect(placements[0]?.width).toBeCloseTo(480);
-    expect(placements[0]?.x).toBe(0);
+    const wide: PackItem = { id: 'w', ratio: 0.5, span: 3 };
+    const { placements } = pack([wide], 2);
+    expect(placements[0]).toMatchObject({ col: 0, span: 2 });
+    expect(placements[0]?.height).toBeCloseTo(1);
   });
 
   it('produces no overlapping rectangles for a mixed set', () => {
     const items: PackItem[] = [
-      { id: '1', width: 400, height: 600, span: 1 },
-      { id: '2', width: 160, height: 90, span: 2 },
-      { id: '3', width: 100, height: 100, span: 1 },
-      { id: '4', width: 160, height: 90, span: 2 },
-      { id: '5', width: 400, height: 600, span: 1 },
-      { id: '6', width: 100, height: 100, span: 1 },
+      { id: '1', ratio: 1.5, span: 1 },
+      { id: '2', ratio: 9 / 16, span: 2 },
+      { id: '3', ratio: 1, span: 1 },
+      { id: '4', ratio: 9 / 16, span: 2 },
+      { id: '5', ratio: 1.5, span: 1 },
+      { id: '6', ratio: 1, span: 1 },
     ];
-    const { placements, totalHeight } = pack(items, { width: 800, gap: 2, columns: 4 });
+    const { placements, totalHeight } = pack(items, 4);
     for (const [i, a] of placements.entries()) {
       for (const b of placements.slice(i + 1)) {
         expect(overlaps(a, b)).toBe(false);
