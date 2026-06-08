@@ -5,16 +5,18 @@ import { page } from 'vitest/browser';
 import { Manifesto } from './index';
 
 const items = [
-  { term: 'テストを先に書く。', description: 'Red Green Refactor。' },
-  { term: '状態を書き換えない。', description: 'const だけ。' },
+  { no: '所見 01', term: 'テストを先に書く。', description: 'Red Green Refactor。' },
+  { no: '所見 02', term: '状態を書き換えない。', description: 'const だけ。' },
 ];
 
 describe('Manifesto', () => {
-  it('renders each tenet term and description', async () => {
+  it('renders each tenet marker, term and description', async () => {
     await render(<Manifesto items={items} />);
 
+    await expect.element(page.getByText('所見 01')).toBeInTheDocument();
     await expect.element(page.getByText('テストを先に書く。')).toBeInTheDocument();
     await expect.element(page.getByText('Red Green Refactor。')).toBeInTheDocument();
+    await expect.element(page.getByText('所見 02')).toBeInTheDocument();
     await expect.element(page.getByText('状態を書き換えない。')).toBeInTheDocument();
     await expect.element(page.getByText('const だけ。')).toBeInTheDocument();
   });

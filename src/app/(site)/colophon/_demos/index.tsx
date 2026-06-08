@@ -23,9 +23,12 @@ import { Timeline } from '@components/timeline';
 import { TypewriterText } from '@components/typewriter-text';
 
 import { colophon } from '../content';
+import { CursorPresenceDemo } from './cursor-presence-demo';
 import { GalleryArchiveLazy } from './gallery-archive-lazy';
 import { GalleryLazy } from './gallery-lazy';
+import { GameOfLifeDemo } from './game-of-life-demo';
 import { richTextSample } from './rich-text-sample';
+import { TypographyBandDemo } from './typography-band-demo';
 
 import flyerBooth0424 from '../../_assets/flyer-booth-0424.jpg';
 import flyerBooth0523 from '../../_assets/flyer-booth-0523.jpg';
@@ -42,8 +45,11 @@ import type { ReactNode } from 'react';
 // demo without a content entry) is a compile error.
 type ComponentName = (typeof colophon.components.items)[number]['name'];
 
+// Demo data only — every href is dropped / neutralized so interacting with a
+// showcased component on the colophon never navigates off the page. Timeline
+// reads as plain (no clickable title) when href is omitted.
 const timelineItems: TimelineItem[] = [
-  { id: '1', date: '06/14', label: 'night vol.19 @ club eleven', meta: 'Tokyo', upcoming: true, href: '/works/1' },
+  { id: '1', date: '06/14', label: 'night vol.19 @ club eleven', meta: 'Tokyo', upcoming: true },
   { id: '2', date: '05/03', label: 'dawn session @ rooftop', meta: 'DJ set' },
   { id: '3', date: '04/12', label: 'ambient night @ gallery', meta: 'live' },
 ];
@@ -96,10 +102,12 @@ const descItems = [
   { term: 'equipment', description: 'Technics SL-1200, Pioneer DJM-900' },
 ];
 
-const breadcrumbItems = [{ href: '/', label: 'home' }, { href: '/works', label: 'works' }, { label: 'night vol.13' }];
+// '#' keeps every demo link on the colophon (no cross-page navigation).
+const breadcrumbItems = [{ href: '#', label: 'home' }, { href: '#', label: 'works' }, { label: 'night vol.13' }];
 
-// The consumer owns the URL shape; Pagination owns layout / a11y / routing.
-const paginationHref = (page: number): string => (page <= 1 ? '/works' : `/works?page=${page}`);
+// Demo-only href: stays on the page. (In real use the consumer owns the URL shape;
+// Pagination owns layout / a11y / routing.)
+const paginationHref = (): string => '#';
 
 // Live demos keyed by component name, mapped against colophon.components.items in
 // the page. Kept out of content.ts so the data file stays JSX-free.
@@ -172,8 +180,8 @@ export const demos: Record<ComponentName, ReactNode> = {
   ),
   Link: (
     <>
-      <Link href="/works">作品一覧</Link>{' '}
-      <Link href="/about" tone="muted">
+      <Link href="#">作品一覧</Link>{' '}
+      <Link href="#" tone="muted">
         About
       </Link>
     </>
@@ -186,4 +194,7 @@ export const demos: Record<ComponentName, ReactNode> = {
   ),
   Pagination: <Pagination currentPage={3} totalPages={5} href={paginationHref} />,
   Breadcrumbs: <Breadcrumbs items={breadcrumbItems} />,
+  TypographyBand: <TypographyBandDemo />,
+  GameOfLife: <GameOfLifeDemo />,
+  CursorPresence: <CursorPresenceDemo />,
 };

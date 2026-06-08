@@ -12,8 +12,24 @@ export const item = css({
   gap: 'inline',
 });
 
-// The principle headline — prominent, bold, the line that should land first.
+// One finding: a mono marker stacked above its headline, like a chart row.
 export const term = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.5',
+});
+
+// The finding marker ("所見 01") — mono system-annotation voice, matching
+// SectionHeading's no marker.
+export const no = css({
+  fontFamily: 'mono',
+  fontSize: 'sm',
+  letterSpacing: 'wide',
+  color: 'accent.text',
+});
+
+// The finding headline — prominent, bold, the line that should land first.
+export const headline = css({
   fontFamily: 'body',
   fontWeight: 'bold',
   fontSize: { base: 'md', desktop: 'lg' },

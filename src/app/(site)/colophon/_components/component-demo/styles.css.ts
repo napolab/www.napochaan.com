@@ -37,5 +37,5 @@ export const stage = css({
   flexDirection: 'column',
   gap: 'element',
   paddingBlock: 'element',
-  overflowX: 'auto',
+  overflow: 'hidden',
 });
