@@ -19,9 +19,10 @@ describe('Gallery', () => {
     await render(<Gallery items={items} />);
     const img = page.getByRole('img', { name: 'flyer a' }).first().element();
     const style = img.getAttribute('style') ?? '';
-    expect(style).toContain('blur=20');
-    // Placeholder source is kept tiny (small width), not the default 32.
-    expect(style).toContain('w=16');
+    expect(style).toContain('blur=10');
+    // Booth2Booth blur option: width 32 / quality 30 / blur 10.
+    expect(style).toContain('w=32');
+    expect(style).toContain('q=30');
   });
   it('renders the corner caption label when provided', async () => {
     await render(<Gallery items={items} />);

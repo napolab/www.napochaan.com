@@ -37,7 +37,15 @@ const GalleryCell = ({ item }: { item: GalleryItem }) => {
   return (
     <li className={styles.cell} style={cellStyle}>
       <Lightbox src={item.src} alt={item.alt} width={item.width} height={item.height} triggerClassName={styles.trigger}>
-        <Image src={item.src} alt={item.alt} width={item.width} height={item.height} className={styles.gridImage} placeholder="blur" blurDataURL={formatBlurURL(item.src, { width: 16, blur: 20 })} />
+        <Image
+          src={item.src}
+          alt={item.alt}
+          width={item.width}
+          height={item.height}
+          className={styles.gridImage}
+          placeholder="blur"
+          blurDataURL={formatBlurURL(item.src, { blur: 10, width: 32, quality: 30 })}
+        />
       </Lightbox>
       {item.caption !== undefined ? <span className={styles.caption}>{item.caption}</span> : null}
     </li>

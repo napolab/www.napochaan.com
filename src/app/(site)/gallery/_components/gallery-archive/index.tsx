@@ -39,6 +39,12 @@ const cellVars = (place: Placement): CSSProperties => ({ '--cell-x': `${place.x}
 
 const totalVars = (totalHeight: number): CSSProperties => ({ '--total-h': `${totalHeight}px` }) as CSSProperties;
 
+// Photo cell style: always publish the aspect ratio (so the flow fallback reserves
+// each cell's height and nothing shifts on image load); add the packed position/size
+// vars once the width has been measured.
+const photoCellStyle = (photo: GalleryPhoto, place: Placement | undefined): CSSProperties =>
+  ({ '--cell-ar': `${photo.width} / ${photo.height}`, ...(place === undefined ? {} : cellVars(place)) }) as CSSProperties;
+
 export const GalleryArchive = ({ photos }: Props) => {
   const ref = useRef<HTMLUListElement | null>(null);
   const [width, setWidth] = useState<number | null>(null);
@@ -79,7 +85,7 @@ export const GalleryArchive = ({ photos }: Props) => {
         const place = placementOf(photo.id);
 
         return (
-          <li key={photo.id} className={styles.cell} style={place === undefined ? undefined : cellVars(place)}>
+          <li key={photo.id} className={styles.cell} style={photoCellStyle(photo, place)}>
             <Lightbox src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} triggerClassName={styles.trigger}>
               <Image
                 src={photo.src}
@@ -88,7 +94,7 @@ export const GalleryArchive = ({ photos }: Props) => {
                 height={photo.height}
                 className={styles.image}
                 placeholder="blur"
-                blurDataURL={formatBlurURL(photo.src, { width: 16, blur: 20 })}
+                blurDataURL={formatBlurURL(photo.src, { blur: 10, width: 32, quality: 30 })}
               />
             </Lightbox>
             {photo.caption !== undefined ? <span className={styles.caption}>{photo.caption}</span> : null}

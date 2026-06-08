@@ -31,6 +31,9 @@ export const cell = css({
     display: 'block',
     breakInside: 'avoid',
     marginBottom: '[2px]',
+    // Reserve each cell's height from its known aspect ratio so images never shift
+    // the column as they load (the fallback's anti-CLS lock).
+    aspectRatio: '[var(--cell-ar)]',
   },
   '[data-mode=packed] &': {
     position: 'absolute',
@@ -79,13 +82,10 @@ export const trigger = css({
 export const image = css({
   display: 'block',
   width: 'full',
-  '[data-mode=flow] &': {
-    height: 'auto',
-  },
-  '[data-mode=packed] &': {
-    height: 'full',
-    objectFit: 'cover',
-  },
+  // The cell owns the dimensions (aspect-ratio in flow, fixed --cell-h in packed);
+  // the image always fills and cover-crops it, so nothing reflows on load.
+  height: 'full',
+  objectFit: 'cover',
 });
 
 export const caption = css({

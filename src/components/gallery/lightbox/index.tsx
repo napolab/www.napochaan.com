@@ -31,7 +31,7 @@ export const Lightbox = ({ src, alt, width, height, triggerClassName, children }
           <Dialog className={styles.dialog} aria-label={alt}>
             {({ close }) => (
               <>
-                <Image src={src} alt={alt} width={width} height={height} className={styles.modalImage} placeholder="blur" blurDataURL={formatBlurURL(src, { width: 16, blur: 20 })} />
+                <Image src={src} alt={alt} width={width} height={height} className={styles.modalImage} placeholder="blur" blurDataURL={formatBlurURL(src, { blur: 10, width: 32, quality: 30 })} />
                 <Button onPress={close} className={styles.close}>
                   close
                 </Button>
