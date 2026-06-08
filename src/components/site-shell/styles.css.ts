@@ -1,5 +1,14 @@
 import { css } from '@styled/css';
 
+// The fixed full-screen frame the background Game of Life fills. inset: band keeps it
+// clear of the TypographyBand; the canvas inside just fills this box.
+export const lifeFrame = css({
+  position: 'fixed',
+  inset: '[token(sizes.band)]',
+  zIndex: 'base',
+  pointerEvents: 'none',
+});
+
 export const stage = css({
   position: 'relative',
   zIndex: 'base',

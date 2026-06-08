@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef } from 'react';
 
+import { useResizer } from '@components/canvas-resize';
 import { useIsClient } from '@hooks/use-is-client';
 import { useLifeEngine } from './provider';
 
@@ -31,16 +32,23 @@ type RafState = {
   acc: number;
 };
 
+// The canvas always fills its container; the caller's box decides the size (the
+// fixed full-screen frame for the page background, a cell for the colophon demo).
+// How that size is measured / observed is injected via the Resizer context, so the
+// component itself owns no viewport logic. For a contained instance, wrap it in its
+// own LifeEngineProvider so it gets an isolated engine and never disturbs the
+// background's generation count.
 export const GameOfLife = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const isClient = useIsClient();
 
   const engine = useLifeEngine();
+  const resizer = useResizer();
   const reduced = useMemo(() => (isClient ? matchMedia('(prefers-reduced-motion: reduce)').matches : false), [isClient]);
 
-  // Effect 1: Resize — sizes the canvas and calls engine.resize on window resize
+  // Effect 1: Resize — sizes the canvas and re-seeds the engine on layout change
   useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: Imperative canvas sizing + engine resize on window layout change
+    // USEEFFECT_JUSTIFICATION: Imperative canvas sizing + engine resize on layout change
     if (!isClient) return;
 
     const canvas = canvasRef.current;
@@ -51,26 +59,20 @@ export const GameOfLife = () => {
       if (ctx === null) return;
 
       const dpr = Math.min(devicePixelRatio ?? 1, 2);
-      const w = innerWidth - 48;
-      const h = innerHeight - 48;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
+      const { width, height } = resizer.measure(canvas);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const cols = Math.ceil(w / CELL) + 1;
-      const rows = Math.ceil(h / CELL) + 1;
+      const cols = Math.ceil(width / CELL) + 1;
+      const rows = Math.ceil(height / CELL) + 1;
       engine.resize(cols, rows);
       drawCells(ctx, engine.getState());
     };
 
     resize();
-    window.addEventListener('resize', resize, { passive: true });
-    return () => {
-      window.removeEventListener('resize', resize);
-    };
-  }, [engine, isClient]);
+    return resizer.observe(canvas, resize);
+  }, [engine, isClient, resizer]);
 
   // Effect 2: Animation loop (rAF 7fps) + pause while the tab is hidden
   useEffect(() => {

@@ -9,23 +9,16 @@ import { createVisitorPointerApp } from '@lib/cursor/visitor-pointer-app';
 import { defineCache } from '@utils/define-cache';
 
 import { CursorLayer } from './cursor-layer';
+import { createSurfacePlacement, PlacementProvider } from './placement-context';
 import { PresenceContextProvider } from './presence-context';
+import { readCursorColor } from './read-cursor-color';
+import * as styles from './styles.css';
 import { SurfaceRefProvider } from './surface-context';
-
-import type { CursorColor } from '@lib/cursor/identity';
 
 const STORAGE_KEY = 'cursor-presence-enabled';
 // Defer start() past React StrictMode's synchronous mount→unmount→remount in dev. The throwaway
 // first mount's timer is cleared before it fires, so only the surviving mount opens a socket.
 const START_DELAY_MS = 100;
-
-// Resolve a cursor color token to its computed CSS value. Lives here (the consumer) and is injected
-// into CursorLayer so the layer stays agnostic of the design tokens / DOM.
-const readCursorColor = (color: CursorColor): string => {
-  const value = getComputedStyle(document.documentElement).getPropertyValue(`--colors-cursor-${color}`).trim();
-
-  return value === '' ? '#111111' : value;
-};
 
 const readRect = (el: HTMLElement | null): Rect | null => {
   if (el === null) return null;
@@ -103,12 +96,18 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
 
   const getRect = useCallback((): Rect | null => rectRef.current, []);
   const getColor = useMemo(() => defineCache(readCursorColor), []);
+  // Surface-anchored placement: cursors follow page content as it scrolls.
+  const placement = useMemo(() => createSurfacePlacement(getRect), [getRect]);
 
   return (
     <PresenceContextProvider value={value}>
       <SurfaceRefProvider value={surfaceRef}>
         {children}
-        <CursorLayer app={app} enabled={enabled} getRect={getRect} getColor={getColor} />
+        <PlacementProvider value={placement}>
+          <div className={styles.overlay}>
+            <CursorLayer app={app} enabled={enabled} getColor={getColor} />
+          </div>
+        </PlacementProvider>
       </SurfaceRefProvider>
     </PresenceContextProvider>
   );

@@ -1,9 +1,10 @@
 import { css } from '@styled/css';
 
-// position:fixed; inset: 24px (typography-band width); sits behind content at z-index base
+// The canvas fills its container; the caller's box (a fixed full-screen frame for the
+// page background, a cell for the demo) decides the size.
 export const root = css({
-  position: 'fixed',
-  inset: '[token(sizes.band)]',
-  zIndex: 'base',
+  display: 'block',
+  width: 'full',
+  height: 'full',
   pointerEvents: 'none',
 });

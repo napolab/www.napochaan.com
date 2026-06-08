@@ -40,6 +40,12 @@ describe('PageHeader', () => {
     await expect.element(page.getByText('過去の制作物の記録。')).not.toBeInTheDocument();
   });
 
+  it('renders the lead with the scramble reveal when leadReveal is "scramble"', async () => {
+    await render(<PageHeader title="archive" breadcrumbs={breadcrumbs} lead="刻むｩ！" leadReveal="scramble" />);
+    // ScrambleText keeps a width-reserving ghost plus the animated copy, so scope to the first match.
+    await expect.element(page.getByText('刻むｩ！').first()).toBeInTheDocument();
+  });
+
   it('renders the annotation when provided', async () => {
     await render(<PageHeader title="archive" breadcrumbs={breadcrumbs} annotation="35.6595 / 139.7006" />);
     await expect.element(page.getByText('35.6595 / 139.7006')).toBeInTheDocument();

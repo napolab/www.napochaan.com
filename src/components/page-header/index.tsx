@@ -1,26 +1,41 @@
 import { Breadcrumbs } from '@components/breadcrumbs';
+import { ScrambleText } from '@components/scramble-text';
 import { SystemAnnotation } from '@components/system-annotation';
 import { TypewriterText } from '@components/typewriter-text';
 
 import * as styles from './styles.css';
+
+import type { ReactNode } from 'react';
 
 type Crumb = {
   href?: string;
   label: string;
 };
 
+// How the lead text reveals. 'typewriter' (default) types it out one keystroke
+// at a time; 'scramble' decodes it through glitch glyphs on hover (e.g. the
+// colophon's tagline). The text itself always stays a plain `lead` string.
+type LeadReveal = 'typewriter' | 'scramble';
+
 type Props = {
   title: string;
   breadcrumbs: readonly Crumb[];
   kicker?: string;
   lead?: string;
+  leadReveal?: LeadReveal;
   annotation?: string;
   // 'tight' pulls the title tracking in for long, content titles (e.g. a news
   // detail title) where the default label tracking reads too spread.
   titleTracking?: 'wide' | 'tight';
 };
 
-export const PageHeader = ({ title, breadcrumbs, kicker, lead, annotation, titleTracking }: Props) => {
+// The blockquote lead: same string, swappable reveal.
+const renderLead = (lead?: string, reveal: LeadReveal = 'typewriter'): ReactNode => {
+  if (lead === undefined) return null;
+  return <p className={styles.lead}>{reveal === 'scramble' ? <ScrambleText>{lead}</ScrambleText> : <TypewriterText>{lead}</TypewriterText>}</p>;
+};
+
+export const PageHeader = ({ title, breadcrumbs, kicker, lead, leadReveal, annotation, titleTracking }: Props) => {
   return (
     <header className={styles.root}>
       <Breadcrumbs items={breadcrumbs} />
@@ -30,11 +45,7 @@ export const PageHeader = ({ title, breadcrumbs, kicker, lead, annotation, title
       <h1 className={styles.title} data-tracking={titleTracking}>
         {title}
       </h1>
-      {lead !== undefined ? (
-        <p className={styles.lead}>
-          <TypewriterText>{lead}</TypewriterText>
-        </p>
-      ) : null}
+      {renderLead(lead, leadReveal)}
       {annotation !== undefined ? (
         <SystemAnnotation tone="muted" className={styles.annotation}>
           {annotation}

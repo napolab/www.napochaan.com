@@ -21,7 +21,9 @@ export const SiteShell = ({ children }: { children: ReactNode }) => {
     <LifeEngineProvider>
       <CursorPresence>
         <TypographyBand />
-        <GameOfLife />
+        <div className={styles.lifeFrame}>
+          <GameOfLife />
+        </div>
         <CursorSurface className={styles.stage}>
           <SysBar initialTime={initialTime} />
           {children}

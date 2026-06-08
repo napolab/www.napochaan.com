@@ -2,8 +2,9 @@
 
 import { useEffect, useRef } from 'react';
 
-import { fromNormalized, type Rect } from '@lib/cursor/coordinate';
+import { useResizer } from '@components/canvas-resize';
 
+import { usePlacement } from './placement-context';
 import * as styles from './styles.css';
 
 import type { CursorColor } from '@lib/cursor/identity';
@@ -16,7 +17,6 @@ type Render = { x: number; y: number; seeded: boolean };
 type Props = {
   app: VisitorPointerApp;
   enabled: boolean;
-  getRect: () => Rect | null;
   // Injected by the consumer so this layer stays agnostic of how a cursor color resolves.
   getColor: (color: CursorColor) => string;
 };
@@ -45,8 +45,10 @@ const drawCursor = (ctx: CanvasRenderingContext2D, color: string, label: string,
   ctx.fillText(label, labelX + LABEL_PAD_X, y + 2);
 };
 
-export const CursorLayer = ({ app, enabled, getRect, getColor }: Props) => {
+export const CursorLayer = ({ app, enabled, getColor }: Props) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const resizer = useResizer();
+  const placement = usePlacement();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -55,10 +57,11 @@ export const CursorLayer = ({ app, enabled, getRect, getColor }: Props) => {
     if (ctx === null) return;
 
     // All per-frame state lives in this effect: render positions (lerped on-screen px), the latest
-    // visitor map (kept current via subscribe), and the rAF handle.
+    // visitor map (kept current via subscribe), the drawing surface's CSS-px size, and the rAF handle.
     const renders = new Map<string, Render>();
     let visitors = app.getState().visitors;
     let rafId = 0;
+    const size = { width: 0, height: 0 };
 
     // Track prefers-reduced-motion live so an OS setting change takes effect without a remount.
     const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
@@ -72,33 +75,37 @@ export const CursorLayer = ({ app, enabled, getRect, getColor }: Props) => {
       visitors = s.visitors;
     });
 
+    // The canvas fills its container; the injected Resizer measures + observes the box.
     const resize = (): void => {
       const dpr = window.devicePixelRatio;
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
+      const measured = resizer.measure(canvas);
+      size.width = measured.width;
+      size.height = measured.height;
+      canvas.width = size.width * dpr;
+      canvas.height = size.height * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
-    window.addEventListener('resize', resize);
+    const unobserve = resizer.observe(canvas, resize);
 
-    // One continuous rAF loop: re-lerps cursors toward their targets and re-anchors them on scroll
-    // (the canvas is viewport-fixed; cursors are document-anchored) every frame.
+    // One continuous rAF loop: re-lerps cursors toward their targets every frame. The
+    // injected Placement maps each normalized point (and, for the page background,
+    // re-anchors against page scroll — recomputed here every frame).
     const frame = (): void => {
       rafId = requestAnimationFrame(frame);
-      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      ctx.clearRect(0, 0, size.width, size.height);
       if (!enabled) return;
-      const rect = getRect();
-      if (rect === null) return;
 
       const current = visitors;
       for (const visitor of current.values()) {
         if (visitor.x === undefined || visitor.y === undefined) continue; // no position yet (just joined)
-        const p = fromNormalized(rect, { nx: visitor.x, ny: visitor.y });
-        // canvas is viewport-fixed; convert document px -> viewport px.
-        const tx = p.x - window.scrollX;
-        const ty = p.y - window.scrollY;
+        const target = placement.place(visitor.x, visitor.y, size);
+        if (target === null) continue;
         const prev = renders.get(visitor.id);
-        const next: Render = prev === undefined || reduceMotion || !prev.seeded ? { x: tx, y: ty, seeded: true } : { x: prev.x + (tx - prev.x) * LERP, y: prev.y + (ty - prev.y) * LERP, seeded: true };
+        const next: Render =
+          prev === undefined || reduceMotion || !prev.seeded
+            ? { x: target.x, y: target.y, seeded: true }
+            : { x: prev.x + (target.x - prev.x) * LERP, y: prev.y + (target.y - prev.y) * LERP, seeded: true };
         renders.set(visitor.id, next);
         drawCursor(ctx, getColor(visitor.color), visitor.label, next.x, next.y);
       }
@@ -113,10 +120,10 @@ export const CursorLayer = ({ app, enabled, getRect, getColor }: Props) => {
     return () => {
       unsub();
       cancelAnimationFrame(rafId);
-      window.removeEventListener('resize', resize);
+      unobserve();
       motionQuery.removeEventListener('change', onMotionChange);
     };
-  }, [app, enabled, getRect, getColor]);
+  }, [app, enabled, getColor, resizer, placement]);
 
   return <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />;
 };

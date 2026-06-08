@@ -65,6 +65,9 @@ export default defineConfig({
         marquee: {
           to: { transform: 'translateX(-50%)' },
         },
+        marqueeY: {
+          to: { transform: 'translateY(-50%)' },
+        },
       },
     },
   },
