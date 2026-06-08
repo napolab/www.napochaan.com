@@ -16,7 +16,14 @@ const ensureMedia = async (payload: MigrateUpArgs['payload'], alt: string, filen
   return created.id as number
 }
 
-const photosData = [
+type PhotoEntry = {
+  filename: string
+  alt: string
+  caption: string
+  mediaAlt?: string
+}
+
+const photosData: PhotoEntry[] = [
   {
     filename: 'vrchat-glitch.jpg',
     alt: 'napochaan のアバター milfy v3.0.0 m001',
@@ -47,6 +54,23 @@ const photosData = [
     alt: 'Booth²Booth イベントフライヤー 04.24',
     caption: 'flyer / 04.24',
   },
+  {
+    filename: 'flyer-sugoi-dj.jpg',
+    alt: '「超すごい DJ イベント」フライヤー（本人制作）',
+    caption: 'flyer / 超すごい DJ',
+  },
+  {
+    filename: 'flyer-kanda-roost.jpg',
+    alt: '神田Roost シーシャ DJ オールナイト フライヤー（本人制作）',
+    caption: 'flyer / 神田Roost',
+  },
+  {
+    filename: 'flyer-otiru-soudan.png',
+    // mediaAlt matches the works migration so the media row deduplicates
+    mediaAlt: 'ちこく×おてぃる お悩み相談かふぇ ポスター',
+    alt: 'ちこく×おてぃる お悩み相談かふぇ ポスター（本人制作）',
+    caption: 'flyer / お悩み相談かふぇ',
+  },
 ]
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
@@ -54,7 +78,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   if (existing.docs.length > 0) return
 
   for (const [index, photo] of photosData.entries()) {
-    const image = await ensureMedia(payload, photo.alt, photo.filename)
+    const image = await ensureMedia(payload, photo.mediaAlt ?? photo.alt, photo.filename)
     await payload.create({
       collection: 'gallery',
       data: {

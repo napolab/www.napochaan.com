@@ -1,6 +1,22 @@
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+
 import type { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-d1-sqlite'
 
 import { richTextFromParagraphs } from '../src/utils/sample-rich-text'
+
+const dirname = path.dirname(fileURLToPath(import.meta.url))
+
+const ensureMedia = async (payload: MigrateUpArgs['payload'], alt: string, filename: string): Promise<number> => {
+  const existing = await payload.find({ collection: 'media', where: { alt: { equals: alt } }, limit: 1 })
+  const [first] = existing.docs
+  if (first !== undefined) {
+    return first.id as number
+  }
+  const filePath = path.resolve(dirname, '..', 'src', 'assets', filename)
+  const created = await payload.create({ collection: 'media', data: { alt }, filePath })
+  return created.id as number
+}
 
 const worksData = [
   {
@@ -161,7 +177,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   const existing = await payload.find({ collection: 'works', limit: 1 })
   if (existing.docs.length > 0) return
 
+  const posterMediaId = await ensureMedia(payload, 'ちこく×おてぃる お悩み相談かふぇ ポスター', 'flyer-otiru-soudan.png')
+
   for (const work of worksData) {
+    const thumbnail = work.no === '05' ? posterMediaId : undefined
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     await payload.create({
       collection: 'works',
@@ -173,6 +192,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
         url: work.url,
         description: work.description,
         body: richTextFromParagraphs([work.description]),
+        ...(thumbnail !== undefined ? { thumbnail } : {}),
         _status: 'published',
       } as any,
     })
