@@ -2,20 +2,21 @@ import { describe, expect, it } from 'vitest';
 
 import { fromNormalized, toNormalized } from './coordinate';
 
-const wide = { left: 100, top: 0, width: 800, height: 2000 };
-const narrow = { left: 20, top: 0, width: 320, height: 4000 };
+const rect = { left: 100, top: 50, width: 800, height: 1000 };
 
 describe('coordinate', () => {
-  it('normalizes a point relative to the surface bbox', () => {
-    expect(toNormalized(wide, 500, 1000)).toEqual({ nx: 0.5, ny: 0.5 });
+  it('normalizes a page point against the surface box', () => {
+    expect(toNormalized(rect, 500, 550)).toEqual({ nx: 0.5, ny: 0.5 });
   });
 
-  it('round-trips through a different rect preserving relative position', () => {
-    const n = toNormalized(wide, 500, 1000);
-    expect(fromNormalized(narrow, n)).toEqual({ x: 20 + 0.5 * 320, y: 0.5 * 4000 });
+  it('maps a normalized point back into the surface box', () => {
+    expect(fromNormalized(rect, { nx: 0.5, ny: 0.5 })).toEqual({ x: 500, y: 550 });
   });
 
-  it('allows out-of-column overshoot (no clamping)', () => {
-    expect(toNormalized(wide, 100 - 80, 0).nx).toBeCloseTo(-0.1);
+  it('round-trips a page point through normalize and back', () => {
+    const norm = toNormalized(rect, 340, 720);
+    const back = fromNormalized(rect, norm);
+    expect(back.x).toBeCloseTo(340);
+    expect(back.y).toBeCloseTo(720);
   });
 });

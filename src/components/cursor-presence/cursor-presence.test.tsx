@@ -2,6 +2,7 @@ import { render } from 'vitest-browser-react';
 import { describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
+import { CursorSurface } from './cursor-surface';
 import { CursorPresence } from './index';
 import { usePresence } from './presence-context';
 
@@ -20,7 +21,7 @@ describe('CursorPresence', () => {
     localStorage.removeItem('cursor-presence-enabled');
     render(
       <CursorPresence>
-        <div data-cursor-surface style={{ width: 400, height: 800 }} />
+        <CursorSurface />
         <Probe />
       </CursorPresence>,
     );

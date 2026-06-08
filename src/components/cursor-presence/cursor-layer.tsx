@@ -3,76 +3,120 @@
 import { useEffect, useRef } from 'react';
 
 import { fromNormalized, type Rect } from '@lib/cursor/coordinate';
-import { type CursorColor } from '@lib/cursor/identity';
 
 import * as styles from './styles.css';
 
-const MAX_RENDERED = 30;
-const colorVar = (color: CursorColor): string => `var(--colors-cursor-${color})`;
+import type { CursorColor } from '@lib/cursor/identity';
+import type { VisitorPointerApp } from '@lib/cursor/visitor-pointer-app';
 
-export type RemoteCursor = { id: string; color: CursorColor; label: string };
+// Per-cursor render state in screen px. `render*` is the interpolated on-screen position (canvas has
+// no CSS transition, so we lerp it each frame). `seeded` flips true after the first placement.
+type Render = { x: number; y: number; seeded: boolean };
 
 type Props = {
+  app: VisitorPointerApp;
+  enabled: boolean;
   getRect: () => Rect | null;
-  registerMove: (apply: (id: string, nx: number, ny: number) => void) => void;
-  registerPresence: (apply: (cursors: RemoteCursor[]) => void) => void;
+  // Injected by the consumer so this layer stays agnostic of how a cursor color resolves.
+  getColor: (color: CursorColor) => string;
 };
 
-export const CursorLayer = ({ getRect, registerMove, registerPresence }: Props) => {
-  const layerRef = useRef<HTMLDivElement>(null);
-  const nodes = useRef<Map<string, HTMLDivElement>>(new Map());
+const GLYPH = '✕';
+const LERP = 0.25; // per-frame follow factor toward the target
+const GLYPH_FONT = '700 16px "config-mono-vf", monospace';
+const LABEL_FONT = '11px "config-mono-vf", monospace';
+const LABEL_PAD_X = 4;
+const LABEL_HEIGHT = 15;
+const LABEL_GAP = 16;
+
+const drawCursor = (ctx: CanvasRenderingContext2D, color: string, label: string, x: number, y: number): void => {
+  ctx.textBaseline = 'top';
+
+  ctx.font = GLYPH_FONT;
+  ctx.fillStyle = color;
+  ctx.fillText(GLYPH, x, y);
+
+  ctx.font = LABEL_FONT;
+  const width = ctx.measureText(label).width + LABEL_PAD_X * 2;
+  const labelX = x + LABEL_GAP;
+  ctx.fillStyle = color;
+  ctx.fillRect(labelX, y, width, LABEL_HEIGHT);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(label, labelX + LABEL_PAD_X, y + 2);
+};
+
+export const CursorLayer = ({ app, enabled, getRect, getColor }: Props) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    registerMove((id, nx, ny) => {
-      const node = nodes.current.get(id);
+    const canvas = canvasRef.current;
+    if (canvas === null) return;
+    const ctx = canvas.getContext('2d');
+    if (ctx === null) return;
+
+    // All per-frame state lives in this effect: render positions (lerped on-screen px), the latest
+    // visitor map (kept current via subscribe), and the rAF handle.
+    const renders = new Map<string, Render>();
+    let visitors = app.getState().visitors;
+    let rafId = 0;
+
+    // Track prefers-reduced-motion live so an OS setting change takes effect without a remount.
+    const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
+    let reduceMotion = motionQuery.matches;
+    const onMotionChange = (): void => {
+      reduceMotion = motionQuery.matches;
+    };
+    motionQuery.addEventListener('change', onMotionChange);
+
+    const unsub = app.subscribe((s) => {
+      visitors = s.visitors;
+    });
+
+    const resize = (): void => {
+      const dpr = window.devicePixelRatio;
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener('resize', resize);
+
+    // One continuous rAF loop: re-lerps cursors toward their targets and re-anchors them on scroll
+    // (the canvas is viewport-fixed; cursors are document-anchored) every frame.
+    const frame = (): void => {
+      rafId = requestAnimationFrame(frame);
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      if (!enabled) return;
       const rect = getRect();
-      if (node === undefined || rect === null) return;
-      const p = fromNormalized(rect, { nx, ny });
-      node.style.translate = `${p.x}px ${p.y}px`;
-    });
+      if (rect === null) return;
 
-    registerPresence((cursors) => {
-      const layer = layerRef.current;
-      if (layer === null) return;
-      const visible = cursors.slice(0, MAX_RENDERED);
-      const keep = new Set(visible.map((c) => c.id));
-
-      for (const [id, node] of nodes.current) {
-        if (keep.has(id)) continue;
-        node.remove();
-        nodes.current.delete(id);
-      }
-      for (const c of visible) {
-        if (nodes.current.has(c.id)) continue;
-        const node = document.createElement('div');
-        node.className = styles.cursor;
-        node.style.setProperty('--cursor-color', colorVar(c.color));
-        const glyph = document.createElement('span');
-        glyph.className = styles.glyph;
-        glyph.textContent = '✕';
-        const label = document.createElement('span');
-        label.className = styles.label;
-        label.textContent = c.label;
-        node.appendChild(glyph);
-        node.appendChild(label);
-        layer.appendChild(node);
-        nodes.current.set(c.id, node);
+      const current = visitors;
+      for (const visitor of current.values()) {
+        if (visitor.x === undefined || visitor.y === undefined) continue; // no position yet (just joined)
+        const p = fromNormalized(rect, { nx: visitor.x, ny: visitor.y });
+        // canvas is viewport-fixed; convert document px -> viewport px.
+        const tx = p.x - window.scrollX;
+        const ty = p.y - window.scrollY;
+        const prev = renders.get(visitor.id);
+        const next: Render = prev === undefined || reduceMotion || !prev.seeded ? { x: tx, y: ty, seeded: true } : { x: prev.x + (tx - prev.x) * LERP, y: prev.y + (ty - prev.y) * LERP, seeded: true };
+        renders.set(visitor.id, next);
+        drawCursor(ctx, getColor(visitor.color), visitor.label, next.x, next.y);
       }
 
-      const moreNode = layer.querySelector<HTMLDivElement>('[data-more]');
-      const overflow = cursors.length - visible.length;
-      if (overflow > 0) {
-        const el = moreNode ?? document.createElement('div');
-        el.className = styles.more;
-        el.dataset.more = 'true';
-        el.textContent = `+${overflow} more`;
-        if (moreNode === null) layer.appendChild(el);
-
-        return;
+      // Drop render entries for visitors that have left.
+      for (const id of renders.keys()) {
+        if (!current.has(id)) renders.delete(id);
       }
-      if (moreNode !== null) moreNode.remove();
-    });
-  }, [getRect, registerMove, registerPresence]);
+    };
+    rafId = requestAnimationFrame(frame);
 
-  return <div ref={layerRef} className={styles.layer} aria-hidden="true" />;
+    return () => {
+      unsub();
+      cancelAnimationFrame(rafId);
+      window.removeEventListener('resize', resize);
+      motionQuery.removeEventListener('change', onMotionChange);
+    };
+  }, [app, enabled, getRect, getColor]);
+
+  return <canvas ref={canvasRef} className={styles.canvas} aria-hidden="true" />;
 };

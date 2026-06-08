@@ -1,4 +1,5 @@
 import { CursorPresence } from '@components/cursor-presence';
+import { CursorSurface } from '@components/cursor-presence/cursor-surface';
 import { GameOfLife } from '@components/game-of-life';
 import { LifeEngineProvider } from '@components/game-of-life/provider';
 import { SiteFooter } from '@components/site-footer';
@@ -15,11 +16,11 @@ export const SiteShell = ({ children }: { children: ReactNode }) => {
       <CursorPresence>
         <TypographyBand />
         <GameOfLife />
-        <div className={styles.stage} data-cursor-surface>
+        <CursorSurface className={styles.stage}>
           <SysBar />
           {children}
           <SiteFooter />
-        </div>
+        </CursorSurface>
       </CursorPresence>
     </LifeEngineProvider>
   );

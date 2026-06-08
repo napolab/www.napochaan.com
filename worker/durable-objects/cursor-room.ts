@@ -3,11 +3,19 @@ import { BroadcastMessage } from 'durabcast';
 import { deriveIdentity } from '../../src/lib/cursor/identity';
 import { ClientMessage, type ServerMessage } from '../../src/lib/cursor/protocol';
 
+import type { WebSocketAttachment } from 'durabcast';
 import type { Env } from 'hono';
 
 type CursorBindings = { Bindings: Cloudflare.Env };
 
-const send = (ws: WebSocket, msg: ServerMessage): void => ws.send(JSON.stringify(msg));
+// durabcast sets { roomId, uid, connectedAt } once and never rewrites it, so adding `path`
+// (the socket's current page) is safe — base broadcast/isAliveSocket only read uid/connectedAt.
+type CursorAttachment = WebSocketAttachment & { path?: string };
+
+// Server-side move throttle: at most one broadcast per uid per interval. The timestamp lives in
+// ctx.storage (transactional, survives hibernation) so a fast client can't fan out 60+/sec.
+const MOVE_BROADCAST_INTERVAL_MS = 50;
+const moveThrottleKey = (uid: string): string => `lastMove:${uid}`;
 
 const safeJsonParse = (raw: string): unknown => {
   try {
@@ -18,62 +26,128 @@ const safeJsonParse = (raw: string): unknown => {
 };
 
 export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
-  protected count(): number {
-    return this.ctx.getWebSockets().length;
+  #attachmentOf(ws: WebSocket): CursorAttachment {
+    return ws.deserializeAttachment();
   }
 
-  protected broadcastCount(delta = 0): void {
-    this.broadcast(JSON.stringify({ t: 'count', n: this.count() + delta } satisfies ServerMessage));
+  // Guarded single send: drop a socket that can no longer receive (abrupt disconnect) instead of
+  // letting the throw abort a whole fan-out.
+  #send(ws: WebSocket, message: string): void {
+    try {
+      ws.send(message);
+    } catch {
+      this.sessions.delete(ws);
+    }
   }
 
-  protected override async createRoom(roomId: string, uid: string): Promise<WebSocket> {
-    const pair = new WebSocketPair();
-    const client = pair[0];
-    const server = pair[1];
+  #broadcastToPath(path: string, message: string, exclude?: WebSocket): void {
+    for (const ws of this.ctx.getWebSockets()) {
+      if (exclude !== undefined && ws === exclude) continue;
+      if (this.#attachmentOf(ws).path !== path) continue;
+      this.#send(ws, message);
+    }
+  }
 
-    this.ctx.acceptWebSocket(server);
-    this.sessions.add(server);
-    server.serializeAttachment({ roomId, uid, connectedAt: new Date() });
-
-    const self = deriveIdentity(uid);
-    send(server, { t: 'welcome', self });
-    this.broadcast(JSON.stringify({ t: 'join', id: self.id, color: self.color, label: self.label } satisfies ServerMessage), {
-      excludes: [server],
-    });
-    this.broadcastCount();
-
-    if (this.AUTO_CLOSE) {
-      const alarm = await this.ctx.storage.getAlarm();
-      if (alarm === null) await this.ctx.storage.setAlarm(Date.now() + this.INTERVAL);
+  // Presence is keyed by uid (identity), NOT by socket: one visitor can hold several sockets (tabs),
+  // all sharing the same IP-derived uid. Count distinct uids so multi-tab sessions count as one.
+  #countOnPath(path: string, exclude?: WebSocket): number {
+    const uids = new Set<string>();
+    for (const ws of this.ctx.getWebSockets()) {
+      if (ws === exclude) continue;
+      const att = this.#attachmentOf(ws);
+      if (att.path === path) uids.add(att.uid);
     }
 
-    return client;
+    return uids.size;
   }
 
-  override webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void {
-    if (typeof message !== 'string') return;
-    if (message === this.REQUEST_RESPONSE_PAIR.request) return;
-
-    const json = safeJsonParse(message);
-    if (json === undefined) {
-      console.warn('[cursor] non-JSON client message ignored');
-      return;
+  // True if another socket (≠ exclude) for the same uid is on `path`. Used so join fires only on a
+  // uid's first arrival and leave only on its last departure (otherwise closing one tab evicts the
+  // visitor's cursor for everyone while another tab is still open).
+  #hasUidOnPath(path: string, uid: string, exclude: WebSocket): boolean {
+    for (const ws of this.ctx.getWebSockets()) {
+      if (ws === exclude) continue;
+      const att = this.#attachmentOf(ws);
+      if (att.path === path && att.uid === uid) return true;
     }
 
-    const parsed = ClientMessage.safeParse(json);
-    if (!parsed.success) {
-      console.warn('[cursor] invalid client message', parsed.error.message);
-      return;
-    }
-
-    const attachment: { uid: string } = ws.deserializeAttachment();
-    this.broadcast(JSON.stringify({ t: 'move', id: attachment.uid, nx: parsed.data.nx, ny: parsed.data.ny } satisfies ServerMessage), { excludes: [ws] });
+    return false;
   }
 
-  override webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): void {
-    const attachment: { uid: string } = ws.deserializeAttachment();
-    this.sessions.delete(ws);
-    this.broadcast(JSON.stringify({ t: 'leave', id: attachment.uid } satisfies ServerMessage), { excludes: [ws] });
-    this.broadcastCount(-1);
+  #broadcastCount(path: string, exclude?: WebSocket): void {
+    const message = JSON.stringify({ t: 'count', n: this.#countOnPath(path, exclude) } satisfies ServerMessage);
+    this.#broadcastToPath(path, message, exclude);
+  }
+
+  // Apply the page carried by a message: if it differs from the socket's current page, move the
+  // socket and broadcast the leave/join/count transition. No-op when the page is unchanged. Every
+  // client message (nav and move) flows through here, so presence stays correct on navigation.
+  #applyPath(ws: WebSocket, att: CursorAttachment, nextPath: string): void {
+    const prevPath = att.path;
+    if (prevPath === nextPath) return;
+    const { id, color, label } = deriveIdentity(att.uid);
+
+    // Move this socket onto the new page first so the counts below place it correctly.
+    ws.serializeAttachment({ ...att, path: nextPath });
+
+    if (prevPath !== undefined) {
+      // Leave the old page only when this uid's LAST socket leaves it (multi-tab keeps the cursor).
+      if (!this.#hasUidOnPath(prevPath, att.uid, ws)) {
+        this.#broadcastToPath(prevPath, JSON.stringify({ t: 'leave', id } satisfies ServerMessage), ws);
+      }
+      this.#broadcastCount(prevPath);
+    }
+
+    // Always announce arrival — peers key cursors by id, so a same-uid second tab just re-asserts the
+    // same cursor (no duplicate). Suppressing it would hide same-uid tabs from each other.
+    this.#broadcastToPath(nextPath, JSON.stringify({ t: 'join', id, color, label } satisfies ServerMessage), ws);
+    // Replay existing peers (deduped by uid) so this socket sees who's already here.
+    const replayed = new Set<string>();
+    for (const peer of this.ctx.getWebSockets()) {
+      if (peer === ws) continue;
+      const peerAtt = this.#attachmentOf(peer);
+      if (peerAtt.path !== nextPath || replayed.has(peerAtt.uid)) continue;
+      replayed.add(peerAtt.uid);
+      const peerId = deriveIdentity(peerAtt.uid);
+      this.#send(ws, JSON.stringify({ t: 'join', id: peerId.id, color: peerId.color, label: peerId.label } satisfies ServerMessage));
+    }
+    this.#broadcastCount(nextPath);
+  }
+
+  async #handleMove(ws: WebSocket, uid: string, path: string, x: number, y: number): Promise<void> {
+    const key = moveThrottleKey(uid);
+    const now = Date.now();
+    const last = (await this.ctx.storage.get<number>(key)) ?? 0;
+    if (now - last < MOVE_BROADCAST_INTERVAL_MS) return;
+    await this.ctx.storage.put(key, now);
+    this.#broadcastToPath(path, JSON.stringify({ t: 'move', id: uid, x, y } satisfies ServerMessage), ws);
+  }
+
+  override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+    if (typeof message !== 'string' || message === this.REQUEST_RESPONSE_PAIR.request) return;
+    const parsed = ClientMessage.safeParse(safeJsonParse(message));
+    if (!parsed.success) return;
+    const att = this.#attachmentOf(ws);
+    // Every message carries the page — apply the transition first (no-op if unchanged).
+    this.#applyPath(ws, att, parsed.data.path);
+    if (parsed.data.t === 'move') {
+      await this.#handleMove(ws, att.uid, parsed.data.path, parsed.data.x, parsed.data.y);
+    }
+  }
+
+  override async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): Promise<void> {
+    const att = this.#attachmentOf(ws);
+    await this.ctx.storage.delete(moveThrottleKey(att.uid));
+    const path = att.path;
+    if (path !== undefined) {
+      // Emit leave only when this uid's last socket on the page is closing (keep the cursor alive
+      // while another tab of the same visitor remains).
+      if (!this.#hasUidOnPath(path, att.uid, ws)) {
+        const { id } = deriveIdentity(att.uid);
+        this.#broadcastToPath(path, JSON.stringify({ t: 'leave', id } satisfies ServerMessage), ws);
+      }
+      this.#broadcastCount(path, ws);
+    }
+    super.webSocketClose(ws, code, reason, wasClean);
   }
 }
