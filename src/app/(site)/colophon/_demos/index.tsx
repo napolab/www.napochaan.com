@@ -41,7 +41,7 @@ import type { ReactNode } from 'react';
 type ComponentName = (typeof colophon.components.items)[number]['name'];
 
 const timelineItems: TimelineItem[] = [
-  { id: '1', date: '06/14', label: 'night vol.19 @ club eleven', meta: 'Tokyo', upcoming: true },
+  { id: '1', date: '06/14', label: 'night vol.19 @ club eleven', meta: 'Tokyo', upcoming: true, href: '/works/1' },
   { id: '2', date: '05/03', label: 'dawn session @ rooftop', meta: 'DJ set' },
   { id: '3', date: '04/12', label: 'ambient night @ gallery', meta: 'live' },
 ];

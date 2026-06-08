@@ -1,3 +1,6 @@
+import { Link } from '@components/link';
+import { clsx } from '@utils/clsx';
+
 import * as styles from './styles.css';
 
 export type TimelineItem = {
@@ -6,10 +9,48 @@ export type TimelineItem = {
   label: string;
   meta?: string;
   upcoming?: boolean;
+  // Where the title links. Absolute http(s) URLs open in a new tab; everything
+  // else is treated as an internal route. Omit to render the title as plain text.
+  href?: string;
 };
 
 type Props = {
   items: TimelineItem[];
+};
+
+const isExternal = (href: string): boolean => href.startsWith('http://') || href.startsWith('https://');
+
+// The title cell. `tone="inherit"` keeps the timeline's own label colour (which
+// carries the data-upcoming accent), so the link only adds the underline
+// affordance — matching the underlined title links in the works/news archives.
+const Label = ({ label, upcoming, href }: { label: string; upcoming?: string; href?: string }) => {
+  if (href === undefined) {
+    return (
+      <span className={styles.label} data-upcoming={upcoming}>
+        {label}
+      </span>
+    );
+  }
+
+  const external = isExternal(href);
+
+  return (
+    <Link
+      href={href}
+      tone="inherit"
+      className={clsx(styles.label, styles.labelLink)}
+      data-upcoming={upcoming}
+      target={external ? '_blank' : undefined}
+      rel={external ? 'noopener noreferrer' : undefined}
+    >
+      {label}
+      {external ? (
+        <span className={styles.externalMark} aria-hidden="true">
+          ↗
+        </span>
+      ) : null}
+    </Link>
+  );
 };
 
 export const Timeline = ({ items }: Props) => {
@@ -24,9 +65,7 @@ export const Timeline = ({ items }: Props) => {
               {item.date}
             </span>
             <p className={styles.content}>
-              <span className={styles.label} data-upcoming={upcomingAttr}>
-                {item.label}
-              </span>
+              <Label label={item.label} upcoming={upcomingAttr} href={item.href} />
               {item.meta !== undefined ? <span className={styles.meta}> / {item.meta}</span> : null}
             </p>
           </li>

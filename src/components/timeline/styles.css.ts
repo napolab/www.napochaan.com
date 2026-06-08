@@ -78,6 +78,22 @@ export const label = css({
   },
 });
 
+// When the title is a link it keeps the label's colour (via tone="inherit" + the
+// shared label class) and adds an underline as the only extra affordance, matching
+// the underlined title links in the works / news archives.
+export const labelLink = css({
+  textDecorationLine: 'underline',
+  textUnderlineOffset: '[2px]',
+});
+
+// Small trailing marker for links that open externally. aria-hidden — the new-tab
+// behaviour is conveyed by target/rel, this is a purely visual cue.
+export const externalMark = css({
+  marginLeft: '1',
+  fontSize: 'xs',
+  color: 'accent.text',
+});
+
 export const meta = css({
   fontFamily: 'mono',
   fontSize: 'xs',

@@ -70,7 +70,7 @@ export const colophon = {
       { name: 'Card', why: 'コンテンツの最小枠。as で中の要素を差し替えられるようにしてあるよ。' },
       { name: 'Figure', why: '画像とキャプションのセット。比率を保ったまま枠に収める。' },
       { name: 'Gallery', why: 'タイル状の写真グリッド。クリックで lightbox が開く。' },
-      { name: 'Timeline', why: '年表。これからの予定だけ accent で立ててる。' },
+      { name: 'Timeline', why: '年表。これからの予定だけ accent で立てて、各項目のタイトルは詳細ページや外部リンクへ飛べる。' },
       { name: 'Table', why: '素朴な表。caption 付きで、event ログとかに使ってる。' },
       { name: 'List', why: '箇条書きと定義リスト。順序あり / なし、どっちもいける。' },
       { name: 'Badge', why: '状態の小札。now playing / rec / offline みたいなやつ。' },
