@@ -90,11 +90,12 @@ export const image = css({
   width: 'full',
   height: 'full',
   objectFit: 'cover',
-  // Spotlight hover: while any cell is hovered, every other photo desaturates so the
-  // hovered one stands out. The hovered photo also zooms slightly (motion-safe only);
-  // the cell's overflow clips the zoom.
+  // Spotlight hover: while a *photo* cell is hovered, every other photo desaturates so the
+  // hovered one stands out. Keyed off `:has([data-photo]:hover)` (not the gallery as a
+  // whole) so hovering a decorative blank filler cell never greys the photos out. The
+  // hovered photo also zooms slightly (motion-safe only); the cell's overflow clips the zoom.
   filter: '[grayscale(0)]',
-  '[data-gallery]:hover li:not(:hover) &': { filter: '[grayscale(1)]' },
+  '[data-gallery]:has([data-photo]:hover) li:not(:hover) &': { filter: '[grayscale(1)]' },
   _motionSafe: {
     transition: '[filter 0.4s ease, transform 0.4s ease]',
     'li:hover &': { transform: '[scale(1.05)]' },

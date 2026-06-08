@@ -40,4 +40,20 @@ describe('GalleryArchive', () => {
     await page.getByRole('button', { name: /flyer a/ }).click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
   });
+
+  // The spotlight-on-hover effect must key off a hovered *photo*, not the gallery as a
+  // whole — otherwise hovering a decorative blank cell greys out every photo. Photo cells
+  // carry data-photo so the CSS `:has([data-photo]:hover)` selector targets only them.
+  it('marks photo cells with data-photo and leaves blank filler cells unmarked', async () => {
+    const { container } = await render(<GalleryArchive photos={photos} />);
+    const marked = container.querySelectorAll('li[data-photo]');
+    expect(marked).toHaveLength(photos.length);
+    for (const cell of marked) {
+      expect(cell.querySelector('img')).not.toBeNull();
+    }
+    // Decorative blanks (aria-hidden filler) must not carry the spotlight hook.
+    for (const blank of container.querySelectorAll('li[aria-hidden="true"]')) {
+      expect(blank.hasAttribute('data-photo')).toBe(false);
+    }
+  });
 });

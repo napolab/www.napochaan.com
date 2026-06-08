@@ -67,7 +67,7 @@ export const GalleryArchive = ({ photos }: Props) => {
   return (
     <ul className={styles.root} data-gallery style={totalVars(layouts.map((layout) => layout.result.totalHeight))}>
       {photos.map((photo) => (
-        <li key={photo.id} className={styles.cell} style={cellVars(placementOf(photo.id, 0), placementOf(photo.id, 1), placementOf(photo.id, 2))}>
+        <li key={photo.id} className={styles.cell} data-photo style={cellVars(placementOf(photo.id, 0), placementOf(photo.id, 1), placementOf(photo.id, 2))}>
           <Lightbox src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} triggerClassName={styles.trigger}>
             <Image
               src={photo.src}
