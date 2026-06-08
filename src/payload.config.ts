@@ -8,6 +8,7 @@ import { lexicalEditor } from '@payloadcms/richtext-lexical';
 import { r2Storage } from '@payloadcms/storage-r2';
 import { buildConfig } from 'payload';
 
+import { Blog } from './collections/blog';
 import { Media } from './collections/media';
 import { News } from './collections/news';
 import { Users } from './collections/users';
@@ -107,8 +108,13 @@ export default buildConfig({
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
           buildPath: (data) => `/works/${data.id}`,
         }),
+        draftPreviewRoute({
+          slug: 'blog',
+          previewSecret: cfEnv.PREVIEW_SECRET ?? '',
+          buildPath: (data) => `/blog/${data.id}`,
+        }),
       ]),
-      collections: ['news', 'works'],
+      collections: ['news', 'works', 'blog'],
     },
     get autoLogin() {
       if (process.env.NODE_ENV !== 'development') return false;
@@ -122,7 +128,7 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, News, Works],
+  collections: [Users, Media, News, Works, Blog],
   editor: lexicalEditor(),
   secret,
   typescript: {
@@ -141,7 +147,7 @@ export default buildConfig({
       },
     }),
     seoPlugin({
-      collections: ['news', 'works'],
+      collections: ['news', 'works', 'blog'],
       uploadsCollection: 'media',
       tabbedUI: true,
       generateTitle: ({ doc }) => `napochaan — ${doc.title as string}`,
