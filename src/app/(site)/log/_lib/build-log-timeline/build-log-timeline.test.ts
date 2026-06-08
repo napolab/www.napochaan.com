@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { buildLogTimeline } from './index';
 
+import type { ExternalPost } from '../external-feeds';
 import type { NewsItem } from '../../../news/_lib/news-item';
 import type { WorkRow } from '../../../works/_lib/work-row';
 
@@ -19,6 +20,12 @@ const newsItem = (overrides: Partial<NewsItem> & Pick<NewsItem, 'id' | 'date' | 
   ...overrides,
 });
 
+const post = (overrides: Partial<ExternalPost> & Pick<ExternalPost, 'id' | 'date' | 'source'>): ExternalPost => ({
+  title: `post ${overrides.id}`,
+  link: `https://example.com/${overrides.id}`,
+  ...overrides,
+});
+
 describe('buildLogTimeline', () => {
   it('keeps live/release news and drops site/blog news', () => {
     const news = [
@@ -28,7 +35,7 @@ describe('buildLogTimeline', () => {
       newsItem({ id: '4', date: '2026-05-04', category: 'blog' }),
     ];
 
-    const [group] = buildLogTimeline(news, [], now);
+    const [group] = buildLogTimeline(news, [], [], now);
     const ids = group?.items.map((item) => item.id) ?? [];
 
     expect(ids).toContain('news-1');
@@ -41,7 +48,7 @@ describe('buildLogTimeline', () => {
     const news = [newsItem({ id: '1', date: '2026-05-01', category: 'live' })];
     const works = [work({ id: '1', year: 2026 })];
 
-    const groups = buildLogTimeline(news, works, now);
+    const groups = buildLogTimeline(news, works, [], now);
 
     expect(groups).toHaveLength(1);
     expect(groups[0]?.year).toBe(2026);
@@ -56,7 +63,7 @@ describe('buildLogTimeline', () => {
     ];
     const works = [work({ id: 'w1', year: 2026 }), work({ id: 'w2', year: 2025 })];
 
-    const groups = buildLogTimeline(news, works, now);
+    const groups = buildLogTimeline(news, works, [], now);
 
     expect(groups.map((group) => group.year)).toEqual([2026, 2025]);
     expect(groups[0]?.items.map((item) => item.id)).toEqual(['news-c', 'news-b', 'work-w1']);
@@ -67,7 +74,7 @@ describe('buildLogTimeline', () => {
     const news = [newsItem({ id: '1', date: '2026-04-09', category: 'live' })];
     const works = [work({ id: '1', year: 2026 })];
 
-    const [group] = buildLogTimeline(news, works, now);
+    const [group] = buildLogTimeline(news, works, [], now);
 
     expect(group?.items[0]?.date).toBe('04.09');
     expect(group?.items[1]?.date).toBe('—');
@@ -80,7 +87,7 @@ describe('buildLogTimeline', () => {
       newsItem({ id: 'future', date: '2026-06-20', category: 'live' }),
     ];
 
-    const [group] = buildLogTimeline(news, [], now);
+    const [group] = buildLogTimeline(news, [], [], now);
     const byId = new Map(group?.items.map((item) => [item.id, item.upcoming]));
 
     expect(byId.get('news-past')).toBe(false);
@@ -91,7 +98,7 @@ describe('buildLogTimeline', () => {
   it('sets upcoming false for all works', () => {
     const works = [work({ id: '1', year: 2026 })];
 
-    const [group] = buildLogTimeline([], works, now);
+    const [group] = buildLogTimeline([], works, [], now);
 
     expect(group?.items[0]?.upcoming).toBe(false);
   });
@@ -99,7 +106,7 @@ describe('buildLogTimeline', () => {
   it('leaves a news entry without an href when the source has no url', () => {
     const news = [newsItem({ id: '7', date: '2026-05-01', category: 'live' })];
 
-    const [group] = buildLogTimeline(news, [], now);
+    const [group] = buildLogTimeline(news, [], [], now);
 
     expect(group?.items[0]?.href).toBeUndefined();
   });
@@ -107,7 +114,7 @@ describe('buildLogTimeline', () => {
   it('passes an internal news url through as the href', () => {
     const news = [newsItem({ id: '7', date: '2026-05-01', category: 'live', url: '/news/7' })];
 
-    const [group] = buildLogTimeline(news, [], now);
+    const [group] = buildLogTimeline(news, [], [], now);
 
     expect(group?.items[0]?.href).toBe('/news/7');
   });
@@ -115,7 +122,7 @@ describe('buildLogTimeline', () => {
   it('passes an external news url through as the href', () => {
     const news = [newsItem({ id: '7', date: '2026-05-01', category: 'live', url: 'https://example.com/x' })];
 
-    const [group] = buildLogTimeline(news, [], now);
+    const [group] = buildLogTimeline(news, [], [], now);
 
     expect(group?.items[0]?.href).toBe('https://example.com/x');
   });
@@ -123,7 +130,7 @@ describe('buildLogTimeline', () => {
   it('leaves a work entry without an href when the source has no url', () => {
     const works = [work({ id: '9', year: 2026 })];
 
-    const [group] = buildLogTimeline([], works, now);
+    const [group] = buildLogTimeline([], works, [], now);
 
     expect(group?.items[0]?.href).toBeUndefined();
   });
@@ -131,7 +138,7 @@ describe('buildLogTimeline', () => {
   it('passes a work url through as the href', () => {
     const works = [work({ id: '9', year: 2026, url: 'https://example.com/w' })];
 
-    const [group] = buildLogTimeline([], works, now);
+    const [group] = buildLogTimeline([], works, [], now);
 
     expect(group?.items[0]?.href).toBe('https://example.com/w');
   });
@@ -142,9 +149,46 @@ describe('buildLogTimeline', () => {
     const newsSnapshot = [...news];
     const worksSnapshot = [...works];
 
-    buildLogTimeline(news, works, now);
+    buildLogTimeline(news, works, [], now);
 
     expect(news).toEqual(newsSnapshot);
     expect(works).toEqual(worksSnapshot);
+  });
+
+  it('merges an external post into the correct year group', () => {
+    const posts = [post({ id: 'zenn-1', date: '2026-02-15T00:00:00.000Z', source: 'zenn' })];
+
+    const groups = buildLogTimeline([], [], posts, now);
+
+    expect(groups).toHaveLength(1);
+    expect(groups[0]?.year).toBe(2026);
+    expect(groups[0]?.items[0]?.id).toBe('post-zenn-1');
+  });
+
+  it('carries the feed source as meta and the article url as href', () => {
+    const posts = [post({ id: 'sizu-9', date: '2026-02-15T00:00:00.000Z', source: 'sizu', link: 'https://sizu.me/x/posts/9' })];
+
+    const [group] = buildLogTimeline([], [], posts, now);
+
+    expect(group?.items[0]?.meta).toBe('sizu');
+    expect(group?.items[0]?.href).toBe('https://sizu.me/x/posts/9');
+  });
+
+  it('formats a post date as MM.DD and never marks it upcoming', () => {
+    const posts = [post({ id: '1', date: '2026-04-09T00:00:00.000Z', source: 'zenn' })];
+
+    const [group] = buildLogTimeline([], [], posts, now);
+
+    expect(group?.items[0]?.date).toBe('04.09');
+    expect(group?.items[0]?.upcoming).toBe(false);
+  });
+
+  it('sorts posts and news together by date (desc) within a year', () => {
+    const news = [newsItem({ id: 'n', date: '2026-03-10', category: 'release' })];
+    const posts = [post({ id: 'early', date: '2026-01-05T00:00:00.000Z', source: 'zenn' }), post({ id: 'late', date: '2026-05-20T00:00:00.000Z', source: 'sizu' })];
+
+    const [group] = buildLogTimeline(news, [], posts, now);
+
+    expect(group?.items.map((entry) => entry.id)).toEqual(['post-late', 'news-n', 'post-early']);
   });
 });

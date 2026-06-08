@@ -1,5 +1,6 @@
 import { dayjs } from '@utils/dayjs';
 
+import type { ExternalPost } from '../external-feeds';
 import type { NewsItem } from '../../../news/_lib/news-item';
 import type { WorkRow } from '../../../works/_lib/work-row';
 
@@ -50,6 +51,23 @@ const toNewsEntry = (item: NewsItem, now: string): SortableEntry => {
   };
 };
 
+// External blog posts are dated, so they sort alongside news by sortDate. The
+// feed source (`zenn` / `sizu`) becomes the meta label and the article URL the href.
+const toPostEntry = (post: ExternalPost): SortableEntry => {
+  const at = dayjs(post.date).tz('Asia/Tokyo');
+
+  return {
+    id: `post-${post.id}`,
+    year: at.year(),
+    date: at.format('MM.DD'),
+    meta: post.source,
+    title: post.title,
+    upcoming: false,
+    href: post.link,
+    sortDate: post.date,
+  };
+};
+
 const toWorkEntry = (work: WorkRow): SortableEntry => ({
   id: `work-${work.id}`,
   year: work.year,
@@ -68,13 +86,14 @@ const bySortDateDesc = (a: SortableEntry, b: SortableEntry): number => (a.sortDa
 
 const stripSortKey = ({ sortDate: _sortDate, ...entry }: SortableEntry): LogEntry => entry;
 
-// Merge news (live/release only) and all works into a single chronicle grouped by
-// year, newest year first. Within a year: dated news (date desc) precede works.
-// Pure — inputs are never mutated.
-export const buildLogTimeline = (news: readonly NewsItem[], works: readonly WorkRow[], now: string): LogYearGroup[] => {
+// Merge news (live/release only), external blog posts, and all works into a single
+// chronicle grouped by year, newest year first. Within a year: dated news and posts
+// (date desc) precede works. Pure — inputs are never mutated.
+export const buildLogTimeline = (news: readonly NewsItem[], works: readonly WorkRow[], posts: readonly ExternalPost[], now: string): LogYearGroup[] => {
   const newsEntries = news.filter(isChronicleNews).map((item) => toNewsEntry(item, now));
+  const postEntries = posts.map(toPostEntry);
   const workEntries = works.map(toWorkEntry);
-  const entries = [...newsEntries, ...workEntries];
+  const entries = [...newsEntries, ...postEntries, ...workEntries];
 
   const buckets = entries.reduce<Map<number, SortableEntry[]>>((acc, entry) => {
     const existing = acc.get(entry.year) ?? [];
