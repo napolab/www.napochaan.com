@@ -159,6 +159,9 @@ export default buildConfig({
       },
     }),
     seoPlugin({
+      // `logs` is intentionally omitted: the plugin injects a `meta` group field
+      // that collides with the logs collection's own `meta` field (DuplicateFieldName
+      // at boot), and logs entries have no public detail page (they resolve to /log).
       collections: ['news', 'works', 'blog', 'gallery'],
       uploadsCollection: 'media',
       tabbedUI: true,
