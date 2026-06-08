@@ -67,6 +67,28 @@ export const findNewsById = async (id: string): Promise<NewsItem | undefined> =>
   return fetchNewsById(id);
 };
 
+// The draft path is intentionally uncached (never wrapped in `unstable_cache`)
+// and bypasses the published filter via `draft: true`, so it always returns the
+// latest draft regardless of `_status`. Only reachable from the secret-gated
+// preview route (`/news/preview/{id}`), so it never leaks drafts to the public site.
+export const findNewsDraftById = async (id: string): Promise<NewsItem | undefined> => {
+  if (isBuildPhase()) return undefined;
+
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: 'news',
+    where: { id: { equals: id } },
+    draft: true,
+    overrideAccess: true,
+    limit: 1,
+  });
+
+  const [doc] = result.docs;
+  if (doc === undefined) return undefined;
+
+  return toNewsItem(doc);
+};
+
 const fetchLatestNews = unstable_cache(
   async (limit: number): Promise<readonly NewsItem[]> => {
     const payload = await getPayloadClient();

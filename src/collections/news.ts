@@ -27,7 +27,9 @@ export const News = {
     update: ({ req: { user } }) => user !== null,
     delete: ({ req: { user } }) => user !== null,
   },
-  versions: { drafts: true },
+  // Autosave streams draft edits as you type, so the server-side Live Preview
+  // route (RefreshRouteOnSave) can refetch the latest draft and refresh in real time.
+  versions: { drafts: { autosave: { interval: 375 } } },
   hooks: {
     afterChange: [revalidateNews.afterChange],
     afterDelete: [revalidateNews.afterDelete],

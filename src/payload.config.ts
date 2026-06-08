@@ -11,6 +11,7 @@ import { buildConfig } from 'payload';
 import { Media } from './collections/media';
 import { News } from './collections/news';
 import { Users } from './collections/users';
+import { createPreviewURLFactory, draftPreviewRoute } from './lib/payload/create-preview-url-factory';
 
 import type { CloudflareContext } from '@opennextjs/cloudflare';
 
@@ -94,11 +95,13 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
     livePreview: {
-      url: ({ data, collectionConfig }) => {
-        const base = process.env.BASE_URL ?? 'http://localhost:3000';
-        if (collectionConfig?.slug === 'news') return `${base}/news/${data.id}`;
-        return base;
-      },
+      url: createPreviewURLFactory([
+        draftPreviewRoute({
+          slug: 'news',
+          previewSecret: cfEnv.PREVIEW_SECRET ?? '',
+          buildPath: (data) => `/news/preview/${data.id}`,
+        }),
+      ]),
       collections: ['news'],
     },
     get autoLogin() {

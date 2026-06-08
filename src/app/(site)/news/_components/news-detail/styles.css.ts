@@ -1,6 +1,6 @@
 import { css } from '@styled/css';
 
-export const main = css({
+export const root = css({
   display: 'flex',
   flexDirection: 'column',
   gap: { base: '8', desktop: 'section' },
