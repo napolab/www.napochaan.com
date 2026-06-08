@@ -39,10 +39,13 @@ export const EchoText = ({ children, size = 'hero' }: Props) => {
   };
 
   const { contextSafe } = useGSAP(decode, { scope: rootRef, dependencies: [children] });
+  // pointerenter fires for every pointer type, so the wordmark re-decodes on a
+  // mouse hover AND a touch tap — it's a playful flourish, not a link, so there
+  // is no navigation to race. (ScrambleText, which wraps links, skips touch.)
   const handleEnter = contextSafe(decode);
 
   return (
-    <span ref={rootRef} data-size={size} className={styles.root} role="img" aria-label={children} onMouseEnter={handleEnter}>
+    <span ref={rootRef} data-size={size} className={styles.root} role="img" aria-label={children} onPointerEnter={handleEnter}>
       <span aria-hidden data-size={size} className={styles.echoOut}>
         {children}
       </span>

@@ -59,7 +59,11 @@ export const ScrambleText = (props: Props) => {
 
       // contextSafe so the tween created in this listener is added to the scope
       // and reverted on cleanup.
-      const decode = contextSafe(() => {
+      const decode = contextSafe((event: PointerEvent) => {
+        // Skip taps: on touch the browser fires a compatibility pointerenter
+        // right before navigating, flashing the scramble for a frame. The reveal
+        // is a hover affordance, so only a dwell-able pointer (mouse/pen) decodes.
+        if (event.pointerType === 'touch') return;
         if (reduced()) return;
         const fill = fillRef.current;
         if (fill === null) return;
@@ -79,8 +83,8 @@ export const ScrambleText = (props: Props) => {
         });
       });
 
-      target.addEventListener('mouseenter', decode);
-      return () => target.removeEventListener('mouseenter', decode);
+      target.addEventListener('pointerenter', decode);
+      return () => target.removeEventListener('pointerenter', decode);
     },
     { scope: rootRef, dependencies: [children, host] },
   );
