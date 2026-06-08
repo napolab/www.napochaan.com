@@ -1,5 +1,4 @@
 import { AboutMasthead } from './_components/about-masthead';
-import { ContactList } from './_components/contact-list';
 import { SkillMatrix } from './_components/skill-matrix';
 import { TagCloud } from './_components/tag-cloud';
 import { Whoami } from './_components/whoami';
@@ -7,6 +6,7 @@ import { profile } from './profile';
 import * as s from './styles.css';
 
 import { Breadcrumbs } from '@components/breadcrumbs';
+import { ContactList } from '@components/contact-list';
 import { RichText } from '@components/rich-text';
 import { SectionHeading } from '@components/section-heading';
 
