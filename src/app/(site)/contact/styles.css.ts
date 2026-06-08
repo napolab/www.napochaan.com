@@ -5,3 +5,23 @@ export const main = css({
   flexDirection: 'column',
   gap: { base: '8', desktop: 'section' },
 });
+
+// Desktop pairs the message form (wide) and the direct-contact aside (narrow)
+// into a two-column grid; mobile stacks them with the aside below the form.
+export const grid = css({
+  display: 'grid',
+  gap: { base: '8', desktop: 'section' },
+  gridTemplateColumns: { base: '1fr', desktop: '2fr 1fr' },
+});
+
+export const formCell = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'element',
+});
+
+export const directCell = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'element',
+});
