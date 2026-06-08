@@ -707,9 +707,9 @@
           "notNull": false,
           "autoincrement": false
         },
-        "year": {
-          "name": "year",
-          "type": "numeric",
+        "date": {
+          "name": "date",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -895,9 +895,9 @@
           "notNull": false,
           "autoincrement": false
         },
-        "version_year": {
-          "name": "version_year",
-          "type": "numeric",
+        "version_date": {
+          "name": "version_date",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -1138,13 +1138,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "source": {
-          "name": "source",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "published_at": {
           "name": "published_at",
           "type": "text",
@@ -1280,13 +1273,6 @@
         },
         "version_title": {
           "name": "version_title",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "version_source": {
-          "name": "version_source",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -3587,6 +3573,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "bdb1acf0-dd36-4040-85c6-20f1574edc5f",
+  "id": "f28575f6-8259-49ee-89b8-ff5fbda8e575",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

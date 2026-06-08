@@ -34,7 +34,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '01',
       title: 'Booth² key visual',
       type: 'graphic',
-      year: 2026,
+      date: '2026-01-01',
       thumbnail: mediaVrchatSquare,
       description: 'Booth² のためのキービジュアル。グリッドの上に黒のグロテスクを叩き込み、エレクトリックブルーの矩形でリズムを刻んだ一枚。',
       body: richTextFromParagraphs([
@@ -46,7 +46,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '02',
       title: 'light trails set',
       type: 'vj',
-      year: 2026,
+      date: '2026-01-01',
       thumbnail: mediaVrchatWide,
       description: 'テクノの四つ打ちに同期させた光跡のVJセット。残像を引きずるトレイルでフロアの体温を可視化した。',
       body: richTextFromParagraphs([
@@ -58,7 +58,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '03',
       title: 'VRChat stage VJ set',
       type: 'vj',
-      year: 2025,
+      date: '2025-01-01',
       url: 'https://www.youtube.com/watch?v=booth2booth-vrchat-set',
       thumbnail: mediaVrchatGlitch,
       description: 'VRChat のステージで回した実験的VJセット。glitch とスキャンラインで仮想空間そのものを歪ませた。',
@@ -71,7 +71,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '04',
       title: 'midnight flyer 05.23',
       type: 'flyer',
-      year: 2025,
+      date: '2025-01-01',
       thumbnail: mediaFlyerBooth0523,
       description: '深夜帯のパーティ用フライヤー。モノクロのコントラストに蛍光ブルーの座標を一点だけ落として深夜の緊張感を作った。',
       body: richTextFromParagraphs([
@@ -83,7 +83,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '05',
       title: 'glitch study',
       type: 'graphic',
-      year: 2025,
+      date: '2025-01-01',
       thumbnail: mediaVrchatGlitch,
       description: 'データモッシュと走査線のグラフィック習作。意図的に壊した画素の中から新しい構図を拾い集めた。',
       body: richTextFromParagraphs([
@@ -95,7 +95,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '06',
       title: 'night graphics vol.13',
       type: 'flyer',
-      year: 2024,
+      date: '2024-01-01',
       thumbnail: mediaFlyerBooth0424,
       description: '夜のグラフィックシリーズ第13弾。グリッドを基準線に、情報を等幅フォントで淡々と並べた告知フライヤー。',
       body: richTextFromParagraphs([
@@ -107,7 +107,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '07',
       title: 'ALICE portrait series',
       type: 'graphic',
-      year: 2024,
+      date: '2024-01-01',
       thumbnail: mediaVrchatAlice,
       description: 'アバター ALICE のポートレートシリーズ。グレースケールの proof にグリッチを一筋走らせ、仮想の存在感を焼き付けた。',
       body: richTextFromParagraphs([
@@ -119,7 +119,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '08',
       title: 'neon grid flyer',
       type: 'flyer',
-      year: 2023,
+      date: '2023-01-01',
       thumbnail: mediaFlyerBooth0424,
       description: 'ネオングリッドのフライヤー。方眼の交点に光を宿らせ、地下のテクノの夜を一枚に閉じ込めた。',
       body: richTextFromParagraphs([
@@ -131,7 +131,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '09',
       title: 'techno set @ basement',
       type: 'vj',
-      year: 2023,
+      date: '2023-01-01',
       thumbnail: mediaVrchatWide,
       description: '地下のフロアで回したテクノセットのVJ。BPMに食らいつくストロボとワイドな映像で空間を縦に伸ばした。',
       body: richTextFromParagraphs([
@@ -143,7 +143,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '10',
       title: 'first booth² poster',
       type: 'graphic',
-      year: 2022,
+      date: '2022-01-01',
       thumbnail: mediaVrchatSquare,
       description: 'Booth² 最初のポスター。グリッドと黒のグロテスクという原型を、ここで初めて紙の上に定着させた。',
       body: richTextFromParagraphs([
@@ -155,7 +155,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '11',
       title: 'warehouse VJ rig',
       type: 'vj',
-      year: 2022,
+      date: '2022-01-01',
       thumbnail: mediaVrchatGlitch,
       description: '倉庫レイヴ用に組んだVJリグ。glitch を主役に、剥き出しのコンクリートへ映像を直接叩きつけた。',
       body: richTextFromParagraphs([
@@ -167,7 +167,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '12',
       title: 'lockdown stream set',
       type: 'vj',
-      year: 2021,
+      date: '2021-01-01',
       thumbnail: mediaVrchatWide,
       description: 'ロックダウン下の配信用VJセット。無観客のフロアへ向けて、画面越しのテクノを途切れさせないために組んだ。',
       body: richTextFromParagraphs([
@@ -179,7 +179,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '13',
       title: 'zine cover 02',
       type: 'graphic',
-      year: 2021,
+      date: '2021-01-01',
       thumbnail: mediaVrchatAlice,
       description: '自主制作 zine の第2号カバー。等幅フォントとグリッドだけで、宅録テクノの手触りを表紙に翻訳した。',
       body: richTextFromParagraphs([
@@ -191,7 +191,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '14',
       title: 'debut night flyer',
       type: 'flyer',
-      year: 2020,
+      date: '2020-01-01',
       thumbnail: mediaFlyerBooth0523,
       description: '初めて主催した夜のフライヤー。何も持たないまま、グリッドと黒一色だけで最初の告知を刷った。',
       body: richTextFromParagraphs([
@@ -203,7 +203,7 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
       no: '15',
       title: 'since 2020 logo',
       type: 'graphic',
-      year: 2020,
+      date: '2020-01-01',
       thumbnail: mediaVrchatSquare,
       description: 'すべての起点になった "since 2020" ロゴ。矩形と等幅の数字だけで、これから続く活動の基準線を引いた。',
       body: richTextFromParagraphs([

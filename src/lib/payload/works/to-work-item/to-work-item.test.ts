@@ -8,7 +8,7 @@ const base = {
   id: 7,
   title: 'glitch study',
   type: 'graphic',
-  year: 2025,
+  date: '2025-03-15T00:00:00.000Z',
   updatedAt: '2025-01-01T00:00:00.000Z',
   createdAt: '2025-01-01T00:00:00.000Z',
 } as unknown as Work;
@@ -21,6 +21,7 @@ describe('toWorkItem', () => {
     expect(row.title).toBe('glitch study');
     expect(row.type).toBe('graphic');
     expect(row.year).toBe(2025);
+    expect(row.date).toBe('2025-03-15');
   });
 
   it('coerces NULL url/description/body to undefined', () => {
@@ -28,6 +29,14 @@ describe('toWorkItem', () => {
     expect(row.url).toBeUndefined();
     expect(row.description).toBeUndefined();
     expect(row.body).toBeUndefined();
+  });
+
+  it('derives year from the date field (Asia/Tokyo)', () => {
+    // date near UTC year boundary — ensure year is resolved in Asia/Tokyo
+    const row = toWorkItem({ ...base, date: '2024-12-31T15:30:00.000Z' } as unknown as Work, '01');
+    // 2024-12-31T15:30Z = 2025-01-01T00:30+09:00 → year 2025 in Asia/Tokyo
+    expect(row.year).toBe(2025);
+    expect(row.date).toBe('2025-01-01');
   });
 
   it('extracts thumbnail src/width/height from a populated media upload', () => {

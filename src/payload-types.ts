@@ -234,7 +234,7 @@ export interface Work {
    */
   no?: string | null;
   type: 'graphic' | 'vj' | 'flyer' | 'dev' | 'video' | 'vrchat' | 'talk' | 'support';
-  year: number;
+  date: string;
   /**
    * 設定すると、一覧や年表のリンクが内部の詳細ページではなくこの URL を指します。
    */
@@ -522,7 +522,7 @@ export interface WorksSelect<T extends boolean = true> {
   title?: T;
   no?: T;
   type?: T;
-  year?: T;
+  date?: T;
   url?: T;
   thumbnail?: T;
   description?: T;

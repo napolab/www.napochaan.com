@@ -69,17 +69,20 @@ const toPostEntry = (post: ExternalPost): SortableEntry => {
   };
 };
 
-const toWorkEntry = (work: WorkRow): SortableEntry => ({
-  id: `work-${work.id}`,
-  year: work.year,
-  // Works are year-precision only — em dash (U+2014) stands in for a day.
-  date: '—',
-  meta: work.type,
-  title: work.title,
-  upcoming: false,
-  href: work.url,
-  sortDate: '',
-});
+const toWorkEntry = (work: WorkRow): SortableEntry => {
+  const at = work.date !== undefined ? dayjs(work.date).tz('Asia/Tokyo') : undefined;
+
+  return {
+    id: `work-${work.id}`,
+    year: work.year,
+    date: at !== undefined ? at.format('MM.DD') : '—',
+    meta: work.type,
+    title: work.title,
+    upcoming: false,
+    href: work.url,
+    sortDate: work.date ?? '',
+  };
+};
 
 // Manual log entries are dated, so they sort alongside news/posts by sortDate.
 const toManualEntry = (item: LogManualItem): SortableEntry => {

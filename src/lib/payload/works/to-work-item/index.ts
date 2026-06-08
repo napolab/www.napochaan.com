@@ -1,3 +1,5 @@
+import { dayjs } from '@utils/dayjs';
+
 import type { WorkRow } from '../../../../app/(site)/works/_lib/work-row';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { Media, Work } from '@payload-types';
@@ -18,14 +20,19 @@ const toThumbnail = (thumbnail: Work['thumbnail']): WorkRow['thumbnail'] => {
 // Maps a Payload `works` document to the site's `WorkRow`. `no` is supplied by the
 // caller (derived from list order) since it is optional in the CMS. Payload NULLs
 // are coerced to undefined at this boundary. Pure — unit-testable in isolation.
-export const toWorkItem = (doc: Work, no: string): WorkRow => ({
-  id: `${doc.id}`,
-  no: doc.no ?? no,
-  title: doc.title,
-  type: doc.type,
-  year: doc.year,
-  url: doc.url ?? undefined,
-  thumbnail: toThumbnail(doc.thumbnail),
-  description: doc.description ?? undefined,
-  body: (doc.body ?? undefined) as SerializedEditorState | undefined,
-});
+export const toWorkItem = (doc: Work, no: string): WorkRow => {
+  const at = dayjs(doc.date).tz('Asia/Tokyo');
+
+  return {
+    id: `${doc.id}`,
+    no: doc.no ?? no,
+    title: doc.title,
+    type: doc.type,
+    year: at.year(),
+    date: at.format('YYYY-MM-DD'),
+    url: doc.url ?? undefined,
+    thumbnail: toThumbnail(doc.thumbnail),
+    description: doc.description ?? undefined,
+    body: (doc.body ?? undefined) as SerializedEditorState | undefined,
+  };
+};

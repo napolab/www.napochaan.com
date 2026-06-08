@@ -14,7 +14,7 @@ export const Works = {
   labels: { singular: '作品', plural: '作品' },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'type', 'year', '_status'],
+    defaultColumns: ['title', 'type', 'date', '_status'],
   },
   access: {
     read: ({ req: { user } }) => (user !== null ? true : { _status: { equals: 'published' } }),
@@ -53,11 +53,11 @@ export const Works = {
       admin: { position: 'sidebar' },
     },
     {
-      name: 'year',
-      label: '制作年',
-      type: 'number',
+      name: 'date',
+      label: '制作日',
+      type: 'date',
       required: true,
-      admin: { position: 'sidebar' },
+      admin: { position: 'sidebar', date: { pickerAppearance: 'dayOnly', displayFormat: 'yyyy-MM-dd' } },
     },
     {
       name: 'url',

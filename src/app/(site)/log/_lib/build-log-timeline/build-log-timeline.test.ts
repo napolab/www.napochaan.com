@@ -194,6 +194,43 @@ describe('buildLogTimeline', () => {
   });
 });
 
+describe('buildLogTimeline work date precision', () => {
+  it('shows MM.DD for a work that has a date', () => {
+    const works = [work({ id: 'dated', year: 2025, date: '2025-03-15' })];
+
+    const [group] = buildLogTimeline([], works, [], now);
+
+    expect(group?.items[0]?.date).toBe('03.15');
+  });
+
+  it('shows em dash for a work without a date', () => {
+    const works = [work({ id: 'undated', year: 2025 })];
+
+    const [group] = buildLogTimeline([], works, [], now);
+
+    expect(group?.items[0]?.date).toBe('—');
+  });
+
+  it('sorts a dated work before an undated work within the same year', () => {
+    const works = [work({ id: 'undated', year: 2025 }), work({ id: 'dated', year: 2025, date: '2025-06-01' })];
+
+    const [group] = buildLogTimeline([], works, [], now);
+    const ids = group?.items.map((item) => item.id) ?? [];
+
+    // dated work sorts first (has a non-empty sortDate)
+    expect(ids.indexOf('work-dated')).toBeLessThan(ids.indexOf('work-undated'));
+  });
+
+  it('sorts two dated works in descending date order', () => {
+    const works = [work({ id: 'early', year: 2025, date: '2025-01-10' }), work({ id: 'late', year: 2025, date: '2025-11-20' })];
+
+    const [group] = buildLogTimeline([], works, [], now);
+    const ids = group?.items.map((item) => item.id) ?? [];
+
+    expect(ids.indexOf('work-late')).toBeLessThan(ids.indexOf('work-early'));
+  });
+});
+
 describe('buildLogTimeline manual entries', () => {
   it('merges manual log entries into the correct year, sorted by date desc', () => {
     const logs: LogManualItem[] = [{ id: '1', title: 'サイト公開', date: '2026-06-01', meta: 'milestone', url: 'https://napochaan.com' }];

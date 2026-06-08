@@ -8,8 +8,8 @@ import type { ChannelData, ItemData } from '@utils/rss/types';
 // revalidateTag('works') hook busts this feed automatically.
 export const revalidate = 3600;
 
-// Works carry year-precision only; use Jan 1 of the year as a stable pubDate.
-const pubDateOf = (work: WorkRow): string => `${work.year}-01-01`;
+// Use the real date when available; fall back to Jan 1 of the year for year-only works.
+const pubDateOf = (work: WorkRow): string => work.date ?? `${work.year}-01-01`;
 
 const linkOf = (work: WorkRow, origin: string): string => {
   if (work.url === undefined) return `${origin}/works/${work.id}`;
