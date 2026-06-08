@@ -2,6 +2,7 @@ import { Lightbox } from '@components/gallery/lightbox';
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
+import { BlankDim } from './blank-dim';
 import { computeBlanks } from './skyline/compute-blanks';
 import { spanForAspect } from './skyline/layout';
 import { pack } from './skyline/pack';
@@ -102,7 +103,7 @@ export const GalleryArchive = ({ photos }: Props) => {
             <span className={styles.corner} data-pos="br">
               +
             </span>
-            <span className={styles.blankDim}>{`NO.${refNo(index)}\nVACANT`}</span>
+            <BlankDim refLabel={refNo(index)} />
           </li>
         )),
       )}

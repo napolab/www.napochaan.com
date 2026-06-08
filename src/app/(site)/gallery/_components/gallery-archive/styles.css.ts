@@ -135,20 +135,3 @@ export const corner = css({
   '&[data-pos=bl]': { bottom: '[2px]', left: '[3px]' },
   '&[data-pos=br]': { bottom: '[2px]', right: '[3px]' },
 });
-
-// A reference number + status, centered like a dimension callout.
-export const blankDim = css({
-  position: 'absolute',
-  inset: '0',
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  whiteSpace: 'pre-line',
-  textAlign: 'center',
-  fontFamily: 'mono',
-  fontSize: '[11px]',
-  letterSpacing: 'wide',
-  lineHeight: '[1.45]',
-  color: 'fg.muted',
-  userSelect: 'none',
-});
