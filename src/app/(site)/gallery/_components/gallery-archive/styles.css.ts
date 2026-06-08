@@ -127,21 +127,19 @@ export const blankMark = css({
   height: 'full',
 });
 
-// A standing display-face word (digibop) over the ✕ — set vertically, sized to sit
-// inside the cell now that the horizontal mono line carries the density. nowrap keeps
-// it one column. Latin only, so the display face renders (it carries no JP glyphs).
+// The hero word — a big horizontal black display headline (digibop), like the flyer's
+// "booth". nowrap + the cell's overflow lets it bleed off-frame. Latin only, so the
+// display face renders (it carries no JP glyphs).
 export const blankText = css({
   position: 'absolute',
   inset: '0',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  writingMode: 'vertical-rl',
-  textOrientation: 'upright',
   whiteSpace: 'nowrap',
   fontFamily: 'display',
-  fontSize: '[clamp(1.25rem, 3.5vw, 2rem)]',
-  lineHeight: '[0.95]',
+  fontSize: '[clamp(1.5rem, 6vw, 3.5rem)]',
+  lineHeight: '[0.9]',
   textTransform: 'uppercase',
   color: 'fg.default',
   userSelect: 'none',
