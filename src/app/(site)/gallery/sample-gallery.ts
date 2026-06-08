@@ -14,7 +14,7 @@ import vrchatGlitch from '../_assets/vrchat-glitch.jpg';
 import vrchatSquare from '../_assets/vrchat-square.jpg';
 import vrchatWide from '../_assets/vrchat-wide.jpg';
 
-import type { GalleryPhoto } from './_components/gallery-archive';
+import type { GalleryPhoto } from '@components/gallery-archive';
 
 // The structural shape of a static image import (next/image's StaticImageData),
 // declared locally so this module never imports next/image directly (see images.md).

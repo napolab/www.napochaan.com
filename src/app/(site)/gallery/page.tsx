@@ -1,4 +1,4 @@
-import { GalleryArchive } from './_components/gallery-archive';
+import { GalleryArchive } from '@components/gallery-archive';
 import { LeadTypewriter } from './_components/lead-typewriter';
 import { galleryPhotos } from './sample-gallery';
 import * as s from './styles.css';

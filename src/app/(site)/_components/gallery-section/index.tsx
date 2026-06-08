@@ -1,13 +1,13 @@
-import { Gallery } from '@components/gallery';
+import { GalleryArchive } from '@components/gallery-archive';
 import { SectionHeading } from '@components/section-heading';
 
 import * as styles from './styles.css';
 
-import type { GalleryItem } from '@components/gallery';
+import type { GalleryPhoto } from '@components/gallery-archive';
 
 type Props = {
   id?: string;
-  items: GalleryItem[];
+  items: GalleryPhoto[];
 };
 
 export const GallerySection = ({ id, items }: Props) => {
@@ -16,7 +16,7 @@ export const GallerySection = ({ id, items }: Props) => {
       <SectionHeading no="04" more="flyer / VRChat →" moreHref="/gallery">
         gallery
       </SectionHeading>
-      <Gallery items={items} />
+      <GalleryArchive photos={items} />
     </section>
   );
 };
