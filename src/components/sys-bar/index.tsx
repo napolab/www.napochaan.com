@@ -12,16 +12,14 @@ import { isNavActive } from './is-nav-active';
 import * as styles from './styles.css';
 import { useClock } from './use-clock';
 
-// Transitional nav targets: 'index', 'about', 'works', 'news' and 'blog' are
-// real pages; the rest jump to home-page sections until their own routes exist
-// (see isNavActive — anchors are never page-active).
+// Every nav target is now a real page.
 const navItems = [
   { label: 'index', href: '/' },
   { label: 'about', href: '/about' },
   { label: 'works', href: '/works' },
   { label: 'news', href: '/news' },
-  { label: 'log', href: '/#log' },
-  { label: 'gallery', href: '/#gallery' },
+  { label: 'log', href: '/log' },
+  { label: 'gallery', href: '/gallery' },
   { label: 'blog', href: '/blog' },
 ];
 
