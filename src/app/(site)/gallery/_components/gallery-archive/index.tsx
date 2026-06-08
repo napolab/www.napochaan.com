@@ -71,7 +71,7 @@ export const GalleryArchive = ({ photos }: Props) => {
   const placementOf = (id: string, layoutIndex: number): Placement => layouts[layoutIndex]?.result.placements.find((p) => p.id === id) ?? FALLBACK;
 
   return (
-    <ul className={styles.root} style={totalVars(layouts.map((layout) => layout.result.totalHeight))}>
+    <ul className={styles.root} data-gallery style={totalVars(layouts.map((layout) => layout.result.totalHeight))}>
       {photos.map((photo) => (
         <li key={photo.id} className={styles.cell} style={cellVars(placementOf(photo.id, 0), placementOf(photo.id, 1), placementOf(photo.id, 2))}>
           <Lightbox src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} triggerClassName={styles.trigger}>

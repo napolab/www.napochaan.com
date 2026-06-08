@@ -53,27 +53,32 @@ export const trigger = css({
   p: '0',
   position: 'relative',
   overflow: 'hidden',
+  // Hover / focus indicator drawn as a pseudo border ABOVE the fill image (a plain
+  // outline would be painted under next/image's absolutely-positioned img).
+  _after: {
+    content: '""',
+    position: 'absolute',
+    inset: '0',
+    borderWidth: 'strong',
+    borderStyle: 'solid',
+    borderColor: 'accent.solid',
+    opacity: '[0]',
+    pointerEvents: 'none',
+    zIndex: '[3]',
+  },
   _hover: {
-    outlineWidth: 'strong',
-    outlineStyle: 'solid',
-    outlineColor: 'accent.solid',
-    outlineOffset: '[-3px]',
     zIndex: '[2]',
+    _after: { opacity: '[1]' },
   },
   _focusVisible: {
+    zIndex: '[2]',
     _after: {
-      content: '""',
-      position: 'absolute',
+      opacity: '[1]',
       inset: '[3px]',
-      borderWidth: 'strong',
-      borderStyle: 'solid',
-      borderColor: 'accent.solid',
       outlineWidth: 'strong',
       outlineStyle: 'solid',
       outlineColor: 'fg.default',
       outlineOffset: '0',
-      pointerEvents: 'none',
-      zIndex: '[3]',
     },
   },
 });
@@ -85,6 +90,15 @@ export const image = css({
   width: 'full',
   height: 'full',
   objectFit: 'cover',
+  // Spotlight hover: while any cell is hovered, every other photo desaturates so the
+  // hovered one stands out. The hovered photo also zooms slightly (motion-safe only);
+  // the cell's overflow clips the zoom.
+  filter: '[grayscale(0)]',
+  '[data-gallery]:hover li:not(:hover) &': { filter: '[grayscale(1)]' },
+  _motionSafe: {
+    transition: '[filter 0.4s ease, transform 0.4s ease]',
+    'li:hover &': { transform: '[scale(1.05)]' },
+  },
 });
 
 export const caption = css({
