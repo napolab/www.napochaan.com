@@ -102,3 +102,18 @@ export const caption = css({
   paddingInline: '[6px]',
   paddingBlock: '[1px]',
 });
+
+// Crosshatch filler for empty grid space (ragged bottom / internal gaps left by the
+// skyline). Paper base + two perpendicular grid-line hatches read as a drafting fill.
+// Decorative only (aria-hidden); positioned by the same --cell-* vars as photo cells.
+export const blank = css({
+  position: 'absolute',
+  left: '[var(--cell-x)]',
+  top: '[var(--cell-y)]',
+  width: '[var(--cell-w)]',
+  height: '[var(--cell-h)]',
+  pointerEvents: 'none',
+  bg: 'bg.canvas',
+  backgroundImage:
+    '[repeating-linear-gradient(45deg, var(--colors-grid-line) 0, var(--colors-grid-line) 1px, transparent 1px, transparent 6px), repeating-linear-gradient(-45deg, var(--colors-grid-line) 0, var(--colors-grid-line) 1px, transparent 1px, transparent 6px)]',
+});

@@ -6,6 +6,7 @@ import { Lightbox } from '@components/gallery/lightbox';
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
+import { computeBlanks } from './skyline/compute-blanks';
 import { resolveColumns, spanForAspect } from './skyline/layout';
 import { pack } from './skyline/pack';
 import * as styles from './styles.css';
@@ -65,6 +66,10 @@ export const GalleryArchive = ({ photos }: Props) => {
 
   const placementOf = (id: string): Placement | undefined => result?.placements.find((p) => p.id === id);
 
+  // Crosshatch fillers for the ragged bottom and any internal gaps the skyline left,
+  // so empty space reads as a drafting hatch rather than blank grid.
+  const blanks = result === null || width === null ? [] : computeBlanks(result.placements, { columns, width, gap: GAP, totalHeight: result.totalHeight });
+
   return (
     <ul ref={ref} className={styles.root} data-mode={result === null ? 'flow' : 'packed'} style={result === null ? undefined : totalVars(result.totalHeight)}>
       {photos.map((photo) => {
@@ -87,6 +92,9 @@ export const GalleryArchive = ({ photos }: Props) => {
           </li>
         );
       })}
+      {blanks.map((blank) => (
+        <li key={blank.id} className={styles.blank} style={cellVars(blank)} aria-hidden="true" />
+      ))}
     </ul>
   );
 };
