@@ -69,7 +69,7 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    pages: Page;
+    news: News;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -79,7 +79,7 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    pages: PagesSelect<false> | PagesSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -169,16 +169,21 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
+ * via the `definition` "news".
  */
-export interface Page {
+export interface News {
   id: number;
   title: string;
+  publishedAt: string;
   /**
-   * URL-safe identifier, e.g. "about".
+   * 出演: DJ/VJ 出演・イベント開催のお知らせ / リリース: フライヤー・キービジュアル・楽曲・ソフトなど制作物の公開 / 更新: サイト・プロフィール・ブログなどの更新のお知らせ
    */
-  slug: string;
-  content?: {
+  category: 'live' | 'release' | 'update';
+  /**
+   * 設定すると、年表などのリンクが内部の詳細ページではなくこの URL を指します。
+   */
+  url?: string | null;
+  body?: {
     root: {
       type: string;
       children: {
@@ -193,10 +198,6 @@ export interface Page {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Short summary used for SEO description fallback.
-   */
-  excerpt?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -207,6 +208,7 @@ export interface Page {
   };
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -241,8 +243,8 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'pages';
-        value: number | Page;
+        relationTo: 'news';
+        value: number | News;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -329,13 +331,14 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages_select".
+ * via the `definition` "news_select".
  */
-export interface PagesSelect<T extends boolean = true> {
+export interface NewsSelect<T extends boolean = true> {
   title?: T;
-  slug?: T;
-  content?: T;
-  excerpt?: T;
+  publishedAt?: T;
+  category?: T;
+  url?: T;
+  body?: T;
   meta?:
     | T
     | {
@@ -345,6 +348,7 @@ export interface PagesSelect<T extends boolean = true> {
       };
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

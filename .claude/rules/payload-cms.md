@@ -68,20 +68,20 @@ livePreview: {
 ### 5. Generate and run migration
 
 ```bash
-PAYLOAD_SECRET=dev-secret-change-me-in-production pnpm payload migrate:create <migration_name>
-PAYLOAD_SECRET=dev-secret-change-me-in-production pnpm payload migrate
+pnpm payload:migrate:create <migration_name>
+pnpm payload:migrate
 ```
 
 ### 6. Regenerate import map
 
 ```bash
-PAYLOAD_SECRET=dev-secret-change-me-in-production pnpm payload generate:importmap
+pnpm payload:generate-importmap
 ```
 
 ### 7. Regenerate types (optional)
 
 ```bash
-PAYLOAD_SECRET=dev-secret-change-me-in-production pnpm payload generate:types
+pnpm payload generate:types
 ```
 
 ## Commands
@@ -94,15 +94,20 @@ PAYLOAD_SECRET=dev-secret-change-me-in-production pnpm payload generate:types
 | `pnpm payload generate:types`        | Regenerate TypeScript types       |
 | `pnpm deploy:database:production`    | Apply migrations to production D1 |
 
-**Note:** All Payload CLI commands require `PAYLOAD_SECRET` env var. Defined in `.dev.vars` but must be passed explicitly when running CLI:
+**Note:** Payload CLI commands need `PAYLOAD_SECRET`, but you do **not** pass it explicitly. `payload.config.ts` reads it from the Cloudflare env (`cfEnv.PAYLOAD_SECRET`), and the CLI resolves bindings through wrangler's `getPlatformProxy`, which loads `.dev.vars` automatically. So as long as `PAYLOAD_SECRET` is defined in `.dev.vars`, this works with no prefix:
 
 ```bash
-PAYLOAD_SECRET=dev-secret-change-me-in-production pnpm payload <command>
+pnpm payload <command>
 ```
+
+If you see `PAYLOAD_SECRET is required at runtime`, the key is missing from `.dev.vars` (add it there — do **not** reintroduce a `PAYLOAD_SECRET=… pnpm payload …` prefix or a `.env`).
+
+> Production migrations (`pnpm deploy:database:production`, `CLOUDFLARE_ENV=production`) use **remote** bindings, so they read the deployed `wrangler secret`, not `.dev.vars`.
 
 ## File Structure
 
 ```
+migrations/                    # Auto-generated: DB migrations (REPO ROOT, not src/ — see payload.config `migrationDir`)
 src/
 ├── payload.config.ts          # Config: collections, plugins, DB
 ├── payload-types.ts           # Auto-generated: TypeScript types
@@ -110,7 +115,6 @@ src/
 │   ├── users.ts
 │   ├── media.ts
 │   └── news.ts
-├── migrations/                # Auto-generated: DB migrations
 ├── app/(payload)/             # Payload admin routes
 │   ├── layout.tsx
 │   ├── admin/
@@ -153,6 +157,6 @@ These files are managed by Payload — do NOT edit manually:
 
 - `src/app/(payload)/admin/importMap.js`
 - `src/payload-types.ts`
-- `src/migrations/*.ts`
+- `migrations/*.ts` (repo root)
 
 These files may not pass linter rules (filename casing, function style, etc.). This is expected.

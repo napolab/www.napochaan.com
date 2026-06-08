@@ -9,7 +9,7 @@ import { r2Storage } from '@payloadcms/storage-r2';
 import { buildConfig } from 'payload';
 
 import { Media } from './collections/media';
-import { Pages } from './collections/pages';
+import { News } from './collections/news';
 import { Users } from './collections/users';
 
 import type { CloudflareContext } from '@opennextjs/cloudflare';
@@ -60,8 +60,7 @@ const resolveCloudflareContext = async (): Promise<CloudflareContext> => {
 };
 
 const cloudflare = await resolveCloudflareContext();
-
-const cfEnv = cloudflare.env as unknown as Cloudflare.Env;
+const cfEnv = cloudflare.env;
 
 const d1 = cfEnv.D1;
 const r2 = cfEnv.R2;
@@ -70,10 +69,13 @@ if (d1 === undefined || r2 === undefined) {
 }
 
 // PAYLOAD_SECRET signs auth tokens, so it MUST be a real secret at runtime.
-// The placeholder is allowed ONLY during `next build` (so the build doesn't
-// require the secret) — at runtime a missing secret is a hard error, never sign
-// with a known constant. Set it via `wrangler secret put PAYLOAD_SECRET`.
-const secret = process.env.PAYLOAD_SECRET ?? (isNextBuild ? 'build-time-placeholder-not-used-at-runtime' : undefined);
+// Single source = the Cloudflare env: `getPlatformProxy` / `getCloudflareContext`
+// reads `.dev.vars` for both `next dev` and the Payload CLI (migrate/seed), and the
+// deployed worker exposes the `wrangler secret` there. The build stub has no secret,
+// so the placeholder is allowed ONLY during `next build`; the generated type claims
+// `PAYLOAD_SECRET: string`, but that is too optimistic for the build stub, so the
+// runtime guards below stay even though they look type-unreachable.
+const secret = cfEnv.PAYLOAD_SECRET ?? (isNextBuild ? 'build-time-placeholder-not-used-at-runtime' : undefined);
 if (secret === undefined) {
   throw new Error('PAYLOAD_SECRET is required at runtime. Set it via `wrangler secret put PAYLOAD_SECRET`.');
 }
@@ -91,6 +93,14 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    livePreview: {
+      url: ({ data, collectionConfig }) => {
+        const base = process.env.BASE_URL ?? 'http://localhost:3000';
+        if (collectionConfig?.slug === 'news') return `${base}/news/${data.id}`;
+        return base;
+      },
+      collections: ['news'],
+    },
     get autoLogin() {
       if (process.env.NODE_ENV !== 'development') return false;
 
@@ -103,7 +113,7 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, Pages],
+  collections: [Users, Media, News],
   editor: lexicalEditor(),
   secret,
   typescript: {
@@ -122,7 +132,7 @@ export default buildConfig({
       },
     }),
     seoPlugin({
-      collections: ['pages'],
+      collections: ['news'],
       uploadsCollection: 'media',
       tabbedUI: true,
       generateTitle: ({ doc }) => `napochaan — ${doc.title as string}`,
