@@ -27,7 +27,7 @@ const fetchWorksList = unstable_cache(
     const result = await payload.find({
       collection: 'works',
       where: publishedWhere,
-      sort: '-year',
+      sort: '-date',
       depth: 1,
       limit: 0,
     });
