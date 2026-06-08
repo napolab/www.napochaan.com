@@ -11,14 +11,12 @@ const galleryCrumbs = [{ href: '/', label: 'home' }, { label: 'gallery' }] as co
 
 const GalleryPage = async () => {
   const galleryPhotos = await findGalleryList();
-  // GalleryArchive expects mutable GalleryPhoto[]; spread from readonly.
-  const photos = [...galleryPhotos];
 
   return (
     <main id="main-content" className={s.main}>
       <PageHeader title="gallery" breadcrumbs={galleryCrumbs} kicker="// flyer · VRChat · photo — 2024–2026" lead="やっていきを、やっていく....." />
       <section aria-label="作品ギャラリー一覧">
-        <GalleryArchive photos={photos} />
+        <GalleryArchive photos={galleryPhotos} />
       </section>
     </main>
   );

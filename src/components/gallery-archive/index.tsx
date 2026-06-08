@@ -22,7 +22,7 @@ export type GalleryPhoto = {
 };
 
 type Props = {
-  photos: GalleryPhoto[];
+  photos: readonly GalleryPhoto[];
 };
 
 // Column counts per breakpoint: base (mobile) / tablet / desktop. The packing is run
