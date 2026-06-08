@@ -23,6 +23,8 @@ export const news: readonly NewsItem[] = [
     date: '2026-06-01',
     category: 'live',
     title: 'Booth²Booth vol.12 への出演が決定しました',
+    // External event page — the log timeline links straight to the listing.
+    url: 'https://vrchat.com/home/launch?worldId=wrld_booth2booth-vol12',
     body: richTextFromParagraphs(['VRDJ イベント Booth²Booth vol.12 に DJ / VJ として出演します。当日はフロアの熱量を光跡で可視化する予定です。']),
   },
   {
@@ -30,6 +32,8 @@ export const news: readonly NewsItem[] = [
     date: '2026-05-23',
     category: 'release',
     title: 'works ページを公開しました',
+    // Internal link example — the announcement points at the page it announces.
+    url: '/works',
     body: richTextFromParagraphs(['フライヤー・グラフィック・VJ の制作物をアーカイブとして公開しました。年ごとに積み上がる台帳形式で閲覧できます。']),
   },
   {
@@ -121,6 +125,8 @@ export const news: readonly NewsItem[] = [
     date: '2025-12-01',
     category: 'release',
     title: 'VJ ソフトの最初のデモを公開しました',
+    // External release — demo reel hosted off-site.
+    url: 'https://soundcloud.com/napochaan/booth2booth-vj-demo',
     body: richTextFromParagraphs(['Electron と WebGPU で組んだ自作 VJ ソフトの最初のデモ映像を公開しました。']),
   },
 ];

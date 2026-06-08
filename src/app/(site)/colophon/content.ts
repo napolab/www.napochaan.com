@@ -57,11 +57,13 @@ export const colophon = {
       { label: 'このページを包む殻', target: 'SiteShell' },
       { label: '上の見出しブロック', target: 'PageHeader' },
       { label: 'いちばん下のフッター', target: 'SiteFooter' },
+      { label: '同じページを見てる人のカーソル', target: 'CursorPresence' },
     ],
     // フロー要素 — 生デモは _demos に置き、name で対応付ける。
     items: [
       { name: 'ScrambleText', why: 'hover すると文字がほどけて組み直る。news / blog のタイトルに効かせてるやつ。' },
       { name: 'EchoText', why: '多層エコーの見出し。輪郭・青・本体を重ねて、T2 みたいに光らせてる。' },
+      { name: 'TypewriterText', why: 'lead を1文字ずつ打つやつ。たまに打ち間違えて、悩んで、消して直す。top も下層も、導入文ぜんぶこれで喋らせてる。' },
       { name: 'Marquee', why: '横に流れる帯。2トラックで継ぎ目なくループさせてる。' },
       { name: 'Heading', why: '見出しのレベル本体。h1 / h2 はページと節に取ってあるから、ここは h3 以降。' },
       { name: 'SectionHeading', why: '番号付きの節見出し。mono の連番に 2px の罫線で締める。' },
@@ -71,7 +73,7 @@ export const colophon = {
       { name: 'Figure', why: '画像とキャプションのセット。比率を保ったまま枠に収める。' },
       { name: 'Gallery', why: 'タイル状の写真グリッド。クリックで lightbox が開く。' },
       { name: 'GalleryArchive', why: 'skyline で詰める可変メイソンリー。レイアウトは CSS(cqw/calc)だけで測定なし・無段差、空きマスは図面みたいに採寸して埋めてる。' },
-      { name: 'Timeline', why: '年表。これからの予定だけ accent で立ててる。' },
+      { name: 'Timeline', why: '年表。これからの予定だけ accent で立てて、各項目のタイトルは詳細ページや外部リンクへ飛べる。' },
       { name: 'Table', why: '素朴な表。caption 付きで、event ログとかに使ってる。' },
       { name: 'List', why: '箇条書きと定義リスト。順序あり / なし、どっちもいける。' },
       { name: 'Badge', why: '状態の小札。now playing / rec / offline みたいなやつ。' },

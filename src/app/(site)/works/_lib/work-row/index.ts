@@ -6,6 +6,9 @@ export type WorkRow = {
   title: string;
   type: string;
   year: number;
+  // Explicit external destination. When set, links (e.g. the log timeline) point
+  // here instead of the internal `/works/{id}` detail page.
+  url?: string;
   thumbnail?: { src: string; width: number; height: number };
   description?: string;
   body?: SerializedEditorState;

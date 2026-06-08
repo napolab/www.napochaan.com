@@ -2,14 +2,14 @@ import { css } from '@styled/css';
 
 export const srOnly = css({ srOnly: true });
 
-// The hidden sizer reserves the final wrapped height; the typed copy overlays it
-// absolutely so the typewriter (and its fumbles) never reflow the content below.
+// The hidden sizer reserves the final wrapped height; the typed text overlays it
+// absolutely so the typewriter (and its fumbles) never shift what sits below.
 export const typeWrap = css({
   position: 'relative',
   display: 'block',
 });
 
-export const typeSizer = css({
+export const sizer = css({
   visibility: 'hidden',
 });
 
@@ -20,7 +20,7 @@ export const typed = css({
   width: 'full',
 });
 
-// Blinking terminal caret trailing the typed text (paused under reduced-motion).
+// Blinking terminal caret appended after the text (paused under reduced-motion).
 export const caret = css({
   _after: {
     content: '"_"',

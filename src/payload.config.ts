@@ -51,7 +51,7 @@ const getCloudflareContextFromWrangler = async (): Promise<CloudflareContext> =>
   });
 };
 
-const getBuildStubContext = (): CloudflareContext => ({ env: {} as Cloudflare.Env }) as CloudflareContext;
+const getBuildStubContext = (): CloudflareContext => ({ env: { D1: {} as D1Database, R2: {} as R2Bucket } as Cloudflare.Env }) as CloudflareContext;
 
 const resolveCloudflareContext = async (): Promise<CloudflareContext> => {
   if (isNextBuild) return getBuildStubContext();
@@ -62,6 +62,12 @@ const resolveCloudflareContext = async (): Promise<CloudflareContext> => {
 const cloudflare = await resolveCloudflareContext();
 
 const cfEnv = cloudflare.env as unknown as Cloudflare.Env;
+
+const d1 = cfEnv.D1;
+const r2 = cfEnv.R2;
+if (d1 === undefined || r2 === undefined) {
+  throw new Error('Cloudflare bindings D1/R2 are not available in this context');
+}
 
 // PAYLOAD_SECRET signs auth tokens, so it MUST be a real secret at runtime.
 // The placeholder is allowed ONLY during `next build` (so the build doesn't
@@ -104,13 +110,13 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: sqliteD1Adapter({
-    binding: cfEnv.D1,
+    binding: d1,
     migrationDir: path.resolve(dirname, '..', 'migrations'),
     push: false,
   }),
   plugins: [
     r2Storage({
-      bucket: cfEnv.R2,
+      bucket: r2,
       collections: {
         media: true,
       },

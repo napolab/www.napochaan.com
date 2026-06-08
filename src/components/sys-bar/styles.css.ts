@@ -8,7 +8,12 @@ export const root = css({
   justifyContent: 'space-between',
   alignItems: { base: 'start', desktop: 'center' },
   gap: '4',
-  flexWrap: 'wrap',
+  // Wrap only in the desktop row (where nav + status may overflow onto a second
+  // line). In the mobile COLUMN, wrap must stay off: a column flex container that
+  // is allowed to wrap breaks the menu/status stack into two *columns* whenever
+  // the header is given a height shorter than its content (e.g. a transient
+  // reflow / iOS dynamic toolbar), which makes `cursors: …` jump up beside `menu`.
+  flexWrap: { base: 'nowrap', desktop: 'wrap' },
   borderBottomWidth: 'default',
   borderBottomStyle: 'solid',
   borderBottomColor: 'fg.default',
@@ -116,6 +121,22 @@ export const gen = css({
 
 export const rec = css({
   color: 'danger.text',
+});
+
+export const watching = css({
+  color: 'accent.text',
+});
+
+export const toggle = css({
+  fontFamily: 'mono',
+  fontSize: 'xs',
+  color: 'fg.muted',
+  background: 'transparent',
+  border: 'none',
+  cursor: 'pointer',
+  padding: '0',
+  textDecoration: 'underline',
+  _hover: { color: 'accent.text' },
 });
 
 export const checker = css({

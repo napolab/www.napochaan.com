@@ -47,26 +47,6 @@ export const sub = css({
   color: 'fg.muted',
 });
 
-export const srOnly = css({ srOnly: true });
-
-// The hidden sizer reserves the final wrapped height; the typed text overlays it
-// absolutely so the typewriter (and its fumbles) never shift the buttons below.
-export const typeWrap = css({
-  position: 'relative',
-  display: 'block',
-});
-
-export const typeSizer = css({
-  visibility: 'hidden',
-});
-
-export const typed = css({
-  position: 'absolute',
-  top: '0',
-  left: '0',
-  width: 'full',
-});
-
 // Scattered decorative annotations are a desktop-only flourish — on mobile they
 // would overlap the content/buttons.
 export const annotationStart = css({
@@ -102,20 +82,6 @@ const square = {
 
 export const squareBlue = css({ ...square, bg: 'accent.solid' });
 export const squareRed = css({ ...square, bg: 'danger.spot' });
-
-// Blinking terminal caret appended after the lead (paused under reduced-motion).
-export const caret = css({
-  _after: {
-    content: '"_"',
-    marginInlineStart: '0.5',
-    color: 'accent.text',
-    animationName: 'blink',
-    animationDuration: '[1s]',
-    animationTimingFunction: '[steps(1)]',
-    animationIterationCount: 'infinite',
-    _motionReduce: { animationName: '[none]' },
-  },
-});
 
 export const buttons = css({
   display: 'flex',

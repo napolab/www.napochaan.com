@@ -20,6 +20,7 @@ import { SystemAnnotation } from '@components/system-annotation';
 import { Table } from '@components/table';
 import { Tag } from '@components/tag';
 import { Timeline } from '@components/timeline';
+import { TypewriterText } from '@components/typewriter-text';
 
 import { colophon } from '../content';
 import { GalleryArchiveLazy } from './gallery-archive-lazy';
@@ -42,7 +43,7 @@ import type { ReactNode } from 'react';
 type ComponentName = (typeof colophon.components.items)[number]['name'];
 
 const timelineItems: TimelineItem[] = [
-  { id: '1', date: '06/14', label: 'night vol.19 @ club eleven', meta: 'Tokyo', upcoming: true },
+  { id: '1', date: '06/14', label: 'night vol.19 @ club eleven', meta: 'Tokyo', upcoming: true, href: '/works/1' },
   { id: '2', date: '05/03', label: 'dawn session @ rooftop', meta: 'DJ set' },
   { id: '3', date: '04/12', label: 'ambient night @ gallery', meta: 'live' },
 ];
@@ -105,6 +106,7 @@ const paginationHref = (page: number): string => (page <= 1 ? '/works' : `/works
 export const demos: Record<ComponentName, ReactNode> = {
   ScrambleText: <ScrambleText>static internet</ScrambleText>,
   EchoText: <EchoText size="compact">napochaan</EchoText>,
+  TypewriterText: <TypewriterText>さまざまな「破壊」、承っております。</TypewriterText>,
   Marquee: <Marquee>napochaan ✕ graphic · digital · since 2020 · </Marquee>,
   Heading: (
     <>
@@ -144,7 +146,9 @@ export const demos: Record<ComponentName, ReactNode> = {
   ),
   Badge: (
     <>
-      <Badge tone="accent">now playing</Badge> <Badge tone="danger">rec</Badge> <Badge tone="neutral">offline</Badge>
+      <Badge tone="accent">now playing</Badge>
+      <Badge tone="danger">rec</Badge>
+      <Badge tone="neutral">offline</Badge>
     </>
   ),
   Tag: (
@@ -154,12 +158,16 @@ export const demos: Record<ComponentName, ReactNode> = {
   ),
   SystemAnnotation: (
     <>
-      <SystemAnnotation tone="muted">sys.log: ready</SystemAnnotation> <SystemAnnotation tone="accent">status: ok</SystemAnnotation> <SystemAnnotation tone="danger">err: 404</SystemAnnotation>
+      <SystemAnnotation tone="muted">sys.log: ready</SystemAnnotation>
+      <SystemAnnotation tone="accent">status: ok</SystemAnnotation>
+      <SystemAnnotation tone="danger">err: 404</SystemAnnotation>
     </>
   ),
   Button: (
     <>
-      <Button variant="solid">solid</Button> <Button variant="outline">outline</Button> <Button variant="danger">danger</Button>
+      <Button variant="solid">solid</Button>
+      <Button variant="outline">outline</Button>
+      <Button variant="danger">danger</Button>
     </>
   ),
   Link: (

@@ -46,6 +46,8 @@ export const works: readonly WorkRow[] = [
     title: 'VRChat stage VJ set',
     type: 'vj',
     year: 2025,
+    // External archive — the recorded set lives on the streaming platform.
+    url: 'https://www.youtube.com/watch?v=booth2booth-vrchat-set',
     thumbnail: { src: vrchatGlitch.src, width: vrchatGlitch.width, height: vrchatGlitch.height },
     description: 'VRChat のステージで回した実験的VJセット。glitch とスキャンラインで仮想空間そのものを歪ませた。',
     body: richTextFromParagraphs([

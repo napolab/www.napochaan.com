@@ -24,7 +24,7 @@ const TransformOptions = z.object({
 
 type TransformOptionsType = z.infer<typeof TransformOptions>;
 
-const transformImage = async (images: Cloudflare.Env['IMAGES'], body: ReadableStream<Uint8Array>, query: TransformOptionsType, accept: string) => {
+const transformImage = async (images: NonNullable<Cloudflare.Env['IMAGES']>, body: ReadableStream<Uint8Array>, query: TransformOptionsType, accept: string) => {
   const transform = await images
     .input(body)
     .transform({
@@ -84,5 +84,8 @@ export const imageHandlers = factory.createHandlers(zValidator('query', Transfor
   const body = sourceRes.body;
   if (!body) return c.json({ error: 'Empty image body' }, 404);
 
-  return transformImage(c.env.IMAGES, body, query, accept);
+  const images = c.env.IMAGES;
+  if (images === undefined) return c.json({ error: 'IMAGES binding unavailable' }, 500);
+
+  return transformImage(images, body, query, accept);
 });

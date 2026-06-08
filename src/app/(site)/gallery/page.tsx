@@ -1,5 +1,4 @@
 import { GalleryArchive } from '@components/gallery-archive';
-import { LeadTypewriter } from './_components/lead-typewriter';
 import { galleryPhotos } from './sample-gallery';
 import * as s from './styles.css';
 
@@ -13,7 +12,7 @@ const galleryCrumbs = [{ href: '/', label: 'home' }, { label: 'gallery' }] as co
 const GalleryPage = () => {
   return (
     <main id="main-content" className={s.main}>
-      <PageHeader title="gallery" breadcrumbs={galleryCrumbs} kicker="// flyer · VRChat · photo — 2024–2026" lead={<LeadTypewriter text="やっていきを、やっていく....." />} />
+      <PageHeader title="gallery" breadcrumbs={galleryCrumbs} kicker="// flyer · VRChat · photo — 2024–2026" lead="やっていきを、やっていく....." />
       <section aria-label="作品ギャラリー一覧">
         <GalleryArchive photos={galleryPhotos} />
       </section>
