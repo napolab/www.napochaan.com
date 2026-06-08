@@ -1,221 +1,181 @@
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
-
 import type { MigrateUpArgs, MigrateDownArgs } from '@payloadcms/db-d1-sqlite'
 
 import { richTextFromParagraphs } from '../src/utils/sample-rich-text'
 
-const dirname = path.dirname(fileURLToPath(import.meta.url))
-
-const ensureMedia = async (payload: MigrateUpArgs['payload'], alt: string, filename: string): Promise<number> => {
-  const existing = await payload.find({ collection: 'media', where: { alt: { equals: alt } }, limit: 1 })
-  const [first] = existing.docs
-  if (first !== undefined) {
-    return first.id as number
-  }
-  const filePath = path.resolve(dirname, '..', 'src', 'assets', filename)
-  const created = await payload.create({ collection: 'media', data: { alt }, filePath })
-  return created.id as number
-}
+const worksData = [
+  {
+    no: '01',
+    title: 'PAE2.0 ドットレカギミック制作',
+    type: 'dev',
+    date: '2025-09-13',
+    url: 'https://vrchat.com/home/world/wrld_ab2c1526-c1b1-419d-b138-be32591e799f',
+    description: 'VRChat で公開されている VRC PIXELART EXHIBITION 2.0 にドット絵組み合わせギミックを制作・提供した。複数人で同じものを見るための同期機能や、VR・Desktop 環境での最適化など、UX を重視した設計を行った。',
+  },
+  {
+    no: '02',
+    title: 'まだ知らない君がいる 映像提供',
+    type: 'video',
+    date: '2025-05-03', // date: inferred (from report context; around 2025-05 MV release)
+    url: 'https://x.com/naporin24690/status/1959117309689438582',
+    description: '椎乃味醂の楽曲「まだ知らない君がいる - 初音ミク･重音テト」の MV に VRChat で撮影した映像を提供した。',
+  },
+  {
+    no: '03',
+    title: 'ボカコレ2025夏 アーカイブ作成',
+    type: 'dev',
+    date: '2025-08-01', // date: inferred (ボカコレ2025夏 = summer 2025)
+    url: 'https://vocaloid-collection-archive.studiognu.org/2025/summer',
+    description: 'ボカコレ2025夏の統計情報を Web サイトにまとめた。',
+  },
+  {
+    no: '04',
+    title: 'おてぃる誕生日 モザイクアート制作',
+    type: 'dev',
+    date: '2025-04-01', // date: inferred (spring 2025 birthday project)
+    url: 'https://ristill.club/2025',
+    description: 'VRChat の推しの誕生日を祝うためにモザイクアートと HP を作成した。20人の協力により約3000枚の画像から24000タイルのモザイクアートを制作。モザイクアート生成用の Rust ツールも開発した。',
+  },
+  {
+    no: '05',
+    title: 'VRChat イベントポスター制作',
+    type: 'flyer',
+    date: '2025-06-01', // date: inferred (from tweet context, VRChat event poster)
+    url: 'https://x.com/napochaan_vrc2/status/1929843195313377560',
+    description: 'VRChat の個人イベント用ポスター・ロゴを制作した。可愛らしさと情報の伝わりやすさを重視したレイアウトを心がけた。',
+  },
+  {
+    no: '06',
+    title: 'AKAGE オマージュ動画制作',
+    type: 'video',
+    date: '2025-04-17', // date: inferred (tweet date from @ristill_vr/1913064949242360039 = ~April 2025)
+    url: 'https://x.com/ristill_vr/status/1913064949242360039',
+    description: 'After Effects を使った初めての動画制作で AKAGE オマージュ動画を作成した。アバターのコンセプトに合わせ、可愛さと面白さを重視した編集を心がけた。',
+  },
+  {
+    no: '07',
+    title: 'UMANITY HP 制作',
+    type: 'dev',
+    date: '2025-03-15',
+    url: 'https://ahub.jp/umanity/',
+    description: 'AHUB のアルバム「UMANITY」の Web サイトを制作した。アルバム紹介コンテンツやクイズなどのインタラクティブなギミックを搭載した HP を作成した。',
+  },
+  {
+    no: '08',
+    title: 'ヘイロー化ギミック booth 販売',
+    type: 'dev',
+    date: '2025-01-01', // date: inferred (VRChat gimmick released, ~early 2025)
+    url: 'https://booth.pm/ja/items/6604904',
+    description: 'VRChat で好きなオブジェクトを頭上で回転させるヘイローにできるギミックを制作した。ボタン一つで自動配置する仕組みを実装し、フルパック版では13種類のメニューを用意。汎用的な円形配置スクリプトにより頭部以外の部位にも装着可能で、BOOTH で販売中。',
+  },
+  {
+    no: '09',
+    title: 'W♭Y♭K M♭C K システム作成',
+    type: 'dev',
+    date: '2024-12-12',
+    url: 'https://x.com/naporin24690/status/1867175063893811585',
+    description: '企画展「共に在る音楽」の作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。',
+  },
+  {
+    no: '10',
+    title: 'DEMiXUS システム作成',
+    type: 'dev',
+    date: '2024-12-12',
+    url: 'https://x.com/naporin24690/status/1867179943060504598',
+    description: '企画展「共に在る音楽」の作品「DEMiXUS」のシステムを設計・実装した。短期間での開発ながら要望実現のため Cloudflare Stack をフル活用した構成とした。',
+  },
+  {
+    no: '11',
+    title: '燭 / MusicVideo Coding Advisor',
+    type: 'dev',
+    date: '2024-10-10', // date: inferred (tweet /1845201683368071632 = Oct 2024)
+    url: 'https://x.com/naporin24690/status/1845201683368071632',
+    description: '燭の MV で使用する図形を p5.js で生成できるシンプルなエディターを作成した。',
+  },
+  {
+    no: '12',
+    title: '工房祭ステージシステム実装',
+    type: 'dev',
+    date: '2024-09-14',
+    url: 'https://x.com/naporin24690/status/1834900593808490701',
+    description: 'OBS のブラウザソースで動作するステージ演出システムを作成した。Cloudflare Workers と WebSocket により OBS とスマホ間の通信を実現。スマホでの正解不正解選択、再生停止操作、回答者位置調整など現場での実用性を重視した機能を搭載。',
+  },
+  {
+    no: '13',
+    title: 'Workers Tech Talk #3 登壇',
+    type: 'talk',
+    date: '2024-08-01',
+    url: 'https://speakerdeck.com/naporin0624/durableobjects-nituite',
+    description: 'Cloudflare Workers DurableObjects での WebSocket 活用のための Tips について登壇した。自身が直面した問題を具体例として挙げながら、実践的な解決策を紹介した。',
+  },
+  {
+    no: '14',
+    title: 'Hono Conf 2024 登壇（初登壇）',
+    type: 'talk',
+    date: '2024-06-22',
+    url: 'https://speakerdeck.com/naporin0624/event-exhibition-with-hono',
+    description: 'Hono Conference 2024 - Our first step に登壇した。大阪関西国際芸術祭での展示システム事例について発表。Hono RPC での型安全通信、ReverseProxy と getPath を併用した画像最適化サーバーの構築手法などを紹介した。',
+  },
+  {
+    no: '15',
+    title: 'flat-工房 HP 制作サポート',
+    type: 'support',
+    date: '2024-03-01', // date: inferred (flat-工房 HP, estimated 2024)
+    url: 'https://www.flatkobo.com',
+    description: 'flat-工房の HP 制作サポートを行った。Next.js を Cloudflare Pages で運用し、コンタクトフォームは ServerAction と Resend で実装し、bot 対策として Cloudflare WAF ページ検証を導入するなど安全な運用を重視した。',
+  },
+  {
+    no: '16',
+    title: '彼方 DL ページ作成',
+    type: 'dev',
+    date: '2024-01-01', // date: inferred (StudioGnu UTAU release, ~2024)
+    url: 'https://www.studiognu.org/lp/kanata',
+    description: 'StudioGnu で公開した UTAU 彼方のランディングページを作成した。Cloudflare Turnstile で bot 排除後、数分間有効な signed URL でダウンロードリンクを生成。DurableObjects によるダウンロードカウンター機能も搭載。',
+  },
+  {
+    no: '17',
+    title: 'ボカコレ2024冬 ランキングの作成',
+    type: 'dev',
+    date: '2024-12-01', // date: inferred (ボカコレ2024冬 = winter 2024)
+    url: 'https://vocaloid-collection-archive.studiognu.org/2024/winter',
+    description: 'ボカコレ2024冬のランキングアーカイブを作成した。Cloudflare Cron Trigger で収集したランキングスナップショットを drizzle で Cloudflare D1 に保存する構成に変更した。',
+  },
+  {
+    no: '18',
+    title: 'StudioGnu HP の作成',
+    type: 'dev',
+    date: '2023-06-01', // date: inferred (StudioGnu HP, ~mid-2023)
+    url: 'https://www.studiognu.org',
+    description: 'StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに使用し、データ管理には MicroCMS を採用。作品ごとの動的 og:image 生成には next/og を活用した。',
+  },
+  {
+    no: '19',
+    title: '楽曲「デュレエ」関連データ解析',
+    type: 'dev',
+    date: '2023-09-01', // date: inferred (デュレエ data analysis, ~2023)
+    url: 'https://www.studiognu.org/ja/works/duree',
+    description: '楽曲「デュレエ」の一部で使用されるデータの解析を担当した。データ分析に JupyterLab、pandas、numpy を使用し、描画に matplotlib、NetWorkX、JavaScript canvas を活用。',
+  },
+]
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   const existing = await payload.find({ collection: 'works', limit: 1 })
   if (existing.docs.length > 0) return
 
-  const mediaVrchatSquare = await ensureMedia(payload, 'vrchat-square', 'vrchat-square.jpg')
-  const mediaVrchatWide = await ensureMedia(payload, 'vrchat-wide', 'vrchat-wide.jpg')
-  const mediaVrchatGlitch = await ensureMedia(payload, 'vrchat-glitch', 'vrchat-glitch.jpg')
-  const mediaFlyerBooth0523 = await ensureMedia(payload, 'flyer-booth-0523', 'flyer-booth-0523.jpg')
-  const mediaFlyerBooth0424 = await ensureMedia(payload, 'flyer-booth-0424', 'flyer-booth-0424.jpg')
-  const mediaVrchatAlice = await ensureMedia(payload, 'vrchat-alice', 'vrchat-alice.jpg')
-
-  const worksData = [
-    {
-      no: '01',
-      title: 'Booth² key visual',
-      type: 'graphic',
-      date: '2026-01-01',
-      thumbnail: mediaVrchatSquare,
-      description: 'Booth² のためのキービジュアル。グリッドの上に黒のグロテスクを叩き込み、エレクトリックブルーの矩形でリズムを刻んだ一枚。',
-      body: richTextFromParagraphs([
-        'Booth² のためのキービジュアル。グリッドの上に黒のグロテスクを叩き込み、エレクトリックブルーの矩形でリズムを刻んだ一枚。',
-        '版面を方眼で分割し、余白と矩形の間（ま）だけで会場の鼓動を設計した、シリーズ全体の基準となるアートワーク。',
-      ]),
-    },
-    {
-      no: '02',
-      title: 'light trails set',
-      type: 'vj',
-      date: '2026-01-01',
-      thumbnail: mediaVrchatWide,
-      description: 'テクノの四つ打ちに同期させた光跡のVJセット。残像を引きずるトレイルでフロアの体温を可視化した。',
-      body: richTextFromParagraphs([
-        'テクノの四つ打ちに同期させた光跡のVJセット。残像を引きずるトレイルでフロアの体温を可視化した。',
-        'BPMをそのまま座標へ流し込み、エレクトリックブルーの線がフロアの熱量に応じて伸縮するようリアルタイムで制御した。',
-      ]),
-    },
-    {
-      no: '03',
-      title: 'VRChat stage VJ set',
-      type: 'vj',
-      date: '2025-01-01',
-      url: 'https://www.youtube.com/watch?v=booth2booth-vrchat-set',
-      thumbnail: mediaVrchatGlitch,
-      description: 'VRChat のステージで回した実験的VJセット。glitch とスキャンラインで仮想空間そのものを歪ませた。',
-      body: richTextFromParagraphs([
-        'VRChat のステージで回した実験的VJセット。glitch とスキャンラインで仮想空間そのものを歪ませた。',
-        'ワールドのジオメトリへ直接映像を投げ込み、走査線のノイズで「仮想であること」そのものを演出に転化した試み。',
-      ]),
-    },
-    {
-      no: '04',
-      title: 'midnight flyer 05.23',
-      type: 'flyer',
-      date: '2025-01-01',
-      thumbnail: mediaFlyerBooth0523,
-      description: '深夜帯のパーティ用フライヤー。モノクロのコントラストに蛍光ブルーの座標を一点だけ落として深夜の緊張感を作った。',
-      body: richTextFromParagraphs([
-        '深夜帯のパーティ用フライヤー。モノクロのコントラストに蛍光ブルーの座標を一点だけ落として深夜の緊張感を作った。',
-        'タイムテーブルと会場情報を等幅フォントで淡々と組み、唯一の色点へ視線を集める告知物としてデザインした。',
-      ]),
-    },
-    {
-      no: '05',
-      title: 'glitch study',
-      type: 'graphic',
-      date: '2025-01-01',
-      thumbnail: mediaVrchatGlitch,
-      description: 'データモッシュと走査線のグラフィック習作。意図的に壊した画素の中から新しい構図を拾い集めた。',
-      body: richTextFromParagraphs([
-        'データモッシュと走査線のグラフィック習作。意図的に壊した画素の中から新しい構図を拾い集めた。',
-        '破綻したフレームを方眼に並べ直し、ノイズを構成要素として扱うグラフィックの語彙を探った連作習作。',
-      ]),
-    },
-    {
-      no: '06',
-      title: 'night graphics vol.13',
-      type: 'flyer',
-      date: '2024-01-01',
-      thumbnail: mediaFlyerBooth0424,
-      description: '夜のグラフィックシリーズ第13弾。グリッドを基準線に、情報を等幅フォントで淡々と並べた告知フライヤー。',
-      body: richTextFromParagraphs([
-        '夜のグラフィックシリーズ第13弾。グリッドを基準線に、情報を等幅フォントで淡々と並べた告知フライヤー。',
-        '回を重ねるごとに研いだ方眼レイアウトの型を踏襲し、出演者と時刻だけを主役に据えた静かな告知デザイン。',
-      ]),
-    },
-    {
-      no: '07',
-      title: 'ALICE portrait series',
-      type: 'graphic',
-      date: '2024-01-01',
-      thumbnail: mediaVrchatAlice,
-      description: 'アバター ALICE のポートレートシリーズ。グレースケールの proof にグリッチを一筋走らせ、仮想の存在感を焼き付けた。',
-      body: richTextFromParagraphs([
-        'アバター ALICE のポートレートシリーズ。グレースケールの proof にグリッチを一筋走らせ、仮想の存在感を焼き付けた。',
-        'コンタクトシート風の校正紙へ一点だけブルーのグリッチを差し、仮想の被写体に肉体の手触りを与えようとした連作。',
-      ]),
-    },
-    {
-      no: '08',
-      title: 'neon grid flyer',
-      type: 'flyer',
-      date: '2023-01-01',
-      thumbnail: mediaFlyerBooth0424,
-      description: 'ネオングリッドのフライヤー。方眼の交点に光を宿らせ、地下のテクノの夜を一枚に閉じ込めた。',
-      body: richTextFromParagraphs([
-        'ネオングリッドのフライヤー。方眼の交点に光を宿らせ、地下のテクノの夜を一枚に閉じ込めた。',
-        '黒地に引いた方眼の格子点だけをエレクトリックブルーで発光させ、地下フロアの暗さと熱を同居させた告知物。',
-      ]),
-    },
-    {
-      no: '09',
-      title: 'techno set @ basement',
-      type: 'vj',
-      date: '2023-01-01',
-      thumbnail: mediaVrchatWide,
-      description: '地下のフロアで回したテクノセットのVJ。BPMに食らいつくストロボとワイドな映像で空間を縦に伸ばした。',
-      body: richTextFromParagraphs([
-        '地下のフロアで回したテクノセットのVJ。BPMに食らいつくストロボとワイドな映像で空間を縦に伸ばした。',
-        '横長スクリーンへ縦方向のモーションを叩き込み、低い天井の地下空間を視覚的に引き延ばすことを狙ったライブ映像。',
-      ]),
-    },
-    {
-      no: '10',
-      title: 'first booth² poster',
-      type: 'graphic',
-      date: '2022-01-01',
-      thumbnail: mediaVrchatSquare,
-      description: 'Booth² 最初のポスター。グリッドと黒のグロテスクという原型を、ここで初めて紙の上に定着させた。',
-      body: richTextFromParagraphs([
-        'Booth² 最初のポスター。グリッドと黒のグロテスクという原型を、ここで初めて紙の上に定着させた。',
-        '後の全ビジュアルへ受け継がれる方眼と太いグロテスク書体の組み合わせを、最初に印刷物として確定させた起点。',
-      ]),
-    },
-    {
-      no: '11',
-      title: 'warehouse VJ rig',
-      type: 'vj',
-      date: '2022-01-01',
-      thumbnail: mediaVrchatGlitch,
-      description: '倉庫レイヴ用に組んだVJリグ。glitch を主役に、剥き出しのコンクリートへ映像を直接叩きつけた。',
-      body: richTextFromParagraphs([
-        '倉庫レイヴ用に組んだVJリグ。glitch を主役に、剥き出しのコンクリートへ映像を直接叩きつけた。',
-        'プロジェクションの歪みを逆手に取り、コンクリート壁の凹凸ごとグリッチの構成要素として取り込んだ即興リグ。',
-      ]),
-    },
-    {
-      no: '12',
-      title: 'lockdown stream set',
-      type: 'vj',
-      date: '2021-01-01',
-      thumbnail: mediaVrchatWide,
-      description: 'ロックダウン下の配信用VJセット。無観客のフロアへ向けて、画面越しのテクノを途切れさせないために組んだ。',
-      body: richTextFromParagraphs([
-        'ロックダウン下の配信用VJセット。無観客のフロアへ向けて、画面越しのテクノを途切れさせないために組んだ。',
-        '配信フレームに最適化した低帯域の映像設計で、画面の向こうのフロアと孤立した夜をつなぎ続けるために組み上げた。',
-      ]),
-    },
-    {
-      no: '13',
-      title: 'zine cover 02',
-      type: 'graphic',
-      date: '2021-01-01',
-      thumbnail: mediaVrchatAlice,
-      description: '自主制作 zine の第2号カバー。等幅フォントとグリッドだけで、宅録テクノの手触りを表紙に翻訳した。',
-      body: richTextFromParagraphs([
-        '自主制作 zine の第2号カバー。等幅フォントとグリッドだけで、宅録テクノの手触りを表紙に翻訳した。',
-        '装飾を削ぎ落とし、方眼とモノスペース書体という最小限の語彙で宅録の生々しさを誌面へ移し替えた表紙。',
-      ]),
-    },
-    {
-      no: '14',
-      title: 'debut night flyer',
-      type: 'flyer',
-      date: '2020-01-01',
-      thumbnail: mediaFlyerBooth0523,
-      description: '初めて主催した夜のフライヤー。何も持たないまま、グリッドと黒一色だけで最初の告知を刷った。',
-      body: richTextFromParagraphs([
-        '初めて主催した夜のフライヤー。何も持たないまま、グリッドと黒一色だけで最初の告知を刷った。',
-        '予算も機材もないなかで、方眼と一色刷りという制約そのものを様式に変え、最初のイベントを世に出した一枚。',
-      ]),
-    },
-    {
-      no: '15',
-      title: 'since 2020 logo',
-      type: 'graphic',
-      date: '2020-01-01',
-      thumbnail: mediaVrchatSquare,
-      description: 'すべての起点になった "since 2020" ロゴ。矩形と等幅の数字だけで、これから続く活動の基準線を引いた。',
-      body: richTextFromParagraphs([
-        'すべての起点になった "since 2020" ロゴ。矩形と等幅の数字だけで、これから続く活動の基準線を引いた。',
-        '矩形とモノスペースの数字という二要素のみで構成し、以後の全グラフィックの基準線となるアイデンティティを定義した。',
-      ]),
-    },
-  ]
-
   for (const work of worksData) {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await payload.create({ collection: 'works', data: { ...work, _status: 'published' } as any })
+    await payload.create({
+      collection: 'works',
+      data: {
+        no: work.no,
+        title: work.title,
+        type: work.type,
+        date: work.date,
+        url: work.url,
+        description: work.description,
+        body: richTextFromParagraphs([work.description]),
+        _status: 'published',
+      } as any,
+    })
   }
 }
 
