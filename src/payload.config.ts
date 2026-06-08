@@ -15,6 +15,7 @@ import { Media } from './collections/media';
 import { News } from './collections/news';
 import { Users } from './collections/users';
 import { Works } from './collections/works';
+import { Profile } from './globals/profile';
 import { createPreviewURLFactory, draftPreviewRoute } from './lib/payload/create-preview-url-factory';
 
 import type { CloudflareContext } from '@opennextjs/cloudflare';
@@ -141,6 +142,7 @@ export default buildConfig({
   cors: [serverURL],
   csrf: [serverURL],
   collections: [Users, Media, News, Works, Blog, Gallery, Logs],
+  globals: [Profile],
   editor: lexicalEditor(),
   secret,
   typescript: {
