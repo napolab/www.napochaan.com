@@ -17,7 +17,7 @@
     "lint:oxlint": "oxlint --ignore-pattern migrations --ignore-pattern .claude/worktrees --ignore-pattern src/app/\\(payload\\)/admin/importMap.js .",
     "typecheck": "tsgo --noEmit -p tsconfig.json",
     "test": "vitest run",
-    "preview": "CLOUDFLARE_ENV=staging opennextjs-cloudflare build && opennextjs-cloudflare preview --env staging --remote",
+    "preview": "CLOUDFLARE_ENV=staging opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "payload": "payload",
     "payload:migrate": "payload migrate",
