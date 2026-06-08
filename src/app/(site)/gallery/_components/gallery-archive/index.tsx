@@ -90,8 +90,8 @@ export const GalleryArchive = ({ photos }: Props) => {
               <Image
                 src={photo.src}
                 alt={photo.alt}
-                width={photo.width}
-                height={photo.height}
+                fill
+                sizes="(min-width: 768px) 25vw, (min-width: 480px) 33vw, 50vw"
                 className={styles.image}
                 placeholder="blur"
                 blurDataURL={formatBlurURL(photo.src, { blur: 10, width: 32, quality: 30 })}
