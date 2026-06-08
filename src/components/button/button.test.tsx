@@ -35,4 +35,25 @@ describe('Button', () => {
     render(<Button variant="danger">削除</Button>);
     await expect.element(page.getByRole('button', { name: '削除' })).toHaveAttribute('data-variant', 'danger');
   });
+
+  it('renders a button element when no href is given', async () => {
+    render(<Button>label</Button>);
+    await expect.element(page.getByRole('button', { name: 'label' })).toBeInTheDocument();
+  });
+
+  it('renders an anchor with href when href is given', async () => {
+    render(<Button href="/about">enter</Button>);
+    const link = page.getByRole('link', { name: 'enter' });
+    await expect.element(link).toBeInTheDocument();
+    await expect.element(link).toHaveAttribute('href', '/about');
+  });
+
+  it('exposes the variant via data attribute on the link form', async () => {
+    render(
+      <Button href="/x" variant="danger">
+        削除
+      </Button>,
+    );
+    await expect.element(page.getByRole('link', { name: '削除' })).toHaveAttribute('data-variant', 'danger');
+  });
 });

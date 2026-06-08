@@ -25,9 +25,15 @@ export const Hero = ({ name = DEFAULT_NAME, lead = DEFAULT_LEAD }: Props) => {
       <LeadQuote text={lead} />
       <p className={styles.sub}>{SUB}</p>
       <div className={styles.buttons}>
-        <Button variant="solid">enter →</Button>
-        <Button variant="outline">works</Button>
-        <Button variant="danger">contact →</Button>
+        <Button variant="solid" href="/about">
+          enter →
+        </Button>
+        <Button variant="outline" href="/works">
+          works
+        </Button>
+        <Button variant="danger" href="/contact">
+          contact →
+        </Button>
       </div>
       <SystemAnnotation tone="danger" className={styles.annotationEnd}>
         ▸ not found

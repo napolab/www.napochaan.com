@@ -1,19 +1,22 @@
 'use client';
 
-import { Button as AriaButton } from 'react-aria-components';
+import { Button as AriaButton, Link as AriaLink } from 'react-aria-components';
 
 import * as styles from './styles.css';
 
-import type { ButtonProps as AriaButtonProps } from 'react-aria-components';
+import type { ButtonProps as AriaButtonProps, LinkProps as AriaLinkProps } from 'react-aria-components';
 
 type Variant = 'solid' | 'outline' | 'danger';
 
-type Props = Omit<AriaButtonProps, 'className'> & { variant?: Variant };
+type ButtonVariantProps = Omit<AriaButtonProps, 'className'> & { variant?: Variant; href?: never };
+type LinkVariantProps = Omit<AriaLinkProps, 'className' | 'href'> & { variant?: Variant; href: string };
 
-export const Button = ({ variant = 'solid', children, ...rest }: Props) => {
-  return (
-    <AriaButton {...rest} data-variant={variant} className={styles.root}>
-      {children}
-    </AriaButton>
-  );
+type Props = ButtonVariantProps | LinkVariantProps;
+
+export const Button = ({ variant = 'solid', ...rest }: Props) => {
+  if (rest.href !== undefined) {
+    return <AriaLink {...rest} data-variant={variant} className={styles.root} />;
+  }
+
+  return <AriaButton {...rest} data-variant={variant} className={styles.root} />;
 };

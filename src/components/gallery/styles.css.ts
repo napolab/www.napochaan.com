@@ -49,8 +49,25 @@ export const trigger = css({
     outlineOffset: '[-3px]',
     zIndex: '[2]',
   },
+  // Two-tone focus ring drawn over the photo via an overlay pseudo so it wins on
+  // any image: an inner accent band (border) plus an outer ink ring (outline).
+  // Inset 3px from the cell edge so the parent's overflow:hidden can't crop it,
+  // and z-raised so it sits above the cover image rather than behind it.
   _focusVisible: {
-    layerStyle: 'focusRing',
+    _after: {
+      content: '""',
+      position: 'absolute',
+      inset: '[3px]',
+      borderWidth: 'strong',
+      borderStyle: 'solid',
+      borderColor: 'accent.solid',
+      outlineWidth: 'strong',
+      outlineStyle: 'solid',
+      outlineColor: 'fg.default',
+      outlineOffset: '0',
+      pointerEvents: 'none',
+      zIndex: '[3]',
+    },
   },
 });
 
