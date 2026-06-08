@@ -30,14 +30,8 @@ type Props = {
 
 const GAP = 2;
 
-// Latin-only system noise filling each blank as a mock ad slot — a big standing word
-// crossed by a horizontal mono "small-print" line. Both picked by the blank's index
-// (deterministic — blanks only exist client-side, so no SSR mismatch).
-// Explicit \n breaks (rendered with white-space: pre) so the headline always stacks
-// the same way regardless of viewport width.
-const AD_FILLERS = ['NOT\nFOUND', 'AD\nSPACE', 'COMING\nSOON', 'NO\nSIGNAL', 'SOLD\nOUT', 'FOR\nRENT', 'SINCE\n2020', 'VACANCY', '404'] as const;
-const BLANK_TAGS = ['X 5470.009', 'N35 40.7009', 'SINCE 2020', 'GEN 0427', '00:25 AM', 'E139 42.0041', '404 VACANT'] as const;
-const BLANK_CODES = ['SYS_001', 'CORE_02', 'LOC_02', 'T:128.00', 'P:01', '∠90.00°', 'SYS_009'] as const;
+// A 2-digit reference number for each blank (deterministic by index).
+const refNo = (index: number): string => `${index + 1}`.padStart(2, '0');
 
 // The absolute-position bridge: skyline output is published as CSS custom
 // properties (the only style-prop bridge the project allows), consumed by s.cell.
@@ -103,13 +97,19 @@ export const GalleryArchive = ({ photos }: Props) => {
       })}
       {blanks.map((blank, index) => (
         <li key={blank.id} className={styles.blank} style={cellVars(blank)} aria-hidden="true">
-          <svg className={styles.blankMark} viewBox="0 0 100 100" preserveAspectRatio="none">
-            <line x1="0" y1="0" x2="100" y2="100" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-            <line x1="100" y1="0" x2="0" y2="100" stroke="currentColor" strokeWidth="2" vectorEffect="non-scaling-stroke" />
-          </svg>
-          <span className={styles.blankCode}>{BLANK_CODES[index % BLANK_CODES.length]}</span>
-          <span className={styles.blankText}>{AD_FILLERS[index % AD_FILLERS.length]}</span>
-          <span className={styles.blankTag}>{BLANK_TAGS[index % BLANK_TAGS.length]}</span>
+          <span className={styles.corner} data-pos="tl">
+            +
+          </span>
+          <span className={styles.corner} data-pos="tr">
+            +
+          </span>
+          <span className={styles.corner} data-pos="bl">
+            +
+          </span>
+          <span className={styles.corner} data-pos="br">
+            +
+          </span>
+          <span className={styles.blankDim}>{`${Math.round(blank.width)}×${Math.round(blank.height)}\nNO.${refNo(index)}`}</span>
         </li>
       ))}
     </ul>

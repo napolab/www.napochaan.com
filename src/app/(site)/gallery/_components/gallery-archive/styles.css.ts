@@ -104,9 +104,9 @@ export const caption = css({
 });
 
 // Filler for empty grid space (ragged bottom / internal gaps left by the skyline).
-// Paper base crossed by one big ✕ that reaches the cell corners (the design-system
-// motif). `color` drives the SVG stroke via currentColor. Decorative (aria-hidden);
-// positioned by the same --cell-* vars as photo cells.
+// The void is "dimensioned" like a technical drawing: registration crosshairs at the
+// corners + the cell's measured size and a reference number in the middle. Decorative
+// (aria-hidden); positioned by the same --cell-* vars as photo cells.
 export const blank = css({
   position: 'absolute',
   left: '[var(--cell-x)]',
@@ -116,67 +116,37 @@ export const blank = css({
   pointerEvents: 'none',
   overflow: 'hidden',
   bg: 'bg.canvas',
-  color: 'grid.line',
 });
 
-// The ✕ glyph. preserveAspectRatio="none" stretches the 0–100 viewBox to fill any
-// cell shape; non-scaling-stroke (set on the lines) keeps the stroke an even width.
-export const blankMark = css({
-  display: 'block',
-  width: 'full',
-  height: 'full',
-});
-
-// The hero word — a big horizontal black display headline (digibop), like the flyer's
-// "booth". nowrap + the cell's overflow lets it bleed off-frame. Latin only, so the
-// display face renders (it carries no JP glyphs).
-export const blankText = css({
+// Electric-blue registration crosshair pinned to a corner (data-pos selects which) —
+// the drawing's alignment ticks.
+export const corner = css({
   position: 'absolute',
-  top: '[-0.1em]',
-  left: '[5px]',
-  right: '0',
-  display: 'flex',
-  alignItems: 'flex-start',
-  justifyContent: 'flex-start',
-  // `pre` honours the explicit \n in each phrase but never wraps on width, so a
-  // narrow viewport can't break the headline at an unintended spot.
-  whiteSpace: 'pre',
-  textAlign: 'left',
-  fontFamily: 'display',
-  // Oversized and tight — fills and bleeds off the cell like the flyer's huge type.
-  fontSize: '[clamp(2.75rem, 13vw, 7.5rem)]',
-  lineHeight: '[0.78]',
-  letterSpacing: '[-0.04em]',
-  textTransform: 'uppercase',
-  color: 'fg.default',
-  userSelect: 'none',
-});
-
-// Mono "small print" — a coordinate/system code on the bottom-right, the dense flyer
-// noise under the headline. Single line (nowrap), clipped by the cell.
-export const blankTag = css({
-  position: 'absolute',
-  right: '[6px]',
-  bottom: '[5px]',
   fontFamily: 'mono',
   fontSize: '[12px]',
-  letterSpacing: 'wide',
-  whiteSpace: 'nowrap',
-  textTransform: 'uppercase',
-  color: 'fg.default',
+  lineHeight: '[1]',
+  color: 'accent.text',
   userSelect: 'none',
+  '&[data-pos=tl]': { top: '[2px]', left: '[3px]' },
+  '&[data-pos=tr]': { top: '[2px]', right: '[3px]' },
+  '&[data-pos=bl]': { bottom: '[2px]', left: '[3px]' },
+  '&[data-pos=br]': { bottom: '[2px]', right: '[3px]' },
 });
 
-// A second mono code on the bottom-left, in electric blue — the flyer's accent.
-export const blankCode = css({
+// The measured size (W × H px) and a reference number, centered like a dimension
+// callout. pre-line keeps the two lines from wrapping on width.
+export const blankDim = css({
   position: 'absolute',
-  bottom: '[5px]',
-  left: '[6px]',
+  inset: '0',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  whiteSpace: 'pre-line',
+  textAlign: 'center',
   fontFamily: 'mono',
   fontSize: '[11px]',
   letterSpacing: 'wide',
-  whiteSpace: 'nowrap',
-  textTransform: 'uppercase',
-  color: 'accent.text',
+  lineHeight: '[1.45]',
+  color: 'fg.muted',
   userSelect: 'none',
 });
