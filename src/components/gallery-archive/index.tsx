@@ -2,13 +2,12 @@ import { Lightbox } from '@components/gallery/lightbox';
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
-import { BlankDim } from './blank-dim';
+import { BlankCell } from './blank-cell';
 import { computeBlanks } from './skyline/compute-blanks';
 import { spanForAspect } from './skyline/layout';
 import { pack } from './skyline/pack';
 import * as styles from './styles.css';
 
-import type { Blank } from './skyline/compute-blanks';
 import type { Placement } from './skyline/pack';
 import type { CSSProperties } from 'react';
 
@@ -49,12 +48,7 @@ const cellVars = (p2: Placement, p3: Placement, p4: Placement): CSSProperties =>
     '--h-4': `${p4.height}`,
   }) as CSSProperties;
 
-// A blank belongs to one breakpoint's layout, so it carries a single position.
-const blankVars = (blank: Blank): CSSProperties => ({ '--col': `${blank.col}`, '--y': `${blank.y}`, '--h': `${blank.height}` }) as CSSProperties;
-
 const totalVars = (totals: readonly number[]): CSSProperties => ({ '--total-2': `${totals[0]}`, '--total-3': `${totals[1]}`, '--total-4': `${totals[2]}` }) as CSSProperties;
-
-const refNo = (index: number): string => `${index + 1}`.padStart(2, '0');
 
 const FALLBACK: Placement = { id: '', col: 0, span: 1, y: 0, height: 1 };
 
@@ -88,25 +82,7 @@ export const GalleryArchive = ({ photos }: Props) => {
           {photo.caption !== undefined ? <span className={styles.caption}>{photo.caption}</span> : null}
         </li>
       ))}
-      {layouts.flatMap((layout, bp) =>
-        layout.blanks.map((blank, index) => (
-          <li key={`${bp}-${blank.id}`} className={styles.blank} data-bp={bp} style={blankVars(blank)} aria-hidden="true">
-            <span className={styles.corner} data-pos="tl">
-              +
-            </span>
-            <span className={styles.corner} data-pos="tr">
-              +
-            </span>
-            <span className={styles.corner} data-pos="bl">
-              +
-            </span>
-            <span className={styles.corner} data-pos="br">
-              +
-            </span>
-            <BlankDim refLabel={refNo(index)} />
-          </li>
-        )),
-      )}
+      {layouts.flatMap((layout, bp) => layout.blanks.map((blank, index) => <BlankCell key={`${bp}-${blank.id}`} blank={blank} bp={bp} index={index} />))}
     </ul>
   );
 };
