@@ -1,5 +1,4 @@
-import { revalidatePath, revalidateTag } from 'next/cache';
-
+import { revalidateTagsAndPaths } from '../collections/hooks/revalidate';
 import { CACHE_TAGS } from '@utils/cache-tags';
 
 import type { GlobalConfig } from 'payload';
@@ -15,16 +14,7 @@ export const Profile = {
   },
   versions: { drafts: { autosave: { interval: 375 } } },
   hooks: {
-    afterChange: [
-      () => {
-        try {
-          revalidateTag(CACHE_TAGS.profile);
-          revalidatePath('/about');
-        } catch {
-          // revalidate throws outside a Next request context (e.g. CLI seed). Safe to swallow.
-        }
-      },
-    ],
+    afterChange: [() => revalidateTagsAndPaths([CACHE_TAGS.profile], ['/about'])],
   },
   fields: [
     { name: 'name', label: '名前', type: 'text', required: true },

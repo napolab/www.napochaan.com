@@ -1,6 +1,11 @@
-import { revalidatePath } from 'next/cache';
+import { revalidateTagsAndPaths } from './hooks/revalidate';
+import { CACHE_TAGS } from '@utils/cache-tags';
 
 import type { CollectionConfig } from 'payload';
+
+// Media is referenced by news SEO images, works thumbnails, and gallery images.
+// Bust all dependent caches whenever a media document is changed or deleted.
+const revalidateMedia = (): void => revalidateTagsAndPaths([CACHE_TAGS.news, CACHE_TAGS.works, CACHE_TAGS.gallery], ['/', '/news', '/works', '/gallery']);
 
 export const Media: CollectionConfig = {
   slug: 'media',
@@ -14,24 +19,8 @@ export const Media: CollectionConfig = {
     delete: ({ req: { user } }) => user !== null,
   },
   hooks: {
-    afterChange: [
-      () => {
-        try {
-          revalidatePath('/');
-        } catch {
-          // revalidatePath throws outside a Next request context (e.g. CLI seed). Safe to swallow.
-        }
-      },
-    ],
-    afterDelete: [
-      () => {
-        try {
-          revalidatePath('/');
-        } catch {
-          // revalidatePath throws outside a Next request context (e.g. CLI seed). Safe to swallow.
-        }
-      },
-    ],
+    afterChange: [revalidateMedia],
+    afterDelete: [revalidateMedia],
   },
   fields: [
     {
