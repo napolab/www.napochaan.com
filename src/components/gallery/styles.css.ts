@@ -43,31 +43,32 @@ export const trigger = css({
   p: '0',
   position: 'relative',
   overflow: 'hidden',
-  _hover: {
-    outlineWidth: 'strong',
-    outlineStyle: 'solid',
-    outlineColor: 'accent.solid',
-    outlineOffset: '[-3px]',
-    zIndex: '[2]',
+  // Hover / focus indicator as a pseudo border above the photo (matching GalleryArchive):
+  // hover shows an accent band; focus adds an outer ink ring.
+  _after: {
+    content: '""',
+    position: 'absolute',
+    inset: '0',
+    borderWidth: 'strong',
+    borderStyle: 'solid',
+    borderColor: 'accent.solid',
+    opacity: '[0]',
+    pointerEvents: 'none',
+    zIndex: '[3]',
   },
-  // Two-tone focus ring drawn over the photo via an overlay pseudo so it wins on
-  // any image: an inner accent band (border) plus an outer ink ring (outline).
-  // Inset 3px from the cell edge so the parent's overflow:hidden can't crop it,
-  // and z-raised so it sits above the cover image rather than behind it.
+  _hover: {
+    zIndex: '[2]',
+    _after: { opacity: '[1]' },
+  },
   _focusVisible: {
+    zIndex: '[2]',
     _after: {
-      content: '""',
-      position: 'absolute',
+      opacity: '[1]',
       inset: '[3px]',
-      borderWidth: 'strong',
-      borderStyle: 'solid',
-      borderColor: 'accent.solid',
       outlineWidth: 'strong',
       outlineStyle: 'solid',
       outlineColor: 'fg.default',
       outlineOffset: '0',
-      pointerEvents: 'none',
-      zIndex: '[3]',
     },
   },
 });
@@ -77,6 +78,14 @@ export const gridImage = css({
   height: 'full',
   objectFit: 'cover',
   objectPosition: '[var(--gallery-object-position, center)]',
+  // Spotlight hover (matching GalleryArchive): the other photos desaturate while one is
+  // hovered, and the hovered one zooms slightly (motion-safe; clipped by the cell).
+  filter: '[grayscale(0)]',
+  '[data-gallery]:hover li:not(:hover) &': { filter: '[grayscale(1)]' },
+  _motionSafe: {
+    transition: '[filter 0.4s ease, transform 0.4s ease]',
+    'li:hover &': { transform: '[scale(1.05)]' },
+  },
 });
 
 export const caption = css({

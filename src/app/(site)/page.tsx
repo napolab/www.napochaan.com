@@ -13,7 +13,7 @@ import { NewsSection } from './_components/news-section';
 import { WorksSection } from './_components/works-section';
 import * as s from './styles.css';
 
-import type { GalleryPhoto } from '@components/gallery-archive';
+import type { GalleryItem } from '@components/gallery';
 
 // Revalidate hourly so OpenNext serves the page via ISR.
 export const revalidate = 3600;
@@ -47,13 +47,31 @@ const activity = [
   { id: '5', date: '02/18', title: 'VJ @ event', meta: 'VJ' },
 ];
 
-const gallery: GalleryPhoto[] = [
-  { id: '1', src: flyerBooth0424.src, alt: 'Booth² 2026.04.24 イベントフライヤー', width: flyerBooth0424.width, height: flyerBooth0424.height, caption: 'flyer / 04.24' },
-  { id: '2', src: vrchatWide.src, alt: 'VRChat ライブ会場の光跡ショット', width: vrchatWide.width, height: vrchatWide.height, caption: 'VRChat' },
-  { id: '3', src: vrchatSquare.src, alt: 'VRChat アバターのフレーミングポーズ', width: vrchatSquare.width, height: vrchatSquare.height, caption: 'frame' },
-  { id: '4', src: vrchatAlice.src, alt: 'VRChat アバター ALICE ポートレート', width: vrchatAlice.width, height: vrchatAlice.height, caption: 'ALICE' },
-  { id: '5', src: flyerBooth0523.src, alt: 'Booth² 2026.05.23 イベントフライヤー', width: flyerBooth0523.width, height: flyerBooth0523.height, caption: 'flyer / 05.23' },
-  { id: '6', src: vrchatGlitch.src, alt: 'VRChat アバターのグリッチビジュアル', width: vrchatGlitch.width, height: vrchatGlitch.height, caption: 'glitch' },
+const gallery: GalleryItem[] = [
+  {
+    id: '1',
+    src: flyerBooth0424.src,
+    alt: 'Booth² 2026.04.24 イベントフライヤー',
+    width: flyerBooth0424.width,
+    height: flyerBooth0424.height,
+    area: 'lead',
+    caption: 'flyer / 04.24',
+    objectPosition: 'top',
+  },
+  { id: '2', src: vrchatWide.src, alt: 'VRChat ライブ会場の光跡ショット', width: vrchatWide.width, height: vrchatWide.height, area: 'wide', caption: 'VRChat' },
+  { id: '3', src: vrchatSquare.src, alt: 'VRChat アバターのフレーミングポーズ', width: vrchatSquare.width, height: vrchatSquare.height, area: 'square', caption: 'frame' },
+  { id: '4', src: vrchatAlice.src, alt: 'VRChat アバター ALICE ポートレート', width: vrchatAlice.width, height: vrchatAlice.height, area: 'inset', caption: 'ALICE', objectPosition: 'top' },
+  {
+    id: '5',
+    src: flyerBooth0523.src,
+    alt: 'Booth² 2026.05.23 イベントフライヤー',
+    width: flyerBooth0523.width,
+    height: flyerBooth0523.height,
+    area: 'sub',
+    caption: 'flyer / 05.23',
+    objectPosition: 'top',
+  },
+  { id: '6', src: vrchatGlitch.src, alt: 'VRChat アバターのグリッチビジュアル', width: vrchatGlitch.width, height: vrchatGlitch.height, area: 'column', caption: 'glitch' },
 ];
 
 const posts = [

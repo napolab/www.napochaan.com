@@ -54,7 +54,7 @@ const GalleryCell = ({ item }: { item: GalleryItem }) => {
 
 export const Gallery = ({ items }: Props) => {
   return (
-    <ul className={styles.root}>
+    <ul className={styles.root} data-gallery>
       {items.map((item) => (
         <GalleryCell key={item.id} item={item} />
       ))}
