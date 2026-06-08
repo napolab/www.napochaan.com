@@ -132,11 +132,16 @@ export const blankMark = css({
 // display face renders (it carries no JP glyphs).
 export const blankText = css({
   position: 'absolute',
-  inset: '0',
+  top: '[-0.1em]',
+  left: '[5px]',
+  right: '0',
   display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  whiteSpace: 'nowrap',
+  alignItems: 'flex-start',
+  justifyContent: 'flex-start',
+  // `pre` honours the explicit \n in each phrase but never wraps on width, so a
+  // narrow viewport can't break the headline at an unintended spot.
+  whiteSpace: 'pre',
+  textAlign: 'left',
   fontFamily: 'display',
   fontSize: '[clamp(1.5rem, 6vw, 3.5rem)]',
   lineHeight: '[0.9]',
@@ -145,11 +150,11 @@ export const blankText = css({
   userSelect: 'none',
 });
 
-// Horizontal black mono "small print" pinned bottom-left — a coordinate/system code,
-// the dense flyer noise under the standing word. Single line (nowrap), clipped.
+// Mono "small print" — a coordinate/system code on the bottom-right, the dense flyer
+// noise under the headline. Single line (nowrap), clipped by the cell.
 export const blankTag = css({
   position: 'absolute',
-  left: '[6px]',
+  right: '[6px]',
   bottom: '[5px]',
   fontFamily: 'mono',
   fontSize: '[12px]',
@@ -160,10 +165,10 @@ export const blankTag = css({
   userSelect: 'none',
 });
 
-// A second mono code top-left, in electric blue — the flyer's accent annotation.
+// A second mono code on the bottom-left, in electric blue — the flyer's accent.
 export const blankCode = css({
   position: 'absolute',
-  top: '[6px]',
+  bottom: '[5px]',
   left: '[6px]',
   fontFamily: 'mono',
   fontSize: '[11px]',

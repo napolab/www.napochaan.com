@@ -33,7 +33,9 @@ const GAP = 2;
 // Latin-only system noise filling each blank as a mock ad slot — a big standing word
 // crossed by a horizontal mono "small-print" line. Both picked by the blank's index
 // (deterministic — blanks only exist client-side, so no SSR mismatch).
-const AD_FILLERS = ['NOT FOUND', 'AD SPACE', 'COMING SOON', 'NO SIGNAL', 'SOLD OUT', 'FOR RENT', 'SINCE 2020', 'VACANCY', '404'] as const;
+// Explicit \n breaks (rendered with white-space: pre) so the headline always stacks
+// the same way regardless of viewport width.
+const AD_FILLERS = ['NOT\nFOUND', 'AD\nSPACE', 'COMING\nSOON', 'NO\nSIGNAL', 'SOLD\nOUT', 'FOR\nRENT', 'SINCE\n2020', 'VACANCY', '404'] as const;
 const BLANK_TAGS = ['X 5470.009', 'N35 40.7009', 'SINCE 2020', 'GEN 0427', '00:25 AM', 'E139 42.0041', '404 VACANT'] as const;
 const BLANK_CODES = ['SYS_001', 'CORE_02', 'LOC_02', 'T:128.00', 'P:01', '∠90.00°', 'SYS_009'] as const;
 
