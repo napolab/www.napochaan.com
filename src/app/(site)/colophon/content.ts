@@ -80,6 +80,8 @@ export const colophon = {
       { name: 'Tag', why: '分類タグ。default / blue / outline の3トーン。' },
       { name: 'SystemAnnotation', why: 'mono の注釈。muted / accent / danger の3色で状態を喋らせてる。' },
       { name: 'Button', why: 'solid / outline / danger の3種。react-aria ベースで触り心地を担保。' },
+      { name: 'TextField', why: '単一行の入力欄。react-aria ベースの boxed hairline。focus で枠が電子ブルーに灯り、検証エラーは下にインラインで出る。' },
+      { name: 'TextArea', why: '複数行の入力欄。TextField と同じ boxed hairline で、本文みたいな長文用。rows で高さを決める。' },
       { name: 'Link', why: 'リンク。tone と下線の有無を切り替えられる。' },
       { name: 'Divider', why: '区切り線。実線と破線を使い分けてる。' },
       { name: 'Pagination', why: 'ページ送り。URL の形は呼び出し側が持つ設計だよ。' },

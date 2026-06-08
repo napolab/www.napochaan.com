@@ -20,6 +20,8 @@ import { SectionHeading } from '@components/section-heading';
 import { SystemAnnotation } from '@components/system-annotation';
 import { Table } from '@components/table';
 import { Tag } from '@components/tag';
+import { TextArea } from '@components/text-area';
+import { TextField } from '@components/text-field';
 import { Timeline } from '@components/timeline';
 import { TypewriterText } from '@components/typewriter-text';
 
@@ -189,6 +191,8 @@ export const demos: Record<ComponentName, ReactNode> = {
       <Button variant="danger">danger</Button>
     </>
   ),
+  TextField: <TextField label="name / お名前" name="demo-name" defaultValue="napochaan" autoComplete="off" />,
+  TextArea: <TextArea label="message / 本文" name="demo-message" rows={3} defaultValue="はじめまして。" autoComplete="off" />,
   Link: (
     <>
       <Link href="#">作品一覧</Link>{' '}
