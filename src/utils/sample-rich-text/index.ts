@@ -14,7 +14,8 @@ const textNode = (value: string): unknown => ({
 });
 
 // A paragraph segment is either inline text (string) or an inline link (object).
-export type RichSegment = string | { text: string; href: string; newTab?: boolean };
+// Plus a soft line break ({ br: true }), rendered as <br> by Payload's default converter.
+export type RichSegment = string | { text: string; href: string; newTab?: boolean } | { br: true };
 
 const linkNode = (text: string, href: string, newTab: boolean): unknown => ({
   type: 'link',
@@ -26,8 +27,11 @@ const linkNode = (text: string, href: string, newTab: boolean): unknown => ({
   children: [textNode(text)],
 });
 
+const lineBreakNode = (): unknown => ({ type: 'linebreak', version: 1 });
+
 const segmentNode = (segment: RichSegment): unknown => {
   if (typeof segment === 'string') return textNode(segment);
+  if ('br' in segment) return lineBreakNode();
   return linkNode(segment.text, segment.href, segment.newTab ?? false);
 };
 

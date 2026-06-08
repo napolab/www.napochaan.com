@@ -39,6 +39,20 @@ Real verbatim samples:
 
 Note: the contrast between A (light surface) and B (dark depth) is intentional — it mirrors the author's own aesthetic of "相反するものの同居". bio = Register A, philosophy = Register B.
 
+### Keep the two registers from bleeding (review-confirmed, /about)
+The author repeatedly rejected copy where Register B's introspective markers leaked into the bio. Hold the line:
+- **bio = 言い切り (declarative, dry, forward-leaning).** End sentences crisply: 「渡せない。」「つくってる。」「飛び込んだ。」 Do NOT use 「〜だよなぁ」 in bio — that wistful confessional tail belongs to Register B. Do NOT use trailing dots 「……」 in bio — the hesitation/余韻 pause is a philosophy device only.
+- **philosophy = 余韻.** Trailing dots, 「〜なんだと思う」「気がしてる」, hesitation are welcome HERE, not in bio.
+- **Never label the author with an identity noun he'd have to claim about himself.** 「こうしてクリエイターになった」was rejected as cringe — you don't call yourself a creator. Show the becoming through ACTION instead (「気づけばなんでも自分でつくってる」). Identity nouns are fine only as an external org's title (e.g. 「クリエイター集団 StudioGnu」).
+
+### Line breaks in bio (review-confirmed)
+When the bio uses intra-paragraph line breaks (`<br>`) for rhythm, the failure mode is **one sentence per line = reads as a bullet list**. The author rejected that twice. Fix is NOT fewer breaks alone — it's **varied line length**: cluster related sentences onto one line, break only at the seams between idea-chunks (intro / scene / turning-point / making / sign-off), and let a short line sit next to a long one. Equal-length, equal-granularity lines are the enemy.
+
+### Fixed facts (do not contradict)
+- **StudioGnu** = クリエイター集団 he joined (to break out of being "just a problem-solver"); there he supports artists' 0→1 with tech. Link: https://studiognu.org
+- **Booth²Booth** = a recurring DJ event he hosts AND a 制作チーム he leads — a team that keeps making things (world-building, the site, etc.) *through* that recurring event. Frame it as both, never as a one-off event. Link: https://booth2booth.com
+- The spine of the bio is the arc **問題解決者 → (作る人)**: programming is a problem-solving tool that alone can't give people something, so he moved toward visuals (flyers / design / DJ / VJ). Keep this arc; the philosophy carries its inner "なぜ".
+
 What "readable but still theirs" means in practice:
 - KEEP: their vocabulary, their 「ぼく」, the chosen register's energy, the willingness to leave contradictions standing.
 - ADJUST: run-on commas → sensible breaks; obvious typos; ordering; redundancy trimmed only when it doesn't flatten the feeling.

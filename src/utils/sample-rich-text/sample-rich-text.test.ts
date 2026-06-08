@@ -105,6 +105,17 @@ describe('richTextFromBlocks', () => {
     expect(child?.fields?.newTab).toBe(false);
   });
 
+  it('turns a br segment in a p block into a linebreak node between the surrounding text', () => {
+    const state = richTextFromBlocks([{ type: 'p', text: ['line one', { br: true }, 'line two'] }]);
+
+    const [node] = nodesOf(state);
+    const children = node?.children ?? [];
+
+    expect(children.map((child) => child.type)).toEqual(['text', 'linebreak', 'text']);
+    expect(children[0]?.text).toBe('line one');
+    expect(children[2]?.text).toBe('line two');
+  });
+
   it('preserves child order and types for a mixed string/link/string p block', () => {
     const state = richTextFromBlocks([{ type: 'p', text: ['before ', { text: 'link', href: 'https://example.com', newTab: true }, ' after'] }]);
 
