@@ -8,13 +8,13 @@
 
 各ページは現在ローカルの sample データで動いている:
 
-| ページ | 現状のデータ源 | 詳細ルート |
-|---|---|---|
-| `/works` | `works/sample-works.ts`（`WorkRow[]`） | `/works/[id]` 有 |
-| `/blog` | `blog/sample-posts.ts`（`Post[]`） | `/blog/[id]` 有 |
-| `/gallery` | `gallery/sample-gallery.ts`（`GalleryPhoto[]`） | なし |
-| `/log` | **派生ビュー** = `findNewsList()`(Payload) + `works`(sample) + 外部RSS記事 を `buildLogTimeline` で合成 | なし |
-| `/about` | `about/profile.ts`（`as const` オブジェクト。コメントに「Payload global に置換」と明記） | なし |
+| ページ     | 現状のデータ源                                                                                          | 詳細ルート       |
+| ---------- | ------------------------------------------------------------------------------------------------------- | ---------------- |
+| `/works`   | `works/sample-works.ts`（`WorkRow[]`）                                                                  | `/works/[id]` 有 |
+| `/blog`    | `blog/sample-posts.ts`（`Post[]`）                                                                      | `/blog/[id]` 有  |
+| `/gallery` | `gallery/sample-gallery.ts`（`GalleryPhoto[]`）                                                         | なし             |
+| `/log`     | **派生ビュー** = `findNewsList()`(Payload) + `works`(sample) + 外部RSS記事 を `buildLogTimeline` で合成 | なし             |
+| `/about`   | `about/profile.ts`（`as const` オブジェクト。コメントに「Payload global に置換」と明記）                | なし             |
 
 確立済みの基盤（`news` コレクションで実証済み）をそのまま横展開する:
 
@@ -41,16 +41,16 @@
 
 ### 1. `works`（slug: `works`, draft 有）
 
-| field | type | 必須 | 備考 |
-|---|---|---|---|
-| `title` | text | ✓ | `useAsTitle` |
-| `no` | text | | 表示序数 '01'。未設定なら read 時に並び順から導出 |
-| `type` | select | ✓ | 上記8値。sidebar |
-| `year` | number | ✓ | 年精度。sidebar |
-| `url` | text | | 外部アーカイブ。あれば log / 詳細リンクが外部を指す |
-| `thumbnail` | relationship → `media` | | 一覧サムネ。width/height は media が保持 |
-| `description` | textarea | | 一覧の短文 |
-| `body` | richText | | `/works/[id]` 本文 |
+| field         | type                   | 必須 | 備考                                                |
+| ------------- | ---------------------- | ---- | --------------------------------------------------- |
+| `title`       | text                   | ✓    | `useAsTitle`                                        |
+| `no`          | text                   |      | 表示序数 '01'。未設定なら read 時に並び順から導出   |
+| `type`        | select                 | ✓    | 上記8値。sidebar                                    |
+| `year`        | number                 | ✓    | 年精度。sidebar                                     |
+| `url`         | text                   |      | 外部アーカイブ。あれば log / 詳細リンクが外部を指す |
+| `thumbnail`   | relationship → `media` |      | 一覧サムネ。width/height は media が保持            |
+| `description` | textarea               |      | 一覧の短文                                          |
+| `body`        | richText               |      | `/works/[id]` 本文                                  |
 
 - ドメイン型: 既存 `WorkRow`（`works/_lib/work-row`）。`thumbnail` は `{ src, width, height }` に変換。
 - マッパー `to-work-item`: media doc から `src/width/height` を取り出す（`media` relationship を depth 1 で取得、または id→媒体解決）。
@@ -58,25 +58,25 @@
 
 ### 2. `blog`（slug: `blog`, draft 有）
 
-| field | type | 必須 | 備考 |
-|---|---|---|---|
-| `title` | text | ✓ | `useAsTitle` |
-| `source` | select | ✓ | `zenn` / `sizu`（しずか）。sidebar |
-| `publishedAt` | date | ✓ | sidebar, dayOnly |
-| `excerpt` | textarea | ✓ | 一覧 / teaser |
-| `body` | richText | ✓ | `/blog/[id]` 本文 |
+| field         | type     | 必須 | 備考                               |
+| ------------- | -------- | ---- | ---------------------------------- |
+| `title`       | text     | ✓    | `useAsTitle`                       |
+| `source`      | select   | ✓    | `zenn` / `sizu`（しずか）。sidebar |
+| `publishedAt` | date     | ✓    | sidebar, dayOnly                   |
+| `excerpt`     | textarea | ✓    | 一覧 / teaser                      |
+| `body`        | richText | ✓    | `/blog/[id]` 本文                  |
 
 - ドメイン型: 既存 `Post`（`blog/_lib/post`）。`index`（'01' 序数）は read 時に並び順から導出、`readMin` は `readingMinutes(body のプレーンテキスト)` で導出。
 - 消費: `/blog`、`/blog/[id]`、home `blog-index`。外部RSS は混ぜない。
 
 ### 3. `gallery`（slug: `gallery`, draft 有）
 
-| field | type | 必須 | 備考 |
-|---|---|---|---|
-| `image` | relationship → `media` | ✓ | width/height/alt を media から取得 |
-| `caption` | text | | 'flyer / 05.23' 等 |
-| `alt` | text | | media.alt を上書きする時のみ。基本は media 側を使用 |
-| `order` | number | | masonry 並び順（昇順）。sidebar |
+| field     | type                   | 必須 | 備考                                                |
+| --------- | ---------------------- | ---- | --------------------------------------------------- |
+| `image`   | relationship → `media` | ✓    | width/height/alt を media から取得                  |
+| `caption` | text                   |      | 'flyer / 05.23' 等                                  |
+| `alt`     | text                   |      | media.alt を上書きする時のみ。基本は media 側を使用 |
+| `order`   | number                 |      | masonry 並び順（昇順）。sidebar                     |
 
 - ドメイン型: 既存 `GalleryPhoto`（`@components/gallery-archive`）。
 - マッパー `to-gallery-photo`: `alt` は `gallery.alt ?? media.alt ?? ''`、`src/width/height` は media。
@@ -86,12 +86,12 @@
 
 派生 timeline にマージする手動エントリ。news / works / 外部記事に乗らない出来事用。
 
-| field | type | 必須 | 備考 |
-|---|---|---|---|
-| `title` | text | ✓ | `useAsTitle` |
-| `date` | date | ✓ | 月日精度。sidebar |
-| `meta` | text | ✓ | timeline の meta ラベル（例 'milestone'） |
-| `url` | text | | あればタイトルがリンク化 |
+| field   | type | 必須 | 備考                                      |
+| ------- | ---- | ---- | ----------------------------------------- |
+| `title` | text | ✓    | `useAsTitle`                              |
+| `date`  | date | ✓    | 月日精度。sidebar                         |
+| `meta`  | text | ✓    | timeline の meta ラベル（例 'milestone'） |
+| `url`   | text |      | あればタイトルがリンク化                  |
 
 - `buildLogTimeline` を拡張: 第4引数 `logs: readonly LogManualItem[]` を追加し `toLogManualEntry` を足す。**既存の news / works / posts マージ挙動は不変**（純粋関数のまま、テスト追加）。
 - `/log` ページで `findLogList()` を呼び `buildLogTimeline(news, works, posts, now, logs)` に渡す。
@@ -100,14 +100,14 @@
 
 `buildConfig` に `globals: [Profile]` を追加。`collections` には入れない。
 
-| field | type | 備考 |
-|---|---|---|
-| `name` / `aka` / `now` / `team` / `tagline` | text | |
-| `bio` | richText | |
-| `philosophy` | richText | |
-| `love` | array(`{ value: text }`) | ジャンルタグ |
-| `skillGroups` | array(`{ category: text, items: array<{ value: text }> }`) | |
-| `contacts` | array(`{ label: text, handle: text, href: text }`) | |
+| field                                       | type                                                       | 備考         |
+| ------------------------------------------- | ---------------------------------------------------------- | ------------ |
+| `name` / `aka` / `now` / `team` / `tagline` | text                                                       |              |
+| `bio`                                       | richText                                                   |              |
+| `philosophy`                                | richText                                                   |              |
+| `love`                                      | array(`{ value: text }`)                                   | ジャンルタグ |
+| `skillGroups`                               | array(`{ category: text, items: array<{ value: text }> }`) |              |
+| `contacts`                                  | array(`{ label: text, handle: text, href: text }`)         |              |
 
 - ドメイン型: `about/profile.ts` の `profile` 形を踏襲した `Profile` 型を `lib/payload/profile` に定義。
 - クエリヘルパ `findProfile()`: `payload.findGlobal({ slug: 'profile' })` を `unstable_cache`(tag=`profile`) + build-phase guard でラップ。
@@ -118,12 +118,12 @@
 
 `utils/rss/create-rss-document` + `news/rss.xml` の型を踏襲し、各動的ページに `rss.xml/route.ts`（`export const revalidate = 3600`）を追加。各ルートは対応する `unstable_cache` タグを読むので、コレクションフックの `revalidateTag` で自動 bust される。
 
-| ルート | item | enclosure |
-|---|---|---|
-| `/blog/rss.xml` | title / link=`/blog/{id}` / description=excerpt / pubDate=publishedAt | なし |
-| `/works/rss.xml` | title / link=`url ?? /works/{id}` / description / pubDate≈year | なし |
-| `/log/rss.xml` | 合成 timeline 各 entry（title / link=href / pubDate=date） | なし |
-| `/gallery/rss.xml` | title=caption/alt / link=`/gallery` / pubDate≈order or createdAt | `<enclosure url=image>` |
+| ルート             | item                                                                  | enclosure               |
+| ------------------ | --------------------------------------------------------------------- | ----------------------- |
+| `/blog/rss.xml`    | title / link=`/blog/{id}` / description=excerpt / pubDate=publishedAt | なし                    |
+| `/works/rss.xml`   | title / link=`url ?? /works/{id}` / description / pubDate≈year        | なし                    |
+| `/log/rss.xml`     | 合成 timeline 各 entry（title / link=href / pubDate=date）            | なし                    |
+| `/gallery/rss.xml` | title=caption/alt / link=`/gallery` / pubDate≈order or createdAt      | `<enclosure url=image>` |
 
 - 各ページの `<head>`（該当 `page.tsx` の `metadata.alternates.types` もしくは `generateMetadata`）に `application/rss+xml` の self link を追加し自動 discovery 対応。
 - `utils/rss/types` の `ItemData` に enclosure が無ければ optional フィールドを追加し、`create-rss-document` を後方互換で拡張（既存 `news` フィードは出力不変）。

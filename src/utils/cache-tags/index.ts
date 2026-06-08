@@ -5,4 +5,9 @@
  */
 export const CACHE_TAGS = {
   news: 'news',
+  works: 'works',
+  blog: 'blog',
+  gallery: 'gallery',
+  logs: 'logs',
+  profile: 'profile',
 } as const;

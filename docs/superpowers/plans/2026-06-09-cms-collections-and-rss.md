@@ -27,12 +27,14 @@
 ## File Structure
 
 **Phase 1 — shared infra (modify):**
+
 - `src/utils/cache-tags/index.ts` — add `works`/`blog`/`gallery`/`logs`/`profile` tags.
 - `src/utils/rss/types.ts` — add optional `enclosure` to `ItemData`.
 - `src/utils/rss/create-rss-document/index.ts` — emit `<enclosure>` line.
 - `src/utils/rss/create-rss-document/create-rss-document.test.ts` — enclosure coverage.
 
 **Phase 2 — works:**
+
 - Create `src/collections/works.ts`
 - Create `src/lib/payload/works/to-work-item/index.ts` + `.test.ts`
 - Create `src/lib/payload/works/index.ts`
@@ -59,6 +61,7 @@
 ### Task 1.1: Add cache tags for the new collections
 
 **Files:**
+
 - Modify: `src/utils/cache-tags/index.ts`
 
 - [ ] **Step 1: Extend the CACHE_TAGS map**
@@ -91,6 +94,7 @@ git commit -m "feat(cache): add cache tags for works/blog/gallery/logs/profile"
 ### Task 1.2: Support `<enclosure>` in the RSS document builder (TDD)
 
 **Files:**
+
 - Modify: `src/utils/rss/types.ts`
 - Modify: `src/utils/rss/create-rss-document/index.ts`
 - Test: `src/utils/rss/create-rss-document/create-rss-document.test.ts`
@@ -196,6 +200,7 @@ git commit -m "feat(rss): support <enclosure> for media items"
 ### Task 2.1: Define the `works` collection
 
 **Files:**
+
 - Create: `src/collections/works.ts`
 
 - [ ] **Step 1: Write the collection definition**
@@ -280,6 +285,7 @@ export const Works = {
 - [ ] **Step 2: Register in `payload.config.ts`**
 
 In `src/payload.config.ts`:
+
 - Add import near the other collection imports: `import { Works } from './collections/works';`
 - Change `collections: [Users, Media, News],` to `collections: [Users, Media, News, Works],`
 - In `seoPlugin({ collections: ['news'], ... })` change to `collections: ['news', 'works']`.
@@ -292,15 +298,18 @@ In `src/payload.config.ts`:
           buildPath: (data) => `/works/${data.id}`,
         }),
 ```
-  and add `'works'` to the `collections: ['news']` array under `livePreview`.
+
+and add `'works'` to the `collections: ['news']` array under `livePreview`.
 
 - [ ] **Step 3: Generate types + import map**
 
 Run:
+
 ```bash
 pnpm payload generate:types
 pnpm payload generate:importmap
 ```
+
 Expected: `src/payload-types.ts` now exports a `Work` type; `importMap.js` updated. (These files are auto-generated; do not hand-edit.)
 
 - [ ] **Step 4: Typecheck**
@@ -318,10 +327,12 @@ git commit -m "feat(works): add works collection and register in payload config"
 ### Task 2.2: `to-work-item` mapper (TDD)
 
 **Files:**
+
 - Create: `src/lib/payload/works/to-work-item/index.ts`
 - Test: `src/lib/payload/works/to-work-item/to-work-item.test.ts`
 
 The existing domain type `WorkRow` (`src/app/(site)/works/_lib/work-row/index.ts`) is the target:
+
 ```ts
 type WorkRow = { id: string; no: string; title: string; type: string; year: number; url?: string; thumbnail?: { src: string; width: number; height: number }; description?: string; body?: SerializedEditorState };
 ```
@@ -435,6 +446,7 @@ git commit -m "feat(works): add to-work-item mapper"
 ### Task 2.3: works query helper
 
 **Files:**
+
 - Create: `src/lib/payload/works/index.ts`
 
 This mirrors `src/lib/payload/news/index.ts` exactly, substituting: collection `works`, tag `CACHE_TAGS.works`, sort `-year`, mapper `toWorkItem`, and supplying the derived `no` from list index.
@@ -519,12 +531,14 @@ git commit -m "feat(works): add works query helper"
 ### Task 2.4: Wire `/works` and `/works/[id]` to Payload
 
 **Files:**
+
 - Modify: `src/app/(site)/works/page.tsx`
 - Modify: `src/app/(site)/works/[id]/page.tsx`
 
 - [ ] **Step 1: Update the archive page**
 
 In `src/app/(site)/works/page.tsx`:
+
 - Remove `import { works } from './sample-works';`
 - Add `import { findWorksList } from '@lib/payload/works';`
 - Inside `WorksPage`, after `const { page: raw } = await searchParams;`, add `const works = await findWorksList();` (the rest of the pagination logic referencing `works` is unchanged).
@@ -532,6 +546,7 @@ In `src/app/(site)/works/page.tsx`:
 - [ ] **Step 2: Update the detail page**
 
 In `src/app/(site)/works/[id]/page.tsx`:
+
 - Remove `import { works } from '../sample-works';` and `import { findWork } from '../_lib/find-work';`.
 - Add `import { findWorkById } from '@lib/payload/works';` and `import { findWorksList } from '@lib/payload/works';`.
 - Replace `generateStaticParams`:
@@ -542,6 +557,7 @@ export const generateStaticParams = async () => {
   return works.map((work) => ({ id: work.id }));
 };
 ```
+
 - In `generateMetadata`, replace `const work = findWork(works, id);` with `const work = await findWorkById(id);`.
 - In the page component, replace `const work = findWork(works, id);` with `const work = await findWorkById(id);`. For `adjacentWorks`/`relatedWorks` (which need the full list), add `const works = await findWorksList();` before those calls. Keep the `if (work === undefined) notFound();` guard.
 
@@ -560,15 +576,18 @@ git commit -m "feat(works): wire /works pages to payload"
 ### Task 2.5: Schema migration for works
 
 **Files:**
+
 - Create: `migrations/*` (auto-generated)
 
 - [ ] **Step 1: Create + apply the migration**
 
 Run:
+
 ```bash
 pnpm payload migrate:create works
 pnpm payload migrate
 ```
+
 Expected: a new `migrations/<timestamp>_works.ts` creating the `works` + `_works_v` tables; `migrate` applies it to the local D1 with no error.
 
 - [ ] **Step 2: Commit**
@@ -587,6 +606,7 @@ git commit -m "feat(works): add works schema migration"
 ### Task 3.1: Define the `blog` collection
 
 **Files:**
+
 - Create: `src/collections/blog.ts`
 
 - [ ] **Step 1: Write the collection definition**
@@ -651,7 +671,7 @@ export const Blog = {
 - Import: `import { Blog } from './collections/blog';`
 - `collections: [Users, Media, News, Works, Blog],`
 - SEO: `collections: ['news', 'works', 'blog']`
-- livePreview: add a `draftPreviewRoute` with `slug: 'blog'`, `buildPath: (data) => `/blog/${data.id}``, and `'blog'` in the `collections` array.
+- livePreview: add a `draftPreviewRoute` with `slug: 'blog'`, `buildPath: (data) => `/blog/${data.id}``, and `'blog'`in the`collections` array.
 
 - [ ] **Step 3: Generate types + importmap, typecheck, commit**
 
@@ -666,13 +686,16 @@ git commit -m "feat(blog): add blog collection and register in payload config"
 ### Task 3.2: `to-blog-post` mapper (TDD)
 
 **Files:**
+
 - Create: `src/lib/payload/blog/to-blog-post/index.ts`
 - Test: `src/lib/payload/blog/to-blog-post/to-blog-post.test.ts`
 
 Target domain type `Post` (`src/app/(site)/blog/_lib/post/index.ts`):
+
 ```ts
 type Post = { id: string; index: string; title: string; source: string; readMin: number; date: string; excerpt: string; body?: SerializedEditorState };
 ```
+
 `readMin` is derived from the body via `readingMinutes(extractPlainText(body))`; `index` is the caller-supplied ordinal.
 
 - [ ] **Step 1: Write the failing test**
@@ -770,6 +793,7 @@ git commit -m "feat(blog): add to-blog-post mapper"
 ### Task 3.3: blog query helper
 
 **Files:**
+
 - Create: `src/lib/payload/blog/index.ts`
 
 - [ ] **Step 1: Write the helper**
@@ -849,12 +873,14 @@ git commit -m "feat(blog): add blog query helper"
 ### Task 3.4: Wire `/blog` and `/blog/[id]`
 
 **Files:**
+
 - Modify: `src/app/(site)/blog/page.tsx`
 - Modify: `src/app/(site)/blog/[id]/page.tsx`
 
 - [ ] **Step 1: Update the feed page**
 
 In `src/app/(site)/blog/page.tsx`:
+
 - Remove `import { posts } from './sample-posts';`
 - Add `import { findBlogList } from '@lib/payload/blog';`
 - Replace the module-scope `const sortedPosts = [...posts].sort(...)` with an in-component fetch. Inside the page component (it is `async`), add at the top:
@@ -863,11 +889,13 @@ In `src/app/(site)/blog/page.tsx`:
 const posts = await findBlogList();
 const sortedPosts = [...posts].sort((a, b) => dayjs(b.date).tz('Asia/Tokyo').valueOf() - dayjs(a.date).tz('Asia/Tokyo').valueOf());
 ```
-  (Move the sort inside the component since it now depends on a fetched value. Keep the existing pagination logic that slices `sortedPosts`.)
+
+(Move the sort inside the component since it now depends on a fetched value. Keep the existing pagination logic that slices `sortedPosts`.)
 
 - [ ] **Step 2: Update the detail page**
 
 In `src/app/(site)/blog/[id]/page.tsx`:
+
 - Remove `import { posts } from '../sample-posts';` and `import { findPost } from '../_lib/find-post';`.
 - Add `import { findBlogById, findBlogList } from '@lib/payload/blog';`.
 - Replace `generateStaticParams`:
@@ -878,6 +906,7 @@ export const generateStaticParams = async () => {
   return posts.map((post) => ({ id: post.id }));
 };
 ```
+
 - In `generateMetadata`, replace `const post = findPost(posts, id);` with `const post = await findBlogById(id);`.
 - In the component, replace `const post = findPost(posts, id);` with `const post = await findBlogById(id);`. Where `adjacentPosts` needs the full list, add `const posts = await findBlogList();`. Keep the `notFound()` guard.
 
@@ -912,6 +941,7 @@ git commit -m "feat(blog): add blog schema migration"
 ### Task 4.1: Define the `gallery` collection
 
 **Files:**
+
 - Create: `src/collections/gallery.ts`
 
 - [ ] **Step 1: Write the collection definition**
@@ -974,13 +1004,16 @@ git commit -m "feat(gallery): add gallery collection and register in payload con
 ### Task 4.2: `to-gallery-photo` mapper (TDD)
 
 **Files:**
+
 - Create: `src/lib/payload/gallery/to-gallery-photo/index.ts`
 - Test: `src/lib/payload/gallery/to-gallery-photo/to-gallery-photo.test.ts`
 
 Target `GalleryPhoto` (`@components/gallery-archive`):
+
 ```ts
 type GalleryPhoto = { id: string; src: string; width: number; height: number; alt: string; caption: string };
 ```
+
 The mapper returns `GalleryPhoto | undefined` (undefined when the image is unpopulated / missing dimensions), so the helper can filter.
 
 - [ ] **Step 1: Write the failing test**
@@ -1065,6 +1098,7 @@ git commit -m "feat(gallery): add to-gallery-photo mapper"
 ### Task 4.3: gallery query helper
 
 **Files:**
+
 - Create: `src/lib/payload/gallery/index.ts`
 
 - [ ] **Step 1: Write the helper**
@@ -1119,6 +1153,7 @@ git commit -m "feat(gallery): add gallery query helper"
 ### Task 4.4: Wire `/gallery`
 
 **Files:**
+
 - Modify: `src/app/(site)/gallery/page.tsx`
 
 - [ ] **Step 1: Update the page**
@@ -1158,6 +1193,7 @@ git commit -m "feat(gallery): add gallery schema migration"
 ### Task 5.1: Define the `logs` collection
 
 **Files:**
+
 - Create: `src/collections/logs.ts`
 
 - [ ] **Step 1: Write the collection definition**
@@ -1226,6 +1262,7 @@ git commit -m "feat(logs): add logs collection and register in payload config"
 ### Task 5.2: logs domain type + mapper + helper
 
 **Files:**
+
 - Create: `src/app/(site)/log/_lib/log-manual-item/index.ts`
 - Create: `src/lib/payload/logs/to-log-manual-item/index.ts` + `.test.ts`
 - Create: `src/lib/payload/logs/index.ts`
@@ -1357,6 +1394,7 @@ git commit -m "feat(logs): add log-manual-item type, mapper, and query helper"
 ### Task 5.3: Extend `buildLogTimeline` to merge manual entries (TDD)
 
 **Files:**
+
 - Modify: `src/app/(site)/log/_lib/build-log-timeline/index.ts`
 - Test: `src/app/(site)/log/_lib/build-log-timeline/build-log-timeline.test.ts` (create if absent, else append)
 
@@ -1397,6 +1435,7 @@ Expected: FAIL — `buildLogTimeline` accepts only 4 args / `log-1` entry not pr
 - [ ] **Step 3: Implement the extension**
 
 In `src/app/(site)/log/_lib/build-log-timeline/index.ts`:
+
 - Add import: `import type { LogManualItem } from '../log-manual-item';`
 - Add a converter near the other `toXEntry` helpers:
 
@@ -1417,6 +1456,7 @@ const toManualEntry = (item: LogManualItem): SortableEntry => {
   };
 };
 ```
+
 - Change the signature and the `entries` assembly:
 
 ```ts
@@ -1451,6 +1491,7 @@ git commit -m "feat(log): merge manual logs entries into the chronicle timeline"
 ### Task 5.4: Wire `/log` to use works + logs from Payload
 
 **Files:**
+
 - Modify: `src/app/(site)/log/page.tsx`
 
 - [ ] **Step 1: Update the page**
@@ -1499,6 +1540,7 @@ git commit -m "feat(logs): add logs schema migration"
 ### Task 6.1: Define the `profile` global
 
 **Files:**
+
 - Create: `src/globals/profile.ts`
 
 - [ ] **Step 1: Write the global definition**
@@ -1596,6 +1638,7 @@ git commit -m "feat(about): add profile global and register in payload config"
 ### Task 6.2: profile domain type + mapper + helper (TDD)
 
 **Files:**
+
 - Create: `src/app/(site)/about/_lib/profile/index.ts` (domain type)
 - Create: `src/lib/payload/profile/to-profile/index.ts` + `.test.ts`
 - Create: `src/lib/payload/profile/index.ts`
@@ -1758,6 +1801,7 @@ git commit -m "feat(about): add profile domain type, mapper, and query helper"
 ### Task 6.3: Wire `/about` to the global
 
 **Files:**
+
 - Modify: `src/app/(site)/about/page.tsx`
 - Inspect: the `_components` that consume `profile` (AboutMasthead, ContactList, SkillMatrix, TagCloud, Whoami) to confirm prop shapes still match the new `Profile` type.
 
@@ -1775,7 +1819,8 @@ Run: `sed -n '1,200p' "src/app/(site)/about/page.tsx"` and skim the five `_compo
 const profile = await findProfile();
 if (profile === undefined) notFound();
 ```
-  (Add `import { notFound } from 'next/navigation';` if missing.) `generateMetadata` reads `profile.tagline`; change it to `async` and fetch via `findProfile()` there too (mirror how works/blog detail metadata fetch).
+
+(Add `import { notFound } from 'next/navigation';` if missing.) `generateMetadata` reads `profile.tagline`; change it to `async` and fetch via `findProfile()` there too (mirror how works/blog detail metadata fetch).
 
 - [ ] **Step 3: Lint, typecheck, commit**
 
@@ -1786,6 +1831,7 @@ git commit -m "feat(about): wire /about to the profile global"
 ```
 
 > No schema migration step is strictly separate for globals — the global's table is created by `migrate:create` in Phase 8's combined regen, OR run `pnpm payload migrate:create profile_global && pnpm payload migrate` now. Prefer running it now for an immediately working `/about` admin:
+>
 > ```bash
 > pnpm payload migrate:create profile_global
 > pnpm payload migrate
@@ -1801,6 +1847,7 @@ Each route mirrors `src/app/(site)/news/rss.xml/route.ts`: `export const revalid
 ### Task 7.1: `/blog/rss.xml`
 
 **Files:**
+
 - Create: `src/app/(site)/blog/rss.xml/route.ts`
 
 - [ ] **Step 1: Write the route**
@@ -1850,6 +1897,7 @@ git commit -m "feat(blog): add /blog/rss.xml feed"
 ### Task 7.2: `/works/rss.xml`
 
 **Files:**
+
 - Create: `src/app/(site)/works/rss.xml/route.ts`
 
 - [ ] **Step 1: Write the route**
@@ -1909,6 +1957,7 @@ git commit -m "feat(works): add /works/rss.xml feed"
 ### Task 7.3: `/log/rss.xml`
 
 **Files:**
+
 - Create: `src/app/(site)/log/rss.xml/route.ts`
 
 The log feed flattens the timeline groups into items. `LogEntry.href` may be relative (`/works/3`), absolute (external), or absent.
@@ -1991,6 +2040,7 @@ git commit -m "feat(log): add /log/rss.xml feed"
 ### Task 7.4: `/gallery/rss.xml` (with enclosures)
 
 **Files:**
+
 - Create: `src/app/(site)/gallery/rss.xml/route.ts`
 
 Gallery images may be relative (`/media/x.jpg`) — absolutize against origin for both the enclosure and link.
@@ -2057,6 +2107,7 @@ git commit -m "feat(gallery): add /gallery/rss.xml feed with enclosures"
 ### Task 7.5: Add `<head>` alternate-feed links for discovery
 
 **Files:**
+
 - Modify: `src/app/(site)/blog/page.tsx`, `works/page.tsx`, `log/page.tsx`, `gallery/page.tsx`
 
 For each page, add (or extend) the `metadata`/`generateMetadata` `alternates.types`. Example for blog (apply the analogous block to each, pointing at its own feed):
@@ -2072,6 +2123,7 @@ In each page's `generateMetadata` return object (or static `metadata`), add:
       },
     },
 ```
+
 Use the matching path/title per page: `/works/rss.xml` "napochaan — works", `/log/rss.xml` "napochaan — log", `/gallery/rss.xml` "napochaan — gallery". For `works/page.tsx` which currently has no `generateMetadata`, add a static `export const metadata: Metadata = { alternates: { types: { 'application/rss+xml': [{ url: '/works/rss.xml', title: 'napochaan — works' }] } } };` (import `Metadata` from `next`). Verify it does not conflict with an existing metadata export; if one exists, merge.
 
 - [ ] **Step 2: Lint, typecheck, commit**
@@ -2091,6 +2143,7 @@ git commit -m "feat(rss): add alternate feed links to dynamic page heads"
 ### Task 8.1: Seed media + works
 
 **Files:**
+
 - Create: `migrations/<timestamp>_seed_works.ts` (create via `pnpm payload migrate:create seed_works`, then fill the `up` body)
 
 - [ ] **Step 1: Generate the empty migration**
@@ -2156,6 +2209,7 @@ export async function down(_args: MigrateDownArgs): Promise<void> {
 pnpm payload migrate
 pnpm dev
 ```
+
 Then visit `http://localhost:3000/works` and `/works/1` — confirm the archive and a detail page render the seeded works. Stop dev.
 
 - [ ] **Step 4: Commit**
@@ -2168,6 +2222,7 @@ git commit -m "feat(works): seed sample works + media"
 ### Task 8.2: Seed blog
 
 **Files:**
+
 - Create: `migrations/<timestamp>_seed_blog.ts`
 
 - [ ] **Step 1: Generate + implement**
@@ -2185,6 +2240,7 @@ git commit -m "feat(blog): seed sample posts"
 ### Task 8.3: Seed gallery
 
 **Files:**
+
 - Create: `migrations/<timestamp>_seed_gallery.ts`
 
 - [ ] **Step 1: Generate + implement**
@@ -2202,6 +2258,7 @@ git commit -m "feat(gallery): seed sample photos + media"
 ### Task 8.4: Seed the profile global
 
 **Files:**
+
 - Create: `migrations/<timestamp>_seed_profile.ts`
 
 - [ ] **Step 1: Generate + implement**
@@ -2231,6 +2288,7 @@ pnpm payload generate:importmap
 pnpm lint && pnpm typecheck
 pnpm vitest run
 ```
+
 Expected: all green.
 
 - [ ] **Step 3: Build smoke test**
@@ -2238,6 +2296,7 @@ Expected: all green.
 ```bash
 pnpm build
 ```
+
 Expected: build succeeds (this also exercises the `@assets/*.jpg` ambient-module risk noted in the spec — a path typo only surfaces here, not in typecheck).
 
 - [ ] **Step 4: Manual feed check**
@@ -2245,13 +2304,16 @@ Expected: build succeeds (this also exercises the `@assets/*.jpg` ambient-module
 ```bash
 pnpm dev
 ```
+
 Fetch each feed and confirm valid XML:
+
 ```bash
 curl -s http://localhost:3000/blog/rss.xml | head -20
 curl -s http://localhost:3000/works/rss.xml | head -20
 curl -s http://localhost:3000/log/rss.xml | head -20
 curl -s http://localhost:3000/gallery/rss.xml | head -20
 ```
+
 Confirm `/gallery/rss.xml` contains `<enclosure ...>`. Stop dev.
 
 - [ ] **Step 5: Commit any regen drift**
