@@ -1,10 +1,11 @@
 import { css } from '@styled/css';
 
 // Editorial gallery: a fixed 6×6 grid whose named template areas tile completely
-// (no empty cells), so the dark 2px gaps read as crisp grid lines with nothing to
+// (no empty cells), so the 2px gaps read as crisp grid lines with nothing to
 // fill awkwardly. aspect-ratio keeps the cell proportions stable at any width; the
-// ink background only shows through the seams. Each item is placed by area name and
-// cover-crops to its cell, framed per-item via --gallery-object-position.
+// grid-line background only shows through the seams (matching the /gallery archive).
+// Each item is placed by area name and cover-crops to its cell, framed per-item via
+// --gallery-object-position.
 export const root = css({
   listStyle: 'none',
   display: 'grid',
@@ -22,8 +23,8 @@ export const root = css({
   gap: '[2px]',
   borderWidth: 'default',
   borderStyle: 'solid',
-  borderColor: 'fg.default',
-  bg: 'fg.default',
+  borderColor: 'grid.line',
+  bg: 'grid.line',
 });
 
 export const cell = css({
