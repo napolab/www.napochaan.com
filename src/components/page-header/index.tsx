@@ -3,6 +3,8 @@ import { SystemAnnotation } from '@components/system-annotation';
 
 import * as styles from './styles.css';
 
+import type { ReactNode } from 'react';
+
 type Crumb = {
   href?: string;
   label: string;
@@ -12,7 +14,8 @@ type Props = {
   title: string;
   breadcrumbs: readonly Crumb[];
   kicker?: string;
-  lead?: string;
+  // Usually a plain string; pages may pass a node (e.g. the /gallery typewriter lead).
+  lead?: ReactNode;
   annotation?: string;
   // 'tight' pulls the title tracking in for long, content titles (e.g. a news
   // detail title) where the default label tracking reads too spread.
