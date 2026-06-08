@@ -1,6 +1,7 @@
 import { PostList } from './_components/post-list';
 import * as s from './styles.css';
 
+import { FeedLink } from '@components/feed-link';
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 import { dayjs } from '@utils/dayjs';
@@ -57,6 +58,7 @@ const BlogPage = async ({ searchParams }: Props) => {
   return (
     <main id="main-content" className={s.main}>
       <PageHeader title="blog" breadcrumbs={crumbs} kicker="// 記事" lead="あ、ほんと(発見)" />
+      <FeedLink href="/blog/rss.xml" label="blog の RSS フィード" />
       <PostList posts={pagePosts} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={blogHref} /> : null}
     </main>

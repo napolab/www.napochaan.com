@@ -86,6 +86,7 @@ export const colophon = {
       { name: 'Divider', why: '区切り線。実線と破線を使い分けてる。' },
       { name: 'Pagination', why: 'ページ送り。URL の形は呼び出し側が持つ設計だよ。' },
       { name: 'Breadcrumbs', why: 'パンくず。いまどの階層にいるかを辿れるように。' },
+      { name: 'FeedLink', why: 'RSS フィードへのリンク。一覧ページの PageHeader 直下に置いて、購読を促す。' },
       {
         name: 'TypographyBand',
         why: '画面の四辺を時計回りに流れる銘の帯。スクロール速度で加速して、止まると 24px グリッドにスナップする。本来は viewport の縁に貼りつくけど、ここはミニフレームに切り出した版。',

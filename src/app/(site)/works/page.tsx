@@ -3,6 +3,7 @@ import * as s from './styles.css';
 
 import { findWorksList } from '@lib/payload/works';
 
+import { FeedLink } from '@components/feed-link';
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 
@@ -47,6 +48,7 @@ const WorksPage = async ({ searchParams }: Props) => {
   return (
     <main id="main-content" className={s.main}>
       <PageHeader title="works" breadcrumbs={worksCrumbs} kicker="// archive — dev·vrchat·video·graphic" lead="なにかを作るって楽しいんだよなぁ〜😁" />
+      <FeedLink href="/works/rss.xml" label="works の RSS フィード" />
       <WorksArchive works={pageWorks} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={worksHref} /> : null}
     </main>

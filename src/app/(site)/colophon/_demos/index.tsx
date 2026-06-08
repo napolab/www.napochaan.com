@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 
 import { Badge } from '@components/badge';
 import { Breadcrumbs } from '@components/breadcrumbs';
+import { FeedLink } from '@components/feed-link';
 import { Button } from '@components/button';
 import { Card } from '@components/card';
 import { Divider } from '@components/divider';
@@ -209,6 +210,7 @@ export const demos: Record<ComponentName, ReactNode> = {
   ),
   Pagination: <Pagination currentPage={3} totalPages={5} href={paginationHref} />,
   Breadcrumbs: <Breadcrumbs items={breadcrumbItems} />,
+  FeedLink: <FeedLink href="/news/rss.xml" label="サンプル RSS フィード" />,
   TypographyBand: <TypographyBandDemo />,
   GameOfLife: <GameOfLifeDemo />,
   CursorPresence: <CursorPresenceDemo />,

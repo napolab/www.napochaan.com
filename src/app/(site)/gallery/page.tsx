@@ -1,3 +1,4 @@
+import { FeedLink } from '@components/feed-link';
 import { GalleryArchive } from '@components/gallery-archive';
 import { PageHeader } from '@components/page-header';
 import { findGalleryList } from '@lib/payload/gallery';
@@ -25,6 +26,7 @@ const GalleryPage = async () => {
   return (
     <main id="main-content" className={s.main}>
       <PageHeader title="gallery" breadcrumbs={galleryCrumbs} kicker="// flyer · VRChat · photo — 2024–2026" lead="やっていきを、やっていく....." />
+      <FeedLink href="/gallery/rss.xml" label="gallery の RSS フィード" />
       <section aria-label="作品ギャラリー一覧">
         <GalleryArchive photos={galleryPhotos} />
       </section>
