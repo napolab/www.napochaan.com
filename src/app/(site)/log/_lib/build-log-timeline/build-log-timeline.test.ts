@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { buildLogTimeline } from './index';
 
+import type { LogManualItem } from '../log-manual-item';
 import type { ExternalPost } from '../external-feeds';
 import type { NewsItem } from '../../../news/_lib/news-item';
 import type { WorkRow } from '../../../works/_lib/work-row';
@@ -190,5 +191,20 @@ describe('buildLogTimeline', () => {
     const [group] = buildLogTimeline(news, [], posts, now);
 
     expect(group?.items.map((entry) => entry.id)).toEqual(['post-late', 'news-n', 'post-early']);
+  });
+});
+
+describe('buildLogTimeline manual entries', () => {
+  it('merges manual log entries into the correct year, sorted by date desc', () => {
+    const logs: LogManualItem[] = [{ id: '1', title: 'サイト公開', date: '2026-06-01', meta: 'milestone', url: 'https://napochaan.com' }];
+    const groups = buildLogTimeline([], [], [], now, logs);
+    const y2026 = groups.find((g) => g.year === 2026);
+    expect(y2026).toBeDefined();
+    const entry = y2026?.items.find((i) => i.id === 'log-1');
+    expect(entry).toMatchObject({ title: 'サイト公開', date: '06.01', meta: 'milestone', upcoming: false, href: 'https://napochaan.com' });
+  });
+
+  it('keeps working when no manual entries are passed (default param)', () => {
+    expect(() => buildLogTimeline([], [], [], now)).not.toThrow();
   });
 });

@@ -1,5 +1,6 @@
 import { dayjs } from '@utils/dayjs';
 
+import type { LogManualItem } from '../log-manual-item';
 import type { ExternalPost } from '../external-feeds';
 import type { NewsItem } from '../../../news/_lib/news-item';
 import type { WorkRow } from '../../../works/_lib/work-row';
@@ -80,20 +81,39 @@ const toWorkEntry = (work: WorkRow): SortableEntry => ({
   sortDate: '',
 });
 
+// Manual log entries are dated, so they sort alongside news/posts by sortDate.
+const toManualEntry = (item: LogManualItem): SortableEntry => {
+  const at = dayjs(item.date).tz('Asia/Tokyo');
+
+  return {
+    id: `log-${item.id}`,
+    year: at.year(),
+    date: at.format('MM.DD'),
+    meta: item.meta,
+    title: item.title,
+    upcoming: false,
+    href: item.url,
+    sortDate: item.date,
+  };
+};
+
 // Newest sortDate first; entries with an empty sortDate (works) sort last. The
 // underlying sort is stable, so equal-key works keep their source order.
 const bySortDateDesc = (a: SortableEntry, b: SortableEntry): number => (a.sortDate < b.sortDate ? 1 : a.sortDate > b.sortDate ? -1 : 0);
 
 const stripSortKey = ({ sortDate: _sortDate, ...entry }: SortableEntry): LogEntry => entry;
 
-// Merge news (live/release only), external blog posts, and all works into a single
-// chronicle grouped by year, newest year first. Within a year: dated news and posts
-// (date desc) precede works. Pure — inputs are never mutated.
-export const buildLogTimeline = (news: readonly NewsItem[], works: readonly WorkRow[], posts: readonly ExternalPost[], now: string): LogYearGroup[] => {
+// Merge news (live/release only), external blog posts, all works, and manual log
+// entries into a single chronicle grouped by year, newest year first. Within a year:
+// dated news, posts, and manual entries (date desc) precede works. The `logs` param
+// defaults to [] so existing 4-arg callers continue to compile unchanged.
+// Pure — inputs are never mutated.
+export const buildLogTimeline = (news: readonly NewsItem[], works: readonly WorkRow[], posts: readonly ExternalPost[], now: string, logs: readonly LogManualItem[] = []): LogYearGroup[] => {
   const newsEntries = news.filter(isChronicleNews).map((item) => toNewsEntry(item, now));
   const postEntries = posts.map(toPostEntry);
   const workEntries = works.map(toWorkEntry);
-  const entries = [...newsEntries, ...postEntries, ...workEntries];
+  const manualEntries = logs.map(toManualEntry);
+  const entries = [...newsEntries, ...postEntries, ...workEntries, ...manualEntries];
 
   const buckets = entries.reduce<Map<number, SortableEntry[]>>((acc, entry) => {
     const existing = acc.get(entry.year) ?? [];
