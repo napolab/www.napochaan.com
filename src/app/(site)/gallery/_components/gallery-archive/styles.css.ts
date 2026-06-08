@@ -143,8 +143,10 @@ export const blankText = css({
   whiteSpace: 'pre',
   textAlign: 'left',
   fontFamily: 'display',
-  fontSize: '[clamp(1.5rem, 6vw, 3.5rem)]',
-  lineHeight: '[0.9]',
+  // Oversized and tight — fills and bleeds off the cell like the flyer's huge type.
+  fontSize: '[clamp(2.75rem, 13vw, 7.5rem)]',
+  lineHeight: '[0.78]',
+  letterSpacing: '[-0.04em]',
   textTransform: 'uppercase',
   color: 'fg.default',
   userSelect: 'none',
