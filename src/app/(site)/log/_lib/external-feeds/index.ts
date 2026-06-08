@@ -3,6 +3,7 @@
 export const EXTERNAL_FEEDS = [
   { url: 'https://zenn.dev/naporin24690/feed', source: 'zenn' },
   { url: 'https://sizu.me/naporin24690/rss', source: 'sizu' },
+  { url: 'https://naporitan.hatenablog.com/rss', source: 'hatena' },
 ] as const;
 
 // A normalized external post ready to merge into the timeline. `source` carries the

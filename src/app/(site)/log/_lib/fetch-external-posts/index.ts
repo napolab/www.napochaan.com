@@ -6,6 +6,11 @@ import { EXTERNAL_FEEDS } from '../external-feeds';
 
 import type { ExternalPost } from '../external-feeds';
 
+// Derived from the feed set so the cache key changes whenever a feed is added or
+// removed. Without this, the static key alone keeps serving the previous feed set
+// for up to `revalidate` (a newly added feed wouldn't appear until then).
+const feedsKey = EXTERNAL_FEEDS.map((feed) => feed.url).join('|');
+
 // Time-based cache: these feeds live outside the CMS, so they aren't tied to any
 // revalidateTag. A 1h window keeps /log fresh without hammering the upstreams.
 const loadExternalPosts = unstable_cache(
@@ -20,7 +25,7 @@ const loadExternalPosts = unstable_cache(
 
     return perFeed.flat();
   },
-  ['external-posts'],
+  ['external-posts', feedsKey],
   { revalidate: 3600 },
 );
 
