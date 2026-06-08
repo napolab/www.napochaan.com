@@ -245,3 +245,27 @@ describe('buildLogTimeline manual entries', () => {
     expect(() => buildLogTimeline([], [], [], now)).not.toThrow();
   });
 });
+
+describe('buildLogTimeline href dedup', () => {
+  it('collapses a work, news, and manual log sharing one href into a single entry (work wins)', () => {
+    const sharedUrl = 'https://x.com/naporin24690/status/2012874773630685212';
+    const works = [work({ id: 'w', year: 2026, date: '2026-01-18', type: 'dev', title: 'あみだくじシステム', url: sharedUrl })];
+    const news = [newsItem({ id: 'n', date: '2026-01-18', category: 'live', title: 'あみだくじに参加', url: sharedUrl })];
+    const logs: LogManualItem[] = [{ id: 'l', title: 'あみだくじ 実装', date: '2026-01-18', meta: 'support', url: sharedUrl }];
+
+    const groups = buildLogTimeline(news, works, [], now, logs);
+    const items = groups.find((g) => g.year === 2026)?.items ?? [];
+    const matching = items.filter((item) => item.href === sharedUrl);
+
+    expect(matching).toHaveLength(1);
+    expect(matching[0]).toMatchObject({ id: 'work-w', meta: 'dev' });
+  });
+
+  it('keeps every entry that has no href (cannot collide)', () => {
+    const works = [work({ id: 'a', year: 2026, date: '2026-02-01' }), work({ id: 'b', year: 2026, date: '2026-02-02' })];
+    const groups = buildLogTimeline([], works, [], now, []);
+    const items = groups.find((g) => g.year === 2026)?.items ?? [];
+
+    expect(items).toHaveLength(2);
+  });
+});

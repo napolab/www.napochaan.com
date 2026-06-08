@@ -106,6 +106,22 @@ const bySortDateDesc = (a: SortableEntry, b: SortableEntry): number => (a.sortDa
 
 const stripSortKey = ({ sortDate: _sortDate, ...entry }: SortableEntry): LogEntry => entry;
 
+// Collapse entries that point at the same source URL — a 制作実績 is often ALSO seeded
+// as a curated news announcement and/or a manual gig log, and all three carry the same
+// tweet/repo `href`. Without this the chronicle shows the same event two or three times.
+// First occurrence wins; the caller orders works ahead of news/posts/logs so the work's
+// accurate type label is the one kept. Entries without an href are always kept (no key).
+const dedupeByHref = (entries: readonly SortableEntry[]): SortableEntry[] => {
+  const seen = new Set<string>();
+
+  return entries.reduce<SortableEntry[]>((acc, entry) => {
+    if (entry.href !== undefined && seen.has(entry.href)) return acc;
+    if (entry.href !== undefined) seen.add(entry.href);
+
+    return [...acc, entry];
+  }, []);
+};
+
 // Merge news (live/release only), external blog posts, all works, and manual log
 // entries into a single chronicle grouped by year, newest year first. Within a year:
 // dated news, posts, and manual entries (date desc) precede works. The `logs` param
@@ -116,7 +132,9 @@ export const buildLogTimeline = (news: readonly NewsItem[], works: readonly Work
   const postEntries = posts.map(toPostEntry);
   const workEntries = works.map(toWorkEntry);
   const manualEntries = logs.map(toManualEntry);
-  const entries = [...newsEntries, ...postEntries, ...workEntries, ...manualEntries];
+  // Works first so the canonical 制作実績 entry (accurate type label) wins when the same
+  // item is also seeded as a news announcement or a manual gig log (matched by href).
+  const entries = dedupeByHref([...workEntries, ...newsEntries, ...postEntries, ...manualEntries]);
 
   const buckets = entries.reduce<Map<number, SortableEntry[]>>((acc, entry) => {
     const existing = acc.get(entry.year) ?? [];
