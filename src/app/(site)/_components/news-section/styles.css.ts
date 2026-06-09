@@ -47,3 +47,11 @@ export const titleLink = css({
   fontSize: 'md',
   lineHeight: 'snug',
 });
+
+// Small trailing marker for links that open externally. aria-hidden — the new-tab
+// behaviour is conveyed by target/rel, this is a purely visual cue.
+export const externalMark = css({
+  marginLeft: '1',
+  fontSize: 'xs',
+  color: 'accent.text',
+});

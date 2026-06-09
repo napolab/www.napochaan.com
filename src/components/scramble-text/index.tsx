@@ -3,13 +3,19 @@
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
 import { clsx } from '@utils/clsx';
 
 import * as styles from './styles.css';
 
-gsap.registerPlugin(ScrambleTextPlugin);
+gsap.registerPlugin(ScrambleTextPlugin, ScrollTrigger);
+
+// Desktop hover starts here (768px = the `desktop` breakpoint). Below it there is
+// no hover, so the decode is triggered once when the text scrolls into view.
+const DESKTOP = '(min-width: 768px)';
+const MOBILE = '(max-width: 767.98px)';
 
 // Digital glyphs the text decodes through — the single shared set used by the
 // EchoText wordmark and the PageHeader title, so every scramble across the site
@@ -54,25 +60,17 @@ export const ScrambleText = (props: Props) => {
   useGSAP(
     (_context, contextSafe) => {
       if (contextSafe === undefined) return;
-      const target = props.trigger === 'group' ? props.host : rootRef.current;
-      if (target === null) return;
 
-      // contextSafe so the tween created in this listener is added to the scope
-      // and reverted on cleanup.
-      const decode = contextSafe((event: PointerEvent) => {
-        // Skip taps: on touch the browser fires a compatibility pointerenter
-        // right before navigating, flashing the scramble for a frame. The reveal
-        // is a hover affordance, so only a dwell-able pointer (mouse/pen) decodes.
-        if (event.pointerType === 'touch') return;
+      // The decode tween. contextSafe so a tween created from a (deferred) event
+      // listener or ScrollTrigger callback is added to the scope and reverted on
+      // cleanup. revealDelay holds a short full scramble before decoding; low
+      // speed keeps the glyph refresh chunky (digital); tweenLength off since the
+      // text length never changes. data-scrambling pins the fill to one line for
+      // the decode (see styles), dropping on complete to settle into wrapped text.
+      const decode = contextSafe(() => {
         if (reduced()) return;
         const fill = fillRef.current;
         if (fill === null) return;
-        // revealDelay holds a short full scramble before decoding; low speed
-        // keeps the glyph refresh chunky (digital) rather than a smooth blur;
-        // tweenLength off since the text length never changes.
-        // data-scrambling pins the fill to a single line for the decode (see
-        // styles) so the wider block glyphs never force a wrap; it drops on
-        // complete and the resolved text settles back into its wrapped layout.
         gsap.to(fill, {
           duration: DURATION,
           ease: 'none',
@@ -83,8 +81,29 @@ export const ScrambleText = (props: Props) => {
         });
       });
 
-      target.addEventListener('pointerenter', decode);
-      return () => target.removeEventListener('pointerenter', decode);
+      const mm = gsap.matchMedia();
+
+      // Desktop: decode on hover of the trigger host (the text itself for 'self',
+      // a larger card for 'group'). Skip taps — touch fires a compatibility
+      // pointerenter right before navigating, flashing the scramble for a frame.
+      mm.add(DESKTOP, () => {
+        const target = props.trigger === 'group' ? props.host : rootRef.current;
+        if (target === null) return;
+        const onPointerEnter = (event: PointerEvent) => {
+          if (event.pointerType === 'touch') return;
+          decode();
+        };
+        target.addEventListener('pointerenter', onPointerEnter);
+        return () => target.removeEventListener('pointerenter', onPointerEnter);
+      });
+
+      // Mobile/tablet: no hover — decode once when the text scrolls into view.
+      mm.add(MOBILE, () => {
+        const trigger = rootRef.current;
+        if (trigger === null) return;
+        const st = ScrollTrigger.create({ trigger, start: 'top 90%', once: true, onEnter: () => decode() });
+        return () => st.kill();
+      });
     },
     { scope: rootRef, dependencies: [children, host] },
   );

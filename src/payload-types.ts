@@ -231,12 +231,8 @@ export interface Work {
   id: number;
   title: string;
   thumbnail?: (number | null) | Media;
-  type: 'graphic' | 'vj' | 'flyer' | 'dev' | 'video' | 'vrchat' | 'talk' | 'support';
+  type: 'production' | 'talk' | 'support';
   date: string;
-  /**
-   * 一覧の並び順（大きいほど上）。seed export 時に制作日順で自動採番されます。
-   */
-  sort?: number | null;
   /**
    * 設定すると、一覧や年表のリンクが内部の詳細ページではなくこの URL を指します。
    */
@@ -522,7 +518,6 @@ export interface WorksSelect<T extends boolean = true> {
   thumbnail?: T;
   type?: T;
   date?: T;
-  sort?: T;
   url?: T;
   description?: T;
   body?: T;

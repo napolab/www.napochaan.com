@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 import { link } from '@styled/recipes';
@@ -34,7 +35,15 @@ const RelatedItem = ({ work }: { work: RelatedWork }) => {
         {thumbnail === undefined ? (
           <span className={s.thumbPlaceholder} aria-hidden="true" />
         ) : (
-          <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.thumb} />
+          <Image
+            src={thumbnail.src}
+            alt={work.title}
+            width={thumbnail.width}
+            height={thumbnail.height}
+            className={s.thumb}
+            placeholder="blur"
+            blurDataURL={formatBlurURL(thumbnail.src, { blur: 20 })}
+          />
         )}
         <span className={clsx(link({ tone: 'accent', underline: true, hideOutsideFocusRing: true }), s.title)}>
           <ScrambleText trigger="group" host={card}>

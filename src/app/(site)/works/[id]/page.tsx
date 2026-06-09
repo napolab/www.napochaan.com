@@ -59,9 +59,14 @@ const WorkDetailPage = async ({ params }: Props) => {
 
   return (
     <main id="main-content" className={s.main}>
-      <PageHeader title={work.title} breadcrumbs={crumbs} kicker={`// ${work.type} · ${work.year}`} titleTracking="tight" />
+      <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
       <WorkDetail work={work} />
-      {related.length > 0 ? <RelatedWorks works={related} /> : null}
+      {related.length > 0 ? (
+        <>
+          <hr className={s.divider} />
+          <RelatedWorks works={related} />
+        </>
+      ) : null}
       <AdjacentNav prev={prev} next={next} />
     </main>
   );

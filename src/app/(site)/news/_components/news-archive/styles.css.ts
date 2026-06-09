@@ -74,7 +74,12 @@ export const title = css({
   fontFamily: 'body',
   fontSize: 'md',
   lineHeight: 'snug',
-  // Mobile/tablet: clamp long news titles to 2 lines with ellipsis; desktop
-  // keeps the full title (lineClamp expands to the -webkit-box + box-orient set).
-  desktopDown: { lineClamp: '2' },
+});
+
+// Small trailing marker for links that open externally. aria-hidden — the new-tab
+// behaviour is conveyed by target/rel, this is a purely visual cue.
+export const externalMark = css({
+  marginLeft: '1',
+  fontSize: 'xs',
+  color: 'accent.text',
 });

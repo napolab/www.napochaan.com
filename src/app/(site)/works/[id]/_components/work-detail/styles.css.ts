@@ -8,17 +8,24 @@ export const root = css({
 
 // Full-colour figure. Centres the image so a portrait that is bounded below the
 // column width sits in the middle with even side gutters.
+// When data-fit="cover" is set (small thumbnail), centering is removed so the
+// image stretches to fill the full column width.
 export const figureRoot = css({
   margin: '0',
   position: 'relative',
   display: 'flex',
   justifyContent: 'center',
+  '&[data-fit="cover"]': {
+    justifyContent: 'stretch',
+  },
 });
 
 // Box-fit: keeps the image's aspect ratio, bounded by the column width
 // (maxWidth) and a viewport-relative height cap (maxHeight) so a portrait source
 // can't dominate the screen. width/height auto let the intrinsic ratio drive the
 // final size; landscape fills the column, portrait shrinks to the height cap.
+// When data-fit="cover" is present (small thumbnail < 1920×1080), the image fills
+// the full column width at a fixed 16/10 aspect ratio instead.
 export const image = css({
   display: 'block',
   width: 'auto',
@@ -28,6 +35,13 @@ export const image = css({
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'border.default',
+  '&[data-fit="cover"]': {
+    width: 'full',
+    height: 'auto',
+    maxHeight: '[none]',
+    aspectRatio: '[16 / 10]',
+    objectFit: 'cover',
+  },
 });
 
 export const imagePlaceholder = css({
@@ -40,37 +54,19 @@ export const imagePlaceholder = css({
   borderColor: 'border.default',
 });
 
-// Mono spec ledger: dt/dd pairs laid out as a label grid, hairline-ruled like the
-// archive rows. Each pair sits on its own line with a leading mono label.
-export const spec = css({
-  display: 'grid',
-  gridTemplateColumns: '[auto 1fr]',
-  columnGap: 'element',
-  rowGap: '0',
+// Inline mono meta line: `type · year` on a single hairline-ruled row (replaces
+// the former dt/dd ledger). The display number was dropped with the CMS `no` field.
+export const meta = css({
   margin: '0',
-});
-
-export const specTerm = css({
-  paddingBlock: 'inline',
+  paddingTop: 'inline',
+  borderTopWidth: 'hairline',
+  borderTopStyle: 'solid',
+  borderTopColor: 'border.subtle',
   fontFamily: 'mono',
-  fontSize: 'xs',
+  fontSize: 'sm',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
   color: 'fg.subtle',
-  borderTopWidth: 'hairline',
-  borderTopStyle: 'solid',
-  borderTopColor: 'border.subtle',
-});
-
-export const specDesc = css({
-  margin: '0',
-  paddingBlock: 'inline',
-  fontFamily: 'mono',
-  fontSize: 'sm',
-  color: 'fg.default',
-  borderTopWidth: 'hairline',
-  borderTopStyle: 'solid',
-  borderTopColor: 'border.subtle',
 });
 
 // Persistent per-work ambient backdrop. Fixed to the viewport and sunk behind all

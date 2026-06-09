@@ -12,14 +12,12 @@ const revalidateWorks = createPublishedTagRevalidateHooks([CACHE_TAGS.works]);
 export const Works = {
   slug: 'works',
   labels: { singular: 'works', plural: 'works' },
-  // Admin list orders by the numeric `sort` field (newest first). `sort` mirrors
-  // `date`: it is auto-numbered in date order on `seed:export` (see seed/export.ts),
-  // giving a stable total order even when several works share a dayOnly date.
-  // Public reads keep their own explicit date sort (see lib/payload/works).
-  defaultSort: '-sort',
+  // Admin list orders by `date`, newest first. Public reads keep their own
+  // explicit date sort (see lib/payload/works).
+  defaultSort: '-date',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['date', 'title', 'type', 'body', '_status'],
+    defaultColumns: ['date', 'thumbnail', 'title', 'type', 'body', '_status'],
   },
   access: {
     read: ({ req: { user } }) => (user !== null ? true : { _status: { equals: 'published' } }),
@@ -41,14 +39,9 @@ export const Works = {
       type: 'select',
       required: true,
       options: [
-        { label: 'グラフィック', value: 'graphic' },
-        { label: 'VJ', value: 'vj' },
-        { label: 'フライヤー', value: 'flyer' },
-        { label: '開発', value: 'dev' },
-        { label: '映像', value: 'video' },
-        { label: 'VRChat', value: 'vrchat' },
+        { label: '制作', value: 'production' },
         { label: '登壇', value: 'talk' },
-        { label: 'サポート', value: 'support' },
+        { label: '制作協力', value: 'support' },
       ],
       admin: { position: 'sidebar' },
     },
@@ -58,12 +51,6 @@ export const Works = {
       type: 'date',
       required: true,
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayOnly', displayFormat: 'yyyy-MM-dd' } },
-    },
-    {
-      name: 'sort',
-      label: '並び順',
-      type: 'number',
-      admin: { position: 'sidebar', description: '一覧の並び順（大きいほど上）。seed export 時に制作日順で自動採番されます。' },
     },
     {
       name: 'url',

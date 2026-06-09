@@ -17,11 +17,19 @@ type Props = {
   items: readonly NewsItem[];
 };
 
+const isExternal = (href: string): boolean => href.startsWith('http://') || href.startsWith('https://');
+
 const NewsTitle = ({ title, href }: { title: string; href?: string }) => {
   if (href === undefined) return <span className={styles.title}>{title}</span>;
+  const external = isExternal(href);
   return (
-    <Link href={href} tone="accent" className={styles.titleLink}>
+    <Link href={href} tone="accent" className={styles.titleLink} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
       <ScrambleText>{title}</ScrambleText>
+      {external ? (
+        <span className={styles.externalMark} aria-hidden="true">
+          ↗
+        </span>
+      ) : null}
     </Link>
   );
 };

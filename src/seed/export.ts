@@ -1,8 +1,10 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { access, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import payload from 'payload';
+
+import { dayjs } from '@utils/dayjs';
 
 import type { Gallery, Media, Work } from '@payload-types';
 import type { Payload, SanitizedConfig } from 'payload';
@@ -14,6 +16,7 @@ import type { Payload, SanitizedConfig } from 'payload';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.resolve(dirname, 'data');
+const assetsDir = path.resolve(dirname, '..', 'assets');
 
 // Keys Payload manages for us — never hand-edited, regenerated on import.
 // `globalType` is injected by findGlobal and rejected by updateGlobal on the way back.
@@ -42,6 +45,15 @@ const stripKeys = (doc: object, keys: readonly string[]): Record<string, unknown
 
 const stripSystemKeys = (doc: object): Record<string, unknown> => stripKeys(doc, SYSTEM_KEYS);
 
+// dayOnly date fields (works.date, news/blog.publishedAt, logs.date) are stored as
+// a UTC instant but carry no time-of-day meaning. Emit them as a bare RFC3339
+// full-date in JST (Asia/Tokyo) so the JSON matches the admin picker (displayFormat
+// yyyy-MM-dd) and stays unambiguous when hand-edited. A non-string value is left as-is.
+const toDayDate = (value: unknown): unknown => (typeof value === 'string' ? dayjs(value).tz('Asia/Tokyo').format('YYYY-MM-DD') : value);
+
+// Reformat one date key in place, preserving the surrounding key order.
+const formatDayField = (record: Record<string, unknown>, key: string): Record<string, unknown> => Object.fromEntries(Object.entries(record).map(([k, v]) => (k === key ? [k, toDayDate(v)] : [k, v])));
+
 // A populated upload relationship (depth: 1) is the Media object; pull its
 // filename so the import side can re-resolve the file from src/assets.
 const mediaFilename = (value: number | Media | null | undefined): string | undefined => {
@@ -50,10 +62,55 @@ const mediaFilename = (value: number | Media | null | undefined): string | undef
   return value.filename ?? undefined;
 };
 
+// Fetches the binary for a populated Media object and writes it to assetsDir,
+// but ONLY if the target path does not yet exist (hand-curated assets are never
+// clobbered). Logs what happened. Never throws — a bad media must not abort
+// the whole export run.
+const saveMediaFile = async (media: number | Media | null | undefined, targetAssetsDir: string, instance: Payload): Promise<void> => {
+  if (media === null || media === undefined || typeof media === 'number') return;
+
+  const { filename, url } = media;
+  if (filename === null || filename === undefined || filename === '') {
+    instance.logger.warn('[seed:export] saveMediaFile: skipping media with no filename');
+    return;
+  }
+  if (url === null || url === undefined || url === '') {
+    instance.logger.warn(`[seed:export] saveMediaFile: skipping ${filename} — no url`);
+    return;
+  }
+
+  const destPath = path.resolve(targetAssetsDir, filename);
+
+  // Skip if file already exists (protect hand-curated assets).
+  const alreadyExists = await access(destPath).then(
+    () => true,
+    () => false,
+  );
+  if (alreadyExists) {
+    instance.logger.info(`[seed:export] saveMediaFile: skip (exists) ${filename}`);
+    return;
+  }
+
+  const resolvedUrl = url.startsWith('http') ? url : `${process.env.BASE_URL ?? 'http://localhost:3000'}${url}`;
+
+  try {
+    const res = await fetch(resolvedUrl);
+    if (!res.ok) {
+      instance.logger.warn(`[seed:export] saveMediaFile: fetch failed for ${filename} (${res.status} ${res.statusText})`);
+      return;
+    }
+    const buffer = Buffer.from(await res.arrayBuffer());
+    await writeFile(destPath, buffer);
+    instance.logger.info(`[seed:export] saveMediaFile: wrote ${filename} → ${path.relative(process.cwd(), destPath)}`);
+  } catch (err) {
+    instance.logger.warn(`[seed:export] saveMediaFile: error saving ${filename} — ${err instanceof Error ? err.message : `${err}`}`);
+  }
+};
+
 const toWorkRecord = (work: Work): Record<string, unknown> => {
   const { thumbnail, ...rest } = work;
   const thumbnailFile = mediaFilename(thumbnail);
-  const base = stripSystemKeys(rest);
+  const base = formatDayField(stripSystemKeys(rest), 'date');
   if (thumbnailFile === undefined) return base;
   return { ...base, thumbnailFile };
 };
@@ -73,17 +130,20 @@ const writeJson = async (instance: Payload, slug: string, records: readonly unkn
 };
 
 const exportWorks = async (instance: Payload): Promise<void> => {
-  // `sort` mirrors `date`: number the works in date order (oldest = 1) so the
-  // admin's `-sort` default lists newest first with a stable total order even
-  // across works sharing a dayOnly date. This auto-numbering is the single source
-  // of `sort`, overriding whatever value the live doc happens to hold.
+  // Export in date order (oldest first) for a stable JSON diff. Admin and public
+  // reads both order by `-date` at query time, so no per-record ordinal is stored.
   const { docs } = await instance.find({ collection: 'works', depth: 1, limit: 0, sort: 'date', overrideAccess: true });
-  const records = docs.map((doc, index) => ({ ...toWorkRecord(doc), sort: index + 1 }));
-  await writeJson(instance, 'works', records);
+  for (const doc of docs) {
+    await saveMediaFile(doc.thumbnail, assetsDir, instance);
+  }
+  await writeJson(instance, 'works', docs.map(toWorkRecord));
 };
 
 const exportGallery = async (instance: Payload): Promise<void> => {
   const { docs } = await instance.find({ collection: 'gallery', depth: 1, limit: 0, sort: '_order', overrideAccess: true });
+  for (const doc of docs) {
+    await saveMediaFile(doc.image, assetsDir, instance);
+  }
   await writeJson(instance, 'gallery', docs.map(toGalleryRecord));
 };
 
@@ -93,10 +153,11 @@ const exportGallery = async (instance: Payload): Promise<void> => {
 const exportSimple = async (instance: Payload, slug: 'news' | 'blog' | 'logs', sort: string): Promise<void> => {
   const { docs } = await instance.find({ collection: slug, depth: 1, limit: 0, sort, overrideAccess: true });
   const keys = slug === 'logs' ? LOGS_SYSTEM_KEYS : SYSTEM_KEYS;
+  const dateKey = slug === 'logs' ? 'date' : 'publishedAt';
   await writeJson(
     instance,
     slug,
-    docs.map((doc) => stripKeys(doc, keys)),
+    docs.map((doc) => formatDayField(stripKeys(doc, keys), dateKey)),
   );
 };
 
@@ -112,6 +173,7 @@ const exportProfile = async (instance: Payload): Promise<void> => {
 export const script = async (config: SanitizedConfig): Promise<void> => {
   await payload.init({ config });
   await mkdir(dataDir, { recursive: true });
+  await mkdir(assetsDir, { recursive: true });
   await exportWorks(payload);
   await exportSimple(payload, 'news', 'publishedAt');
   await exportSimple(payload, 'blog', 'publishedAt');

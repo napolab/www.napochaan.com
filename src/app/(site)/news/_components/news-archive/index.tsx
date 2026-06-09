@@ -13,6 +13,9 @@ type ArchiveItem = {
   date: string;
   category: string;
   title: string;
+  // Optional external destination. When set, the row links here instead of the
+  // internal `/news/{id}` detail page. Absolute http(s) URLs open in a new tab.
+  url?: string;
 };
 
 type ArchiveGroup = {
@@ -25,15 +28,25 @@ type Props = {
   groups: readonly ArchiveGroup[];
 };
 
+const isExternal = (href: string): boolean => href.startsWith('http://') || href.startsWith('https://');
+
 const NewsRow = ({ item }: { item: ArchiveItem }) => {
+  const href = item.url ?? `/news/${item.id}`;
+  const external = isExternal(href);
+
   return (
     <li className={s.row}>
       <span className={s.date}>{dayjs(item.date).tz('Asia/Tokyo').format('MM.DD')}</span>
       <Tag tone="outline" className={s.category}>
         {item.category}
       </Tag>
-      <Link href={`/news/${item.id}`} tone="accent" className={s.title}>
+      <Link href={href} tone="accent" className={s.title} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
         <ScrambleText>{item.title}</ScrambleText>
+        {external ? (
+          <span className={s.externalMark} aria-hidden="true">
+            ↗
+          </span>
+        ) : null}
       </Link>
     </li>
   );

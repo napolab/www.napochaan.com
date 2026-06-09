@@ -1,7 +1,10 @@
 import { WorksArchive } from './_components/works-archive';
+import * as s from './styles.css';
 
 import { findWorksList } from '@lib/payload/works';
 
+import { FeedLink } from '@components/feed-link';
+import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 
 import type { Metadata } from 'next';
@@ -22,6 +25,8 @@ export const metadata: Metadata = {
 
 const PAGE_SIZE = 50;
 
+const crumbs = [{ href: '/', label: 'home' }, { label: 'works' }] as const;
+
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 // Inject the page href: the archive owns its own URL shape (page 1 is the bare
@@ -41,10 +46,12 @@ const WorksPage = async ({ searchParams }: Props) => {
   const pageWorks = works.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <>
+    <main id="main-content" className={s.main}>
+      <PageHeader title="works" breadcrumbs={crumbs} kicker="// archive — dev·vrchat·video·graphic" lead="なにかを作るって楽しいんだよなぁ〜😁" />
+      <FeedLink href="/works/rss.xml" label="works の RSS フィード" />
       <WorksArchive works={pageWorks} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={worksHref} /> : null}
-    </>
+    </main>
   );
 };
 

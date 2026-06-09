@@ -1,4 +1,5 @@
 import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
 import { RichText } from '@components/rich-text';
 
 import * as s from './styles.css';
@@ -10,7 +11,6 @@ type WorkDetailData = {
   title: string;
   type: string;
   year: number;
-  no: string;
   thumbnail?: { src: string; width: number; height: number };
   body?: SerializedEditorState;
 };
@@ -23,6 +23,11 @@ type Props = {
 // fixed s.ambient layer can paint this work's thumb behind all content.
 const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})` }) as CSSProperties;
 
+// Returns "cover" when the thumbnail's intrinsic dimensions are below the
+// full-HD threshold (1920×1080). Small images fill the column at a fixed 16/10
+// frame; large images keep the default box-fit behaviour.
+const resolveFit = (width: number, height: number): 'cover' | undefined => (width < 1920 || height < 1080 ? 'cover' : undefined);
+
 // The detail body of a single work: a large contact-sheet proof image, a mono
 // spec ledger (type / year / no), then the body prose rendered as Payload-Lexical
 // rich text. Pure Server Component — no react-aria, no interactivity — so it stays
@@ -30,26 +35,31 @@ const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})`
 // heading.
 export const WorkDetail = ({ work }: Props) => {
   const { thumbnail, body } = work;
+  const fit = thumbnail !== undefined ? resolveFit(thumbnail.width, thumbnail.height) : undefined;
 
   return (
     <section className={s.root} aria-label="work detail">
       {thumbnail === undefined ? null : <span className={s.ambient} aria-hidden="true" style={ambientStyle(thumbnail.src)} />}
-      <figure className={s.figureRoot}>
+      <figure className={s.figureRoot} data-fit={fit}>
         {thumbnail === undefined ? (
           <span className={s.imagePlaceholder} aria-hidden="true" />
         ) : (
-          <Image src={thumbnail.src} alt={work.title} width={thumbnail.width} height={thumbnail.height} className={s.image} />
+          <Image
+            src={thumbnail.src}
+            alt={work.title}
+            width={thumbnail.width}
+            height={thumbnail.height}
+            className={s.image}
+            data-fit={fit}
+            placeholder="blur"
+            blurDataURL={formatBlurURL(thumbnail.src, { blur: 20 })}
+          />
         )}
       </figure>
 
-      <dl className={s.spec}>
-        <dt className={s.specTerm}>type</dt>
-        <dd className={s.specDesc}>{work.type}</dd>
-        <dt className={s.specTerm}>year</dt>
-        <dd className={s.specDesc}>{work.year}</dd>
-        <dt className={s.specTerm}>no</dt>
-        <dd className={s.specDesc}>{work.no}</dd>
-      </dl>
+      <p className={s.meta}>
+        {work.type} · {work.year}
+      </p>
 
       {body === undefined ? null : <RichText data={body} className={s.body} />}
     </section>

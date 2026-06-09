@@ -1,4 +1,5 @@
 import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
@@ -28,7 +29,15 @@ const toRows = (works: readonly WorkRow[]): Record<string, ReactNode>[] =>
   works.map((work) => ({
     thumb:
       work.thumbnail !== undefined ? (
-        <Image src={work.thumbnail.src} alt={work.title} width={work.thumbnail.width} height={work.thumbnail.height} className={styles.thumb} />
+        <Image
+          src={work.thumbnail.src}
+          alt={work.title}
+          width={work.thumbnail.width}
+          height={work.thumbnail.height}
+          className={styles.thumb}
+          placeholder="blur"
+          blurDataURL={formatBlurURL(work.thumbnail.src, { blur: 20 })}
+        />
       ) : (
         <span className={styles.thumbPlaceholder} aria-hidden="true" />
       ),
