@@ -6,9 +6,8 @@ export const root = css({
   gap: 'block',
 });
 
-// Large contact-sheet proof, grayscale by default to keep the ledger's proof
-// aesthetic, blooming to colour on hover. Centres the image so a portrait that
-// is bounded below the column width sits in the middle with even side gutters.
+// Full-colour figure. Centres the image so a portrait that is bounded below the
+// column width sits in the middle with even side gutters.
 export const figureRoot = css({
   margin: '0',
   position: 'relative',
@@ -16,7 +15,7 @@ export const figureRoot = css({
   justifyContent: 'center',
 });
 
-// Box-fit: the proof keeps its aspect ratio, bounded by the column width
+// Box-fit: keeps the image's aspect ratio, bounded by the column width
 // (maxWidth) and a viewport-relative height cap (maxHeight) so a portrait source
 // can't dominate the screen. width/height auto let the intrinsic ratio drive the
 // final size; landscape fills the column, portrait shrinks to the height cap.
@@ -26,17 +25,9 @@ export const image = css({
   height: 'auto',
   maxWidth: 'full',
   maxHeight: '[min(70vh, 640px)]',
-  filter: '[grayscale(1) contrast(1.05)]',
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'border.default',
-  transitionProperty: '[filter]',
-  transitionDuration: 'base',
-  transitionTimingFunction: 'stepSnap',
-  _hover: { filter: '[grayscale(0)]' },
-  '@media (prefers-reduced-motion: reduce)': {
-    transitionDuration: 'instant',
-  },
 });
 
 export const imagePlaceholder = css({
@@ -80,6 +71,23 @@ export const specDesc = css({
   borderTopWidth: 'hairline',
   borderTopStyle: 'solid',
   borderTopColor: 'border.subtle',
+});
+
+// Persistent per-work ambient backdrop. Fixed to the viewport and sunk behind all
+// content (zIndex.hide). The work's thumb url is passed via `--thumb` and the
+// image is rendered full-viewport with heavy blur at low opacity so body text
+// stays readable. Fixed positioning holds because no ancestor (WorkDetail root,
+// the page <main>) establishes a transform/filter containing block.
+export const ambient = css({
+  position: 'fixed',
+  inset: '0',
+  zIndex: 'hide',
+  backgroundImage: 'var(--thumb)',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  filter: '[blur(40px)]',
+  opacity: '[0.2]',
+  pointerEvents: 'none',
 });
 
 // Thin override on top of RichText's own `styles.root` (which already owns color

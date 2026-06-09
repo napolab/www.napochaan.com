@@ -40,3 +40,23 @@ export const findGalleryList = async (): Promise<readonly GalleryPhoto[]> => {
 
   return fetchGalleryList();
 };
+
+// The draft path is intentionally uncached (never wrapped in `unstable_cache`)
+// and drops the published filter via `draft: true`, so each photo resolves to
+// its latest draft regardless of `_status`. Only reachable from the secret-gated
+// preview route (`/gallery/preview`), so it never leaks drafts to the public site.
+export const findGalleryDraftList = async (): Promise<readonly GalleryPhoto[]> => {
+  if (isBuildPhase()) return [];
+
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: 'gallery',
+    draft: true,
+    overrideAccess: true,
+    sort: '_order',
+    depth: 1,
+    limit: 0,
+  });
+
+  return result.docs.map(toGalleryPhoto).filter((photo): photo is GalleryPhoto => photo !== undefined);
+};

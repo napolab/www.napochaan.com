@@ -66,3 +66,25 @@ export const findBlogById = async (id: string): Promise<Post | undefined> => {
 
   return fetchBlogById(id);
 };
+
+// The draft path is intentionally uncached (never wrapped in `unstable_cache`)
+// and bypasses the published filter via `draft: true`, so it always returns the
+// latest draft regardless of `_status`. Only reachable from the secret-gated
+// preview route (`/blog/preview/{id}`), so it never leaks drafts to the public site.
+export const findBlogDraftById = async (id: string): Promise<Post | undefined> => {
+  if (isBuildPhase()) return undefined;
+
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: 'blog',
+    where: { id: { equals: id } },
+    draft: true,
+    overrideAccess: true,
+    limit: 1,
+  });
+
+  const [doc] = result.docs;
+  if (doc === undefined) return undefined;
+
+  return toBlogPost(doc, '01');
+};

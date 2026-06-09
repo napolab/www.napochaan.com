@@ -12,10 +12,14 @@ const revalidateWorks = createPublishedTagRevalidateHooks([CACHE_TAGS.works]);
 export const Works = {
   slug: 'works',
   labels: { singular: 'works', plural: 'works' },
-  defaultSort: '-date',
+  // Admin list orders by the numeric `sort` field (newest first). `sort` mirrors
+  // `date`: it is auto-numbered in date order on `seed:export` (see seed/export.ts),
+  // giving a stable total order even when several works share a dayOnly date.
+  // Public reads keep their own explicit date sort (see lib/payload/works).
+  defaultSort: '-sort',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'type', 'date', '_status'],
+    defaultColumns: ['date', 'title', 'type', 'body', '_status'],
   },
   access: {
     read: ({ req: { user } }) => (user !== null ? true : { _status: { equals: 'published' } }),
@@ -30,12 +34,7 @@ export const Works = {
   },
   fields: [
     { name: 'title', label: 'タイトル', type: 'text', required: true },
-    {
-      name: 'no',
-      label: '表示番号',
-      type: 'text',
-      admin: { description: "'01' のような表示用の連番。未設定なら一覧の並び順から自動採番されます。" },
-    },
+    { name: 'thumbnail', label: 'サムネイル', type: 'upload', relationTo: 'media' },
     {
       name: 'type',
       label: '種別',
@@ -61,12 +60,17 @@ export const Works = {
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayOnly', displayFormat: 'yyyy-MM-dd' } },
     },
     {
+      name: 'sort',
+      label: '並び順',
+      type: 'number',
+      admin: { position: 'sidebar', description: '一覧の並び順（大きいほど上）。seed export 時に制作日順で自動採番されます。' },
+    },
+    {
       name: 'url',
       label: '外部リンク',
       type: 'text',
       admin: { description: '設定すると、一覧や年表のリンクが内部の詳細ページではなくこの URL を指します。' },
     },
-    { name: 'thumbnail', label: 'サムネイル', type: 'upload', relationTo: 'media' },
     { name: 'description', label: '概要', type: 'textarea' },
     { name: 'body', label: '本文', type: 'richText' },
   ],

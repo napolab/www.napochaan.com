@@ -23,8 +23,7 @@ export const list = css({
   gap: 'element',
 });
 
-// Contact-sheet card link: a grayscale proof thumb above the title + type,
-// blooming to colour on hover/focus. Mirrors the archive row treatment.
+// Card link: full-colour thumb above the title + type.
 export const item = css({
   position: 'relative',
   display: 'flex',
@@ -42,15 +41,9 @@ export const thumb = css({
   width: 'full',
   aspectRatio: '[1 / 1]',
   objectFit: 'cover',
-  filter: '[grayscale(1) contrast(1.05)]',
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'border.default',
-  transitionProperty: '[filter]',
-  transitionDuration: 'base',
-  transitionTimingFunction: 'stepSnap',
-  _groupHover: { filter: '[grayscale(0)]' },
-  _groupFocusVisible: { filter: '[grayscale(0)]' },
 });
 
 export const thumbPlaceholder = css({

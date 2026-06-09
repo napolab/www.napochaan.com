@@ -101,8 +101,7 @@ export const rows = css({
 });
 
 // Block link row: the whole row is the link target to /works/[id]. A plain <a>,
-// so this style fully owns hover/focus. Color blooms into the contact-sheet
-// thumb on hover (grayscale → color), matching the home teaser ledger treatment.
+// so this style fully owns hover/focus.
 //
 // Hover keeps the text readable: a faint surface wash + the title shifting to
 // accent — never the inverted white-on-light the shared link applies.
@@ -140,22 +139,15 @@ export const item = css({
   '&:focus-visible::after': { inset: '[2px]' },
 });
 
-// Contact-sheet thumbnail: grayscale "proof"; colour blooms in when the row is
-// hovered or focused (reusing the works-section treatment).
+// Thumbnail: full-colour image displayed at a fixed 40 × 40 square.
 export const thumb = css({
   flexShrink: '0',
   width: '[40px]',
   height: '[40px]',
   objectFit: 'cover',
-  filter: '[grayscale(1) contrast(1.05)]',
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'border.default',
-  transitionProperty: '[filter]',
-  transitionDuration: 'base',
-  transitionTimingFunction: 'stepSnap',
-  _groupHover: { filter: '[grayscale(0)]' },
-  _groupFocusVisible: { filter: '[grayscale(0)]' },
 });
 
 export const thumbPlaceholder = css({
@@ -176,6 +168,9 @@ export const title = css({
   minWidth: '0',
   fontFamily: 'body',
   fontSize: 'md',
+  // Mobile/tablet: clamp long work titles to 2 lines with ellipsis; desktop
+  // keeps the full title (lineClamp expands to the -webkit-box + box-orient set).
+  desktopDown: { lineClamp: '2' },
 });
 
 export const type = css({

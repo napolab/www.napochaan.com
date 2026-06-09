@@ -14,9 +14,10 @@ const revalidateNews = createPublishedTagRevalidateHooks([CACHE_TAGS.news]);
 export const News = {
   slug: 'news',
   labels: { singular: 'news', plural: 'news' },
-  // Newest first in both the admin list view and API queries (the public site
-  // already sorts explicitly, but this keeps the editor's default sane).
-  defaultSort: '-publishedAt',
+  // Drag-and-drop reordering in the admin list view (Payload stores a hidden
+  // fractional-index `_order` and sorts by it by default). Public reads keep their
+  // own explicit publishedAt sort (see lib/payload/news), so only the admin order is manual.
+  orderable: true,
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'publishedAt', '_status'],
@@ -64,12 +65,12 @@ export const News = {
         { label: '登壇', value: 'talk' },
         { label: 'DJ', value: 'dj' },
         { label: 'VJ', value: 'vj' },
-        { label: '映像', value: 'video' },
+        { label: '制作', value: 'work' },
         { label: 'フライヤー', value: 'flyer' },
       ],
       admin: {
         position: 'sidebar',
-        description: 'お知らせの活動カテゴリ。サポート/登壇/DJ/VJ/映像/フライヤー から選ぶ。',
+        description: 'お知らせの活動カテゴリ。サポート/登壇/DJ/VJ/フライヤー/制作 から選ぶ。',
       },
     },
     {

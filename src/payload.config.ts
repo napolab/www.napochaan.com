@@ -109,22 +109,22 @@ export default buildConfig({
         draftPreviewRoute({
           slug: 'works',
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
-          buildPath: (data) => `/works/${data.id}`,
+          buildPath: (data) => `/works/preview/${data.id}`,
         }),
         draftPreviewRoute({
           slug: 'blog',
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
-          buildPath: (data) => `/blog/${data.id}`,
+          buildPath: (data) => `/blog/preview/${data.id}`,
         }),
         draftPreviewRoute({
           slug: 'gallery',
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
-          buildPath: () => '/gallery',
+          buildPath: () => '/gallery/preview',
         }),
         draftPreviewRoute({
           slug: 'logs',
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
-          buildPath: () => '/log',
+          buildPath: () => '/log/preview',
         }),
       ]),
       collections: ['news', 'works', 'blog', 'gallery', 'logs'],

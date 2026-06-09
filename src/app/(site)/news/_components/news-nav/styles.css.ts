@@ -12,6 +12,7 @@ export const root = css({
 
 export const pager = css({
   display: 'flex',
+  flexDirection: { base: 'column', desktop: 'row' },
   alignItems: 'stretch',
   justifyContent: 'space-between',
   gap: 'element',
@@ -23,14 +24,17 @@ export const link = css({
   display: 'flex',
   alignItems: 'center',
   gap: 'inline',
-  maxWidth: '[50%]',
+  maxWidth: { base: 'full', desktop: '[50%]' },
   minWidth: '0',
   fontFamily: 'body',
   fontSize: 'sm',
   transitionProperty: '[color]',
   transitionDuration: 'fast',
   transitionTimingFunction: 'stepSnap',
-  '&[data-side="next"]': { marginInlineStart: 'auto', textAlign: 'right' },
+  '&[data-side="next"]': {
+    marginInlineStart: { base: '0', desktop: 'auto' },
+    textAlign: { base: 'left', desktop: 'right' },
+  },
 });
 
 export const arrow = css({
@@ -50,9 +54,9 @@ export const label = css({
 });
 
 // Empty side: holds the space-between layout balanced when one neighbour is
-// absent.
+// absent. Hidden on mobile (column stack needs no spacer row).
 export const empty = css({
-  display: 'block',
+  display: { base: 'none', desktop: 'block' },
 });
 
 export const back = css({

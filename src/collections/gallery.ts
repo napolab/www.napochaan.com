@@ -35,28 +35,15 @@ export const Gallery = {
     { name: 'caption', label: 'キャプション', type: 'text', admin: { description: "'flyer / 05.23' のような短い表示ラベル。" } },
     { name: 'alt', label: '代替テキスト（上書き）', type: 'text', admin: { description: '空なら画像（media）側の alt を使います。' } },
     {
-      // Virtual (not stored): true for the first 6 rows by `_order`, i.e. the ones shown on
-      // the home page. The Cell renders a badge so editors can see at a glance which rows
-      // appear on top. Only computed for admin reads — the public site never reads this field.
+      // Presentational only (no stored data): the Cell renders a "top" badge on the first
+      // 6 rows by list order — the ones shown on the home page. It reads the live order from
+      // useListQuery, so the badge updates in real time while dragging. A `ui` field is the
+      // right host for a Cell with no underlying column.
       name: 'homeTop',
+      type: 'ui',
       label: 'ホーム',
-      type: 'checkbox',
-      virtual: true,
       admin: {
-        readOnly: true,
         components: { Cell: '/components/admin/gallery-home-badge#GalleryHomeBadgeCell' },
-      },
-      hooks: {
-        afterRead: [
-          async ({ data, req }) => {
-            if (req.user === null || req.user === undefined) return false;
-            const id = data?.id;
-            if (id === undefined || id === null) return false;
-            const top = await req.payload.find({ collection: 'gallery', sort: '_order', limit: 6, depth: 0, overrideAccess: true });
-
-            return top.docs.some((doc) => doc.id === id);
-          },
-        ],
       },
     },
   ],

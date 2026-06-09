@@ -74,4 +74,7 @@ export const title = css({
   fontFamily: 'body',
   fontSize: 'md',
   lineHeight: 'snug',
+  // Mobile/tablet: clamp long news titles to 2 lines with ellipsis; desktop
+  // keeps the full title (lineClamp expands to the -webkit-box + box-orient set).
+  desktopDown: { lineClamp: '2' },
 });

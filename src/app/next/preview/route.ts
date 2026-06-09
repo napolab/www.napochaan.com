@@ -4,6 +4,15 @@ import { redirect } from 'next/navigation';
 
 import { getPayloadClient } from '@lib/payload/client';
 
+// Allowlist of preview-route prefixes this handshake is permitted to redirect to.
+// A bare `startsWith('/')` would let protocol-relative URLs like `//evil.com`
+// through and turn this into an open redirect, so every entry pins a concrete
+// `/<slug>/preview` prefix. Detail collections carry a trailing id segment
+// (`/works/preview/<id>`); aggregate previews (gallery, logs) have none.
+const PREVIEW_PATH_PREFIXES = ['/news/preview/', '/works/preview/', '/blog/preview/', '/gallery/preview', '/log/preview'] as const;
+
+const isAllowedPreviewPath = (path: string | null): path is string => path !== null && PREVIEW_PATH_PREFIXES.some((prefix) => path.startsWith(prefix));
+
 // Payload Live Preview handshake (official draft-mode pattern). The CMS iframe
 // points here with `path` + `previewSecret`; this route verifies the secret,
 // authenticates the admin user, enables Next draft mode, then redirects to the
@@ -20,11 +29,11 @@ export const GET = async (req: Request): Promise<Response> => {
     return new Response('You are not allowed to preview this page', { status: 403 });
   }
 
-  // Allowlist the only path this handshake serves. A bare `startsWith('/')`
-  // would let protocol-relative URLs like `//evil.com` through and turn this into
-  // an open redirect, so we pin the prefix to the news preview route.
-  if (path === null || path.startsWith('/news/preview/') === false) {
-    return new Response('This endpoint can only be used for news preview', { status: 400 });
+  // Only the previewable collections' draft routes may be served (see
+  // PREVIEW_PATH_PREFIXES). Anything else — including open-redirect attempts —
+  // is rejected before draft mode is touched.
+  if (!isAllowedPreviewPath(path)) {
+    return new Response('This endpoint can only be used for preview routes', { status: 400 });
   }
 
   const draft = await draftMode();

@@ -185,6 +185,7 @@ export interface Media {
  */
 export interface News {
   id: number;
+  _order?: string | null;
   title: string;
   publishedAt: string;
   /**
@@ -229,17 +230,17 @@ export interface News {
 export interface Work {
   id: number;
   title: string;
-  /**
-   * '01' のような表示用の連番。未設定なら一覧の並び順から自動採番されます。
-   */
-  no?: string | null;
+  thumbnail?: (number | null) | Media;
   type: 'graphic' | 'vj' | 'flyer' | 'dev' | 'video' | 'vrchat' | 'talk' | 'support';
   date: string;
+  /**
+   * 一覧の並び順（大きいほど上）。seed export 時に制作日順で自動採番されます。
+   */
+  sort?: number | null;
   /**
    * 設定すると、一覧や年表のリンクが内部の詳細ページではなくこの URL を指します。
    */
   url?: string | null;
-  thumbnail?: (number | null) | Media;
   description?: string | null;
   body?: {
     root: {
@@ -323,7 +324,6 @@ export interface Gallery {
    * 空なら画像（media）側の alt を使います。
    */
   alt?: string | null;
-  homeTop?: boolean | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -496,6 +496,7 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "news_select".
  */
 export interface NewsSelect<T extends boolean = true> {
+  _order?: T;
   title?: T;
   publishedAt?: T;
   category?: T;
@@ -518,11 +519,11 @@ export interface NewsSelect<T extends boolean = true> {
  */
 export interface WorksSelect<T extends boolean = true> {
   title?: T;
-  no?: T;
+  thumbnail?: T;
   type?: T;
   date?: T;
+  sort?: T;
   url?: T;
-  thumbnail?: T;
   description?: T;
   body?: T;
   meta?:
@@ -565,7 +566,6 @@ export interface GallerySelect<T extends boolean = true> {
   image?: T;
   caption?: T;
   alt?: T;
-  homeTop?: T;
   meta?:
     | T
     | {

@@ -36,6 +36,10 @@ export const title = css({
   textTransform: 'uppercase',
   letterSpacing: 'tighter',
   fontSize: { base: 'h2', desktop: 'h1' },
+  // Mobile/tablet: long content titles clamp to 2 lines with ellipsis (the
+  // lineClamp utility expands to the -webkit-box + box-orient + line-clamp set).
+  // Desktop keeps the full title.
+  desktopDown: { lineClamp: '2' },
   '&[data-tracking="tight"]': { fontFamily: 'mono', letterSpacing: '[-0.06em]' },
 });
 

@@ -1,14 +1,14 @@
 [
   {
-    "title": "企画展『拡張される音楽』(1回目) に参加（「多面体、鏡面」@ 大阪関西国際芸術祭2023, StudioGnu×たなか合作）",
+    "title": "企画展『拡張される音楽』椎乃味醂・たなか 「多面体、鏡面」@ 大阪関西国際芸術祭2023のシステム構築を担当",
     "publishedAt": "2023-12-20T00:00:00.000Z",
-    "category": "support",
+    "category": "work",
     "url": "https://x.com/sheeno3rin/status/1738184053508239618",
     "body": null,
     "_status": "published"
   },
   {
-    "title": "Hono Conference 2024 で登壇（英語・大型カンファレンス）",
+    "title": "Hono Conference 2024 に登壇",
     "publishedAt": "2024-06-22T00:00:00.000Z",
     "category": "talk",
     "url": "https://x.com/naporin24690/status/1804542363895001374",
@@ -16,43 +16,231 @@
     "_status": "published"
   },
   {
-    "title": "企画展『拡張される音楽』(2回目) に参加（「多面体、鏡面」+ LLM 即時更新システム）",
+    "title": "Cloudflare Workers Tech Talks in Tokyo #3 に登壇",
+    "publishedAt": "2024-08-01T12:00:00.000Z",
+    "category": "talk",
+    "url": "",
+    "body": {
+      "root": {
+        "children": [
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "Cloudflare Workers Tech Talks in Tokyo #3",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://workers-tech.connpass.com/event/324272/",
+                  "linkType": "custom"
+                },
+                "id": "6a278bf5cead56b8577ced63"
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " で「Durable Objectsについて」という題目で発表しました。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "SpeakerDeck | DurableObjects について",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "linkType": "custom",
+                  "newTab": false,
+                  "url": "https://speakerdeck.com/naporin0624/durableobjects-nituite"
+                },
+                "id": "6a278c79cead56b8577ced67"
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "ツイート",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://x.com/naporin24690/status/1818952959713218818",
+                  "linkType": "custom"
+                },
+                "id": "6a278c70cead56b8577ced66"
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          }
+        ],
+        "direction": null,
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "企画展『拡張される音楽』椎乃味醂・たなか 「多面体、鏡面」のシステム構築を担当",
     "publishedAt": "2024-11-29T00:00:00.000Z",
-    "category": "support",
+    "category": "work",
     "url": "https://x.com/naporin24690/status/1862529523344187817",
     "body": null,
     "_status": "published"
   },
   {
-    "title": "企画展『共に在る音楽』に参加（DEMiXUS / W♭Y♭K M♭C K システム制作）",
+    "title": "企画展『共に在る音楽』椎乃味醂xももえ W♭Y♭K M♭C K システム構築を担当",
     "publishedAt": "2024-12-12T00:00:00.000Z",
-    "category": "support",
+    "category": "work",
     "url": "https://x.com/naporin24690/status/1867179943060504598",
     "body": null,
     "_status": "published"
   },
   {
-    "title": "企画展『思弁的な音楽』に参加（r-906《額縁の言葉 : I》背景映像・システム構築）",
+    "title": "企画展『共に在る音楽』煮ル果実DEMiXUSシステム構築を担当",
+    "publishedAt": "2024-12-12T00:00:00.000Z",
+    "category": "work",
+    "url": "https://x.com/naporin24690/status/1867179943060504598",
+    "body": null,
+    "_status": "published"
+  },
+  {
+    "title": "企画展『思弁的な音楽』r-906《額縁の言葉 : I》の背景映像・システム構築を担当",
     "publishedAt": "2025-12-10T00:00:00.000Z",
-    "category": "support",
+    "category": "work",
     "url": "https://x.com/naporin24690/status/1998715240075374793",
     "body": null,
     "_status": "published"
   },
   {
-    "title": "Booth2Booth 公式サイト（booth2booth.com）公開",
+    "title": "VRDJイベントBooth²Boothの立ち上げ",
     "publishedAt": "2026-04-12T00:00:00.000Z",
-    "category": "support",
+    "category": "work",
     "url": "https://x.com/naporin24690/status/2043185292337975601",
     "body": null,
     "_status": "published"
   },
   {
-    "title": "#ProjectCircles 椎乃味醂ライブにモーキャプシステムで参加（大規模ライブ）",
+    "title": "#ProjectCircles 椎乃味醂ライブセクションの一部にモーキャプシステムを提供",
     "publishedAt": "2026-05-05T00:00:00.000Z",
     "category": "support",
     "url": "https://x.com/naporin24690/status/2051632371590701138",
-    "body": null,
+    "body": {
+      "root": {
+        "children": [
+          {
+            "children": [],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          }
+        ],
+        "direction": null,
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
+      }
+    },
     "_status": "published"
   }
 ]

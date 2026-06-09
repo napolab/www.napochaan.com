@@ -17,15 +17,16 @@ const toThumbnail = (thumbnail: Work['thumbnail']): WorkRow['thumbnail'] => {
   return { src: thumbnail.url, width: thumbnail.width, height: thumbnail.height };
 };
 
-// Maps a Payload `works` document to the site's `WorkRow`. `no` is supplied by the
-// caller (derived from list order) since it is optional in the CMS. Payload NULLs
-// are coerced to undefined at this boundary. Pure — unit-testable in isolation.
+// Maps a Payload `works` document to the site's `WorkRow`. `no` is the display
+// ordinal, supplied entirely by the caller from list order (the CMS no longer
+// stores a `no` field). Payload NULLs are coerced to undefined at this boundary.
+// Pure — unit-testable in isolation.
 export const toWorkItem = (doc: Work, no: string): WorkRow => {
   const at = dayjs(doc.date).tz('Asia/Tokyo');
 
   return {
     id: `${doc.id}`,
-    no: doc.no ?? no,
+    no,
     title: doc.title,
     type: doc.type,
     year: at.year(),

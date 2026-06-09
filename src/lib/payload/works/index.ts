@@ -68,3 +68,26 @@ export const findWorkById = async (id: string): Promise<WorkRow | undefined> => 
 
   return fetchWorkById(id);
 };
+
+// The draft path is intentionally uncached (never wrapped in `unstable_cache`)
+// and bypasses the published filter via `draft: true`, so it always returns the
+// latest draft regardless of `_status`. Only reachable from the secret-gated
+// preview route (`/works/preview/{id}`), so it never leaks drafts to the public site.
+export const findWorkDraftById = async (id: string): Promise<WorkRow | undefined> => {
+  if (isBuildPhase()) return undefined;
+
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: 'works',
+    where: { id: { equals: id } },
+    draft: true,
+    overrideAccess: true,
+    depth: 1,
+    limit: 1,
+  });
+
+  const [doc] = result.docs;
+  if (doc === undefined) return undefined;
+
+  return toWorkItem(doc, '01');
+};

@@ -33,3 +33,22 @@ export const findLogList = async (): Promise<readonly LogManualItem[]> => {
 
   return fetchLogList();
 };
+
+// The draft path is intentionally uncached (never wrapped in `unstable_cache`)
+// and drops the published filter via `draft: true`, so each entry resolves to
+// its latest draft regardless of `_status`. Only reachable from the secret-gated
+// preview route (`/log/preview`), so it never leaks drafts to the public site.
+export const findLogDraftList = async (): Promise<readonly LogManualItem[]> => {
+  if (isBuildPhase()) return [];
+
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: 'logs',
+    draft: true,
+    overrideAccess: true,
+    sort: '-date',
+    limit: 0,
+  });
+
+  return result.docs.map(toLogManualItem);
+};
