@@ -7,7 +7,7 @@ import type { Work } from '@payload-types';
 const base = {
   id: 7,
   title: 'glitch study',
-  type: 'graphic',
+  type: 'production',
   date: '2025-03-15T00:00:00.000Z',
   updatedAt: '2025-01-01T00:00:00.000Z',
   createdAt: '2025-01-01T00:00:00.000Z',
@@ -19,7 +19,7 @@ describe('toWorkItem', () => {
     expect(row.id).toBe('7');
     expect(row.no).toBe('03');
     expect(row.title).toBe('glitch study');
-    expect(row.type).toBe('graphic');
+    expect(row.type).toBe('production');
     expect(row.year).toBe(2025);
     expect(row.date).toBe('2025-03-15');
   });

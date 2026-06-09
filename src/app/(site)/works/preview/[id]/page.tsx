@@ -46,7 +46,7 @@ const WorkPreviewPage = async ({ params }: Props) => {
   return (
     <main id="main-content" className={s.main}>
       <LivePreviewListener />
-      <PageHeader title={work.title} breadcrumbs={crumbs} kicker={`// ${work.type} · ${work.year}`} titleTracking="tight" />
+      <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
       <WorkDetail work={work} />
       {related.length > 0 ? (
         <>

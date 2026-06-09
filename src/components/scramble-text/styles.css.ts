@@ -20,12 +20,16 @@ export const root = css({
   display: 'inline-block',
   textDecorationLine: '[inherit]',
   textUnderlineOffset: '[inherit]',
-  desktopDown: { display: 'inline' },
+  // Clamp mode: become a full-width block on mobile so the clamped ghost reserves
+  // the box height predictably (desktop keeps the inline-block shrink-wrap).
+  '&[data-clamp]': { desktopDown: { display: 'block', width: 'full' } },
 });
 
 export const ghost = css({
   visibility: 'hidden',
-  desktopDown: { display: 'none' },
+  // Clamp mode (mobile): the in-flow ghost reserves the 2-line-max height that the
+  // absolute fill decodes within, so the in-view scramble never reflows the box.
+  '[data-clamp] &': { desktopDown: { lineClamp: '2', width: 'full' } },
 });
 
 // Animated overlay. At rest it wraps exactly like the ghost (same text, same
@@ -49,9 +53,9 @@ export const fill = css({
   textDecorationLine: '[inherit]',
   textUnderlineOffset: '[inherit]',
   '&[data-scrambling]': {
-    whiteSpace: { base: 'normal', desktop: 'nowrap' },
+    whiteSpace: 'nowrap',
   },
-  // Mobile/tablet: the fill is the only visible copy and must flow in-line so the
-  // parent clamp applies and the box never changes size during the decode.
-  desktopDown: { position: 'static', width: 'auto', maxWidth: 'full' },
+  // Clamp mode (mobile): show at most the 2 lines the ghost reserved; the absolute
+  // fill churns within that fixed box, so the in-view decode never shifts layout.
+  '[data-clamp] &': { desktopDown: { lineClamp: '2' } },
 });

@@ -28,6 +28,11 @@ const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matc
 type BaseProps = {
   children: string;
   className?: string;
+  // When set, the text clamps to 2 lines on mobile/tablet. The (hidden, in-flow)
+  // ghost reserves that clamped height while the absolute fill decodes, so the
+  // in-view scramble can never grow/shrink the box (no layout shift). Desktop is
+  // unclamped — the ghost reserves the full title height there.
+  clamp?: boolean;
 };
 
 // The hover host is always passed as a value — never resolved by walking up the
@@ -48,7 +53,7 @@ type Props = BaseProps & ({ trigger?: 'self' } | { trigger: 'group'; host: HTMLE
 // accessible name to the text so an ancestor link's name stays stable while the
 // glyphs churn (and reduced-motion users just see the plain text).
 export const ScrambleText = (props: Props) => {
-  const { children, className } = props;
+  const { children, className, clamp } = props;
   const rootRef = useRef<HTMLSpanElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
 
@@ -58,16 +63,13 @@ export const ScrambleText = (props: Props) => {
   const host = props.trigger === 'group' ? props.host : null;
 
   useGSAP(
-    (_context, contextSafe) => {
-      if (contextSafe === undefined) return;
-
-      // The decode tween. contextSafe so a tween created from a (deferred) event
-      // listener or ScrollTrigger callback is added to the scope and reverted on
-      // cleanup. revealDelay holds a short full scramble before decoding; low
-      // speed keeps the glyph refresh chunky (digital); tweenLength off since the
-      // text length never changes. data-scrambling pins the fill to one line for
-      // the decode (see styles), dropping on complete to settle into wrapped text.
-      const decode = contextSafe(() => {
+    () => {
+      // The raw decode tween body. revealDelay holds a short full scramble before
+      // decoding; low speed keeps the glyph refresh chunky (digital); tweenLength
+      // off since the text length never changes. data-scrambling pins the fill to
+      // one line for the decode (see styles), dropping on complete to settle into
+      // wrapped text.
+      const runDecode = () => {
         if (reduced()) return;
         const fill = fillRef.current;
         if (fill === null) return;
@@ -79,14 +81,27 @@ export const ScrambleText = (props: Props) => {
           onComplete: () => fill.removeAttribute('data-scrambling'),
           onInterrupt: () => fill.removeAttribute('data-scrambling'),
         });
-      });
+      };
 
       const mm = gsap.matchMedia();
+
+      // decode is wrapped by each branch's OWN contextSafe — the matchMedia
+      // condition context, never the outer useGSAP context. This matters because
+      // the MOBILE ScrollTrigger fires onEnter synchronously during create (when
+      // the text is already in view), i.e. while the conditional context is gsap's
+      // active context. A decode owned by the outer context would be cross-linked
+      // into the conditional context there (gsap runs `prev.data.push(self)`),
+      // forming a U⇄C cycle that makes the unmount-time revert() recurse forever in
+      // Context.getTweens (the "Maximum call stack size exceeded" on navigation).
+      // Owning decode on the active conditional context keeps self === active, so
+      // there is no cross-link and no cycle.
 
       // Desktop: decode on hover of the trigger host (the text itself for 'self',
       // a larger card for 'group'). Skip taps — touch fires a compatibility
       // pointerenter right before navigating, flashing the scramble for a frame.
-      mm.add(DESKTOP, () => {
+      mm.add(DESKTOP, (_ctx, contextSafe) => {
+        if (contextSafe === undefined) return;
+        const decode = contextSafe(runDecode);
         const target = props.trigger === 'group' ? props.host : rootRef.current;
         if (target === null) return;
         const onPointerEnter = (event: PointerEvent) => {
@@ -98,7 +113,9 @@ export const ScrambleText = (props: Props) => {
       });
 
       // Mobile/tablet: no hover — decode once when the text scrolls into view.
-      mm.add(MOBILE, () => {
+      mm.add(MOBILE, (_ctx, contextSafe) => {
+        if (contextSafe === undefined) return;
+        const decode = contextSafe(runDecode);
         const trigger = rootRef.current;
         if (trigger === null) return;
         const st = ScrollTrigger.create({ trigger, start: 'top 90%', once: true, onEnter: () => decode() });
@@ -109,7 +126,7 @@ export const ScrambleText = (props: Props) => {
   );
 
   return (
-    <span ref={rootRef} className={clsx(styles.root, className)} aria-label={children}>
+    <span ref={rootRef} className={clsx(styles.root, className)} aria-label={children} data-clamp={clamp || undefined}>
       <span aria-hidden className={styles.ghost}>
         {children}
       </span>

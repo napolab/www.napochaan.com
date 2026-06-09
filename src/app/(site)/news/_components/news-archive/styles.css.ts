@@ -36,15 +36,22 @@ export const rows = css({
   rowGap: '0',
 });
 
+// Mobile/tablet: a wrapping flex row — date + category sit on line 1 and the
+// title (flex-basis full) drops to line 2. Desktop keeps the aligned 3-column
+// subgrid so date · category · title line up across every row and month group.
 export const row = css({
-  display: 'grid',
+  display: { base: 'flex', desktop: 'grid' },
+  flexWrap: 'wrap',
+  columnGap: 'inline',
+  // Tight gap between the date+tag line and the title line on mobile.
+  rowGap: '1',
   gridColumn: '[1 / -1]',
   gridTemplateColumns: '[subgrid]',
-  // Top-align, not baseline: the title is an inline-block scramble whose baseline
-  // is its *last* line, so on a wrapped (2-line) title `baseline` would drop the
-  // date + tag down to the title's second line. `start` pins them to the first
-  // line where they read as the row's leading metadata.
-  alignItems: 'start',
+  // Mobile: date + tag share line 1 and are vertically centred against each other.
+  // Desktop: top-align (not baseline) — the title is an inline-block scramble whose
+  // baseline is its *last* line, so `baseline` would drop the date + tag to the
+  // title's second line; `start` pins them to the title's first line.
+  alignItems: { base: 'center', desktop: 'start' },
   paddingBlock: 'element',
   borderBottomWidth: 'hairline',
   borderBottomStyle: 'dashed',
@@ -74,6 +81,8 @@ export const title = css({
   fontFamily: 'body',
   fontSize: 'md',
   lineHeight: 'snug',
+  // Mobile/tablet: full basis forces the title onto its own line below date+tag.
+  flexBasis: { base: 'full', desktop: '[auto]' },
 });
 
 // Small trailing marker for links that open externally. aria-hidden — the new-tab

@@ -142,8 +142,8 @@ export const item = css({
 // Thumbnail: full-colour image displayed at a fixed 40 × 40 square.
 export const thumb = css({
   flexShrink: '0',
-  width: '[40px]',
-  height: '[40px]',
+  width: '[64px]',
+  height: '[64px]',
   objectFit: 'cover',
   borderWidth: 'hairline',
   borderStyle: 'solid',
@@ -153,24 +153,43 @@ export const thumb = css({
 export const thumbPlaceholder = css({
   flexShrink: '0',
   display: 'inline-block',
-  width: '[40px]',
-  height: '[40px]',
+  width: '[64px]',
+  height: '[64px]',
   bg: 'bg.muted',
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'border.default',
 });
 
-// Layout only — colour + underline come from the `link` recipe applied alongside
-// this class (the title reads as an inline link).
-export const title = css({
+// Body: flex container that holds the title and type label together.
+// On mobile the two stack vertically (column) so the type badge drops below the
+// title rather than crowding it inline. On desktop they sit side-by-side in a
+// row, matching the original look (title flex:1 pushes type to the right).
+// Title on top, a meta row (type + arrow) below — the row reads as a small card.
+export const body = css({
   flex: '1',
+  minWidth: '0',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'inline',
+});
+
+// Layout only — colour + underline come from the `link` recipe applied alongside
+// this class (the title reads as an inline link). The 2-line mobile clamp lives
+// inside ScrambleText (`clamp`) so the ghost reserves the height (no scramble shift).
+export const title = css({
   minWidth: '0',
   fontFamily: 'body',
   fontSize: 'md',
-  // Mobile/tablet: clamp long work titles to 2 lines with ellipsis; desktop
-  // keeps the full title (lineClamp expands to the -webkit-box + box-orient set).
-  desktopDown: { lineClamp: '2' },
+});
+
+// Bottom meta row: type label + go-to arrow. On mobile the arrow sits right next
+// to the type (left-packed); on desktop it's pushed to the row's right edge.
+export const meta = css({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: { base: 'flex-start', desktop: 'space-between' },
+  gap: 'inline',
 });
 
 export const type = css({

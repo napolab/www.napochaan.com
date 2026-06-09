@@ -25,9 +25,13 @@ export const link = css({
   transitionProperty: '[color]',
   transitionDuration: 'fast',
   transitionTimingFunction: 'stepSnap',
+  // next reads `title ›` aligned to the RIGHT — both when stacked on mobile and
+  // when it sits at the right end of the desktop row. justify-end right-packs the
+  // label+arrow; marginInlineStart:auto pushes the whole link to the row's end.
   '&[data-side="next"]': {
     marginInlineStart: { base: '0', desktop: 'auto' },
-    textAlign: { base: 'left', desktop: 'right' },
+    justifyContent: 'flex-end',
+    textAlign: 'right',
   },
 });
 
@@ -39,6 +43,7 @@ export const arrow = css({
 });
 
 export const label = css({
+  minWidth: '0',
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',

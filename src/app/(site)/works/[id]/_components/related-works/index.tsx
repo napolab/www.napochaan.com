@@ -45,12 +45,14 @@ const RelatedItem = ({ work }: { work: RelatedWork }) => {
             blurDataURL={formatBlurURL(thumbnail.src, { blur: 20 })}
           />
         )}
-        <span className={clsx(link({ tone: 'accent', underline: true, hideOutsideFocusRing: true }), s.title)}>
-          <ScrambleText trigger="group" host={card}>
-            {work.title}
-          </ScrambleText>
+        <span className={s.body}>
+          <span className={clsx(link({ tone: 'accent', underline: true, hideOutsideFocusRing: true }), s.title)}>
+            <ScrambleText trigger="group" host={card} clamp>
+              {work.title}
+            </ScrambleText>
+          </span>
+          <span className={s.type}>{work.type}</span>
         </span>
-        <span className={s.type}>{work.type}</span>
       </Link>
     </li>
   );

@@ -19,4 +19,48 @@ describe('ScrambleText', () => {
     );
     await expect.element(page.getByRole('link', { name: 'archive' })).toBeInTheDocument();
   });
+
+  // Regression: navigating away used to throw "RangeError: Maximum call stack
+  // size exceeded at Context.getTweens". On the MOBILE breakpoint the decode
+  // tween fires via a ScrollTrigger created inside a gsap.matchMedia condition;
+  // when decode was owned by the outer useGSAP context, invoking it while the
+  // conditional context was active cross-linked the two contexts into a cycle,
+  // and the unmount-time context.revert() recursed forever. The matchMedia branch
+  // only runs below 768px, so we force it by stubbing window.matchMedia. The
+  // overflow surfaces asynchronously (deferred ScrollTrigger refresh + revert),
+  // so we capture window errors across a flush window instead of asserting sync.
+  it('unmounts without a getTweens stack overflow on the mobile breakpoint', async () => {
+    const original = window.matchMedia.bind(window);
+    window.matchMedia = ((query: string) =>
+      ({
+        matches: query.includes('max-width'),
+        media: query,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      }) as MediaQueryList) as typeof window.matchMedia;
+
+    const captured: unknown[] = [];
+    const onError = (event: ErrorEvent) => captured.push(event.error);
+    const onRejection = (event: PromiseRejectionEvent) => captured.push(event.reason);
+    window.addEventListener('error', onError);
+    window.addEventListener('unhandledrejection', onRejection);
+
+    try {
+      const screen = await render(<ScrambleText>archive</ScrambleText>);
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      screen.unmount();
+      await new Promise((resolve) => setTimeout(resolve, 50));
+
+      const overflow = captured.find((error) => error instanceof RangeError && error.message.includes('call stack'));
+      expect(overflow).toBeUndefined();
+    } finally {
+      window.removeEventListener('error', onError);
+      window.removeEventListener('unhandledrejection', onRejection);
+      window.matchMedia = original;
+    }
+  });
 });

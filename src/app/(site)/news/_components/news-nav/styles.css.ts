@@ -31,9 +31,12 @@ export const link = css({
   transitionProperty: '[color]',
   transitionDuration: 'fast',
   transitionTimingFunction: 'stepSnap',
+  // next reads `title ›` right-aligned — when stacked on mobile and at the right
+  // end of the desktop row. justify-end right-packs label+arrow.
   '&[data-side="next"]': {
     marginInlineStart: { base: '0', desktop: 'auto' },
-    textAlign: { base: 'left', desktop: 'right' },
+    justifyContent: 'flex-end',
+    textAlign: 'right',
   },
 });
 
@@ -45,6 +48,7 @@ export const arrow = css({
 });
 
 export const label = css({
+  minWidth: '0',
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
