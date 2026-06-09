@@ -61,6 +61,7 @@ export const News = {
       type: 'select',
       required: true,
       options: [
+        { label: 'お知らせ', value: 'notification' },
         { label: 'サポート', value: 'support' },
         { label: '登壇', value: 'talk' },
         { label: 'DJ', value: 'dj' },
@@ -70,7 +71,7 @@ export const News = {
       ],
       admin: {
         position: 'sidebar',
-        description: 'お知らせの活動カテゴリ。サポート/登壇/DJ/VJ/フライヤー/制作 から選ぶ。',
+        description: 'お知らせの活動カテゴリ。お知らせ/サポート/登壇/DJ/VJ/フライヤー/制作 から選ぶ。',
       },
     },
     {

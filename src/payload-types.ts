@@ -189,9 +189,9 @@ export interface News {
   title: string;
   publishedAt: string;
   /**
-   * お知らせの活動カテゴリ。サポート/登壇/DJ/VJ/フライヤー/制作 から選ぶ。
+   * お知らせの活動カテゴリ。お知らせ/サポート/登壇/DJ/VJ/フライヤー/制作 から選ぶ。
    */
-  category: 'support' | 'talk' | 'dj' | 'vj' | 'work' | 'flyer';
+  category: 'notification' | 'support' | 'talk' | 'dj' | 'vj' | 'work' | 'flyer';
   /**
    * 設定すると、年表などのリンクが内部の詳細ページではなくこの URL を指します。
    */

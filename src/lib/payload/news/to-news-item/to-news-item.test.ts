@@ -36,6 +36,12 @@ describe('toNewsItem', () => {
     expect(toNewsItem(makeDoc({ url: null })).url).toBeUndefined();
   });
 
+  it('coerces empty-string url to undefined', () => {
+    // Payload stores a cleared text field as '' (not null). Treat it as absent so
+    // consumers fall back to the internal /news/{id} detail link.
+    expect(toNewsItem(makeDoc({ url: '' })).url).toBeUndefined();
+  });
+
   it('keeps a present url', () => {
     expect(toNewsItem(makeDoc({ url: '/works' })).url).toBe('/works');
   });

@@ -585,45 +585,6 @@
     "thumbnailFile": "OKIAF.png"
   },
   {
-    "title": "楽曲「デュレエ」関連データ解析",
-    "type": "support",
-    "date": "2024-01-24",
-    "url": "https://www.studiognu.org/ja/works/duree",
-    "description": "楽曲「デュレエ」の一部で使用されるデータの解析を担当した。データ分析に JupyterLab、pandas、numpy を使用し、描画に matplotlib、NetWorkX、JavaScript canvas を活用。",
-    "body": {
-      "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
-        "children": [
-          {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
-            "children": [
-              {
-                "type": "text",
-                "text": "楽曲「デュレエ」の一部で使用されるデータの解析を担当した。データ分析に JupyterLab、pandas、numpy を使用し、描画に matplotlib、NetWorkX、JavaScript canvas を活用。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
-                "detail": 0,
-                "version": 1
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "_status": "published",
-    "thumbnailFile": "work-14.jpg"
-  },
-  {
     "title": "StudioGnu HP",
     "type": "production",
     "date": "2024-01-24",
@@ -661,6 +622,45 @@
     },
     "_status": "published",
     "thumbnailFile": "www.studiognu.org_ja.png"
+  },
+  {
+    "title": "楽曲「デュレエ」関連データ解析",
+    "type": "support",
+    "date": "2024-01-24",
+    "url": "https://www.studiognu.org/ja/works/duree",
+    "description": "楽曲「デュレエ」の一部で使用されるデータの解析を担当した。データ分析に JupyterLab、pandas、numpy を使用し、描画に matplotlib、NetWorkX、JavaScript canvas を活用。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "楽曲「デュレエ」の一部で使用されるデータの解析を担当した。データ分析に JupyterLab、pandas、numpy を使用し、描画に matplotlib、NetWorkX、JavaScript canvas を活用。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "work-14.jpg"
   },
   {
     "title": "UTAU 彼方公式 HP",
@@ -897,45 +897,6 @@
     "thumbnailFile": "work-23.jpg"
   },
   {
-    "title": "Event Exhibition with LLM（企画展『拡張される音楽』）",
-    "type": "support",
-    "date": "2024-11-29",
-    "url": "https://x.com/naporin24690/status/1862529523344187817",
-    "description": "投稿サムネ/コメント一覧/キャラポスターを WebSocket + LLM 生成で即時更新するシステムを実装した。",
-    "body": {
-      "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
-        "children": [
-          {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
-            "children": [
-              {
-                "type": "text",
-                "text": "投稿サムネ/コメント一覧/キャラポスターを WebSocket + LLM 生成で即時更新するシステムを実装した。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
-                "detail": 0,
-                "version": 1
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "_status": "published",
-    "thumbnailFile": "work-24.jpg"
-  },
-  {
     "title": "ボカコレ2024冬 ランキングアーカイブ",
     "type": "production",
     "date": "2024-12-01",
@@ -975,45 +936,6 @@
     "thumbnailFile": "vocacolle-2024.png"
   },
   {
-    "title": "企画展「共に在る音楽」煮ル果実 DEMiXUS システム",
-    "type": "production",
-    "date": "2024-12-12",
-    "url": "https://x.com/naporin24690/status/1867179943060504598",
-    "description": "企画展「共に在る音楽」の作品「DEMiXUS」のシステムを設計・実装した。短期間での開発ながら要望実現のため Cloudflare Stack をフル活用した構成とした。",
-    "body": {
-      "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
-        "children": [
-          {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
-            "children": [
-              {
-                "type": "text",
-                "text": "企画展「共に在る音楽」の作品「DEMiXUS」のシステムを設計・実装した。短期間での開発ながら要望実現のため Cloudflare Stack をフル活用した構成とした。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
-                "detail": 0,
-                "version": 1
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "_status": "published",
-    "thumbnailFile": "DEMiXUS.jpeg"
-  },
-  {
     "title": "企画展『共に在る音楽』 椎乃味醂 x ももえ W♭Y♭K M♭C K システム",
     "type": "production",
     "date": "2024-12-12",
@@ -1051,6 +973,45 @@
     },
     "_status": "published",
     "thumbnailFile": "WYKMCK.jpeg"
+  },
+  {
+    "title": "企画展「共に在る音楽」煮ル果実 DEMiXUS システム",
+    "type": "production",
+    "date": "2024-12-12",
+    "url": "https://x.com/naporin24690/status/1867179943060504598",
+    "description": "企画展「共に在る音楽」の作品「DEMiXUS」のシステムを設計・実装した。短期間での開発ながら要望実現のため Cloudflare Stack をフル活用した構成とした。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "企画展「共に在る音楽」の作品「DEMiXUS」のシステムを設計・実装した。短期間での開発ながら要望実現のため Cloudflare Stack をフル活用した構成とした。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "DEMiXUS.jpeg"
   },
   {
     "title": "ヘイロー化ギミック booth 販売",

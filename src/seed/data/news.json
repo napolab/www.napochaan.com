@@ -184,7 +184,7 @@
     "_status": "published"
   },
   {
-    "title": "企画展『共に在る音楽』煮ル果実DEMiXUSシステム構築を担当",
+    "title": "企画展『共に在る音楽』椎乃味醂xももえ W♭Y♭K M♭C K システム構築を担当",
     "publishedAt": "2024-12-12",
     "category": "work",
     "url": "https://x.com/naporin24690/status/1867179943060504598",
@@ -192,7 +192,7 @@
     "_status": "published"
   },
   {
-    "title": "企画展『共に在る音楽』椎乃味醂xももえ W♭Y♭K M♭C K システム構築を担当",
+    "title": "企画展『共に在る音楽』煮ル果実DEMiXUSシステム構築を担当",
     "publishedAt": "2024-12-12",
     "category": "work",
     "url": "https://x.com/naporin24690/status/1867179943060504598",
@@ -225,6 +225,298 @@
         "children": [
           {
             "children": [],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          }
+        ],
+        "direction": null,
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "DJ・VJ の出演依頼について",
+    "publishedAt": "2026-06-10",
+    "category": "notification",
+    "url": "",
+    "body": {
+      "root": {
+        "children": [
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "依頼方法・料金・スケジュール",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "heading",
+            "version": 1,
+            "tag": "h2"
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "DJ・VJ の出演依頼を受け付けています。ご依頼は Twitter(X) の DM までご連絡ください。DJ・VJ いずれも ¥5,000 で承っています。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "関東圏内であれば交通費はいただきません。関東圏から出る場合は、交通費に加えて +¥5,000 を頂戴します。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "事前に制作が必要な場合は2週間前まで、既存の素材のみで VJ ができる場合は3日前までにご連絡いただければ、可能な限り調整します。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "機材・システム",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "heading",
+            "version": 1,
+            "tag": "h2"
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "映像ミキサー V1-HD を所有しています。必要であれば持参します。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "VJコメントオーバーレイシステム",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://x.com/naporin24690/status/2042615217952297306",
+                  "linkType": "custom",
+                  "newTab": true
+                },
+                "id": "6a300001cead56b8577ced01"
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " を希望される方は、箱に回線があるかご確認ください。WiFi、またはお客さんに回線が通っている必要があります。HTML で作られているため OBS で合成でき、他の VJ さんと連携することも可能です。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "VJ で特殊な演出が必要な場合は、1ヶ月前にお声がけください。専用の実装を行い、演出をお手伝いします。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "音と演出の傾向",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "heading",
+            "version": 1,
+            "tag": "h2"
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "DJ では dubstep / riddim / jesusclub / hyperflip など激しい音を好みます。ドバガキDJ をしているときが一番気持ちがいいです。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "VJ では datamosh / pixelsort / pixelstretch など、VJ素材を保ちながら破壊する演出が得意です。傾向は",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "こちらの映像",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://x.com/naporin24690/status/2061135986504221049",
+                  "linkType": "custom",
+                  "newTab": true
+                },
+                "id": "6a300002cead56b8577ced02"
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " もご確認ください。",
+                "type": "text",
+                "version": 1
+              }
+            ],
             "direction": null,
             "format": "",
             "indent": 0,
