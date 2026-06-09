@@ -74,6 +74,12 @@ if (d1 === undefined || r2 === undefined) {
   throw new Error('Cloudflare bindings D1/R2 are not available in this context');
 }
 
+// Single source of the resolved R2 binding for bin scripts. `seed:export` reads
+// media bytes directly from R2 instead of over HTTP; the Payload CLI already loads
+// this config to obtain the SanitizedConfig, so re-importing it from a bin reuses
+// the same resolved binding (ESM single evaluation) — no second getPlatformProxy.
+export const r2Bucket = r2;
+
 // PAYLOAD_SECRET signs auth tokens, so it MUST be a real secret at runtime.
 // Single source = the Cloudflare env: `getPlatformProxy` / `getCloudflareContext`
 // reads `.dev.vars` for both `next dev` and the Payload CLI (migrate/seed), and the

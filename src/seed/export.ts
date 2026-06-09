@@ -1,10 +1,14 @@
-import { access, mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import payload from 'payload';
 
 import { dayjs } from '@utils/dayjs';
+
+import { r2Bucket } from '../payload.config';
+
+import { saveMediaFile } from './save-media-file';
 
 import type { Gallery, Media, Work } from '@payload-types';
 import type { Payload, SanitizedConfig } from 'payload';
@@ -62,51 +66,6 @@ const mediaFilename = (value: number | Media | null | undefined): string | undef
   return value.filename ?? undefined;
 };
 
-// Fetches the binary for a populated Media object and writes it to assetsDir,
-// but ONLY if the target path does not yet exist (hand-curated assets are never
-// clobbered). Logs what happened. Never throws — a bad media must not abort
-// the whole export run.
-const saveMediaFile = async (media: number | Media | null | undefined, targetAssetsDir: string, instance: Payload): Promise<void> => {
-  if (media === null || media === undefined || typeof media === 'number') return;
-
-  const { filename, url } = media;
-  if (filename === null || filename === undefined || filename === '') {
-    instance.logger.warn('[seed:export] saveMediaFile: skipping media with no filename');
-    return;
-  }
-  if (url === null || url === undefined || url === '') {
-    instance.logger.warn(`[seed:export] saveMediaFile: skipping ${filename} — no url`);
-    return;
-  }
-
-  const destPath = path.resolve(targetAssetsDir, filename);
-
-  // Skip if file already exists (protect hand-curated assets).
-  const alreadyExists = await access(destPath).then(
-    () => true,
-    () => false,
-  );
-  if (alreadyExists) {
-    instance.logger.info(`[seed:export] saveMediaFile: skip (exists) ${filename}`);
-    return;
-  }
-
-  const resolvedUrl = url.startsWith('http') ? url : `${process.env.BASE_URL ?? 'http://localhost:3000'}${url}`;
-
-  try {
-    const res = await fetch(resolvedUrl);
-    if (!res.ok) {
-      instance.logger.warn(`[seed:export] saveMediaFile: fetch failed for ${filename} (${res.status} ${res.statusText})`);
-      return;
-    }
-    const buffer = Buffer.from(await res.arrayBuffer());
-    await writeFile(destPath, buffer);
-    instance.logger.info(`[seed:export] saveMediaFile: wrote ${filename} → ${path.relative(process.cwd(), destPath)}`);
-  } catch (err) {
-    instance.logger.warn(`[seed:export] saveMediaFile: error saving ${filename} — ${err instanceof Error ? err.message : `${err}`}`);
-  }
-};
-
 const toWorkRecord = (work: Work): Record<string, unknown> => {
   const { thumbnail, ...rest } = work;
   const thumbnailFile = mediaFilename(thumbnail);
@@ -134,7 +93,7 @@ const exportWorks = async (instance: Payload): Promise<void> => {
   // reads both order by `-date` at query time, so no per-record ordinal is stored.
   const { docs } = await instance.find({ collection: 'works', depth: 1, limit: 0, sort: 'date', overrideAccess: true });
   for (const doc of docs) {
-    await saveMediaFile(doc.thumbnail, assetsDir, instance);
+    await saveMediaFile(doc.thumbnail, assetsDir, r2Bucket, instance.logger);
   }
   await writeJson(instance, 'works', docs.map(toWorkRecord));
 };
@@ -142,7 +101,7 @@ const exportWorks = async (instance: Payload): Promise<void> => {
 const exportGallery = async (instance: Payload): Promise<void> => {
   const { docs } = await instance.find({ collection: 'gallery', depth: 1, limit: 0, sort: '_order', overrideAccess: true });
   for (const doc of docs) {
-    await saveMediaFile(doc.image, assetsDir, instance);
+    await saveMediaFile(doc.image, assetsDir, r2Bucket, instance.logger);
   }
   await writeJson(instance, 'gallery', docs.map(toGalleryRecord));
 };
