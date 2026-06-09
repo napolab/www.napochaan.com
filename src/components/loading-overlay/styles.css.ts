@@ -10,20 +10,17 @@ import { css } from '@styled/css';
 // drops, the rule stops matching and the overlay fades back to opacity 0.
 export const root = css({
   position: 'fixed',
-  // Sit INSIDE the TypographyBand frame (24px on every edge). The bands are the
-  // blue (accent.solid) fixed elements iOS Safari samples to tint the safe-area
-  // bars; covering them with this white overlay (inset:0) turned the iPhone
-  // notch/home-indicator white. Insetting by the band keeps the blue frame the
-  // outermost fixed layer, so the safe area stays blue during boot and after.
-  inset: '[token(sizes.band)]',
+  inset: '0',
   zIndex: 'toast',
   display: 'grid',
   placeItems: 'center',
-  bg: 'bg.canvas',
-  // Same 24px grid as the page body, so the overlay reads as the site booting
-  // rather than a separate screen.
-  backgroundImage: '[linear-gradient(to right, token(colors.grid.line) 1px, transparent 1px), linear-gradient(to bottom, token(colors.grid.line) 1px, transparent 1px)]',
-  backgroundSize: '[24px 24px]',
+  // Solid accent blue (matching the TypographyBand frame), full-bleed to the
+  // viewport edges. This is deliberate: iOS Safari tints the safe-area bars
+  // (notch / home indicator) from a shown fixed element's background-color, so a
+  // white overlay painted those bars white until a scroll forced re-sampling.
+  // Booting on the brand blue means the safe area is blue from the very first
+  // frame, with the same blue + white-mono voice as the TypographyBand.
+  bg: 'accent.solid',
   opacity: '[0]',
   pointerEvents: 'none',
   transitionProperty: '[opacity]',
@@ -49,13 +46,13 @@ export const brand = css({
   fontSize: 'sm',
   fontVariationSettings: '"wght" 600',
   letterSpacing: 'tight',
-  color: 'fg.default',
+  color: 'fg.onSolid',
 });
 
 export const square = css({
   width: '[10px]',
   height: '[10px]',
-  bg: 'accent.solid',
+  bg: 'fg.onSolid',
   flexShrink: 0,
 });
 
@@ -68,7 +65,9 @@ export const status = css({
   fontSize: 'xs',
   letterSpacing: 'wider',
   textTransform: 'uppercase',
-  color: 'fg.muted',
+  // Full white on blue keeps WCAG AA; hierarchy comes from the smaller size and
+  // uppercase tracking rather than a dimmer tone (no onSolid-muted token).
+  color: 'fg.onSolid',
 });
 
 export const caret = css({
@@ -76,7 +75,7 @@ export const caret = css({
   width: '[0.6em]',
   height: '[1em]',
   marginInlineStart: '[0.3em]',
-  bg: 'accent.solid',
+  bg: 'fg.onSolid',
   // Blink only when motion is welcome; reduced-motion keeps a steady caret.
   '@media (prefers-reduced-motion: no-preference)': {
     animation: '[blink 1s steps(1) infinite]',
@@ -91,7 +90,9 @@ export const bar = css({
   position: 'relative',
   width: 'full',
   height: '[4px]',
-  bg: 'bg.muted',
+  // Track is a slightly darker blue (the band's hairline tone); the white fill
+  // rides on top so progress reads clearly on the blue boot screen.
+  bg: 'accent.solidHover',
   overflow: 'hidden',
 });
 
@@ -100,7 +101,7 @@ export const barFill = css({
   insetBlock: '0',
   insetInlineStart: '0',
   width: 'full',
-  bg: 'accent.solid',
+  bg: 'fg.onSolid',
   transformOrigin: 'left',
   // Reduced-motion fallback: a steady ~60% fill that reads as "in progress".
   transform: 'scaleX(0.6)',
