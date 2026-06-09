@@ -80,8 +80,12 @@ export const gridImage = css({
   objectPosition: '[var(--gallery-object-position, center)]',
   // Spotlight hover (matching GalleryArchive): the other photos desaturate while one is
   // hovered, and the hovered one zooms slightly (motion-safe; clipped by the cell).
+  // Gated on `(hover: hover)` so touch devices (where :hover sticks on tap) never
+  // desaturate the grid.
   filter: '[grayscale(0)]',
-  '[data-gallery]:hover li:not(:hover) &': { filter: '[grayscale(1)]' },
+  '[data-gallery]:hover li:not(:hover) &': {
+    '@media (hover: hover)': { filter: '[grayscale(1)]' },
+  },
   _motionSafe: {
     transition: '[filter 0.4s ease, transform 0.4s ease]',
     'li:hover &': { transform: '[scale(1.05)]' },

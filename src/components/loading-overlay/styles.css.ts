@@ -10,7 +10,12 @@ import { css } from '@styled/css';
 // drops, the rule stops matching and the overlay fades back to opacity 0.
 export const root = css({
   position: 'fixed',
-  inset: '0',
+  // Sit INSIDE the TypographyBand frame (24px on every edge). The bands are the
+  // blue (accent.solid) fixed elements iOS Safari samples to tint the safe-area
+  // bars; covering them with this white overlay (inset:0) turned the iPhone
+  // notch/home-indicator white. Insetting by the band keeps the blue frame the
+  // outermost fixed layer, so the safe area stays blue during boot and after.
+  inset: '[token(sizes.band)]',
   zIndex: 'toast',
   display: 'grid',
   placeItems: 'center',
@@ -20,23 +25,10 @@ export const root = css({
   backgroundImage: '[linear-gradient(to right, token(colors.grid.line) 1px, transparent 1px), linear-gradient(to bottom, token(colors.grid.line) 1px, transparent 1px)]',
   backgroundSize: '[24px 24px]',
   opacity: '[0]',
-  // visibility:hidden at rest so this fixed, white-filled element drops out of
-  // layout once boot ends. Otherwise iOS Safari keeps using a *shown* fixed
-  // element's background-color to tint the safe-area bars (forehead/chin),
-  // painting the iPhone notch/home-indicator white and overriding the blue
-  // theme-color. The visibility flip is delayed by the opacity duration so the
-  // fade-out still plays, then the bars fall back to the blue theme-color.
-  visibility: 'hidden',
   pointerEvents: 'none',
-  transitionProperty: '[opacity, visibility]',
-  transitionDuration: '[var(--durations-slow), 0s]',
-  transitionDelay: '[0s, var(--durations-slow)]',
-  'html.boot &': {
-    opacity: '[1]',
-    visibility: 'visible',
-    pointerEvents: 'auto',
-    transitionDelay: '[0s, 0s]',
-  },
+  transitionProperty: '[opacity]',
+  transitionDuration: 'slow',
+  'html.boot &': { opacity: '[1]', pointerEvents: 'auto' },
 });
 
 // Left-aligned mono console block, centered as a unit. Fixed-ish width gives the
