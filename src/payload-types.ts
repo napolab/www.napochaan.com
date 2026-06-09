@@ -188,9 +188,9 @@ export interface News {
   title: string;
   publishedAt: string;
   /**
-   * 出演: DJ/VJ 出演・イベント開催のお知らせ / リリース: フライヤー・キービジュアル・楽曲・ソフトなど制作物の公開 / 更新: サイト・プロフィール・ブログなどの更新のお知らせ
+   * お知らせの活動カテゴリ。サポート/登壇/DJ/VJ/映像/フライヤー から選ぶ。
    */
-  category: 'live' | 'release' | 'update';
+  category: 'support' | 'talk' | 'dj' | 'vj' | 'video' | 'flyer';
   /**
    * 設定すると、年表などのリンクが内部の詳細ページではなくこの URL を指します。
    */
@@ -347,9 +347,9 @@ export interface Log {
   title: string;
   date: string;
   /**
-   * 年表に表示する種別ラベル（例: 'milestone'）。
+   * 年表に表示する種別ラベル。
    */
-  meta: string;
+  meta: 'DJ' | 'VJ' | 'DJ/VJ' | 'Support' | 'Dev' | 'Flyer' | 'Talk' | 'Video';
   /**
    * 設定するとタイトルがこの URL へのリンクになります。
    */

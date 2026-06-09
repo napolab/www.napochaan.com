@@ -45,8 +45,8 @@ describe('toNewsItem', () => {
   });
 
   it('passes through title and category', () => {
-    const item = toNewsItem(makeDoc({ title: 'お知らせ', category: 'live' }));
+    const item = toNewsItem(makeDoc({ title: 'お知らせ', category: 'dj' }));
     expect(item.title).toBe('お知らせ');
-    expect(item.category).toBe('live');
+    expect(item.category).toBe('dj');
   });
 });

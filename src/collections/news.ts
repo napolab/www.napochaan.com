@@ -13,7 +13,10 @@ const revalidateNews = createPublishedTagRevalidateHooks([CACHE_TAGS.news]);
 
 export const News = {
   slug: 'news',
-  labels: { singular: 'お知らせ', plural: 'お知らせ' },
+  labels: { singular: 'news', plural: 'news' },
+  // Newest first in both the admin list view and API queries (the public site
+  // already sorts explicitly, but this keeps the editor's default sane).
+  defaultSort: '-publishedAt',
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'category', 'publishedAt', '_status'],
@@ -57,15 +60,16 @@ export const News = {
       type: 'select',
       required: true,
       options: [
-        { label: '出演', value: 'live' },
-        { label: 'リリース', value: 'release' },
-        { label: '更新', value: 'update' },
+        { label: 'サポート', value: 'support' },
+        { label: '登壇', value: 'talk' },
+        { label: 'DJ', value: 'dj' },
+        { label: 'VJ', value: 'vj' },
+        { label: '映像', value: 'video' },
+        { label: 'フライヤー', value: 'flyer' },
       ],
       admin: {
         position: 'sidebar',
-        // Payload 3.81 `select` options are `{ label, value }` only — no
-        // per-option description — so the three buckets are documented here.
-        description: '出演: DJ/VJ 出演・イベント開催のお知らせ / リリース: フライヤー・キービジュアル・楽曲・ソフトなど制作物の公開 / 更新: サイト・プロフィール・ブログなどの更新のお知らせ',
+        description: 'お知らせの活動カテゴリ。サポート/登壇/DJ/VJ/映像/フライヤー から選ぶ。',
       },
     },
     {
