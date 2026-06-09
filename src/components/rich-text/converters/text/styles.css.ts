@@ -1,8 +1,10 @@
 import { css } from '@styled/css';
 
-// Inline text format wrappers
+// Inline text format wrappers. Semibold so emphasis is never lighter than the
+// semibold body weight some pages set (works / news / blog); accent colour carries
+// the rest of the contrast.
 export const strong = css({
-  fontWeight: 'medium',
+  fontWeight: 'semibold',
   color: 'accent.text',
 });
 

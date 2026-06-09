@@ -44,10 +44,11 @@ export const arrow = css({
 });
 
 export const label = css({
+  // min-width:0 lets this flex item shrink below its content so the ScrambleText
+  // inside (truncate mode) can cap at the available width and ellipsise. The
+  // single-line clip lives in ScrambleText: its painted text is an absolute box a
+  // `text-overflow` here could never reach, so the label only owns the underline.
   minWidth: '0',
-  overflow: 'hidden',
-  whiteSpace: 'nowrap',
-  textOverflow: 'ellipsis',
   // Underline so the prev/next title reads as a link (its colour matches body text).
   textDecorationLine: 'underline',
   textUnderlineOffset: '[2px]',

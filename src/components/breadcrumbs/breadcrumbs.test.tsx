@@ -24,4 +24,11 @@ describe('Breadcrumbs', () => {
     await expect.element(current).toHaveAttribute('aria-current', 'page');
     expect(page.getByRole('link', { name: 'night vol.13' }).query()).toBeNull();
   });
+
+  it('flags the last crumb so its title can stay on one line', async () => {
+    render(<Breadcrumbs items={items} />);
+    const current = page.getByText('night vol.13');
+    await expect.element(current).toBeInTheDocument();
+    expect(current.element().closest('li')).toHaveAttribute('data-last', 'true');
+  });
 });

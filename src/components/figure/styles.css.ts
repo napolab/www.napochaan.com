@@ -1,7 +1,7 @@
 import { css } from '@styled/css';
 
 export const root = css({
-  display: 'inline-block',
+  display: 'block',
   borderWidth: 'default',
   borderStyle: 'solid',
   borderColor: 'fg.default',
@@ -9,12 +9,14 @@ export const root = css({
   m: '0',
 });
 
-// Fill the figure's content width so the image never leaves gaps when a wider
-// caption stretches the box. height: auto keeps the aspect ratio (no crop).
+// Uniform 16/10 frame: the image is contained so the whole picture is shown —
+// never cropped. Portrait or square sources letterbox over a transparent backdrop
+// instead of being clipped, matching the works detail proof frame.
 export const image = css({
   display: 'block',
   width: 'full',
-  height: 'auto',
+  aspectRatio: '[16 / 10]',
+  objectFit: 'contain',
 });
 
 export const caption = css({

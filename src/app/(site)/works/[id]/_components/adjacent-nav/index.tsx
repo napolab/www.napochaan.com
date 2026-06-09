@@ -35,7 +35,7 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
             </span>
           ) : null}
           <span className={s.label}>
-            <ScrambleText>{slot.work.title}</ScrambleText>
+            <ScrambleText truncate>{slot.work.title}</ScrambleText>
           </span>
           {slot.side === 'next' ? (
             <span className={s.arrow} aria-hidden="true">

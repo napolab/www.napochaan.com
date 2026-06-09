@@ -39,7 +39,7 @@ export const title = css({
   textTransform: 'uppercase',
   letterSpacing: 'tighter',
   fontSize: { base: 'h2', desktop: 'h1' },
-  '&[data-tracking="tight"]': { fontFamily: 'ryoGothic', fontWeight: 'medium', textTransform: 'none', letterSpacing: 'normal' },
+  '&[data-tracking="tight"]': { fontFamily: 'ryoGothic', fontWeight: 'medium', textTransform: 'none', letterSpacing: 'tight' },
 });
 
 // Markdown-style blockquote lead: accent bar on the left, indented, medium weight.

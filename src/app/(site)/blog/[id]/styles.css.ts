@@ -17,8 +17,12 @@ export const layout = css({
 
 // Desktop: pin the body to column 1 / row 1 so it sits left of the TOC despite
 // coming second in the DOM.
+// Medium so the (system-font) Japanese body reads a touch less thin; inherited by
+// the RichText tree (also covers the preview page, which reuses this style).
+// Explicit-weight nodes (headings) are unaffected.
 export const bodyCol = css({
   minHeight: '[40vh]',
+  fontWeight: 'medium',
   gridColumn: { desktop: '1' },
   gridRow: { desktop: '1' },
 });

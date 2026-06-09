@@ -22,7 +22,7 @@ export const Breadcrumbs = ({ items }: Props) => {
 
           if (isLast) {
             return (
-              <li key={item.label} className={styles.item} data-first={`${isFirst}`}>
+              <li key={item.label} className={styles.item} data-first={`${isFirst}`} data-last="true">
                 <span className={styles.current} aria-current="page">
                   {item.label}
                 </span>
@@ -31,7 +31,7 @@ export const Breadcrumbs = ({ items }: Props) => {
           }
 
           return (
-            <li key={item.label} className={styles.item} data-first={`${isFirst}`}>
+            <li key={item.label} className={styles.item} data-first={`${isFirst}`} data-last="false">
               <Link href={item.href} tone="accent">
                 <ScrambleText>{item.label}</ScrambleText>
               </Link>

@@ -37,6 +37,11 @@ type BaseProps = {
   // in-view scramble can never grow/shrink the box (no layout shift). Desktop is
   // unclamped — the ghost reserves the full title height there.
   clamp?: boolean;
+  // When set, the text truncates to a single ellipsised line at every breakpoint.
+  // A parent's `text-overflow:ellipsis` can't reach the painted (absolute) fill, so
+  // the styles cap the root width and apply the ellipsis to BOTH the in-flow ghost
+  // (reserves the capped line) and the fill (paints the "…"). Used by adjacent-nav.
+  truncate?: boolean;
 };
 
 // The hover host is always passed as a value — never resolved by walking up the
@@ -57,7 +62,7 @@ type Props = BaseProps & ({ trigger?: 'self' } | { trigger: 'group'; host: HTMLE
 // accessible name to the text so an ancestor link's name stays stable while the
 // glyphs churn (and reduced-motion users just see the plain text).
 export const ScrambleText = (props: Props) => {
-  const { children, className, clamp } = props;
+  const { children, className, clamp, truncate } = props;
   const rootRef = useRef<HTMLSpanElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
 
@@ -143,7 +148,7 @@ export const ScrambleText = (props: Props) => {
   );
 
   return (
-    <span ref={rootRef} className={clsx(styles.root, className)} aria-label={children} data-clamp={clamp || undefined}>
+    <span ref={rootRef} className={clsx(styles.root, className)} aria-label={children} data-clamp={clamp || undefined} data-truncate={truncate || undefined}>
       <span aria-hidden className={styles.ghost}>
         {children}
       </span>

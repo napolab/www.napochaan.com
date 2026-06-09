@@ -116,11 +116,16 @@ export const navLink = css({
   '&[data-primary]': { display: 'block' },
   // Fixed-width slots so the active (black) highlight box is the same size on
   // every item and never resizes as the current page changes. Desktop sizes to
-  // the longest label ("gallery"); the mobile shortcuts are all ≤5 chars, so a
-  // narrower slot keeps the three links + menu on one row down to 375px.
+  // the longest label ("gallery"); the mobile shortcuts are all 5 chars
+  // (index/about/works). NOTE these widths are border-box, so the inline padding
+  // below is subtracted from them: a slot must hold its label *plus* 12px of
+  // padding. 7ch (≈46.8px content) clears the 42px label with ~2.4px each side —
+  // the same slack desktop's 9ch leaves "gallery" — while keeping the three links
+  // + menu on one row down to 375px. 6ch (≈38.4px content) was narrower than the
+  // label, so the fill overflowed into its padding and read as off-center.
   flex: 'none',
-  width: { base: '[6ch]', desktop: '[9ch]' },
-  minWidth: { base: '[6ch]', desktop: '[9ch]' },
+  width: { base: '[7ch]', desktop: '[9ch]' },
+  minWidth: { base: '[7ch]', desktop: '[9ch]' },
   textAlign: 'center',
   fontFamily: 'mono',
   fontVariationSettings: '"wght" 600',

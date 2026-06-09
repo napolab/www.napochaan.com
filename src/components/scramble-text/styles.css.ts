@@ -23,6 +23,11 @@ export const root = css({
   // Clamp mode: become a full-width block on mobile so the clamped ghost reserves
   // the box height predictably (desktop keeps the inline-block shrink-wrap).
   '&[data-clamp]': { desktopDown: { display: 'block', width: 'full' } },
+  // Truncate mode: cap the shrink-wrapped box at the parent's width and clip, so a
+  // single overflowing line settles to an ellipsis instead of spilling past (the
+  // box still shrinks to fit a short title). All breakpoints — adjacent-nav clips
+  // on mobile (stacked) and desktop (50% column) alike.
+  '&[data-truncate]': { maxWidth: 'full', overflow: 'hidden' },
 });
 
 export const ghost = css({
@@ -30,6 +35,9 @@ export const ghost = css({
   // Clamp mode (mobile): the in-flow ghost reserves the 2-line-max height that the
   // absolute fill decodes within, so the in-view scramble never reflows the box.
   '[data-clamp] &': { desktopDown: { lineClamp: '2', width: 'full' } },
+  // Truncate mode: the in-flow ghost reserves a single ellipsised line, so the
+  // root's capped width (and thus the absolute fill's width) is set from it.
+  '[data-truncate] &': { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
 });
 
 // Animated overlay. At rest it wraps exactly like the ghost (same text, same
@@ -60,4 +68,8 @@ export const fill = css({
   // Clamp mode (mobile): show at most the 2 lines the ghost reserved; the absolute
   // fill churns within that fixed box, so the in-view decode never shifts layout.
   '[data-clamp] &': { desktopDown: { lineClamp: '2' } },
+  // Truncate mode: the painted fill is what the user sees, and being absolute it is
+  // out of the parent's inline flow — a parent `text-overflow:ellipsis` can't reach
+  // it. Apply the single-line ellipsis here so the "…" actually renders.
+  '[data-truncate] &': { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
 });

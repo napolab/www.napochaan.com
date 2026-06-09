@@ -6,42 +6,25 @@ export const root = css({
   gap: 'block',
 });
 
-// Full-colour figure. Centres the image so a portrait that is bounded below the
-// column width sits in the middle with even side gutters.
-// When data-fit="cover" is set (small thumbnail), centering is removed so the
-// image stretches to fill the full column width.
+// Full-colour figure spanning the column. The image inside owns the uniform 16/10
+// frame, so this only resets margin and anchors the ambient layer.
 export const figureRoot = css({
   margin: '0',
   position: 'relative',
-  display: 'flex',
-  justifyContent: 'center',
-  '&[data-fit="cover"]': {
-    justifyContent: 'stretch',
-  },
 });
 
-// Box-fit: keeps the image's aspect ratio, bounded by the column width
-// (maxWidth) and a viewport-relative height cap (maxHeight) so a portrait source
-// can't dominate the screen. width/height auto let the intrinsic ratio drive the
-// final size; landscape fills the column, portrait shrinks to the height cap.
-// When data-fit="cover" is present (small thumbnail < 1920×1080), the image fills
-// the full column width at a fixed 16/10 aspect ratio instead.
+// Uniform contact-sheet frame: every thumbnail fills the column at a fixed 16/10
+// aspect ratio and is contained (objectFit) so the whole artwork is shown — never
+// cropped. Portrait or square sources letterbox over a transparent backdrop (the
+// blurred ambient layer shows through) instead of being clipped.
 export const image = css({
   display: 'block',
-  width: 'auto',
-  height: 'auto',
-  maxWidth: 'full',
-  maxHeight: '[min(70vh, 640px)]',
+  width: 'full',
+  aspectRatio: '[16 / 10]',
+  objectFit: 'contain',
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'border.default',
-  '&[data-fit="cover"]': {
-    width: 'full',
-    height: 'auto',
-    maxHeight: '[none]',
-    aspectRatio: '[16 / 10]',
-    objectFit: 'cover',
-  },
 });
 
 export const imagePlaceholder = css({
@@ -88,8 +71,11 @@ export const ambient = css({
 });
 
 // Thin override on top of RichText's own `styles.root` (which already owns color
-// fg.default / fontSize md / lineHeight jp). Here we only dim the prose to the
-// muted ink so the body sits quieter than the spec ledger — the proof aesthetic.
+// fg.default / fontSize md / lineHeight jp). Dims the prose to the muted ink so
+// the body sits quieter than the spec ledger — the proof aesthetic — and bumps
+// the weight to medium so the (system-font) Japanese body reads a touch less thin.
+// Inherited by the RichText tree; explicit-weight nodes (headings) are unaffected.
 export const body = css({
   color: 'fg.muted',
+  fontWeight: 'medium',
 });

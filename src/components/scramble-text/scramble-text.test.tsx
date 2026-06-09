@@ -20,6 +20,21 @@ describe('ScrambleText', () => {
     await expect.element(page.getByRole('link', { name: 'archive' })).toBeInTheDocument();
   });
 
+  // truncate drives a `data-truncate` hook the styles target so the painted (absolute)
+  // fill and the in-flow ghost both clip to a single ellipsised line — a parent's
+  // `text-overflow:ellipsis` can't reach the absolute fill on its own.
+  it('marks the root for single-line truncation when truncate is set', async () => {
+    const screen = await render(<ScrambleText truncate>a very long adjacent work title that overflows</ScrambleText>);
+    const root = screen.container.querySelector('[data-truncate]');
+    expect(root).not.toBeNull();
+  });
+
+  it('does not mark the root for truncation by default', async () => {
+    const screen = await render(<ScrambleText>archive</ScrambleText>);
+    const root = screen.container.querySelector('[data-truncate]');
+    expect(root).toBeNull();
+  });
+
   // Regression: navigating away used to throw "RangeError: Maximum call stack
   // size exceeded at Context.getTweens". On the MOBILE breakpoint the decode
   // tween fires via a ScrollTrigger created inside a gsap.matchMedia condition;

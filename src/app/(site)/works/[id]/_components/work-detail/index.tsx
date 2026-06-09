@@ -23,24 +23,19 @@ type Props = {
 // fixed s.ambient layer can paint this work's thumb behind all content.
 const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})` }) as CSSProperties;
 
-// Returns "cover" when the thumbnail's intrinsic dimensions are below the
-// full-HD threshold (1920×1080). Small images fill the column at a fixed 16/10
-// frame; large images keep the default box-fit behaviour.
-const resolveFit = (width: number, height: number): 'cover' | undefined => (width < 1920 || height < 1080 ? 'cover' : undefined);
-
-// The detail body of a single work: a large contact-sheet proof image, a mono
+// The detail body of a single work: a uniform contact-sheet proof image, a mono
 // spec ledger (type / year / no), then the body prose rendered as Payload-Lexical
-// rich text. Pure Server Component — no react-aria, no interactivity — so it stays
-// out of the client bundle. The page <h1> lives in PageHeader, so this renders no
-// heading.
+// rich text. Every thumbnail sits in the same 16/10 frame and is contained (never
+// cropped) so the whole artwork is always visible. Pure Server Component — no
+// react-aria, no interactivity — so it stays out of the client bundle. The page
+// <h1> lives in PageHeader, so this renders no heading.
 export const WorkDetail = ({ work }: Props) => {
   const { thumbnail, body } = work;
-  const fit = thumbnail !== undefined ? resolveFit(thumbnail.width, thumbnail.height) : undefined;
 
   return (
     <section className={s.root} aria-label="work detail">
       {thumbnail === undefined ? null : <span className={s.ambient} aria-hidden="true" style={ambientStyle(thumbnail.src)} />}
-      <figure className={s.figureRoot} data-fit={fit}>
+      <figure className={s.figureRoot}>
         {thumbnail === undefined ? (
           <span className={s.imagePlaceholder} aria-hidden="true" />
         ) : (
@@ -50,7 +45,6 @@ export const WorkDetail = ({ work }: Props) => {
             width={thumbnail.width}
             height={thumbnail.height}
             className={s.image}
-            data-fit={fit}
             placeholder="blur"
             blurDataURL={formatBlurURL(thumbnail.src, { blur: 20 })}
           />
