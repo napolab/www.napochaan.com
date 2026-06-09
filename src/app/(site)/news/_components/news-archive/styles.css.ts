@@ -21,6 +21,7 @@ export const group = css({
 export const month = css({
   gridColumn: '[1 / -1]',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   letterSpacing: 'wide',
   // fg.muted (≥4.5:1 vs canvas); fg.subtle was 4.03 and failed AA at this size.
@@ -61,15 +62,26 @@ export const row = css({
 
 export const date = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   color: 'accent.text',
 });
 
-// Centre the tag within the (max-content = widest tag) category column so the
-// shorter labels sit centred rather than ragged on the left.
+// The tag's grid cell, centred in the (max-content = widest tag) category column.
+// The outline pill is shorter than the row's text line, so the row's `start`
+// alignment left it sitting ~3px above the date and title. Making the cell a flex
+// box exactly one line tall (md/snug = the title's line box) centres the pill on
+// that first line — level with the date and title — and, because the height is
+// pinned to a single line, it stays on line 1 even when the title wraps.
+// (`baseline` / `alignSelf: center` instead drift to the title's last/middle line.)
 export const category = css({
-  justifySelf: 'center',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: '[1lh]',
+  fontSize: 'md',
+  lineHeight: 'snug',
 });
 
 // Title link in the inline link colour (accent.text). The scramble is the only

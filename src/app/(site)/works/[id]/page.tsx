@@ -50,7 +50,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 const WorkDetailPage = async ({ params }: Props) => {
   const { id } = await params;
   const work = await findWorkById(id);
-  if (work === undefined) notFound();
+  if (work === undefined) return notFound();
 
   const works = await findWorksList();
   const { prev, next } = adjacentWorks(works, id);

@@ -37,9 +37,9 @@ const NewsRow = ({ item }: { item: ArchiveItem }) => {
   return (
     <li className={s.row}>
       <span className={s.date}>{dayjs(item.date).tz('Asia/Tokyo').format('MM.DD')}</span>
-      <Tag tone="outline" className={s.category}>
-        {item.category}
-      </Tag>
+      <span className={s.category}>
+        <Tag tone="outline">{item.category}</Tag>
+      </span>
       <Link href={href} tone="accent" className={s.title} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
         <ScrambleText>{item.title}</ScrambleText>
         {external ? (

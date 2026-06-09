@@ -38,6 +38,7 @@ export const link = css({
 export const arrow = css({
   flexShrink: '0',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.subtle',
 });

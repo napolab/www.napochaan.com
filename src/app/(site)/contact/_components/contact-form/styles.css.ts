@@ -15,6 +15,7 @@ export const actions = css({
 export const formError = css({
   paddingLeft: 'element',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'danger.text',
   borderLeftWidth: 'strong',
@@ -26,6 +27,7 @@ export const formError = css({
 export const success = css({
   padding: 'block',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'md',
   color: 'fg.default',
   borderLeftWidth: 'strong',

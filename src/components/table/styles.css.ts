@@ -17,6 +17,7 @@ export const root = css({
 
 export const caption = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   color: 'fg.muted',
   textAlign: 'left',
@@ -35,7 +36,7 @@ export const body = css({
 export const headerCell = css({
   fontFamily: 'mono',
   fontSize: 'xs',
-  fontWeight: 'semibold',
+  fontVariationSettings: '"wght" 600',
   lineHeight: 'snug',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
@@ -96,6 +97,7 @@ export const cell = css({
     content: '[attr(data-label)]',
     display: { base: 'inline', desktop: 'none' },
     fontFamily: 'mono',
+    fontVariationSettings: '"wght" 600',
     fontSize: 'xs',
     letterSpacing: 'wide',
     textTransform: 'uppercase',

@@ -12,6 +12,7 @@ export const root = css({
 
 export const kicker = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   lineHeight: 'snug',
   letterSpacing: 'wider',

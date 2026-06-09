@@ -17,7 +17,7 @@ export const orderedList = css({
     textAlign: 'right',
     color: 'accent.text',
     fontFamily: 'mono',
-    fontWeight: 'medium',
+    fontVariationSettings: '"wght" 600',
   },
 });
 

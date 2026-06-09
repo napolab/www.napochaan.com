@@ -18,6 +18,7 @@ export const yearRoot = css({
 // rule under the number echoes the timeline's accent spine.
 export const year = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'lg',
   letterSpacing: 'wide',
   color: 'fg.default',

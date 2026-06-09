@@ -8,6 +8,7 @@ export const root = css({
 
 export const heading = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wider',
   textTransform: 'uppercase',
@@ -83,6 +84,7 @@ export const title = css({
 
 export const type = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   textTransform: 'uppercase',

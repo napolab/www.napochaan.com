@@ -13,6 +13,7 @@ export const strike = css({
 
 export const inlineCode = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: '[0.875em]',
   bg: 'bg.subtle',
   borderWidth: 'hairline',

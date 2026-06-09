@@ -43,6 +43,7 @@ export const link = css({
 export const arrow = css({
   flexShrink: '0',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.subtle',
 });
@@ -68,6 +69,7 @@ export const back = css({
   // across the row).
   alignSelf: 'start',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   textUnderlineOffset: '[2px]',

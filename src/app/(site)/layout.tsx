@@ -1,6 +1,8 @@
 import { getRequestOrigin } from '@utils/request-url';
 import { fontVariables } from '@themes/fonts';
 import { ThemeProvider } from '@themes/provider';
+import { typekitLoaderHtml } from '@themes/typekit';
+import { LoadingOverlay } from '@components/loading-overlay';
 import { SiteShell } from '@components/site-shell';
 
 import type { Metadata, Viewport } from 'next';
@@ -49,12 +51,19 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 const SiteLayout = async ({ children }: { children: ReactNode }) => {
   return (
-    <html lang="ja" className={fontVariables}>
+    // suppressHydrationWarning: the inline Typekit loader in <head> mutates
+    // documentElement.className (adds wf-loading) before React hydrates, so the
+    // live <html> class legitimately differs from this render. Scoped to <html>'s
+    // own attributes only — child mismatches are still reported.
+    <html lang="ja" className={fontVariables} suppressHydrationWarning>
       <head>
-        <link rel="stylesheet" href="https://use.typekit.net/vmz7pfu.css" />
+        {/* Adobe Fonts (Typekit) async loader — non-blocking; adds wf-loading
+            class hook on <html>. Static vendor snippet, no dynamic content. */}
+        <script dangerouslySetInnerHTML={typekitLoaderHtml} />
       </head>
       <ThemeProvider asChild>
         <body>
+          <LoadingOverlay />
           <SiteShell>{children}</SiteShell>
         </body>
       </ThemeProvider>

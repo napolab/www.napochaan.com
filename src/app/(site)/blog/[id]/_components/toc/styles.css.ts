@@ -9,6 +9,7 @@ export const root = css({
 
 export const label = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
@@ -29,6 +30,7 @@ export const item = css({
 export const link = css({
   display: 'inline-block',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   lineHeight: 'snug',
   letterSpacing: 'wide',

@@ -19,6 +19,7 @@ export const card = css({
 
 export const index = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   color: 'accent.text',

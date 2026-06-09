@@ -23,6 +23,7 @@ export const term = css({
   flex: 'none',
   fontFamily: 'mono',
   fontSize: 'xs',
+  fontVariationSettings: '"wght" 600',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
   // fg.muted (≥4.5:1 vs canvas); fg.subtle was 4.03 and failed AA at this size.

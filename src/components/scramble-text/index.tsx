@@ -123,7 +123,20 @@ export const ScrambleText = (props: Props) => {
         const trigger = rootRef.current;
         if (trigger === null) return;
         const st = ScrollTrigger.create({ trigger, start: 'top 90%', once: true, onEnter: () => decode(MOBILE_DURATION) });
-        return () => st.kill();
+        // Resizing up to desktop reverts this branch's decode tween. ScrambleTextPlugin's
+        // revert does NOT restore the original text — it leaves the fill frozen on a
+        // mid-scramble frame (e.g. `8/41/`) — and the desktop branch only binds a hover
+        // listener, so it never re-renders; React won't reconcile a text node GSAP mutated
+        // imperatively either, so the nav stays unreadable glyphs (also a WCAG fail). Heal
+        // the resting text on teardown: this returned cleanup runs in Context.kill AFTER the
+        // tween revert (gsap-core invokes the `_r` callbacks last), so it deterministically wins.
+        return () => {
+          st.kill();
+          const fill = fillRef.current;
+          if (fill === null) return;
+          fill.removeAttribute('data-scrambling');
+          fill.textContent = children;
+        };
       });
     },
     { scope: rootRef, dependencies: [children, host] },

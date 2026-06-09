@@ -19,6 +19,7 @@ const bandBase = {
   bg: 'accent.solid',
   color: 'fg.onSolid',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   textTransform: 'uppercase',

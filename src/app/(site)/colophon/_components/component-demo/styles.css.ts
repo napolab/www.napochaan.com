@@ -14,7 +14,7 @@ export const name = css({
   margin: '0',
   fontFamily: 'mono',
   fontSize: 'xs',
-  fontWeight: 'normal',
+  fontVariationSettings: '"wght" 600',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
   color: 'accent.text',

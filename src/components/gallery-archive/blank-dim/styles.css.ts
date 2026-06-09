@@ -12,6 +12,7 @@ export const blankDim = css({
   whiteSpace: 'pre-line',
   textAlign: 'center',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: '[11px]',
   letterSpacing: 'wide',
   lineHeight: '[1.45]',

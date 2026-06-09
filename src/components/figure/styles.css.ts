@@ -20,6 +20,7 @@ export const image = css({
 export const caption = css({
   display: 'block',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   lineHeight: 'snug',
   color: 'fg.muted',

@@ -5,6 +5,7 @@ export const root = css({
   alignItems: 'baseline',
   gap: 'inline',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   color: 'fg.muted',
 });

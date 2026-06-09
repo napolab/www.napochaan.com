@@ -63,6 +63,7 @@ export const meta = css({
   borderTopStyle: 'solid',
   borderTopColor: 'border.subtle',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   letterSpacing: 'wide',
   textTransform: 'uppercase',

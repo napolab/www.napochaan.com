@@ -149,8 +149,11 @@ export const tokens = defineTokens({
 
   fonts: {
     display: { value: '"digibop", system-ui, sans-serif' },
-    body: { value: 'var(--font-mplus1), system-ui, -apple-system, sans-serif' },
+    body: { value: 'var(--font-mplus1-en), var(--font-mplus1), system-ui, -apple-system, sans-serif' },
     mono: { value: '"config-mono-vf", ui-monospace, "Cascadia Code", monospace' },
+    // Adobe Fonts (Typekit) Japanese gothic — used for long content detail
+    // titles (works / news / blog). Kit ships weights 500 / 700 only.
+    ryoGothic: { value: '"ryo-gothic-plusn", sans-serif' },
   },
 
   zIndex: {

@@ -9,7 +9,7 @@ export const root = css({
   px: '4',
   fontFamily: 'mono',
   fontSize: 'sm',
-  fontWeight: 'semibold',
+  fontVariationSettings: '"wght" 600',
   lineHeight: 'snug',
   borderWidth: 'default',
   borderStyle: 'solid',

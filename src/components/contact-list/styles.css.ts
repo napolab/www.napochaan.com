@@ -17,6 +17,7 @@ export const link = css({
   paddingInline: 'element',
   paddingBlock: '2',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   textDecorationLine: 'none',
   color: 'fg.default',

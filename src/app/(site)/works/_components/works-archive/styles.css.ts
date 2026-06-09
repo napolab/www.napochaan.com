@@ -67,7 +67,7 @@ export const spine = css({
   color: 'fg.onSolid',
   fontFamily: 'mono',
   fontSize: 'sm',
-  fontWeight: 'medium',
+  fontVariationSettings: '"wght" 600',
   letterSpacing: 'wide',
   borderBottomWidth: 'hairline',
   borderBottomStyle: 'solid',
@@ -195,6 +195,7 @@ export const meta = css({
 export const type = css({
   flexShrink: '0',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
@@ -204,6 +205,7 @@ export const type = css({
 export const arrow = css({
   flexShrink: '0',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.subtle',
 });

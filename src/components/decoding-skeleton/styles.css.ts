@@ -15,6 +15,7 @@ export const glyphs = css({
   flexDirection: 'column',
   gap: '2',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   lineHeight: 'tight',
   color: 'fg.muted',

@@ -12,6 +12,7 @@ export const root = css({
 
 export const kicker = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   lineHeight: 'snug',
   letterSpacing: 'wider',
@@ -41,6 +42,7 @@ export const lead = css({
 export const sub = css({
   margin: '0',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: { base: 'sm', desktop: 'md' },
   lineHeight: 'snug',
   letterSpacing: 'wide',

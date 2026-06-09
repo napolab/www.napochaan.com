@@ -21,16 +21,35 @@ export const root = css({
   paddingBlock: 'element',
 });
 
-// Inline nav is desktop-only; below 768px the seven fixed slots would wrap.
+// First header row: inline nav + (mobile) menu trigger, side by side. Keeping
+// them in one flex row means the mobile shortcut links and the ≡ menu sit on the
+// same line instead of stacking (the header itself is a vertical column).
+export const navRow = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '4',
+  flexWrap: 'nowrap',
+  // Span the full header width (the header column is `alignItems: start`, which
+  // would otherwise shrink the row to its content) so the mobile menu trigger has
+  // room to stretch to the right edge.
+  width: 'full',
+});
+
+// Inline at every width. Below 768px only the `primary` slots remain visible
+// (see navLink); the full seven would wrap, so the rest move into the menu.
 export const nav = css({
-  display: { base: 'none', desktop: 'flex' },
-  gap: '[18px]',
+  display: 'flex',
+  gap: { base: '3', desktop: '[18px]' },
   flexWrap: 'wrap',
 });
 
-// The mobile trigger mirrors the nav: shown only where the inline nav is hidden.
+// The menu trigger is mobile-only: it carries the full nav once the inline row
+// is trimmed to the primary shortcuts below 768px. `margin-inline-start: auto`
+// absorbs the slack, pinning the compact trigger to the right edge while the
+// primary shortcuts (index / about / works) stay clustered on the left.
 export const menuRoot = css({
   display: { base: 'block', desktop: 'none' },
+  marginInlineStart: 'auto',
 });
 
 export const menuButton = css({
@@ -38,6 +57,7 @@ export const menuButton = css({
   alignItems: 'center',
   gap: '2',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   paddingBlock: '[2px]',
   paddingInline: '[8px]',
@@ -75,6 +95,7 @@ export const menu = css({
 
 export const menuItem = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   paddingBlock: '[6px]',
   paddingInline: '[10px]',
@@ -89,14 +110,20 @@ export const menuItem = css({
 });
 
 export const navLink = css({
+  // Below 768px only the primary shortcuts (index/about/works) show inline; the
+  // rest live in the menu. From desktop up, every slot is inline.
+  display: { base: 'none', desktop: 'block' },
+  '&[data-primary]': { display: 'block' },
   // Fixed-width slots so the active (black) highlight box is the same size on
-  // every item and never resizes as the current page changes. Sized to fit the
-  // longest label ("gallery"); text centered within the slot.
+  // every item and never resizes as the current page changes. Desktop sizes to
+  // the longest label ("gallery"); the mobile shortcuts are all ≤5 chars, so a
+  // narrower slot keeps the three links + menu on one row down to 375px.
   flex: 'none',
-  width: '[9ch]',
-  minWidth: '[9ch]',
+  width: { base: '[6ch]', desktop: '[9ch]' },
+  minWidth: { base: '[6ch]', desktop: '[9ch]' },
   textAlign: 'center',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   paddingInline: '[6px]',
   // Hover affordance is the scramble alone; the active (current page) state keeps
@@ -107,29 +134,54 @@ export const navLink = css({
   },
 });
 
+// The live status row. Every value here updates on its own clock — the wall
+// clock ticks each second, the Game of Life gen / alive counters change each
+// frame, the presence count and the cursors toggle flip on interaction. Because
+// the face is mono, every glyph is the same width, so the ONLY thing that shifts
+// layout is the digit COUNT (alive 9 → 139 → 1408) or the on⇄off length flip.
+// Each cell below therefore reserves a fixed `ch` slot sized to its widest value
+// (see per-cell notes); values grow into the reserved slack instead of pushing
+// every sibling to their right (and, at narrow widths, re-wrapping the row).
 export const status = css({
   display: 'flex',
   gap: '3',
   flexWrap: 'wrap',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   color: 'fg.muted',
 });
 
-export const gen = css({
-  color: 'accent.text',
-});
+// Shared cell behaviour: never flex-grow/shrink, never wrap a value mid-cell,
+// tabular digits so successive readings line up column-for-column.
+const cell = {
+  flex: 'none',
+  whiteSpace: 'nowrap',
+  fontVariantNumeric: 'tabular-nums',
+} as const;
 
-export const rec = css({
-  color: 'danger.text',
-});
+// HH:mm:ss — always 8 glyphs.
+export const clock = css({ ...cell, width: '[8ch]' });
 
-export const watching = css({
-  color: 'accent.text',
-});
+// "gen " (4) + the padStart(4) counter; 5 digits covers any realistic session.
+export const gen = css({ ...cell, width: '[9ch]', color: 'accent.text' });
 
+// "alive " (6) + the live-cell count, which stays below 10000 (4 digits).
+export const alive = css({ ...cell, width: '[10ch]' });
+
+// Static label — only needs `flex: none` so the row can't stretch it.
+export const rec = css({ flex: 'none', whiteSpace: 'nowrap', color: 'danger.text' });
+
+// "watching " (9) + the presence count (3 digits is ample).
+export const watching = css({ ...cell, width: '[12ch]', color: 'accent.text' });
+
+// "cursors: off" (12) is the widest state; reserving it means on⇄off never shifts.
 export const toggle = css({
+  ...cell,
+  width: '[12ch]',
+  textAlign: 'start',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   color: 'fg.muted',
   background: 'transparent',

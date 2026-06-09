@@ -12,6 +12,7 @@ export const root = css({
 
 export const no = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'accent.text',
 });
@@ -21,6 +22,7 @@ export const no = css({
 export const more = css({
   marginInlineStart: 'auto',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   whiteSpace: 'nowrap',
 });

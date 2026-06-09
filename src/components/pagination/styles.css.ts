@@ -7,6 +7,7 @@ export const root = css({
   justifyContent: 'center',
   gap: 'inline',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
 });
 

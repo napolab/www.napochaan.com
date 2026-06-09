@@ -30,6 +30,7 @@ export const stackRow = css({
 
 export const stackTerm = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
@@ -40,6 +41,7 @@ export const stackTerm = css({
 export const stackDesc = css({
   margin: '0',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.default',
 });
@@ -53,6 +55,7 @@ export const source = css({
   paddingInline: 'element',
   paddingBlock: '2',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   textDecorationLine: 'none',
   color: 'fg.default',

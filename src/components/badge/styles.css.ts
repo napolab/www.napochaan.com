@@ -5,6 +5,7 @@ export const root = css({
   alignItems: 'center',
   gap: 'inline',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   lineHeight: 'snug',
   color: 'fg.default',

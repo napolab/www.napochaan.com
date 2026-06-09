@@ -14,6 +14,7 @@ export const root = css({
   flexWrap: 'wrap',
   gap: 'inline',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   color: 'fg.muted',
 });

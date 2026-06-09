@@ -12,6 +12,7 @@ export const who = css({
   gap: 'element',
   padding: 'block',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   lineHeight: 'snug',
   color: 'fg.default',
@@ -23,6 +24,7 @@ export const who = css({
 
 export const prompt = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'accent.text',
 });
@@ -38,12 +40,14 @@ export const key = css({
   flex: 'none',
   width: '[7ch]',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.muted',
 });
 
 export const value = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.default',
 });

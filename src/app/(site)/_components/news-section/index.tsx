@@ -45,7 +45,9 @@ export const NewsSection = ({ items }: Props) => {
         {items.slice(0, 3).map((item) => (
           <li key={item.id} className={styles.item}>
             <span className={styles.date}>{item.date}</span>
-            <Tag tone="outline">{item.category}</Tag>
+            <span className={styles.category}>
+              <Tag tone="outline">{item.category}</Tag>
+            </span>
             <NewsTitle title={item.title} href={item.href} />
           </li>
         ))}

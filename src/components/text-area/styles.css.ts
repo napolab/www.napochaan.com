@@ -9,6 +9,7 @@ export const field = css({
 // Mono micro-label — de-emphasised so the boxed input stays the focal point.
 export const label = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.muted',
 });
@@ -41,6 +42,7 @@ export const input = css({
 
 export const error = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'danger.text',
 });

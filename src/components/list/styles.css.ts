@@ -28,6 +28,7 @@ export const item = css({
       content: '"▸"',
       color: 'accent.solid',
       fontFamily: 'mono',
+      fontVariationSettings: '"wght" 600',
       fontSize: 'xs',
       flexShrink: '0',
     },
@@ -38,6 +39,7 @@ export const item = css({
       counterIncrement: 'list-item',
       color: 'accent.solid',
       fontFamily: 'mono',
+      fontVariationSettings: '"wght" 600',
       fontSize: 'xs',
       flexShrink: '0',
     },
@@ -46,6 +48,7 @@ export const item = css({
 
 export const term = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   lineHeight: 'snug',
   color: 'fg.muted',

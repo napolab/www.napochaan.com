@@ -53,6 +53,7 @@ export const dot = css({
 
 export const date = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   lineHeight: 'jp',
   color: 'fg.muted',
@@ -96,6 +97,7 @@ export const externalMark = css({
 
 export const meta = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   color: 'fg.muted',
   whiteSpace: 'nowrap',

@@ -3,6 +3,7 @@ import { css } from '@styled/css';
 // DARK TERMINAL code block: ink bg, canvas text
 export const codeBlock = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   bg: 'fg.default',
   color: 'bg.canvas',

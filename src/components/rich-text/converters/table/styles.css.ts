@@ -21,7 +21,7 @@ export const tableRoot = css({
 export const headerCell = css({
   fontFamily: 'mono',
   fontSize: 'xs',
-  fontWeight: 'semibold',
+  fontVariationSettings: '"wght" 600',
   lineHeight: 'snug',
   letterSpacing: 'wide',
   textTransform: 'uppercase',

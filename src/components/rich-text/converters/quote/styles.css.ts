@@ -3,6 +3,7 @@ import { css } from '@styled/css';
 // TERMINAL-style blockquote: monospaced, muted, "> " prefix
 export const blockquote = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.muted',
   paddingInlineStart: 'element',

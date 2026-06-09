@@ -95,6 +95,7 @@ export const caption = css({
   zIndex: '[1]',
   pointerEvents: 'none',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: '[10px]',
   letterSpacing: 'wide',
   bg: 'fg.default',

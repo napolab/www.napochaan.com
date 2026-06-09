@@ -19,6 +19,7 @@ export const row = css({
 
 export const term = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.muted',
 });
@@ -26,6 +27,7 @@ export const term = css({
 export const description = css({
   margin: '0',
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   color: 'fg.default',
 });

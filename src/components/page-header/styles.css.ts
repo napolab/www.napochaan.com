@@ -15,6 +15,7 @@ export const root = css({
 // Mono uppercase accent kicker mirroring the hero kicker (`//` prefix supplied by caller).
 export const kicker = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   lineHeight: 'snug',
   letterSpacing: 'wider',
@@ -26,8 +27,10 @@ export const kicker = css({
 // grow from h2 to h1, outranking the global `h1` element styles so font/tracking
 // are reliable. Index labels (works / news / blog / colophon) use the loud
 // digibop display face — short English words carry it. Long content titles opt
-// into mono + tighter tracking via `titleTracking="tight"` (digibop renders long
-// mixed-script titles poorly).
+// into the Ryo Gothic PlusN Japanese face via `titleTracking="tight"` (digibop
+// renders long mixed-script titles poorly): medium weight, no caps, natural
+// tracking so Japanese glyphs breathe. The mono uppercase kicker/breadcrumb
+// chrome stays put, letting the humanist title read as "content" against the frame.
 export const title = css({
   fontFamily: 'display',
   fontWeight: 'normal',
@@ -36,7 +39,7 @@ export const title = css({
   textTransform: 'uppercase',
   letterSpacing: 'tighter',
   fontSize: { base: 'h2', desktop: 'h1' },
-  '&[data-tracking="tight"]': { fontFamily: 'mono', letterSpacing: '[-0.06em]' },
+  '&[data-tracking="tight"]': { fontFamily: 'ryoGothic', fontWeight: 'medium', textTransform: 'none', letterSpacing: 'normal' },
 });
 
 // Markdown-style blockquote lead: accent bar on the left, indented, medium weight.
@@ -107,6 +110,7 @@ const skeletonSlot = {
 export const skeletonBreadcrumb = css({
   ...skeletonSlot,
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   lineHeight: 'snug',
   '&[data-mode="bar"]': { height: '[1lh]', width: '[40%]' },
@@ -116,6 +120,7 @@ export const skeletonBreadcrumb = css({
 export const skeletonKicker = css({
   ...skeletonSlot,
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   lineHeight: 'snug',
   letterSpacing: 'wider',

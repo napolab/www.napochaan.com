@@ -41,6 +41,7 @@ export const modalImage = css({
 
 export const close = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   color: 'fg.onSolid',
   bg: 'transparent',

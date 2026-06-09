@@ -23,6 +23,7 @@ export const term = css({
 // SectionHeading's no marker.
 export const no = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   letterSpacing: 'wide',
   color: 'accent.text',

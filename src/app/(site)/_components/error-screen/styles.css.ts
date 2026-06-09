@@ -13,6 +13,7 @@ export const root = css({
 // Mono uppercase accent kicker mirroring the hero kicker (`// ${code} — ${kind}`).
 export const kicker = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
   lineHeight: 'snug',
   letterSpacing: 'wider',
@@ -60,6 +61,7 @@ export const actions = css({
 // Mono home link shared by the 404 and 500 screens.
 export const homeLink = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: { base: 'xs', desktop: 'sm' },
   letterSpacing: 'wide',
 });

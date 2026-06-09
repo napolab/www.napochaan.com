@@ -51,6 +51,13 @@ export default defineConfig({
         blink: {
           '50%': { opacity: '0' },
         },
+        // LoadingOverlay progress fill: eases toward 90% and holds. The overlay
+        // is always dismissed within Typekit's 3s scriptTimeout, so the cap is
+        // never on screen long enough to look stuck.
+        loadBar: {
+          '0%': { transform: 'scaleX(0)' },
+          '100%': { transform: 'scaleX(0.9)' },
+        },
         // DecodingSkeleton glyph churn. Each step swaps a cell's ::before content
         // through the ScrambleText glyph vocabulary (█▓▒░#%&@/\<>0-9) so a row of
         // cells reads as text being decoded. Three variants + per-cell delay keep

@@ -8,6 +8,7 @@ export const root = css({
 
 export const link = css({
   fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   letterSpacing: 'wide',
   color: 'fg.muted',
