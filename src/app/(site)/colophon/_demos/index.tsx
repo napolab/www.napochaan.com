@@ -5,6 +5,7 @@ import { Breadcrumbs } from '@components/breadcrumbs';
 import { FeedLink } from '@components/feed-link';
 import { Button } from '@components/button';
 import { Card } from '@components/card';
+import { DecodingSkeleton } from '@components/decoding-skeleton';
 import { Divider } from '@components/divider';
 import { EchoText } from '@components/echo-text';
 import { Figure } from '@components/figure';
@@ -211,6 +212,7 @@ export const demos: Record<ComponentName, ReactNode> = {
   Pagination: <Pagination currentPage={3} totalPages={5} href={paginationHref} />,
   Breadcrumbs: <Breadcrumbs items={breadcrumbItems} />,
   FeedLink: <FeedLink href="/news/rss.xml" label="サンプル RSS フィード" />,
+  DecodingSkeleton: <DecodingSkeleton rows={4} />,
   TypographyBand: <TypographyBandDemo />,
   GameOfLife: <GameOfLifeDemo />,
   CursorPresence: <CursorPresenceDemo />,

@@ -51,6 +51,40 @@ export default defineConfig({
         blink: {
           '50%': { opacity: '0' },
         },
+        // DecodingSkeleton glyph churn. Each step swaps a cell's ::before content
+        // through the ScrambleText glyph vocabulary (█▓▒░#%&@/\<>0-9) so a row of
+        // cells reads as text being decoded. Three variants + per-cell delay keep
+        // adjacent cells out of phase (random-ish), and `steps(1)` snaps each glyph
+        // (chunky/digital) instead of cross-fading.
+        churnA: {
+          '0%': { content: '"█"' },
+          '20%': { content: '"%"' },
+          '40%': { content: '"0"' },
+          '60%': { content: '"▒"' },
+          '80%': { content: '"@"' },
+          '100%': { content: '"7"' },
+        },
+        churnB: {
+          '0%': { content: '"#"' },
+          '20%': { content: '"▓"' },
+          '40%': { content: '">"' },
+          '60%': { content: '"4"' },
+          '80%': { content: '"░"' },
+          '100%': { content: '"&"' },
+        },
+        churnC: {
+          '0%': { content: '"/"' },
+          '20%': { content: '"2"' },
+          '40%': { content: '"█"' },
+          '60%': { content: '"<"' },
+          '80%': { content: '"9"' },
+          '100%': { content: '"▒"' },
+        },
+        // Subtle per-row opacity pulse so the whole block breathes while decoding.
+        decodePulse: {
+          '0%, 100%': { opacity: '0.55' },
+          '50%': { opacity: '1' },
+        },
         glitchShift: {
           '0%, 92%, 100%': { textShadow: 'none', transform: 'none' },
           '93%': {

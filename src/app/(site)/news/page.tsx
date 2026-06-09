@@ -1,9 +1,6 @@
 import { NewsArchive } from './_components/news-archive';
 import { groupNewsByYearMonth } from './_lib/group-by-year-month';
-import * as s from './styles.css';
 
-import { FeedLink } from '@components/feed-link';
-import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 import { findNewsList } from '@lib/payload/news';
 
@@ -15,10 +12,6 @@ import type { Metadata } from 'next';
 export const revalidate = 3600;
 
 const PAGE_SIZE = 10;
-
-// Built at module scope so it isn't re-created as an inline JSX array prop
-// (react-perf/jsx-no-new-array-as-prop).
-const crumbs = [{ href: '/', label: 'home' }, { label: 'news' }];
 
 // The archive owns its URL shape: page 1 is the bare path, deeper pages carry
 // ?page=N (Pagination doesn't hard-code it).
@@ -53,12 +46,10 @@ const NewsPage = async ({ searchParams }: Props) => {
   const groups = groupNewsByYearMonth(pageItems);
 
   return (
-    <main id="main-content" className={s.main}>
-      <PageHeader title="news" breadcrumbs={crumbs} kicker="// お知らせ" lead="近況すぎ〜↑" />
-      <FeedLink href="/news/rss.xml" label="news の RSS フィード" />
+    <>
       <NewsArchive groups={groups} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={newsHref} /> : null}
-    </main>
+    </>
   );
 };
 
