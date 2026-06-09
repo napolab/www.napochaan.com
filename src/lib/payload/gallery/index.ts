@@ -24,7 +24,7 @@ const fetchGalleryList = unstable_cache(
     const result = await payload.find({
       collection: 'gallery',
       where: publishedWhere,
-      sort: 'order',
+      sort: '_order',
       depth: 1,
       limit: 0,
     });

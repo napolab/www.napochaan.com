@@ -148,7 +148,7 @@ const importLogs = async (instance: Payload): Promise<void> => {
 // Gallery: no stable natural key (caption is optional and can collide), so the
 // simplest idempotent strategy is delete-all then recreate from the JSON.
 // ---------------------------------------------------------------------------
-type GalleryRecord = { imageFile?: string; caption?: string; alt?: string; order?: number; _status?: 'draft' | 'published' };
+type GalleryRecord = { imageFile?: string; caption?: string; alt?: string; _status?: 'draft' | 'published' };
 const importGallery = async (instance: Payload): Promise<void> => {
   const records = await readData<GalleryRecord>('gallery');
   await instance.delete({ collection: 'gallery', where: { id: { exists: true } }, context: writeContext, overrideAccess: true });

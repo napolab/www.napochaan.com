@@ -188,9 +188,9 @@ export interface News {
   title: string;
   publishedAt: string;
   /**
-   * お知らせの活動カテゴリ。サポート/登壇/DJ/VJ/映像/フライヤー から選ぶ。
+   * お知らせの活動カテゴリ。サポート/登壇/DJ/VJ/フライヤー/制作 から選ぶ。
    */
-  category: 'support' | 'talk' | 'dj' | 'vj' | 'video' | 'flyer';
+  category: 'support' | 'talk' | 'dj' | 'vj' | 'work' | 'flyer';
   /**
    * 設定すると、年表などのリンクが内部の詳細ページではなくこの URL を指します。
    */
@@ -313,6 +313,7 @@ export interface Blog {
  */
 export interface Gallery {
   id: number;
+  _order?: string | null;
   image: number | Media;
   /**
    * 'flyer / 05.23' のような短い表示ラベル。
@@ -322,10 +323,7 @@ export interface Gallery {
    * 空なら画像（media）側の alt を使います。
    */
   alt?: string | null;
-  /**
-   * 昇順。masonry の表示順。未設定は最後。
-   */
-  order?: number | null;
+  homeTop?: boolean | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -563,10 +561,11 @@ export interface BlogSelect<T extends boolean = true> {
  * via the `definition` "gallery_select".
  */
 export interface GallerySelect<T extends boolean = true> {
+  _order?: T;
   image?: T;
   caption?: T;
   alt?: T;
-  order?: T;
+  homeTop?: T;
   meta?:
     | T
     | {
