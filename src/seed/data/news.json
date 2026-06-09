@@ -1,0 +1,669 @@
+[
+  {
+    "title": "企画展『拡張される音楽』(1回目) に参加（「多面体、鏡面」@ 大阪関西国際芸術祭2023, StudioGnu×たなか合作）",
+    "publishedAt": "2023-12-20T00:00:00.000Z",
+    "category": "live",
+    "url": "https://x.com/sheeno3rin/status/1738184053508239618",
+    "body": null,
+    "_status": "published"
+  },
+  {
+    "title": "Hono Conference 2024 で登壇（英語・大型カンファレンス）",
+    "publishedAt": "2024-06-22T00:00:00.000Z",
+    "category": "live",
+    "url": "https://x.com/naporin24690/status/1804542363895001374",
+    "body": null,
+    "_status": "published"
+  },
+  {
+    "title": "企画展『拡張される音楽』(2回目) に参加（「多面体、鏡面」+ LLM 即時更新システム）",
+    "publishedAt": "2024-11-29T00:00:00.000Z",
+    "category": "live",
+    "url": "https://x.com/naporin24690/status/1862529523344187817",
+    "body": null,
+    "_status": "published"
+  },
+  {
+    "title": "企画展『共に在る音楽』に参加（DEMiXUS / W♭Y♭K M♭C K システム制作）",
+    "publishedAt": "2024-12-12T00:00:00.000Z",
+    "category": "live",
+    "url": "https://x.com/naporin24690/status/1867179943060504598",
+    "body": null,
+    "_status": "published"
+  },
+  {
+    "title": "VJ ソフトの最初のデモを公開しました",
+    "publishedAt": "2025-12-01T00:00:00.000Z",
+    "category": "release",
+    "url": "https://soundcloud.com/napochaan/booth2booth-vj-demo",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Electron と WebGPU で組んだ自作 VJ ソフトの最初のデモ映像を公開しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "企画展『思弁的な音楽』に参加（r-906《額縁の言葉 : I》背景映像・システム構築）",
+    "publishedAt": "2025-12-10T00:00:00.000Z",
+    "category": "live",
+    "url": "https://x.com/naporin24690/status/1998715240075374793",
+    "body": null,
+    "_status": "published"
+  },
+  {
+    "title": "Booth²Booth vol.8 への出演が決定しました",
+    "publishedAt": "2025-12-14T00:00:00.000Z",
+    "category": "live",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "vol.8 に DJ / VJ として出演します。自作ソフトによる映像演出を持ち込みます。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "2025 年の振り返りを公開しました",
+    "publishedAt": "2025-12-30T00:00:00.000Z",
+    "category": "update",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "DJ を始め、VJ に手を伸ばした一年の振り返りを公開しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "blog ページを公開しました",
+    "publishedAt": "2026-01-11T00:00:00.000Z",
+    "category": "update",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "技術記事とエッセイをまとめた blog ページを公開しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "新しいフライヤーシリーズを公開しました",
+    "publishedAt": "2026-01-25T00:00:00.000Z",
+    "category": "release",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "方眼の交点に光を宿らせたネオングリッドのフライヤーシリーズを公開しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "Booth²Booth vol.9 を開催しました",
+    "publishedAt": "2026-02-08T00:00:00.000Z",
+    "category": "live",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VR 空間で Booth²Booth vol.9 を開催しました。ゲストとともにオールジャンルで回しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "型を自分の視点で設計する話を公開しました",
+    "publishedAt": "2026-02-22T00:00:00.000Z",
+    "category": "update",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "呼び出し側の都合に合わせて型を広げない、という設計指針についてのブログ記事を公開しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "Cloudflare Workers で組んだ配信基盤の話を公開しました",
+    "publishedAt": "2026-03-12T00:00:00.000Z",
+    "category": "update",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "イベント配信を支える Cloudflare Workers ベースの基盤構成について、技術記事を公開しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "Booth²Booth vol.10 への出演が決定しました",
+    "publishedAt": "2026-03-28T00:00:00.000Z",
+    "category": "live",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "節目となる vol.10 に DJ として出演します。テクノの四つ打ちで会場を回します。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "新しいキービジュアルを公開しました",
+    "publishedAt": "2026-04-04T00:00:00.000Z",
+    "category": "release",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Booth²Booth シリーズの基準となるキービジュアルを公開しました。余白と矩形の間で会場の鼓動を設計した一枚です。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "Booth2Booth 公式サイト（booth2booth.com）公開",
+    "publishedAt": "2026-04-12T00:00:00.000Z",
+    "category": "release",
+    "url": "https://x.com/naporin24690/status/2043185292337975601",
+    "body": null,
+    "_status": "published"
+  },
+  {
+    "title": "about ページを更新しました",
+    "publishedAt": "2026-04-20T00:00:00.000Z",
+    "category": "update",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "プロフィールとスキルの一覧を最新の状態に更新しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "VJ セットの設計についての記事を公開しました",
+    "publishedAt": "2026-05-02T00:00:00.000Z",
+    "category": "update",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "BPM を座標へ流し込む VJ セットの設計手法について、ブログ記事を公開しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "#ProjectCircles 椎乃味醂ライブにモーキャプシステムで参加（大規模ライブ）",
+    "publishedAt": "2026-05-05T00:00:00.000Z",
+    "category": "live",
+    "url": "https://x.com/naporin24690/status/2051632371590701138",
+    "body": null,
+    "_status": "published"
+  },
+  {
+    "title": "Booth²Booth vol.11 を開催しました",
+    "publishedAt": "2026-05-10T00:00:00.000Z",
+    "category": "live",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VR 空間で Booth²Booth vol.11 を開催しました。多数のご来場ありがとうございました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "works ページを公開しました",
+    "publishedAt": "2026-05-23T00:00:00.000Z",
+    "category": "release",
+    "url": "/works",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "フライヤー・グラフィック・VJ の制作物をアーカイブとして公開しました。年ごとに積み上がる台帳形式で閲覧できます。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "Booth²Booth vol.12 への出演が決定しました",
+    "publishedAt": "2026-06-01T00:00:00.000Z",
+    "category": "live",
+    "url": "https://vrchat.com/home/launch?worldId=wrld_booth2booth-vol12",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VRDJ イベント Booth²Booth vol.12 に DJ / VJ として出演します。当日はフロアの熱量を光跡で可視化する予定です。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "サイトを全面リニューアルしました",
+    "publishedAt": "2026-06-05T00:00:00.000Z",
+    "category": "update",
+    "url": null,
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "グリッドと黒のグロテスク、エレクトリックブルーで組み直したポートフォリオを公開しました。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "制作物・お知らせ・年表をひとつの版面に統合し、情報の更新に強い構造へ作り変えています。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  }
+]

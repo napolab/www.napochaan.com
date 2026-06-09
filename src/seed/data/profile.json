@@ -1,0 +1,482 @@
+{
+  "name": "naporitan",
+  "aka": "napochaan / naporin / @naporin24690",
+  "now": "プログラマー / フルスタックエンジニア · DJ · VJ",
+  "team": "StudioGnu / Booth²Booth",
+  "tagline": "おそろしき、なんでも屋。",
+  "bio": {
+    "root": {
+      "type": "root",
+      "format": "",
+      "indent": 0,
+      "version": 1,
+      "direction": "ltr",
+      "children": [
+        {
+          "type": "paragraph",
+          "textFormat": 0,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+            {
+              "type": "text",
+              "text": "たぶん今もどっかで何か作ってる、naporitan です。だらだら、ぷらぷら、その場のノリだけで会話する刹那的な生物。",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            },
+            {
+              "type": "linebreak",
+              "version": 1
+            },
+            {
+              "type": "text",
+              "text": "リアルの会場か VRChat、どっちかで DJ か VJ やってる。両方が現場！",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "textFormat": 0,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+            {
+              "type": "text",
+              "text": "正体はプログラマで DJ で VJ。本業はソフトウェア開発。",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            },
+            {
+              "type": "linebreak",
+              "version": 1
+            },
+            {
+              "type": "text",
+              "text": "でもプログラミングは問題解決の道具で、それだけじゃ人に何かを渡せない。だからフライヤーも DJ も VJ もやる。ビジュアルでまるごと人を動かしにいく！",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "textFormat": 0,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+            {
+              "type": "text",
+              "text": "殻を破りたくて、クリエイター集団 ",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            },
+            {
+              "type": "link",
+              "format": "",
+              "indent": 0,
+              "version": 1,
+              "direction": "ltr",
+              "fields": {
+                "linkType": "custom",
+                "url": "https://studiognu.org",
+                "newTab": true
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "text": "StudioGnu",
+                  "format": 0,
+                  "style": "",
+                  "mode": "normal",
+                  "detail": 0,
+                  "version": 1
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": " に飛び込んだ。今はアーティストの 0 → 1 を技術でガッツリ支えてる。",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            },
+            {
+              "type": "linebreak",
+              "version": 1
+            },
+            {
+              "type": "text",
+              "text": "VJ ソフトは Electron + WebGPU で自作した。道具がなければ、つくる。",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            },
+            {
+              "type": "linebreak",
+              "version": 1
+            },
+            {
+              "type": "text",
+              "text": "主催してる定期 DJ イベント「",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            },
+            {
+              "type": "link",
+              "format": "",
+              "indent": 0,
+              "version": 1,
+              "direction": "ltr",
+              "fields": {
+                "linkType": "custom",
+                "url": "https://booth2booth.com",
+                "newTab": true
+              },
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Booth²Booth",
+                  "format": 0,
+                  "style": "",
+                  "mode": "normal",
+                  "detail": 0,
+                  "version": 1
+                }
+              ]
+            },
+            {
+              "type": "text",
+              "text": "」は、回を重ねながらものをつくっていく制作チームでもある。世界観から HP まで、まるっと自分たちで。気づけばなんでも自分でつくってる。見つけたら声かけてね〜！",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "philosophy": {
+    "root": {
+      "type": "root",
+      "format": "",
+      "indent": 0,
+      "version": 1,
+      "direction": "ltr",
+      "children": [
+        {
+          "type": "paragraph",
+          "textFormat": 0,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+            {
+              "type": "text",
+              "text": "目に見えるもの全部を作りたい……本当は、そう思ってる。なにかに触れると、それがどんな仕組みでできているのか知りたくなって、すぐに分解したくなる。コードを読むのが好きだった。それがそのまま手を動かす方に転がって、LLM の時代になってからは、もう作るのが止まらない。次から次へとアイデアが湧いてきて、作ったものにどう意味を持たせようか、ずっと考えてる。たぶんぼくは、作っていない自分にうまく価値を感じられなくて……作り続けることだけが、ちゃんと呼吸できる方法なんだと思う。",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "textFormat": 0,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+            {
+              "type": "text",
+              "text": "その延長で、バグが好きになった。意図していないはずなのに、なにかを企んでいるように見える瞬間。無邪気と不穏が、同じ場所に平気で同居している。pixelsort や datamosh みたいな崩壊も、コラージュも、陰鬱なものも、たぶん同じ理由で惹かれてる。混沌と調和、相反するものがひとつの場所に居座っているもの……ぼくはきっと、そういうものにしか本気で心を動かされない。",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "textFormat": 0,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+            {
+              "type": "text",
+              "text": "それは、ぼく自身がそういう作りをしているからだと思う。物寂しさや陰鬱さが、なぜか安心感をくれる。辛いという感情があるからこそ、生きている実感がある。矛盾しているけど、その矛盾ごとがぼくを構成している。過去には戻れないという、後悔に塗れた感情も、ずっとそこにある。後悔は、たぶんこの先も消えない。",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            }
+          ]
+        },
+        {
+          "type": "paragraph",
+          "textFormat": 0,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+            {
+              "type": "text",
+              "text": "だから、自分の感情が動いた時、それがどう動いたのかをいつも知りたくなる。仕組みがわかると、今度はそれを、自分以外の人にも起こしてみたくなる。プログラミングだけでは届かなかったものが、ビジュアルでなら届く気がしてる。結局ぼくは、ただ後悔したくないだけなんだと思う。戻れない過去を抱えているぶん、これ以上は後悔したくないし、同じことを周りの人にも思ってる。今この瞬間があってよかったと、ぼくも、あの人たちも、そう思えるなら。それが自分の力で少しでもできるなら、いつだってそうしたい。",
+              "format": 0,
+              "style": "",
+              "mode": "normal",
+              "detail": 0,
+              "version": 1
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "love": [
+    {
+      "value": "dubstep"
+    },
+    {
+      "value": "brostep"
+    },
+    {
+      "value": "riddim"
+    },
+    {
+      "value": "color bass"
+    },
+    {
+      "value": "hi-tech"
+    },
+    {
+      "value": "jersey club"
+    },
+    {
+      "value": "hyperpop"
+    },
+    {
+      "value": "jesus club"
+    },
+    {
+      "value": "hyperflip"
+    },
+    {
+      "value": "bairefunk"
+    }
+  ],
+  "skillGroups": [
+    {
+      "category": "lang",
+      "items": [
+        {
+          "value": "TypeScript"
+        },
+        {
+          "value": "Rust"
+        },
+        {
+          "value": "Python"
+        },
+        {
+          "value": "Ruby"
+        },
+        {
+          "value": "Swift"
+        },
+        {
+          "value": "C#"
+        },
+        {
+          "value": "UdonSharp"
+        },
+        {
+          "value": "Haskell"
+        },
+        {
+          "value": "WebAssembly"
+        }
+      ]
+    },
+    {
+      "category": "frontend",
+      "items": [
+        {
+          "value": "React"
+        },
+        {
+          "value": "Next.js"
+        },
+        {
+          "value": "Remix"
+        },
+        {
+          "value": "CSS"
+        },
+        {
+          "value": "vanilla-extract"
+        },
+        {
+          "value": "React Native"
+        },
+        {
+          "value": "Expo"
+        }
+      ]
+    },
+    {
+      "category": "backend",
+      "items": [
+        {
+          "value": "Hono"
+        },
+        {
+          "value": "NestJS"
+        },
+        {
+          "value": "GraphQL"
+        },
+        {
+          "value": "Flask"
+        },
+        {
+          "value": "FastAPI"
+        },
+        {
+          "value": "Rails"
+        }
+      ]
+    },
+    {
+      "category": "infra",
+      "items": [
+        {
+          "value": "Cloudflare"
+        },
+        {
+          "value": "Durable Objects"
+        },
+        {
+          "value": "D1"
+        },
+        {
+          "value": "R2"
+        },
+        {
+          "value": "Firebase"
+        },
+        {
+          "value": "Vercel"
+        }
+      ]
+    },
+    {
+      "category": "data",
+      "items": [
+        {
+          "value": "Yjs"
+        },
+        {
+          "value": "Drizzle"
+        },
+        {
+          "value": "Prisma"
+        },
+        {
+          "value": "pandas"
+        },
+        {
+          "value": "NumPy"
+        },
+        {
+          "value": "scikit-learn"
+        }
+      ]
+    },
+    {
+      "category": "graphics",
+      "items": [
+        {
+          "value": "WebGPU"
+        },
+        {
+          "value": "WGSL"
+        }
+      ]
+    },
+    {
+      "category": "software",
+      "items": [
+        {
+          "value": "Unity"
+        },
+        {
+          "value": "Figma"
+        },
+        {
+          "value": "Photoshop"
+        }
+      ]
+    }
+  ],
+  "contacts": [
+    {
+      "label": "x",
+      "handle": "@naporin24690",
+      "href": "https://x.com/naporin24690"
+    },
+    {
+      "label": "github",
+      "handle": "naporin0624",
+      "href": "https://github.com/naporin0624"
+    },
+    {
+      "label": "mail",
+      "handle": "contact@napochaan.com",
+      "href": "mailto:contact@napochaan.com"
+    }
+  ],
+  "_status": "published"
+}

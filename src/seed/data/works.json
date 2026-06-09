@@ -1,0 +1,1676 @@
+[
+  {
+    "title": "名取さなさんのファンアプリ作成（その2・別アプリ）",
+    "no": "42",
+    "type": "dev",
+    "date": "2019-01-01T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1091367573587865601",
+    "description": "初めて作成した web アプリケーション。タスク管理アプリに推しの声をかけ合わせることで、ユニークで面白い体験を作り出した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "初めて作成した web アプリケーション。タスク管理アプリに推しの声をかけ合わせることで、ユニークで面白い体験を作り出した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "natori-task.jpg"
+  },
+  {
+    "title": "名取さなさんのファンアプリ作成（その1）",
+    "no": "41",
+    "type": "dev",
+    "date": "2019-03-01T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1106641342506004480",
+    "description": "桜を見に行くために作成したファンアプリ。iOS で AR を簡単に実現できる web アプリをラップした推し専用アプリ。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "桜を見に行くために作成したファンアプリ。iOS で AR を簡単に実現できる web アプリをラップした推し専用アプリ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "natori-ar.jpg"
+  },
+  {
+    "title": "lessons ページの開発",
+    "no": "40",
+    "type": "dev",
+    "date": "2020-02-01T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1227830616227344384",
+    "description": "インターン先で主要な検索ページを作成した。検索 UI の初実装を通じてコンポーネント分割の手法を学んだ。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "インターン先で主要な検索ページを作成した。検索 UI の初実装を通じてコンポーネント分割の手法を学んだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "soelu-lesson.jpg"
+  },
+  {
+    "title": "instructors ページの開発",
+    "no": "39",
+    "type": "dev",
+    "date": "2020-03-01T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1244865712490856448",
+    "description": "新卒で入社した会社のアプリページを作成した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "新卒で入社した会社のアプリページを作成した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "soelu-instructor.png"
+  },
+  {
+    "title": "447Records TANA の開発",
+    "no": "38",
+    "type": "dev",
+    "date": "2020-06-01T00:00:00.000Z",
+    "url": "https://tana.447pro.com/",
+    "description": "447Records TANA の開発を担当した。主にオーディオプレイヤー周りを実装。Apple Music のような洗練されたインタラクションを目指した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "447Records TANA の開発を担当した。主にオーディオプレイヤー周りを実装。Apple Music のような洗練されたインタラクションを目指した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "447pro-tana.jpg"
+  },
+  {
+    "title": "Project BLUE Official HP 作成",
+    "no": "37",
+    "type": "dev",
+    "date": "2021-01-01T00:00:00.000Z",
+    "url": "https://pjblue.jp",
+    "description": "ProjectBLUE の公式 HP を作成した。Next.js + styled-components で構築。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ProjectBLUE の公式 HP を作成した。Next.js + styled-components で構築。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "projectblue-hp.png"
+  },
+  {
+    "title": "ネットショップ UI 開発",
+    "no": "36",
+    "type": "dev",
+    "date": "2021-06-01T00:00:00.000Z",
+    "url": "https://flatkobo.shop",
+    "description": "flat-工房のネットショップ UI 改善プロジェクトを担当。デザイン以外の全部分を担当し、lit-element をメインに使用して開発。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "flat-工房のネットショップ UI 改善プロジェクトを担当。デザイン以外の全部分を担当し、lit-element をメインに使用して開発。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "flat-shop.jpg"
+  },
+  {
+    "title": "買取アプリの開発",
+    "no": "35",
+    "type": "dev",
+    "date": "2022-01-01T00:00:00.000Z",
+    "url": "https://flat-kobo-kaitori.web.app/",
+    "description": "flat-工房の買取専用アプリを開発した。デザイン以外の全部分を担当し、Firebase + React + vanilla-extract + react-hook-form で構築。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "flat-工房の買取専用アプリを開発した。デザイン以外の全部分を担当し、Firebase + React + vanilla-extract + react-hook-form で構築。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "flat-kaitori.png"
+  },
+  {
+    "title": "LGTM ジェネレータ",
+    "no": "34",
+    "type": "dev",
+    "date": "2022-03-01T00:00:00.000Z",
+    "url": "https://lgtm.napochaan.com/",
+    "description": "satori で作成した LGTM ジェネレーターを Cloudflare Workers にデプロイ。URL パラメーターで文字色と背景画像をカスタマイズ可能。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "satori で作成した LGTM ジェネレーターを Cloudflare Workers にデプロイ。URL パラメーターで文字色と背景画像をカスタマイズ可能。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "lgtm-napochaan-com.png"
+  },
+  {
+    "title": "napochaan.com の作成（旧バージョン）",
+    "no": "33",
+    "type": "dev",
+    "date": "2022-06-01T00:00:00.000Z",
+    "url": "https://github.com/napolab/www.napochaan.com",
+    "description": "Figma の勉強を兼ねて作成したポートフォリオサイト。Next.js + Cloudflare Pages で高速表示を実現し、react-spring でキャラクターやコンテンツにアニメーションを付与。（※旧バージョン）",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Figma の勉強を兼ねて作成したポートフォリオサイト。Next.js + Cloudflare Pages で高速表示を実現し、react-spring でキャラクターやコンテンツにアニメーションを付与。（※旧バージョン）",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "napochaan-ogp.png"
+  },
+  {
+    "title": "StudioGnu HP の作成",
+    "no": "26",
+    "type": "dev",
+    "date": "2023-06-01T00:00:00.000Z",
+    "url": "https://www.studiognu.org",
+    "description": "StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに使用し、データ管理には MicroCMS を採用。作品ごとの動的 og:image 生成には next/og を活用した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに使用し、データ管理には MicroCMS を採用。作品ごとの動的 og:image 生成には next/og を活用した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "www.studiognu.org_ja.png"
+  },
+  {
+    "title": "熱異常 / シャノン REMIX テクニカルサポート",
+    "no": "32",
+    "type": "support",
+    "date": "2023-07-01T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1687483050253561856",
+    "description": "シャノンの熱異常 REMIX のテクニカルサポートを担当した。主にプログラム部分をサポート。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "シャノンの熱異常 REMIX のテクニカルサポートを担当した。主にプログラム部分をサポート。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "netuijou-remix.jpg"
+  },
+  {
+    "title": "ボカコレランキングアーカイブの作成",
+    "no": "31",
+    "type": "dev",
+    "date": "2023-08-01T00:00:00.000Z",
+    "url": "https://vocaloid-collection-archive.studiognu.org/",
+    "description": "ボカコレ2023夏の毎時ランキングアーカイブを作成した。縦横両方向の仮想スクロールで大量コンテンツの高速検索を実現。データ基盤は Cloudflare Workers + KV + R2、アプリケーションは Hono で構築。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ボカコレ2023夏の毎時ランキングアーカイブを作成した。縦横両方向の仮想スクロールで大量コンテンツの高速検索を実現。データ基盤は Cloudflare Workers + KV + R2、アプリケーションは Hono で構築。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "vocacolle-2023.jpg"
+  },
+  {
+    "title": "楽曲「デュレエ」関連データ解析",
+    "no": "27",
+    "type": "dev",
+    "date": "2023-09-01T00:00:00.000Z",
+    "url": "https://www.studiognu.org/ja/works/duree",
+    "description": "楽曲「デュレエ」の一部で使用されるデータの解析を担当した。データ分析に JupyterLab、pandas、numpy を使用し、描画に matplotlib、NetWorkX、JavaScript canvas を活用。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "楽曲「デュレエ」の一部で使用されるデータの解析を担当した。データ分析に JupyterLab、pandas、numpy を使用し、描画に matplotlib、NetWorkX、JavaScript canvas を活用。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "duree.jpg"
+  },
+  {
+    "title": "オリジナル名刺の作成",
+    "no": "30",
+    "type": "graphic",
+    "date": "2023-09-14T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1705577231928697299",
+    "description": "オリジナル名刺を作成した。Figma でデザインから入稿まですべて自力で実施。キャラクターをメインにしたシンプルで情報が伝わりやすいレイアウトにこだわった。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "オリジナル名刺を作成した。Figma でデザインから入稿まですべて自力で実施。キャラクターをメインにしたシンプルで情報が伝わりやすいレイアウトにこだわった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "meishi-v1.jpg"
+  },
+  {
+    "title": "第一象徴体系 LP 作成",
+    "no": "29",
+    "type": "dev",
+    "date": "2023-11-01T00:00:00.000Z",
+    "url": "https://1st-album.hakualab.org/",
+    "description": "シャノンの 1st アルバムのランディングページを作成した。Figma でデザインし Astro で実装した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "シャノンの 1st アルバムのランディングページを作成した。Figma でデザインし Astro で実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "1st-album.hakualab.org.png"
+  },
+  {
+    "title": "「多面体、鏡面」システム作成",
+    "no": "28",
+    "type": "dev",
+    "date": "2023-12-01T00:00:00.000Z",
+    "url": "https://x.com/StudioGnu/status/1741010587495416144",
+    "description": "大阪関西国際芸術祭2023に出展するためのシステムを作成した。感想投稿機能、ChatGPT API と StableDiffusion による自動動画生成システム、ポスター・コメント表示画面を実装した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "大阪関西国際芸術祭2023に出展するためのシステムを作成した。感想投稿機能、ChatGPT API と StableDiffusion による自動動画生成システム、ポスター・コメント表示画面を実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "OKIAF.png"
+  },
+  {
+    "title": "彼方 DL ページ作成",
+    "no": "24",
+    "type": "dev",
+    "date": "2024-01-01T00:00:00.000Z",
+    "url": "https://www.studiognu.org/lp/kanata",
+    "description": "StudioGnu で公開した UTAU 彼方のランディングページを作成した。Cloudflare Turnstile で bot 排除後、数分間有効な signed URL でダウンロードリンクを生成。DurableObjects によるダウンロードカウンター機能も搭載。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "StudioGnu で公開した UTAU 彼方のランディングページを作成した。Cloudflare Turnstile で bot 排除後、数分間有効な signed URL でダウンロードリンクを生成。DurableObjects によるダウンロードカウンター機能も搭載。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "kanata.png"
+  },
+  {
+    "title": "flat-工房 HP 制作サポート",
+    "no": "23",
+    "type": "support",
+    "date": "2024-03-01T00:00:00.000Z",
+    "url": "https://www.flatkobo.com",
+    "description": "flat-工房の HP 制作サポートを行った。Next.js を Cloudflare Pages で運用し、コンタクトフォームは ServerAction と Resend で実装し、bot 対策として Cloudflare WAF ページ検証を導入するなど安全な運用を重視した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "flat-工房の HP 制作サポートを行った。Next.js を Cloudflare Pages で運用し、コンタクトフォームは ServerAction と Resend で実装し、bot 対策として Cloudflare WAF ページ検証を導入するなど安全な運用を重視した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "flatkobo-hp.png"
+  },
+  {
+    "title": "Hono Conf 2024 登壇（初登壇）",
+    "no": "22",
+    "type": "talk",
+    "date": "2024-06-22T00:00:00.000Z",
+    "url": "https://speakerdeck.com/naporin0624/event-exhibition-with-hono",
+    "description": "Hono Conference 2024 - Our first step に登壇した。大阪関西国際芸術祭での展示システム事例について発表。Hono RPC での型安全通信、ReverseProxy と getPath を併用した画像最適化サーバーの構築手法などを紹介した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Hono Conference 2024 - Our first step に登壇した。大阪関西国際芸術祭での展示システム事例について発表。Hono RPC での型安全通信、ReverseProxy と getPath を併用した画像最適化サーバーの構築手法などを紹介した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "hono-conference-2024.png"
+  },
+  {
+    "title": "Workers Tech Talk #3 登壇",
+    "no": "21",
+    "type": "talk",
+    "date": "2024-08-01T00:00:00.000Z",
+    "url": "https://speakerdeck.com/naporin0624/durableobjects-nituite",
+    "description": "Cloudflare Workers DurableObjects での WebSocket 活用のための Tips について登壇した。自身が直面した問題を具体例として挙げながら、実践的な解決策を紹介した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Cloudflare Workers DurableObjects での WebSocket 活用のための Tips について登壇した。自身が直面した問題を具体例として挙げながら、実践的な解決策を紹介した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "cloudflare-workers-tech-talk-3.png"
+  },
+  {
+    "title": "工房祭ステージシステム実装",
+    "no": "20",
+    "type": "dev",
+    "date": "2024-09-14T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1834900593808490701",
+    "description": "OBS のブラウザソースで動作するステージ演出システムを作成した。Cloudflare Workers と WebSocket により OBS とスマホ間の通信を実現。スマホでの正解不正会選択、再生停止操作、回答者位置調整など現場での実用性を重視した機能を搭載。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "OBS のブラウザソースで動作するステージ演出システムを作成した。Cloudflare Workers と WebSocket により OBS とスマホ間の通信を実現。スマホでの正解不正会選択、再生停止操作、回答者位置調整など現場での実用性を重視した機能を搭載。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "five-blocker.png"
+  },
+  {
+    "title": "燭 / MusicVideo Coding Advisor",
+    "no": "19",
+    "type": "dev",
+    "date": "2024-10-10T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1845201683368071632",
+    "description": "燭の MV で使用する図形を p5.js で生成できるシンプルなエディターを作成した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "燭の MV で使用する図形を p5.js で生成できるシンプルなエディターを作成した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "tomoshibi.png"
+  },
+  {
+    "title": "Event Exhibition with LLM（企画展『拡張される音楽』）",
+    "no": "08",
+    "type": "support",
+    "date": "2024-11-29T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1862529523344187817",
+    "description": "投稿サムネ/コメント一覧/キャラポスターを WebSocket + LLM 生成で即時更新するシステムを実装した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "投稿サムネ/コメント一覧/キャラポスターを WebSocket + LLM 生成で即時更新するシステムを実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "ボカコレ2024冬 ランキングの作成",
+    "no": "25",
+    "type": "dev",
+    "date": "2024-12-01T00:00:00.000Z",
+    "url": "https://vocaloid-collection-archive.studiognu.org/2024/winter",
+    "description": "ボカコレ2024冬のランキングアーカイブを作成した。Cloudflare Cron Trigger で収集したランキングスナップショットを drizzle で Cloudflare D1 に保存する構成に変更した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ボカコレ2024冬のランキングアーカイブを作成した。Cloudflare Cron Trigger で収集したランキングスナップショットを drizzle で Cloudflare D1 に保存する構成に変更した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "vocacolle-2024.png"
+  },
+  {
+    "title": "DEMiXUS システム作成",
+    "no": "18",
+    "type": "dev",
+    "date": "2024-12-12T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1867179943060504598",
+    "description": "企画展「共に在る音楽」の作品「DEMiXUS」のシステムを設計・実装した。短期間での開発ながら要望実現のため Cloudflare Stack をフル活用した構成とした。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "企画展「共に在る音楽」の作品「DEMiXUS」のシステムを設計・実装した。短期間での開発ながら要望実現のため Cloudflare Stack をフル活用した構成とした。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "DEMiXUS.jpeg"
+  },
+  {
+    "title": "W♭Y♭K M♭C K システム作成",
+    "no": "17",
+    "type": "dev",
+    "date": "2024-12-12T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1867175063893811585",
+    "description": "企画展「共に在る音楽」の作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "企画展「共に在る音楽」の作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "WYKMCK.jpeg"
+  },
+  {
+    "title": "ヘイロー化ギミック booth 販売",
+    "no": "16",
+    "type": "dev",
+    "date": "2025-01-01T00:00:00.000Z",
+    "url": "https://booth.pm/ja/items/6604904",
+    "description": "VRChat で好きなオブジェクトを頭上で回転させるヘイローにできるギミックを制作した。ボタン一つで自動配置する仕組みを実装し、フルパック版では13種類のメニューを用意。汎用的な円形配置スクリプトにより頭部以外の部位にも装着可能で、BOOTH で販売中。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VRChat で好きなオブジェクトを頭上で回転させるヘイローにできるギミックを制作した。ボタン一つで自動配置する仕組みを実装し、フルパック版では13種類のメニューを用意。汎用的な円形配置スクリプトにより頭部以外の部位にも装着可能で、BOOTH で販売中。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "halo-gimmick.png"
+  },
+  {
+    "title": "UMANITY HP 制作",
+    "no": "15",
+    "type": "dev",
+    "date": "2025-03-15T00:00:00.000Z",
+    "url": "https://ahub.jp/umanity/",
+    "description": "AHUB のアルバム「UMANITY」の Web サイトを制作した。アルバム紹介コンテンツやクイズなどのインタラクティブなギミックを搭載した HP を作成した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "AHUB のアルバム「UMANITY」の Web サイトを制作した。アルバム紹介コンテンツやクイズなどのインタラクティブなギミックを搭載した HP を作成した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "umanity.jpg"
+  },
+  {
+    "title": "おてぃる誕生日 モザイクアート制作",
+    "no": "12",
+    "type": "dev",
+    "date": "2025-04-01T00:00:00.000Z",
+    "url": "https://ristill.club/2025",
+    "description": "VRChat の推しの誕生日を祝うためにモザイクアートと HP を作成した。20人の協力により約3000枚の画像から24000タイルのモザイクアートを制作。モザイクアート生成用の Rust ツールも開発した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VRChat の推しの誕生日を祝うためにモザイクアートと HP を作成した。20人の協力により約3000枚の画像から24000タイルのモザイクアートを制作。モザイクアート生成用の Rust ツールも開発した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "ristill-birthday-2025.jpg"
+  },
+  {
+    "title": "AKAGE オマージュ動画制作",
+    "no": "14",
+    "type": "video",
+    "date": "2025-04-17T00:00:00.000Z",
+    "url": "https://x.com/ristill_vr/status/1913064949242360039",
+    "description": "After Effects を使った初めての動画制作で AKAGE オマージュ動画を作成した。アバターのコンセプトに合わせ、可愛さと面白さを重視した編集を心がけた。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "After Effects を使った初めての動画制作で AKAGE オマージュ動画を作成した。アバターのコンセプトに合わせ、可愛さと面白さを重視した編集を心がけた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "akage-homage.png"
+  },
+  {
+    "title": "まだ知らない君がいる 映像提供",
+    "no": "10",
+    "type": "video",
+    "date": "2025-05-03T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1959117309689438582",
+    "description": "椎乃味醂の楽曲「まだ知らない君がいる - 初音ミク･重音テト」の MV に VRChat で撮影した映像を提供した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "椎乃味醂の楽曲「まだ知らない君がいる - 初音ミク･重音テト」の MV に VRChat で撮影した映像を提供した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "mada-shiranai-kimi.png"
+  },
+  {
+    "title": "VRChat イベントポスター制作",
+    "no": "13",
+    "type": "flyer",
+    "date": "2025-06-01T00:00:00.000Z",
+    "url": "https://x.com/napochaan_vrc2/status/1929843195313377560",
+    "description": "VRChat の個人イベント用ポスター・ロゴを制作した。可愛らしさと情報の伝わりやすさを重視したレイアウトを心がけた。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VRChat の個人イベント用ポスター・ロゴを制作した。可愛らしさと情報の伝わりやすさを重視したレイアウトを心がけた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "vrchat-event-poster.png"
+  },
+  {
+    "title": "ボカコレ2025夏 アーカイブ作成",
+    "no": "11",
+    "type": "dev",
+    "date": "2025-08-01T00:00:00.000Z",
+    "url": "https://vocaloid-collection-archive.studiognu.org/2025/summer",
+    "description": "ボカコレ2025夏の統計情報を Web サイトにまとめた。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ボカコレ2025夏の統計情報を Web サイトにまとめた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "vocacolle-2025-summer.png"
+  },
+  {
+    "title": "PAE2.0 ドットレカギミック制作",
+    "no": "09",
+    "type": "dev",
+    "date": "2025-09-13T00:00:00.000Z",
+    "url": "https://vrchat.com/home/world/wrld_ab2c1526-c1b1-419d-b138-be32591e799f",
+    "description": "VRChat で公開されている VRC PIXELART EXHIBITION 2.0 にドット絵組み合わせギミックを制作・提供した。複数人で同じものを見るための同期機能や、VR・Desktop 環境での最適化など、UX を重視した設計を行った。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VRChat で公開されている VRC PIXELART EXHIBITION 2.0 にドット絵組み合わせギミックを制作・提供した。複数人で同じものを見るための同期機能や、VR・Desktop 環境での最適化など、UX を重視した設計を行った。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "pixelartexhibision2.0.png"
+  },
+  {
+    "title": "「解釈系 / ハーモニー」特設サイト",
+    "no": "07",
+    "type": "dev",
+    "date": "2025-11-16T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1990007733005979981",
+    "description": "サイト実装を担当。試聴開始で最後まで自動再生される機能を実装した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "サイト実装を担当。試聴開始で最後まで自動再生される機能を実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "Vket2025Winter「PrizeSpider」クレーンゲームギミック",
+    "no": "06",
+    "type": "vrchat",
+    "date": "2025-12-06T00:00:00.000Z",
+    "url": "https://x.com/napochaan_vrc2/status/1998666475687784803",
+    "description": "九龍帝国 欠番街 -無秩序- での一部 Udon 実装を担当した（動画: OrangeLiner / 出演: SwanPute）。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "九龍帝国 欠番街 -無秩序- での一部 Udon 実装を担当した（動画: OrangeLiner / 出演: SwanPute）。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "企画展『思弁的な音楽』r-906《額縁の言葉 : I》",
+    "no": "05",
+    "type": "support",
+    "date": "2025-12-10T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/1998715240075374793",
+    "description": "体験型展示作品の背景映像・システム構築を担当した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "体験型展示作品の背景映像・システム構築を担当した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "#Harmony0118 あみだくじシステム",
+    "no": "04",
+    "type": "dev",
+    "date": "2026-01-18T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/2012874773630685212",
+    "description": "パーティ用あみだくじシステムを実装した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "パーティ用あみだくじシステムを実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "Booth2Booth 公式サイト",
+    "no": "02",
+    "type": "dev",
+    "date": "2026-04-12T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/2043185292337975601",
+    "description": "デザイン/実装担当。コンセプト設計重視・高インタラクションな公式サイト（booth2booth.com）を制作した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "デザイン/実装担当。コンセプト設計重視・高インタラクションな公式サイト（booth2booth.com）を制作した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "booth2booth-ogp.jpg"
+  },
+  {
+    "title": "#ProjectCircles 椎乃味醂 ライブセクション",
+    "no": "03",
+    "type": "support",
+    "date": "2026-05-05T00:00:00.000Z",
+    "url": "https://x.com/naporin24690/status/2051632371590701138",
+    "description": "モーキャプシステム構築・アニメーション補正を担当した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "モーキャプシステム構築・アニメーション補正を担当した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  },
+  {
+    "title": "napochaan.com リニューアル",
+    "no": "01",
+    "type": "dev",
+    "date": "2026-06-09T00:00:00.000Z",
+    "url": "https://github.com/napolab/www.napochaan.com",
+    "description": "Next.js + OpenNext + Cloudflare Workers / Payload CMS / Panda CSS で全面リニューアル制作。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Next.js + OpenNext + Cloudflare Workers / Payload CMS / Panda CSS で全面リニューアル制作。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "napochaan-renewal-ogp.png"
+  }
+]

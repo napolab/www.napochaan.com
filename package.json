@@ -24,6 +24,8 @@
     "payload:migrate:create": "payload migrate:create",
     "payload:generate-importmap": "payload generate:importmap",
     "payload:seed": "payload seed",
+    "seed:export": "payload seed:export",
+    "seed:import": "payload seed:import",
     "cf:types": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
