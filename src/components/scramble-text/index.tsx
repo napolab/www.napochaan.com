@@ -66,9 +66,9 @@ export const ScrambleText = (props: Props) => {
     () => {
       // The raw decode tween body. revealDelay holds a short full scramble before
       // decoding; low speed keeps the glyph refresh chunky (digital); tweenLength
-      // off since the text length never changes. data-scrambling pins the fill to
-      // one line for the decode (see styles), dropping on complete to settle into
-      // wrapped text.
+      // off since the text length never changes. data-scrambling clips the churning
+      // fill to the ghost-reserved box for the decode (see styles) so a multi-line
+      // title keeps wrapping, dropping on complete to settle into the resolved wrap.
       const runDecode = () => {
         if (reduced()) return;
         const fill = fillRef.current;

@@ -37,14 +37,15 @@ export const ghost = css({
 // multi-line titles (news/works/blog), which must wrap within their column
 // instead of spilling a single line out past the viewport.
 //
-// While decoding (`data-scrambling`, set for the tween's duration) DESKTOP switches
-// to `nowrap`: the churning block glyphs are wider than the resolved characters, so
-// without this they would re-break the line as they flicker. `nowrap` pins the
-// scramble to a single line that spills horizontally — safe because the desktop
-// layer is absolute, so nothing reflows. On MOBILE the fill is in-flow, so nowrap
-// would grow the box's width/height (layout shift); there we KEEP wrapping and let
-// the parent's `-webkit-line-clamp` + overflow:hidden cap the box, so the scramble
-// churns within the already-clamped 2-line box with zero reflow.
+// While decoding (`data-scrambling`, set for the tween's duration) the fill KEEPS
+// wrapping so a multi-line title decodes line-for-line instead of collapsing to one
+// spilling line. The churning block glyphs are wider than the resolved characters,
+// so the wrap can momentarily push to MORE lines than the ghost reserved; because
+// the fill is absolute that excess would otherwise spill DOWN over the next row. To
+// contain it we pin the fill to the ghost-reserved box (`inset-block-end: 0`) and
+// `overflow: hidden` clips any extra churning lines — the same wrap-within-a-fixed-
+// box idea the clamp branch already uses on mobile. The box never grows, so nothing
+// around the text reflows; the churn just settles into the resolved wrap on complete.
 export const fill = css({
   position: 'absolute',
   insetBlockStart: '0',
@@ -53,7 +54,8 @@ export const fill = css({
   textDecorationLine: '[inherit]',
   textUnderlineOffset: '[inherit]',
   '&[data-scrambling]': {
-    whiteSpace: 'nowrap',
+    insetBlockEnd: '0',
+    overflow: 'hidden',
   },
   // Clamp mode (mobile): show at most the 2 lines the ghost reserved; the absolute
   // fill churns within that fixed box, so the in-view decode never shifts layout.
