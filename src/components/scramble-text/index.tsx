@@ -21,7 +21,11 @@ const MOBILE = '(max-width: 767.98px)';
 // EchoText wordmark and the PageHeader title, so every scramble across the site
 // reads as one system.
 const CHARS = '█▓▒░#%&@/\\<>0123456789';
+// Desktop hover decode. Snappy because the user actively triggers it.
 const DURATION = 0.5;
+// Mobile/tablet in-view decode. Slower than desktop: the touch user does not
+// trigger it, so a gentler reveal reads better as the text scrolls into view.
+const MOBILE_DURATION = 1.2;
 
 const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -69,12 +73,12 @@ export const ScrambleText = (props: Props) => {
       // off since the text length never changes. data-scrambling clips the churning
       // fill to the ghost-reserved box for the decode (see styles) so a multi-line
       // title keeps wrapping, dropping on complete to settle into the resolved wrap.
-      const runDecode = () => {
+      const runDecode = (duration: number) => {
         if (reduced()) return;
         const fill = fillRef.current;
         if (fill === null) return;
         gsap.to(fill, {
-          duration: DURATION,
+          duration,
           ease: 'none',
           scrambleText: { text: children, chars: CHARS, speed: 0.5, revealDelay: 0.1, tweenLength: false },
           onStart: () => fill.setAttribute('data-scrambling', 'true'),
@@ -106,7 +110,7 @@ export const ScrambleText = (props: Props) => {
         if (target === null) return;
         const onPointerEnter = (event: PointerEvent) => {
           if (event.pointerType === 'touch') return;
-          decode();
+          decode(DURATION);
         };
         target.addEventListener('pointerenter', onPointerEnter);
         return () => target.removeEventListener('pointerenter', onPointerEnter);
@@ -118,7 +122,7 @@ export const ScrambleText = (props: Props) => {
         const decode = contextSafe(runDecode);
         const trigger = rootRef.current;
         if (trigger === null) return;
-        const st = ScrollTrigger.create({ trigger, start: 'top 90%', once: true, onEnter: () => decode() });
+        const st = ScrollTrigger.create({ trigger, start: 'top 90%', once: true, onEnter: () => decode(MOBILE_DURATION) });
         return () => st.kill();
       });
     },
