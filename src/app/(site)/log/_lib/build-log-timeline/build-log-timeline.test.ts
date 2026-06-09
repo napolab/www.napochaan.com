@@ -4,7 +4,6 @@ import { buildLogTimeline } from './index';
 
 import type { LogManualItem } from '../log-manual-item';
 import type { ExternalPost } from '../external-feeds';
-import type { NewsItem } from '../../../news/_lib/news-item';
 import type { WorkRow } from '../../../works/_lib/work-row';
 
 const now = '2026-06-08T00:00:00.000Z';
@@ -16,11 +15,6 @@ const work = (overrides: Partial<WorkRow> & Pick<WorkRow, 'id' | 'year'>): WorkR
   ...overrides,
 });
 
-const newsItem = (overrides: Partial<NewsItem> & Pick<NewsItem, 'id' | 'date' | 'category'>): NewsItem => ({
-  title: `news ${overrides.id}`,
-  ...overrides,
-});
-
 const post = (overrides: Partial<ExternalPost> & Pick<ExternalPost, 'id' | 'date' | 'source'>): ExternalPost => ({
   title: `post ${overrides.id}`,
   link: `https://example.com/${overrides.id}`,
@@ -28,138 +22,46 @@ const post = (overrides: Partial<ExternalPost> & Pick<ExternalPost, 'id' | 'date
 });
 
 describe('buildLogTimeline', () => {
-  it('keeps live/release news and drops site/blog news', () => {
-    const news = [
-      newsItem({ id: '1', date: '2026-05-01', category: 'live' }),
-      newsItem({ id: '2', date: '2026-05-02', category: 'release' }),
-      newsItem({ id: '3', date: '2026-05-03', category: 'site' }),
-      newsItem({ id: '4', date: '2026-05-04', category: 'blog' }),
-    ];
-
-    const [group] = buildLogTimeline(news, [], [], now);
-    const ids = group?.items.map((item) => item.id) ?? [];
-
-    expect(ids).toContain('news-1');
-    expect(ids).toContain('news-2');
-    expect(ids).not.toContain('news-3');
-    expect(ids).not.toContain('news-4');
-  });
-
-  it('merges news and works into the same year group', () => {
-    const news = [newsItem({ id: '1', date: '2026-05-01', category: 'live' })];
+  it('formats works date as an em dash when undated', () => {
     const works = [work({ id: '1', year: 2026 })];
 
-    const groups = buildLogTimeline(news, works, [], now);
+    const [group] = buildLogTimeline(works, [], now);
 
-    expect(groups).toHaveLength(1);
-    expect(groups[0]?.year).toBe(2026);
-    expect(groups[0]?.items.map((item) => item.id)).toEqual(['news-1', 'work-1']);
-  });
-
-  it('orders years newest first and, within a year, dated news (desc) before works', () => {
-    const news = [
-      newsItem({ id: 'a', date: '2025-03-01', category: 'live' }),
-      newsItem({ id: 'b', date: '2026-01-10', category: 'release' }),
-      newsItem({ id: 'c', date: '2026-04-20', category: 'live' }),
-    ];
-    const works = [work({ id: 'w1', year: 2026 }), work({ id: 'w2', year: 2025 })];
-
-    const groups = buildLogTimeline(news, works, [], now);
-
-    expect(groups.map((group) => group.year)).toEqual([2026, 2025]);
-    expect(groups[0]?.items.map((item) => item.id)).toEqual(['news-c', 'news-b', 'work-w1']);
-    expect(groups[1]?.items.map((item) => item.id)).toEqual(['news-a', 'work-w2']);
-  });
-
-  it('formats news date as MM.DD and works date as an em dash', () => {
-    const news = [newsItem({ id: '1', date: '2026-04-09', category: 'live' })];
-    const works = [work({ id: '1', year: 2026 })];
-
-    const [group] = buildLogTimeline(news, works, [], now);
-
-    expect(group?.items[0]?.date).toBe('04.09');
-    expect(group?.items[1]?.date).toBe('—');
-  });
-
-  it('marks a news entry upcoming only when its date is strictly after now', () => {
-    const news = [
-      newsItem({ id: 'past', date: '2026-06-01', category: 'live' }),
-      newsItem({ id: 'today', date: '2026-06-08', category: 'live' }),
-      newsItem({ id: 'future', date: '2026-06-20', category: 'live' }),
-    ];
-
-    const [group] = buildLogTimeline(news, [], [], now);
-    const byId = new Map(group?.items.map((item) => [item.id, item.upcoming]));
-
-    expect(byId.get('news-past')).toBe(false);
-    expect(byId.get('news-today')).toBe(false);
-    expect(byId.get('news-future')).toBe(true);
+    expect(group?.items[0]?.date).toBe('—');
   });
 
   it('sets upcoming false for all works', () => {
     const works = [work({ id: '1', year: 2026 })];
 
-    const [group] = buildLogTimeline([], works, [], now);
+    const [group] = buildLogTimeline(works, [], now);
 
     expect(group?.items[0]?.upcoming).toBe(false);
   });
 
-  it('leaves a news entry without an href when the source has no url', () => {
-    const news = [newsItem({ id: '7', date: '2026-05-01', category: 'live' })];
-
-    const [group] = buildLogTimeline(news, [], [], now);
-
-    expect(group?.items[0]?.href).toBeUndefined();
-  });
-
-  it('passes an internal news url through as the href', () => {
-    const news = [newsItem({ id: '7', date: '2026-05-01', category: 'live', url: '/news/7' })];
-
-    const [group] = buildLogTimeline(news, [], [], now);
-
-    expect(group?.items[0]?.href).toBe('/news/7');
-  });
-
-  it('passes an external news url through as the href', () => {
-    const news = [newsItem({ id: '7', date: '2026-05-01', category: 'live', url: 'https://example.com/x' })];
-
-    const [group] = buildLogTimeline(news, [], [], now);
-
-    expect(group?.items[0]?.href).toBe('https://example.com/x');
-  });
-
-  it('leaves a work entry without an href when the source has no url', () => {
-    const works = [work({ id: '9', year: 2026 })];
-
-    const [group] = buildLogTimeline([], works, [], now);
-
-    expect(group?.items[0]?.href).toBeUndefined();
-  });
-
-  it('passes a work url through as the href', () => {
+  it('links a work to its internal /works/{id} page', () => {
     const works = [work({ id: '9', year: 2026, url: 'https://example.com/w' })];
 
-    const [group] = buildLogTimeline([], works, [], now);
+    const [group] = buildLogTimeline(works, [], now);
 
-    expect(group?.items[0]?.href).toBe('https://example.com/w');
+    expect(group?.items[0]?.href).toBe('/works/9');
   });
 
   it('does not mutate the input arrays', () => {
-    const news = [newsItem({ id: '1', date: '2026-05-01', category: 'live' })];
     const works = [work({ id: '1', year: 2026 })];
-    const newsSnapshot = [...news];
+    const posts = [post({ id: 'p', date: '2026-05-01T00:00:00.000Z', source: 'zenn' })];
     const worksSnapshot = [...works];
+    const postsSnapshot = [...posts];
 
-    buildLogTimeline(news, works, [], now);
+    buildLogTimeline(works, posts, now);
 
-    expect(news).toEqual(newsSnapshot);
     expect(works).toEqual(worksSnapshot);
+    expect(posts).toEqual(postsSnapshot);
   });
 
   it('merges an external post into the correct year group', () => {
     const posts = [post({ id: 'zenn-1', date: '2026-02-15T00:00:00.000Z', source: 'zenn' })];
 
-    const groups = buildLogTimeline([], [], posts, now);
+    const groups = buildLogTimeline([], posts, now);
 
     expect(groups).toHaveLength(1);
     expect(groups[0]?.year).toBe(2026);
@@ -169,7 +71,7 @@ describe('buildLogTimeline', () => {
   it('carries the feed source as meta and the article url as href', () => {
     const posts = [post({ id: 'sizu-9', date: '2026-02-15T00:00:00.000Z', source: 'sizu', link: 'https://sizu.me/x/posts/9' })];
 
-    const [group] = buildLogTimeline([], [], posts, now);
+    const [group] = buildLogTimeline([], posts, now);
 
     expect(group?.items[0]?.meta).toBe('sizu');
     expect(group?.items[0]?.href).toBe('https://sizu.me/x/posts/9');
@@ -178,19 +80,21 @@ describe('buildLogTimeline', () => {
   it('formats a post date as MM.DD and never marks it upcoming', () => {
     const posts = [post({ id: '1', date: '2026-04-09T00:00:00.000Z', source: 'zenn' })];
 
-    const [group] = buildLogTimeline([], [], posts, now);
+    const [group] = buildLogTimeline([], posts, now);
 
     expect(group?.items[0]?.date).toBe('04.09');
     expect(group?.items[0]?.upcoming).toBe(false);
   });
 
-  it('sorts posts and news together by date (desc) within a year', () => {
-    const news = [newsItem({ id: 'n', date: '2026-03-10', category: 'release' })];
+  it('orders years newest first and, within a year, dated posts (desc) before works', () => {
     const posts = [post({ id: 'early', date: '2026-01-05T00:00:00.000Z', source: 'zenn' }), post({ id: 'late', date: '2026-05-20T00:00:00.000Z', source: 'sizu' })];
+    const works = [work({ id: 'w1', year: 2026 }), work({ id: 'w2', year: 2025 })];
 
-    const [group] = buildLogTimeline(news, [], posts, now);
+    const groups = buildLogTimeline(works, posts, now);
 
-    expect(group?.items.map((entry) => entry.id)).toEqual(['post-late', 'news-n', 'post-early']);
+    expect(groups.map((group) => group.year)).toEqual([2026, 2025]);
+    expect(groups[0]?.items.map((item) => item.id)).toEqual(['post-late', 'post-early', 'work-w1']);
+    expect(groups[1]?.items.map((item) => item.id)).toEqual(['work-w2']);
   });
 });
 
@@ -198,7 +102,7 @@ describe('buildLogTimeline work date precision', () => {
   it('shows MM.DD for a work that has a date', () => {
     const works = [work({ id: 'dated', year: 2025, date: '2025-03-15' })];
 
-    const [group] = buildLogTimeline([], works, [], now);
+    const [group] = buildLogTimeline(works, [], now);
 
     expect(group?.items[0]?.date).toBe('03.15');
   });
@@ -206,7 +110,7 @@ describe('buildLogTimeline work date precision', () => {
   it('shows em dash for a work without a date', () => {
     const works = [work({ id: 'undated', year: 2025 })];
 
-    const [group] = buildLogTimeline([], works, [], now);
+    const [group] = buildLogTimeline(works, [], now);
 
     expect(group?.items[0]?.date).toBe('—');
   });
@@ -214,7 +118,7 @@ describe('buildLogTimeline work date precision', () => {
   it('sorts a dated work before an undated work within the same year', () => {
     const works = [work({ id: 'undated', year: 2025 }), work({ id: 'dated', year: 2025, date: '2025-06-01' })];
 
-    const [group] = buildLogTimeline([], works, [], now);
+    const [group] = buildLogTimeline(works, [], now);
     const ids = group?.items.map((item) => item.id) ?? [];
 
     // dated work sorts first (has a non-empty sortDate)
@@ -224,7 +128,7 @@ describe('buildLogTimeline work date precision', () => {
   it('sorts two dated works in descending date order', () => {
     const works = [work({ id: 'early', year: 2025, date: '2025-01-10' }), work({ id: 'late', year: 2025, date: '2025-11-20' })];
 
-    const [group] = buildLogTimeline([], works, [], now);
+    const [group] = buildLogTimeline(works, [], now);
     const ids = group?.items.map((item) => item.id) ?? [];
 
     expect(ids.indexOf('work-late')).toBeLessThan(ids.indexOf('work-early'));
@@ -234,7 +138,7 @@ describe('buildLogTimeline work date precision', () => {
 describe('buildLogTimeline manual entries', () => {
   it('merges manual log entries into the correct year, sorted by date desc', () => {
     const logs: LogManualItem[] = [{ id: '1', title: 'サイト公開', date: '2026-06-01', meta: 'milestone', url: 'https://napochaan.com' }];
-    const groups = buildLogTimeline([], [], [], now, logs);
+    const groups = buildLogTimeline([], [], now, logs);
     const y2026 = groups.find((g) => g.year === 2026);
     expect(y2026).toBeDefined();
     const entry = y2026?.items.find((i) => i.id === 'log-1');
@@ -242,7 +146,7 @@ describe('buildLogTimeline manual entries', () => {
   });
 
   it('keeps working when no manual entries are passed (default param)', () => {
-    expect(() => buildLogTimeline([], [], [], now)).not.toThrow();
+    expect(() => buildLogTimeline([], [], now)).not.toThrow();
   });
 
   it('marks a future-dated gig as upcoming and a past one as not', () => {
@@ -250,33 +154,9 @@ describe('buildLogTimeline manual entries', () => {
       { id: 'future', title: 'VJ at fest', date: '2026-07-26', meta: 'VJ' },
       { id: 'past', title: 'DJ set', date: '2026-05-01', meta: 'DJ' },
     ];
-    const items = buildLogTimeline([], [], [], now, logs).find((g) => g.year === 2026)?.items ?? [];
+    const items = buildLogTimeline([], [], now, logs).find((g) => g.year === 2026)?.items ?? [];
 
     expect(items.find((item) => item.id === 'log-future')?.upcoming).toBe(true);
     expect(items.find((item) => item.id === 'log-past')?.upcoming).toBe(false);
-  });
-});
-
-describe('buildLogTimeline href dedup', () => {
-  it('collapses a work, news, and manual log sharing one href into a single entry (work wins)', () => {
-    const sharedUrl = 'https://x.com/naporin24690/status/2012874773630685212';
-    const works = [work({ id: 'w', year: 2026, date: '2026-01-18', type: 'dev', title: 'あみだくじシステム', url: sharedUrl })];
-    const news = [newsItem({ id: 'n', date: '2026-01-18', category: 'live', title: 'あみだくじに参加', url: sharedUrl })];
-    const logs: LogManualItem[] = [{ id: 'l', title: 'あみだくじ 実装', date: '2026-01-18', meta: 'support', url: sharedUrl }];
-
-    const groups = buildLogTimeline(news, works, [], now, logs);
-    const items = groups.find((g) => g.year === 2026)?.items ?? [];
-    const matching = items.filter((item) => item.href === sharedUrl);
-
-    expect(matching).toHaveLength(1);
-    expect(matching[0]).toMatchObject({ id: 'work-w', meta: 'dev' });
-  });
-
-  it('keeps every entry that has no href (cannot collide)', () => {
-    const works = [work({ id: 'a', year: 2026, date: '2026-02-01' }), work({ id: 'b', year: 2026, date: '2026-02-02' })];
-    const groups = buildLogTimeline([], works, [], now, []);
-    const items = groups.find((g) => g.year === 2026)?.items ?? [];
-
-    expect(items).toHaveLength(2);
   });
 });

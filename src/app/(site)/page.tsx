@@ -9,7 +9,7 @@ import { buildLogTimeline } from './log/_lib/build-log-timeline';
 import { fetchExternalPosts } from './log/_lib/fetch-external-posts';
 import { findBlogList } from '@lib/payload/blog';
 import { findGalleryList } from '@lib/payload/gallery';
-import { findLatestNews, findNewsList } from '@lib/payload/news';
+import { findLatestNews } from '@lib/payload/news';
 import { findLogList } from '@lib/payload/logs';
 import { findWorksList } from '@lib/payload/works';
 import { dayjs } from '@utils/dayjs';
@@ -52,9 +52,8 @@ const about = {
 const HOME_LOG_LIMIT = 5;
 
 const HomePage = async () => {
-  const [latest, allNews, works, blogPosts, galleryPhotos, logs, externalPosts] = await Promise.all([
+  const [latest, works, blogPosts, galleryPhotos, logs, externalPosts] = await Promise.all([
     findLatestNews(3),
-    findNewsList(),
     findWorksList(),
     findBlogList(),
     findGalleryList(),
@@ -64,8 +63,8 @@ const HomePage = async () => {
 
   const newsItems = toFeedItems(latest);
   const now = dayjs().tz('Asia/Tokyo').toISOString();
-  // Build the full timeline from all news/works/posts; take the N newest entries for the home teaser.
-  const logGroups = buildLogTimeline(allNews, works, externalPosts, now, logs);
+  // Build the full timeline from works/posts/logs; take the N newest entries for the home teaser.
+  const logGroups = buildLogTimeline(works, externalPosts, now, logs);
   const logEntries = logGroups.flatMap((group) => group.items).slice(0, HOME_LOG_LIMIT);
   const homePosts = [...blogPosts].slice(0, 3);
   const homeWorks = [...works].slice(0, 3);

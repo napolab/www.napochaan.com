@@ -11,7 +11,8 @@ const revalidateWorks = createPublishedTagRevalidateHooks([CACHE_TAGS.works]);
 
 export const Works = {
   slug: 'works',
-  labels: { singular: '作品', plural: '作品' },
+  labels: { singular: 'works', plural: 'works' },
+  defaultSort: '-date',
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'type', 'date', '_status'],

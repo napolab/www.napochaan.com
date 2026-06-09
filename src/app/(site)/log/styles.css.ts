@@ -5,3 +5,10 @@ export const main = css({
   flexDirection: 'column',
   gap: { base: '8', desktop: 'section' },
 });
+
+export const errorSection = css({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: 'element',
+});

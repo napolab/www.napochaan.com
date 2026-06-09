@@ -10,7 +10,7 @@ const revalidateGallery = createPublishedTagRevalidateHooks([CACHE_TAGS.gallery]
 
 export const Gallery = {
   slug: 'gallery',
-  labels: { singular: 'ギャラリー', plural: 'ギャラリー' },
+  labels: { singular: 'gallery', plural: 'gallery' },
   admin: {
     useAsTitle: 'caption',
     defaultColumns: ['caption', 'order', '_status'],

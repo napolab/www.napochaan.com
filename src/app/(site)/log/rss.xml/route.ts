@@ -2,7 +2,6 @@ import { buildLogTimeline } from '../_lib/build-log-timeline';
 import { fetchExternalPosts } from '../_lib/fetch-external-posts';
 
 import { findLogList } from '@lib/payload/logs';
-import { findNewsList } from '@lib/payload/news';
 import { findWorksList } from '@lib/payload/works';
 import { createRssDocument } from '@utils/rss/create-rss-document';
 import { dayjs } from '@utils/dayjs';
@@ -32,12 +31,11 @@ const pubDateOf = (year: number, date: string): string => {
 
 export const GET = async (): Promise<Response> => {
   const origin = process.env.BASE_URL ?? 'http://localhost:3000';
-  const news = await findNewsList();
   const works = await findWorksList();
   const posts = await fetchExternalPosts();
   const logs = await findLogList();
   const now = dayjs().tz('Asia/Tokyo').toISOString();
-  const groups = buildLogTimeline(news, works, posts, now, logs);
+  const groups = buildLogTimeline(works, posts, now, logs);
 
   const items: ItemData[] = groups.flatMap((group) =>
     group.items.map((entry) => ({

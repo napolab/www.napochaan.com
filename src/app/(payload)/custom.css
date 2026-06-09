@@ -1,0 +1,16 @@
+/*
+ * Admin-only style overrides for the Payload panel.
+ *
+ * Loaded after `@payloadcms/next/css` in (payload)/layout.tsx so these rules win.
+ * Scope every rule to the admin surface — this file never reaches the public site.
+ *
+ * LINE Seed JP is self-hosted via `next/font/local` (see src/themes/fonts.ts).
+ * The layout applies its `--font-line-seed-jp` variable to the admin <html>, so
+ * the font ships from /_next/static/media (same origin) — no external CDN.
+ */
+
+/* Lexical rich-text editor body — `.ContentEditable__root` is the editable
+ * surface inside the `.rich-text-lexical` field wrapper. */
+.rich-text-lexical .ContentEditable__root {
+  font-family: var(--font-line-seed-jp), system-ui, sans-serif;
+}

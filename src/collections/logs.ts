@@ -10,7 +10,8 @@ const revalidateLogs = createPublishedTagRevalidateHooks([CACHE_TAGS.logs]);
 
 export const Logs = {
   slug: 'logs',
-  labels: { singular: '年表エントリ', plural: '年表エントリ' },
+  labels: { singular: 'log', plural: 'logs' },
+  defaultSort: '-date',
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'date', 'meta', '_status'],
@@ -35,7 +36,26 @@ export const Logs = {
       required: true,
       admin: { position: 'sidebar', date: { pickerAppearance: 'dayOnly', displayFormat: 'yyyy-MM-dd' } },
     },
-    { name: 'meta', label: 'メタラベル', type: 'text', required: true, admin: { description: "年表に表示する種別ラベル（例: 'milestone'）。" } },
+    {
+      name: 'meta',
+      label: 'メタラベル',
+      type: 'select',
+      required: true,
+      // Stored verbatim and rendered as the timeline's type label, so each
+      // `value` IS the on-screen text. Existing rows hold DJ / VJ / DJ/VJ, so
+      // those values must stay byte-identical; the rest are new roles.
+      options: [
+        { label: 'DJ', value: 'DJ' },
+        { label: 'VJ', value: 'VJ' },
+        { label: 'DJ/VJ', value: 'DJ/VJ' },
+        { label: 'Support', value: 'Support' },
+        { label: 'Dev', value: 'Dev' },
+        { label: 'Flyer', value: 'Flyer' },
+        { label: 'Talk', value: 'Talk' },
+        { label: 'Video', value: 'Video' },
+      ],
+      admin: { description: '年表に表示する種別ラベル。' },
+    },
     { name: 'url', label: '外部リンク', type: 'text', admin: { description: '設定するとタイトルがこの URL へのリンクになります。' } },
   ],
 } satisfies CollectionConfig;

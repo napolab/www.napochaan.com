@@ -10,7 +10,8 @@ const revalidateBlog = createPublishedTagRevalidateHooks([CACHE_TAGS.blog]);
 
 export const Blog = {
   slug: 'blog',
-  labels: { singular: 'ブログ', plural: 'ブログ' },
+  labels: { singular: 'blog', plural: 'blogs' },
+  defaultSort: '-publishedAt',
   admin: {
     useAsTitle: 'title',
     defaultColumns: ['title', 'publishedAt', '_status'],

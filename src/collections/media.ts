@@ -9,6 +9,7 @@ const revalidateMedia = (): void => revalidateTagsAndPaths([CACHE_TAGS.news, CAC
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  labels: { singular: 'media', plural: 'media' },
   upload: {
     mimeTypes: ['image/*', 'application/pdf'],
   },
