@@ -186,5 +186,6 @@ export default buildConfig({
     },
     { scriptPath: path.resolve(dirname, 'seed', 'export.ts'), key: 'seed:export' },
     { scriptPath: path.resolve(dirname, 'seed', 'import.ts'), key: 'seed:import' },
+    { scriptPath: path.resolve(dirname, 'seed', 'import-prod.ts'), key: 'seed:import:prod' },
   ],
 });

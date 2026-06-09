@@ -38,10 +38,12 @@ const readData = async <T>(name: string): Promise<readonly T[]> => {
 };
 
 // ---------------------------------------------------------------------------
-// Admin user (idempotent — duplicated from src/seed.ts to keep the bin scripts
-// self-contained).
+// Admin user (idempotent). Only the dev seed path (`payload:seed` / `seed:import`)
+// calls this — the production initial seed (`seed:import:prod`) runs content only
+// and never seeds a user, so no weak credentials reach production (see import-prod.ts).
+// Exported so the production-safety invariant can be tested directly.
 // ---------------------------------------------------------------------------
-const ensureAdminUser = async (instance: Payload): Promise<void> => {
+export const ensureAdminUser = async (instance: Payload): Promise<void> => {
   const existing = await instance.find({ collection: 'users', where: { email: { equals: ADMIN_EMAIL } }, limit: 1 });
   if (existing.docs.length > 0) {
     instance.logger.info(`[seed:import] admin user already exists: ${ADMIN_EMAIL}`);
@@ -178,17 +180,25 @@ const importProfile = async (instance: Payload): Promise<void> => {
   instance.logger.info('[seed:import] updated profile global');
 };
 
-// Core import routine: ensure the admin user, then upsert every collection +
-// the profile global from src/seed/data/*.json. Reusable from other bin scripts
-// (e.g. `pnpm payload seed`) without re-initializing Payload.
-export const importSeedData = async (instance: Payload): Promise<void> => {
-  await ensureAdminUser(instance);
+// Content-only import: upsert every collection + the profile global from
+// src/seed/data/*.json. Deliberately touches no `users` row, so it is safe to
+// run against production (`seed:import:prod`), where the admin user is created
+// via Payload's create-first-user onboarding instead.
+export const importContent = async (instance: Payload): Promise<void> => {
   await importNews(instance);
   await importWorks(instance);
   await importBlog(instance);
   await importLogs(instance);
   await importGallery(instance);
   await importProfile(instance);
+};
+
+// Dev seed routine: ensure the dev admin user, then import all content.
+// Reusable from other bin scripts (e.g. `pnpm payload seed`) without
+// re-initializing Payload. Dev-only — never run against production.
+export const importSeedData = async (instance: Payload): Promise<void> => {
+  await ensureAdminUser(instance);
+  await importContent(instance);
 };
 
 // Payload bin script entry point. Invoked by `pnpm seed:import`.
