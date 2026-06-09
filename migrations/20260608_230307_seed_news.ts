@@ -6,52 +6,16 @@ export async function up({ payload }: MigrateUpArgs): Promise<void> {
 
   const newsData = [
     {
-      title: '#Booth2Booth vol.03 を VRChat で開催（ゲスト @Rei_ayanami__Jj）',
-      publishedAt: '2026-06-06T00:00:00.000Z',
-      category: 'live',
-      url: 'https://x.com/naporin24690/status/2063217578395279809',
-    },
-    {
-      title: '神田Roost シーシャ DJ オールナイト開催（フライヤー制作）',
-      publishedAt: '2026-05-30T00:00:00.000Z',
-      category: 'live',
-      url: 'https://x.com/naporin24690/status/2056691334229201294',
-    },
-    {
-      title: '主催 Booth2Booth vol.02 を VRChat で開催（フライヤー制作）',
-      publishedAt: '2026-05-23T00:00:00.000Z',
-      category: 'live',
-      url: 'https://x.com/naporin24690/status/2050895908850762215',
-    },
-    {
-      title: 'PROLOGUE at IV AKIHABARA を開催',
-      publishedAt: '2026-05-08T00:00:00.000Z',
-      category: 'live',
-      url: 'https://x.com/naporin24690/status/2042951785502118342',
-    },
-    {
       title: '#ProjectCircles 椎乃味醂ライブにモーキャプシステムで参加（大規模ライブ）',
       publishedAt: '2026-05-05T00:00:00.000Z',
       category: 'live',
       url: 'https://x.com/naporin24690/status/2051632371590701138',
     },
     {
-      title: 'Booth2Booth vol.01 始動（リアル × VR の VRDJ イベント、初回ゲスト 好き）',
-      publishedAt: '2026-04-24T00:00:00.000Z',
-      category: 'live',
-      url: 'https://x.com/naporin24690/status/2038209695996158212',
-    },
-    {
       title: 'Booth2Booth 公式サイト（booth2booth.com）公開',
       publishedAt: '2026-04-12T00:00:00.000Z',
       category: 'release',
       url: 'https://x.com/naporin24690/status/2043185292337975601',
-    },
-    {
-      title: '「超すごい DJ イベント」を VRChat で開催（Booth2Booth 誕生のきっかけ）',
-      publishedAt: '2026-02-20T00:00:00.000Z',
-      category: 'live',
-      url: 'https://x.com/napochaan_vrc2/status/2022521138967122056',
     },
     {
       title: '企画展『思弁的な音楽』に参加（r-906《額縁の言葉 : I》背景映像・システム構築）',

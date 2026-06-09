@@ -161,6 +161,43 @@ export async function up({ payload }: MigrateUpArgs): Promise<void> {
       meta: 'DJ',
       url: 'https://x.com/napochaan_vrc2/status/1956306353821307081',
     },
+    // 主催イベント
+    {
+      title: 'Booth2Booth vol.03 at VRChat 開催',
+      date: '2026-06-06T00:00:00.000Z',
+      meta: 'DJ/VJ',
+      url: 'https://x.com/naporin24690/status/2063217578395279809',
+    },
+    {
+      title: '神田Roost シーシャ DJ オールナイト at 神田Roost 開催',
+      date: '2026-05-30T00:00:00.000Z',
+      meta: 'DJ',
+      url: 'https://x.com/naporin24690/status/2056691334229201294',
+    },
+    {
+      title: 'Booth2Booth vol.02 at VRChat 開催',
+      date: '2026-05-23T00:00:00.000Z',
+      meta: 'DJ/VJ',
+      url: 'https://x.com/naporin24690/status/2050895908850762215',
+    },
+    {
+      title: 'PROLOGUE at IV AKIHABARA 開催',
+      date: '2026-05-08T00:00:00.000Z',
+      meta: 'DJ/VJ',
+      url: 'https://x.com/naporin24690/status/2042951785502118342',
+    },
+    {
+      title: 'Booth2Booth vol.01 at VRChat 開催',
+      date: '2026-04-24T00:00:00.000Z',
+      meta: 'DJ/VJ',
+      url: 'https://x.com/naporin24690/status/2038209695996158212',
+    },
+    {
+      title: '超すごい DJ イベント at VRChat 開催',
+      date: '2026-02-20T00:00:00.000Z',
+      meta: 'DJ',
+      url: 'https://x.com/napochaan_vrc2/status/2022521138967122056',
+    },
   ]
 
   for (const item of logsData) {
