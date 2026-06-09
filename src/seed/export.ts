@@ -17,7 +17,11 @@ const dataDir = path.resolve(dirname, 'data');
 
 // Keys Payload manages for us — never hand-edited, regenerated on import.
 // `globalType` is injected by findGlobal and rejected by updateGlobal on the way back.
+// `meta` is the seoPlugin's SEO group (regenerated on import) on news/works/blog/gallery —
+// but the `logs` collection has its own required content field also named `meta` (the
+// メタラベル type label), so that one slug must keep it (see `LOGS_SYSTEM_KEYS`).
 const SYSTEM_KEYS = ['id', 'createdAt', 'updatedAt', 'meta', 'sizes', 'globalType'] as const;
+const LOGS_SYSTEM_KEYS = SYSTEM_KEYS.filter((key) => key !== 'meta');
 
 const isPlainObject = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 
@@ -31,7 +35,9 @@ const stripArrayRowIds = (value: unknown): unknown => {
   return Object.fromEntries(Object.entries(value).flatMap(([key, val]) => (key === 'id' ? [] : [[key, stripArrayRowIds(val)]])));
 };
 
-const stripSystemKeys = (doc: object): Record<string, unknown> => Object.fromEntries(Object.entries(doc).filter(([key]) => !SYSTEM_KEYS.includes(key as (typeof SYSTEM_KEYS)[number])));
+const stripKeys = (doc: object, keys: readonly string[]): Record<string, unknown> => Object.fromEntries(Object.entries(doc).filter(([key]) => !keys.includes(key)));
+
+const stripSystemKeys = (doc: object): Record<string, unknown> => stripKeys(doc, SYSTEM_KEYS);
 
 // A populated upload relationship (depth: 1) is the Media object; pull its
 // filename so the import side can re-resolve the file from src/assets.
@@ -74,9 +80,16 @@ const exportGallery = async (instance: Payload): Promise<void> => {
 };
 
 // News / blog / logs carry no media relationship — strip system keys only.
+// `logs.meta` is real content (the メタラベル type label), so logs keeps `meta`
+// while news/blog drop the seoPlugin-generated `meta` group.
 const exportSimple = async (instance: Payload, slug: 'news' | 'blog' | 'logs', sort: string): Promise<void> => {
   const { docs } = await instance.find({ collection: slug, depth: 1, limit: 0, sort, overrideAccess: true });
-  await writeJson(instance, slug, docs.map(stripSystemKeys));
+  const keys = slug === 'logs' ? LOGS_SYSTEM_KEYS : SYSTEM_KEYS;
+  await writeJson(
+    instance,
+    slug,
+    docs.map((doc) => stripKeys(doc, keys)),
+  );
 };
 
 const exportProfile = async (instance: Payload): Promise<void> => {

@@ -129,13 +129,19 @@ const importBlog = async (instance: Payload): Promise<void> => {
   instance.logger.info(`[seed:import] upserted ${records.length} blog`);
 };
 
+// Logs: title is not a unique key — recurring events (e.g. a series at the same
+// venue) legitimately repeat the same title across different dates, so a
+// title-keyed upsert would collapse them. Mirror the gallery strategy: delete-all
+// then recreate from the JSON to stay idempotent without a natural key.
 type LogRecord = Omit<Log, 'id' | 'createdAt' | 'updatedAt'>;
 const importLogs = async (instance: Payload): Promise<void> => {
   const records = await readData<LogRecord>('logs');
+  await instance.delete({ collection: 'logs', where: { id: { exists: true } }, context: writeContext, overrideAccess: true });
+
   for (const record of records) {
-    await upsertByTitle(instance, 'logs', record.title, { ...record });
+    await instance.create({ collection: 'logs', data: { ...record }, context: writeContext, overrideAccess: true });
   }
-  instance.logger.info(`[seed:import] upserted ${records.length} logs`);
+  instance.logger.info(`[seed:import] recreated ${records.length} logs`);
 };
 
 // ---------------------------------------------------------------------------
@@ -172,15 +178,22 @@ const importProfile = async (instance: Payload): Promise<void> => {
   instance.logger.info('[seed:import] updated profile global');
 };
 
+// Core import routine: ensure the admin user, then upsert every collection +
+// the profile global from src/seed/data/*.json. Reusable from other bin scripts
+// (e.g. `pnpm payload seed`) without re-initializing Payload.
+export const importSeedData = async (instance: Payload): Promise<void> => {
+  await ensureAdminUser(instance);
+  await importNews(instance);
+  await importWorks(instance);
+  await importBlog(instance);
+  await importLogs(instance);
+  await importGallery(instance);
+  await importProfile(instance);
+};
+
 // Payload bin script entry point. Invoked by `pnpm seed:import`.
 export const script = async (config: SanitizedConfig): Promise<void> => {
   await payload.init({ config });
-  await ensureAdminUser(payload);
-  await importNews(payload);
-  await importWorks(payload);
-  await importBlog(payload);
-  await importLogs(payload);
-  await importGallery(payload);
-  await importProfile(payload);
+  await importSeedData(payload);
   process.exit(0);
 };
