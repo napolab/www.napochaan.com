@@ -2,6 +2,7 @@ import { getRequestOrigin } from '@utils/request-url';
 import { fontVariables } from '@themes/fonts';
 import { ThemeProvider } from '@themes/provider';
 import { typekitLoaderHtml } from '@themes/typekit';
+import { BootStatusProvider } from '@components/boot-status';
 import { LoadingOverlay } from '@components/loading-overlay';
 import { SiteShell } from '@components/site-shell';
 
@@ -63,8 +64,10 @@ const SiteLayout = async ({ children }: { children: ReactNode }) => {
       </head>
       <ThemeProvider asChild>
         <body>
-          <LoadingOverlay />
-          <SiteShell>{children}</SiteShell>
+          <BootStatusProvider>
+            <LoadingOverlay />
+            <SiteShell>{children}</SiteShell>
+          </BootStatusProvider>
         </body>
       </ThemeProvider>
     </html>

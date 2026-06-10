@@ -27,3 +27,13 @@ export const status = css({
 export const live = css({
   color: 'accent.text',
 });
+
+// sitemap.xml is an XML resource, not a routable page, so it renders as a plain
+// `<a>` (full navigation) rather than the react-aria Link. Mirror the muted footer
+// link affordance: inherit the mono/muted footer type, accent on hover/focus.
+export const sitemap = css({
+  color: 'fg.muted',
+  textDecoration: 'none',
+  '&:hover': { color: 'accent.text' },
+  '&:focus-visible': { color: 'accent.text' },
+});

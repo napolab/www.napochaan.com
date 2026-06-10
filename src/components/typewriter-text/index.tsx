@@ -2,6 +2,7 @@
 
 import { useTypewriter } from '@hooks/use-typewriter';
 
+import { useBootReady } from '@components/boot-status';
 import { PhrasedText } from '@components/phrased-text';
 
 import * as styles from './styles.css';
@@ -17,7 +18,8 @@ type Props = {
 // time. Renders only spans (a Fragment) so the host supplies the wrapping
 // <p>/<blockquote> and the font/color these spans inherit.
 export const TypewriterText = ({ children, phrase = false }: Props) => {
-  const { displayText, isDone } = useTypewriter(children);
+  const bootReady = useBootReady();
+  const { displayText, isDone } = useTypewriter(children, { startWhen: bootReady });
   const sizer = phrase ? <PhrasedText>{children}</PhrasedText> : children;
   const body = phrase && isDone ? <PhrasedText>{children}</PhrasedText> : displayText;
 

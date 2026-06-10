@@ -15,7 +15,11 @@ export const SiteFooter = ({ buildId }: Props) => {
         build {buildId ?? 'dev'} · <span className={styles.live}>life: running</span> ·{' '}
         <Link href="/colophon" tone="muted">
           <ScrambleText>colophon</ScrambleText>
-        </Link>
+        </Link>{' '}
+        ·{' '}
+        <a className={styles.sitemap} href="/sitemap.xml">
+          <ScrambleText>sitemap</ScrambleText>
+        </a>
       </span>
     </footer>
   );

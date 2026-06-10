@@ -6,6 +6,8 @@ import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
+import { useBootReady } from '@components/boot-status';
+
 import { clsx } from '@utils/clsx';
 
 import * as styles from './styles.css';
@@ -71,6 +73,8 @@ export const ScrambleText = (props: Props) => {
   // re-binds the listener.
   const host = props.trigger === 'group' ? props.host : null;
 
+  const bootReady = useBootReady();
+
   useGSAP(
     () => {
       // The raw decode tween body. revealDelay holds a short full scramble before
@@ -124,6 +128,7 @@ export const ScrambleText = (props: Props) => {
       // Mobile/tablet: no hover — decode once when the text scrolls into view.
       mm.add(MOBILE, (_ctx, contextSafe) => {
         if (contextSafe === undefined) return;
+        if (!bootReady) return; // wait for the boot overlay to lift before the in-view decode
         const decode = contextSafe(runDecode);
         const trigger = rootRef.current;
         if (trigger === null) return;
@@ -144,7 +149,7 @@ export const ScrambleText = (props: Props) => {
         };
       });
     },
-    { scope: rootRef, dependencies: [children, host] },
+    { scope: rootRef, dependencies: [children, host, bootReady] },
   );
 
   return (

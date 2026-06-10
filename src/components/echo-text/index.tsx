@@ -5,6 +5,8 @@ import gsap from 'gsap';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { useGSAP } from '@gsap/react';
 
+import { useBootReady } from '@components/boot-status';
+
 import * as styles from './styles.css';
 
 gsap.registerPlugin(ScrambleTextPlugin);
@@ -38,7 +40,14 @@ export const EchoText = ({ children, size = 'hero' }: Props) => {
     });
   };
 
-  const { contextSafe } = useGSAP(decode, { scope: rootRef, dependencies: [children] });
+  const bootReady = useBootReady();
+  const { contextSafe } = useGSAP(
+    () => {
+      if (!bootReady) return;
+      decode();
+    },
+    { scope: rootRef, dependencies: [children, bootReady] },
+  );
   // pointerenter fires for every pointer type, so the wordmark re-decodes on a
   // mouse hover AND a touch tap — it's a playful flourish, not a link, so there
   // is no navigation to race. (ScrambleText, which wraps links, skips touch.)
