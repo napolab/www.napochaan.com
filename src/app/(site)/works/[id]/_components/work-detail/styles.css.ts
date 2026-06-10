@@ -58,10 +58,8 @@ export const ambient = css({
 
 // Thin override on top of RichText's own `styles.root` (which already owns color
 // fg.default / fontSize md / lineHeight jp). Dims the prose to the muted ink so
-// the body sits quieter than the spec ledger — the proof aesthetic — and bumps
-// the weight to medium so the (system-font) Japanese body reads a touch less thin.
-// Inherited by the RichText tree; explicit-weight nodes (headings) are unaffected.
+// the body sits quieter than the spec ledger — the proof aesthetic. No weight
+// override: the body inherits the global body weight so the prose matches /about.
 export const body = css({
   color: 'fg.muted',
-  fontWeight: 'medium',
 });
