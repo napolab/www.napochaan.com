@@ -2,7 +2,7 @@
   {
     "title": "www.napochaan.com v3.0.0 の制作について",
     "publishedAt": "2026-06-10",
-    "excerpt": "napochaan.com を v3.0.0 に作り直した。落書きみたいな衝動から生まれたこのサイトを、どう壊して、どうほどいて、また組み直したのか。混沌と整列が同じ場所に居座っている、その作りの理由まで含めて、ぜんぶ書いておく。",
+    "excerpt": "napochaan.com を v3.0.0 に作り直した。AI に好みを暴かせるゲームをして、拾った断片に名前をつけて、方眼の上に置いていくまで。混沌と整列が同じ画面に居座っている理由を、覚えているうちに書いておく。",
     "body": {
       "root": {
         "type": "root",
@@ -40,7 +40,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "前のサイトは、ちゃんとしていた。情報は整理されていて、導線は通っていて、隙がなかった。だからこそ、ぼくは自分のサイトに心を動かせなかった。整っているものを前にすると、ぼくの心は静かになる。よくできているね、と他人のものを見るみたいに眺めて、それで終わってしまう。",
+                "text": "前のサイトは、よくできていた。情報は整理されて、導線は通って、引っかかるところがどこにもない。開くたびに、よくできているね、と思った。他人の作ったものを褒めるときの言い方で。自分のサイトなのに、それで終わってしまっていた。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -59,7 +59,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "理由はもうわかっている。曖昧なところはひとつもない。ぼくは自分の感情を片っ端から言語化して、論理に並べ替えて、正しくあろうとしてしまう。動いた心があれば、それがどう動いたのかを知りたくなって、すぐに分解して仕組みを取り出す。前のサイトは、その「正しさ」がそのまま形になったものだった。破綻のない設計図。きれいに閉じた回路。",
+                "text": "なんでそうなるのかは、もうわかってる。ぼくは感情が動くと、その動きをすぐ言葉にしてしまう。何が引き金で、どこがどう動いて、どういう仕組みでそうなったのか。分解して、並べ替えて、論理的に正しい形に置き直す。癖というより、ぼくの作りがそうなっている。前のサイトは、その置き直しが終わったあとの形だけでできていた。途中の、崩れたままの状態が、どこにも残っていなかった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -78,7 +78,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "でも、ぼくがほしかったのはそれじゃない。崩れたまま抱えていられる場所がほしかった。混沌と調和、相反するものがひとつの場所に平気で居座っている、ぼくが本気で心を動かされるのはそういうものだけだ。物寂しさが安心をくれて、辛さが生の実感をくれる。その矛盾ごと、ぼくはぼくでできている。サイトもそうあってほしかった。だから作り直した。",
+                "text": "いっぽうで、ぼくの手元にはずっと、もっと単純な衝動がある。落書きがしたい。意味も整合性も置いて、ただ画面を殴り書きのタイポで埋めたい。このサイトはもともと、その衝動から生まれている。前のサイトには、それの置き場がなかった。整いすぎた画面のどこに殴り書きを置けばいいのか、わからなかった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくが本気で心を動かされるのは、相反するものが平気で同居しているものだけだ。OS を壊すウイルスが吐き出す映像が好きで、あれは恐怖と無邪気が混ざっている。バグが好きで、意図していないはずなのに、何かを企んでいるように見える。物寂しいのに安心する。辛いのに、そこにしか生きている実感がない。そういう矛盾を、矛盾のまま置いておける場所がほしかった。だから作り直した……と書くとまた整理しすぎていて、ほんとうはただ、開くたびに静かになっていく自分が嫌だったんだと思う。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -97,7 +116,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "壊す",
+                "text": "好みを暴くゲーム",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -116,7 +135,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "最初にやったのは、全部ほどくことだった。前のサイトのコードを開いて、整っている部分を端から剥がしていく。",
+                "text": "作り直すにあたって、普段のぼくなら絶対にやらないことをひとつした。新しいサイトのコンセプトを、自分で言語化しなかった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -135,7 +154,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "壊すのにも理屈がいる。ぼくは闇雲には壊せない。どこが「正しすぎる」のか、ひとつずつ名前をつけながら剥がした。この余白は不安に対する防御だ。この整列は、見る人を迷わせない代わりに、ぼく自身の何かを迷わせなくしてしまっている。この導線は親切すぎて、立ち止まる隙を奪っている。そうやって、整っていることの正体に名前をつけ終えてから、はじめて手を下す。",
+                "text": "下地はあった。最近のぼくはデザインを学んでいる。グラフィックデザインも、web デザインも、ぜんぶフライヤーや VJ みたいな視覚表現に生かすためだ。その審美眼がどこまで使えるのか試したかったし、LLM の時代なんだから、LLM と一緒にデザインを作っていくワークフローを組んでみたい、というのもずっと考えていた。それが形になったのがこのゲームだった。順番だけは最初から決めていた。ページからではなく、design system から作る。まず token を作る。色も、余白も、文字の大きさも、部品を作るより先にルールの層を敷く。その token を作り始めるとき、AI にこう投げた。質問を繰り返して、ぼくの好みを暴いていきましょう。これはぼくの好みを見つけ出すゲームです、と。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -154,7 +173,237 @@
             "children": [
               {
                 "type": "text",
-                "text": "剥がしていくと、下から殴り書きみたいな衝動が出てくる。落書きをしたいだけなんだと思う。意味も整合性も置いておいて、ただ画面を黒い線で埋めたい。前のサイトは、その衝動の上にきれいな蓋をしていただけだった。蓋を割ると、ずっとそこにあったものが、そのまま出てきた。",
+                "text": "はじめは、何を作るかの方向性すら決まっていなかった。会話をして、フォントを眺めているうちに、音楽もグラフィックデザインもつくる ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/ariiol_",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "ariiol",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " さんのタイポが持つ空気が好きなこと、",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://jp.pinterest.com/search/pins/?q=webcore&rs=typed",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "webcore",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " や ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://jp.pinterest.com/search/pins/?q=digicore&rs=typed",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "digicore",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " という概念と、あの色たちが好きなことが、だんだん輪郭を持ってくる。そして ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://fonts.adobe.com/fonts/digibop",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "digibop",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " という書体を見た瞬間に、方向性が決まった。システムの声は等幅の ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://fonts.adobe.com/fonts/config-mono-variable",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "config-mono-vf",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "、本文は ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://fonts.google.com/specimen/M+PLUS+1",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "M PLUS 1",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " で読みやすく。自分で説明した好みは、もう一回「正しく置き直したあと」の形になってしまうから、説明はしない。出てきたものへ、反射だけで答える。glitch して崩れる napochaan の文字。隅にひとつだけ置かれた赤い dot。薄く引かれたグリッド線。見出しに付いた $whoami。そういう断片に「これすごい好きだった」とだけ返していく。理屈は後から付ければいい。先に体が答える。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ゲームは、思っていたより遠くまで行った。ぼくひとりでは辿り着けなかった UI パターンがいくつも出てきたし、アイデアは勝手に発散していった。自分の口から出た言葉より、反射で選んだ断片のほうが、ぼくの好みをずっとよく説明していた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "そして途中で気づいた。これは LLM に暴かせているのと同時に、ぼく自身の探索でもある。デザインをするとき、いちばん大事なのは対象の探索だ。その人を知る。物語を知る。なりきる。いつも他人に対してやっていることを、今回はぼくに向けてやった。自分が何を好きなのか、好きなものをどうやったら実現できるのか。それを具体的に知るために、このウェブサイトを作ろうと思ったんだ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -173,7 +422,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "ほどける",
+                "text": "全部に名前がついていく",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -192,7 +441,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "おかしいのは、壊しているときも、ぼくは完全に論理的だということだ。",
+                "text": "おかしいのは、そうして集まった断片を前にしても、ぼくがずっと論理的だということだ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -211,7 +460,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "衝動から始めたはずなのに、出てきた要素を、ぼくはまた分解して並べ替えている。殴り書きのタイポ。崩壊して、また組み直っていく glitch ――pixelsort と datamosh で、素材がいったん壊れてから戻ってくるあの動き。機械が等幅で淡々と吐くシステム注釈。タイムスタンプ、座標、since 2020、世代と生存数を刻み続けるカウンタ。背景でずっと静かに明滅している Game of Life。混沌のつもりで集めたものを、ぼくは一個ずつ役割をあてがって配置している。",
+                "text": "反射で選んだはずなのに、気づくと、出てきたものを分類している。殴り書きのタイポ。pixelsort と datamosh で、素材がいったん壊れてから戻ってくる glitch。等幅フォントで機械が淡々と吐き続けるシステム注釈。タイムスタンプ、座標、since 2020、世代と生存数を数え続けるカウンタ。背景でずっと明滅している Game of Life。混沌のつもりで集めてきたものが、手元ではもう、一個ずつ役割を持った部品に変わっている。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -229,8 +478,19 @@
               "caption": "// coord + gen/alive counters, monospaced, never stops"
             },
             "value": {
-              "__file": "v3-system-annotations.png",
-              "__alt": "napochaan.com 上部のシステムバー。時計・gen と alive のカウンタ・rec・cursors がモノスペースで並ぶ"
+              "id": 55,
+              "alt": "napochaan.com 上部のシステムバー。時計・gen と alive のカウンタ・rec・cursors がモノスペースで並ぶ",
+              "updatedAt": "2026-06-09T20:20:14.752Z",
+              "createdAt": "2026-06-09T20:20:14.752Z",
+              "url": "/api/media/file/v3-system-annotations.png",
+              "thumbnailURL": null,
+              "filename": "v3-system-annotations.png",
+              "mimeType": "image/png",
+              "filesize": 51647,
+              "width": 2168,
+              "height": 182,
+              "focalX": 50,
+              "focalY": 50
             }
           },
           {
@@ -243,7 +503,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "この几帳面さが、たぶんいちばん受け入れがたい。落書きすら、ぼくの手にかかると整然と分節されてしまう。全部に名前をつけて、論理で説明し切れてしまう。霧の中にいるのではなくて、剃刀で切ったみたいに、どこに何があるかぜんぶ見えている。その明晰さ自体が、ときどき少しだけしんどい。だから普段はおちゃらけている。ドパガキ、みたいに陽の被膜をかぶせて、明るく振る舞う。ただそれだけのことなんだと思う。",
+                "text": "この几帳面さが、たぶんいちばん受け入れがたい。落書きですら、ぼくの手の中では整然と分節されてしまう。霧の中で迷えているなら、まだよかった。そうじゃなくて、どこに何があって、なぜそうなるのか、ぜんぶ見えている。全部に名前がついてしまう。その明晰さは便利で、ときどき、少しだけしんどい。だから普段のぼくはおちゃらけている。陽気な被膜を一枚かぶせて、明るくやっている。ただそれだけなんだよな。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -262,7 +522,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "組み直す",
+                "text": "方眼の上に置く",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -281,7 +541,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "最後に組み直すとき、土台に置いたのは方眼グリッドだった。",
+                "text": "ページを組むとき、いちばん下に置いたのは方眼グリッドだった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -300,7 +560,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "方眼は秩序だ。すべてを正しく並べたい側のぼくが、いちばん安心する形。その上に、glitch を載せる。過剰な装飾を載せる。さっきの落書きの衝動を載せる。崩したいぼくと、並べたいぼくが、同じ一枚の上で同居する。混沌と整列の共存は、何かの演出じゃない。ぼくの作りをそのまま外に出しただけだ。",
+                "text": "方眼は、ぼくの中の並べたい側がいちばん安心する形だ。その上に、ゲームで拾った断片を置いていく。glitch を置く。過剰な装飾を置く。あの落書きの衝動も置く。崩したいぼくと並べたいぼくは、最後まで和解しなかった。ただ、同じ一枚の上に居させることはできた。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -318,8 +578,19 @@
               "caption": "// hero glyphs, oversized, snapped to grid"
             },
             "value": {
-              "__file": "v3-hero.png",
-              "__alt": "napochaan.com トップページ。白い方眼の上に「napochaan」の巨大な黒いタイポを重ねたヒーロー"
+              "id": 56,
+              "alt": "napochaan.com トップページ。白い方眼の上に「napochaan」の巨大な黒いタイポを重ねたヒーロー",
+              "updatedAt": "2026-06-09T20:20:14.754Z",
+              "createdAt": "2026-06-09T20:20:14.754Z",
+              "url": "/api/media/file/v3-hero.png",
+              "thumbnailURL": null,
+              "filename": "v3-hero.png",
+              "mimeType": "image/png",
+              "filesize": 515841,
+              "width": 2880,
+              "height": 1794,
+              "focalX": 50,
+              "focalY": 50
             }
           },
           {
@@ -332,7 +603,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "仕掛けは、ページをまたいで効かせるほど雰囲気が増幅するように作った。hover で文字がいったんほどけて戻る ScrambleText。多層のエコーで滲んで光る見出しの EchoText。1文字ずつ打って、打ち間違えて、消して、直していく TypewriterText。フォーカスを四角く囲って、ぐるぐる回り続けるマーチングアンツ。どれも、壊れることそのものを動きにしている。",
+                "text": "動きの仕掛けは、どれも「壊れること」を一回くぐらせて作った。hover で文字がいったんほどけてから戻ってくる ScrambleText。多層のエコーで滲んで光る見出しの EchoText。1文字ずつ打って、打ち間違えて、消して、直していく TypewriterText。フォーカスを四角く囲って、ぐるぐる回り続けるマーチングアンツ。きれいに動くだけのものは、ひとつも入れたくなかった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -350,8 +621,19 @@
               "caption": "// about, layers stacked past the point of enough"
             },
             "value": {
-              "__file": "v3-about-maximalism.png",
-              "__alt": "/about ページ。「naporitan」の巨大なエコータイポと whoami・bio の段組レイアウト"
+              "id": 57,
+              "alt": "/about ページ。「naporitan」の巨大なエコータイポと whoami・bio の段組レイアウト",
+              "updatedAt": "2026-06-09T20:20:14.756Z",
+              "createdAt": "2026-06-09T20:20:14.756Z",
+              "url": "/api/media/file/v3-about-maximalism.png",
+              "thumbnailURL": null,
+              "filename": "v3-about-maximalism.png",
+              "mimeType": "image/png",
+              "filesize": 642207,
+              "width": 2880,
+              "height": 1794,
+              "focalX": 50,
+              "focalY": 50
             }
           },
           {
@@ -364,7 +646,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "それでも全体が壊れないのは、下に方眼があるからだ。秩序が一枚通っているから、その上でいくら崩しても画面は破綻しない。整列があるから混沌を抱えられる。ぼく自身がそういう作りで生きているのと、たぶん同じことなんだと思う。",
+                "text": "これだけ崩して全体が破綻しないのは、下に方眼が一枚通っているからだ。秩序があるから、その上の混沌を抱えていられる。書いていて気づくけど、これはサイトの構造の話のようでいて、ほとんどぼく自身の話をしている。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -382,8 +664,19 @@
               "caption": "// gallery, masonry, uneven heights on a fixed grid"
             },
             "value": {
-              "__file": "v3-gallery.png",
-              "__alt": "/gallery ページ。高さの異なるタイルを方眼に詰めたメイソンリーグリッド"
+              "id": 59,
+              "alt": "/gallery ページ。高さの異なるタイルを方眼に詰めたメイソンリーグリッド",
+              "updatedAt": "2026-06-09T20:20:14.767Z",
+              "createdAt": "2026-06-09T20:20:14.767Z",
+              "url": "/api/media/file/v3-gallery.png",
+              "thumbnailURL": null,
+              "filename": "v3-gallery.png",
+              "mimeType": "image/png",
+              "filesize": 4898943,
+              "width": 2880,
+              "height": 1794,
+              "focalX": 50,
+              "focalY": 50
             }
           },
           {
@@ -415,7 +708,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "何を使ったか、より先に、なぜそれに落ち着いたかを書いておく。技術選定も、ぼくにとっては感情を分解して並べ替えた結果の一部だから。",
+                "text": "何を使ったかより先に、なぜそこへ落ち着いたかを書いておきたい。技術選定も、ぼくにとっては感情を分解して並べ替えた、その続きだから。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -434,7 +727,45 @@
             "children": [
               {
                 "type": "text",
-                "text": "Next.js を OpenNext で包んで Cloudflare Workers に載せ、コンテンツは Payload CMS で持つ。スタイルは Panda CSS の strictTokens で、色も余白も全部トークン経由でしか触れないようにした。インタラクションの土台は react-aria-components。崩したい衝動を全部受け止める器に、これだけ厳密な枠を選んだのは矛盾しているように見えて、ぼくの中ではまっすぐ繋がっている。枠が厳密なほど、その上で安心して崩せる。",
+                "text": "起点は Cloudflare だ。ぼくは Cloudflare をインフラにすることにこだわりがある。小さく、早く、安く、高機能。目指しているところがそのまま書いてあるようなインフラだから。next-on-pages の頃から、Cloudflare で Next.js を動かす方法をずっと調べていた。特にこだわったのは next/image の再現だった。ぼんやり滲んだ画像がすっと結像する、あの動きが好きで、Workers の上でも同じものがほしかった。Cloudflare Images で画像リサイズを再現したり、wasm で画像最適化を書いたり、y-durableobjects を作って共同編集を載せたり。Workers の上で高機能なものを再現することを、気づけば何年もやっている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "OpenNext になっても、やっていることは変わらない。Next.js を OpenNext で包んで Workers に載せて、Payload CMS を選んだのも、この構成の上で動かせるからだ。むしろ Durable Objects を一緒に載せるのが簡単になって、メリットしかなくなった。Workers が使えるということは、Durable Objects が使える。Durable Objects が使えるということは、WebSocket が使える。WebSocket が使えるということは、フロントエンドの表現の幅がまだ広がるということだ。たとえば、同じページを見ている誰かのカーソルがふっと見える、みたいなこと。そういうことを、静的なサイトの顔のままやりたい。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "スタイルは Panda CSS の strictTokens で、色も余白もトークンを通さないと触れないようにしてある。インタラクションの足場は react-aria-components。崩すために作ったサイトの足元が、選べる中でいちばん厳密な枠でできている。矛盾して見えるかもしれないけど、枠が固いほど、その上で安心して崩せる。方眼と同じ理屈だ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -452,8 +783,19 @@
               "caption": "// colophon, every component logged with its reason"
             },
             "value": {
-              "__file": "v3-colophon.png",
-              "__alt": "/colophon ページ。所見 01〜04 として設計思想を列挙したカード"
+              "id": 58,
+              "alt": "/colophon ページ。所見 01〜04 として設計思想を列挙したカード",
+              "updatedAt": "2026-06-09T20:20:14.758Z",
+              "createdAt": "2026-06-09T20:20:14.758Z",
+              "url": "/api/media/file/v3-colophon.png",
+              "thumbnailURL": null,
+              "filename": "v3-colophon.png",
+              "mimeType": "image/png",
+              "filesize": 963699,
+              "width": 2880,
+              "height": 1794,
+              "focalX": 50,
+              "focalY": 50
             }
           },
           {
@@ -466,7 +808,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "ひとつだけ、崩すより優先したものがある。アクセシビリティだ。どれだけ過剰に作っても、WCAG 2.1 AA とコントラストだけは手放さなかった。フォーカスリングは、reduced-motion なら静的な破線で、motion-safe ならマーチングアンツが回る。背景の Game of Life も、reduced-motion ならちゃんと止まる。崩したくて作っているのに、それで誰かを置き去りにするのは違う。ぼくが動かしたいのは、ぼくも、あの人たちも、両方なんだから。",
+                "text": "ひとつだけ、崩すことより優先したものがある。アクセシビリティだ。これは気分でやっているのではなくて、プロジェクトのルールの最初のほうに書いてある。color token は WCAG 2.1 AA を満たすように設計すること。token の層で決めてあるから、どのページでどれだけ崩しても、コントラストだけは自動的に守られる。フォーカスリングは、reduced-motion なら静的な破線で止まって、motion-safe ならマーチングアンツが回る。背景の Game of Life も、reduced-motion ならちゃんと止まる。崩したくて作っているのに、その崩し方で誰かを置き去りにしたら、それはただ閉じているだけだ。崩れたものを、一緒に見てほしくて作っているんだから。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -504,7 +846,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "このサイトは、これからも壊れ続ける。",
+                "text": "このサイトは、たぶん完成しない。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -523,7 +865,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "完成させてしまったら、それはまた「正しすぎる」何かに戻ってしまう。隙のない、よくできた、心の動かないサイト。ぼくがいちばん心を動かせない場所。だから完成はさせない。気づいたら名前をつけて、剥がして、また別の崩れ方を載せていく。止まっていられないんだと思う。作っていない自分に、ぼくはうまく価値を感じられないから。",
+                "text": "完成させてしまったら、また「正しすぎる」場所に戻ってしまう。隙がなくて、よくできていて、ぼくの心がいちばん動かないサイト。それは一度やめたはずの形だ。だから、気づいたところに名前をつけて、置き換えて、別の崩れ方を試して、を続けていく。LLM の時代になってから、作ることは前より止まらなくなった。次から次へアイデアが湧いて、湧いたぶんだけ手が動いてしまう。作っていない自分に、ぼくはうまく価値を感じられないから、止まらないくらいでちょうどいい。それと、結局は後悔したくないだけなんだよな。戻れない過去をずっと抱えているぶん、これ以上は増やしたくない。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -542,7 +884,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "Payload CMS にしたのは、そのためでもある。記事を足せる。年表を伸ばせる。更新し続けられる場所になった。この記事も、その最初の一本だ。ここまで読んでくれてありがとう。また何か壊したら、書きに来る。",
+                "text": "Payload CMS にしたのは、その続きのためでもある。記事を足せるし、年表も伸ばせる。終わらせないための場所として作ってある。この記事はその一本目だ。ここまで読んでくれてありがとう。また何か作ったら、書きに来る。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
