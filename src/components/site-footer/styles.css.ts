@@ -30,10 +30,12 @@ export const live = css({
 
 // sitemap.xml is an XML resource, not a routable page, so it renders as a plain
 // `<a>` (full navigation) rather than the react-aria Link. Mirror the muted footer
-// link affordance: inherit the mono/muted footer type, accent on hover/focus.
+// link affordance AND the link recipe's resting underline (offset 2px) so it reads
+// as a link at a glance, like the colophon Link beside it; accent on hover/focus.
 export const sitemap = css({
   color: 'fg.muted',
-  textDecoration: 'none',
+  textDecorationLine: 'underline',
+  textUnderlineOffset: '[2px]',
   '&:hover': { color: 'accent.text' },
   '&:focus-visible': { color: 'accent.text' },
 });
