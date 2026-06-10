@@ -1,4 +1,4 @@
-import { Image } from '@components/image';
+import { Figure } from '@components/figure';
 import { formatBlurURL } from '@components/image/helper';
 import { RichText } from '@components/rich-text';
 
@@ -24,32 +24,34 @@ type Props = {
 const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})` }) as CSSProperties;
 
 // The detail body of a single work: a uniform contact-sheet proof image, a mono
-// spec ledger (type / year / no), then the body prose rendered as Payload-Lexical
-// rich text. Every thumbnail sits in the same 16/10 frame and is contained (never
-// cropped) so the whole artwork is always visible. Pure Server Component — no
-// react-aria, no interactivity — so it stays out of the client bundle. The page
-// <h1> lives in PageHeader, so this renders no heading.
+// spec ledger (type / year), then the body prose rendered as Payload-Lexical rich
+// text. The thumbnail reuses the shared `Figure` frame in its `cover` variant — a
+// blurred copy of the image fills the 16/10 letterbox gaps so the page behind never
+// shows through, and a gallery-style `type / year` corner tag sits over it. The same
+// frame (and 2px border) is shared with the in-body images. When the work has no
+// thumbnail, a matching placeholder block stands in (Figure requires a src). Pure
+// Server Component — no react-aria, no interactivity — so it stays out of the client
+// bundle. The page <h1> lives in PageHeader, so this renders no heading.
 export const WorkDetail = ({ work }: Props) => {
   const { thumbnail, body } = work;
 
   return (
     <section className={s.root} aria-label="work detail">
       {thumbnail === undefined ? null : <span className={s.ambient} aria-hidden="true" style={ambientStyle(thumbnail.src)} />}
-      <figure className={s.figureRoot}>
-        {thumbnail === undefined ? (
-          <span className={s.imagePlaceholder} aria-hidden="true" />
-        ) : (
-          <Image
-            src={thumbnail.src}
-            alt={work.title}
-            width={thumbnail.width}
-            height={thumbnail.height}
-            className={s.image}
-            placeholder="blur"
-            blurDataURL={formatBlurURL(thumbnail.src, { blur: 20 })}
-          />
-        )}
-      </figure>
+      {thumbnail === undefined ? (
+        <span className={s.imagePlaceholder} aria-hidden="true" />
+      ) : (
+        <Figure
+          src={thumbnail.src}
+          alt={work.title}
+          width={thumbnail.width}
+          height={thumbnail.height}
+          variant="cover"
+          caption={`${work.type} / ${work.year}`}
+          placeholder="blur"
+          blurDataURL={formatBlurURL(thumbnail.src, { blur: 20 })}
+        />
+      )}
 
       <p className={s.meta}>
         {work.type} · {work.year}

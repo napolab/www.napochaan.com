@@ -6,35 +6,16 @@ export const root = css({
   gap: 'block',
 });
 
-// Full-colour figure spanning the column. The image inside owns the uniform 16/10
-// frame, so this only resets margin and anchors the ambient layer.
-export const figureRoot = css({
-  margin: '0',
-  position: 'relative',
-});
-
-// Uniform contact-sheet frame: every thumbnail fills the column at a fixed 16/10
-// aspect ratio and is contained (objectFit) so the whole artwork is shown — never
-// cropped. Portrait or square sources letterbox over a transparent backdrop (the
-// blurred ambient layer shows through) instead of being clipped.
-export const image = css({
-  display: 'block',
-  width: 'full',
-  aspectRatio: '[16 / 10]',
-  objectFit: 'contain',
-  borderWidth: 'hairline',
-  borderStyle: 'solid',
-  borderColor: 'border.default',
-});
-
+// No-thumbnail stand-in. Mirrors the shared Figure proof frame (16/10, 2px fg.default
+// border) so the empty state keeps the same outer silhouette as a real thumbnail.
 export const imagePlaceholder = css({
   display: 'block',
   width: 'full',
   aspectRatio: '[16 / 10]',
   bg: 'bg.muted',
-  borderWidth: 'hairline',
+  borderWidth: 'default',
   borderStyle: 'solid',
-  borderColor: 'border.default',
+  borderColor: 'fg.default',
 });
 
 // Inline mono meta line: `type · year` on a single hairline-ruled row (replaces
@@ -53,20 +34,25 @@ export const meta = css({
   color: 'fg.subtle',
 });
 
-// Persistent per-work ambient backdrop. Fixed to the viewport and sunk behind all
-// content (zIndex.hide). The work's thumb url is passed via `--thumb` and the
-// image is rendered full-viewport with heavy blur at low opacity so body text
-// stays readable. Fixed positioning holds because no ancestor (WorkDetail root,
+// Persistent per-work ambient backdrop. Fixed to the viewport and sunk to zIndex.hide
+// (-1) — between the body's 方眼 grid (the rootmost background) and the GameOfLife
+// canvas (zIndex.base). The work's thumb url is passed via `--thumb` and rendered
+// full-viewport with heavy blur. An 82% white veil is stacked over the image via a
+// flat linear-gradient so the artwork's residual contrast can't bleed behind body
+// text; the whole layer then runs at partial opacity so the site's signature grid
+// keeps showing through underneath rather than being slabbed over by an opaque image.
+// The net read: near-white page, the grid intact, a faint blurred trace of the work's
+// colour as ambience. Fixed positioning holds because no ancestor (WorkDetail root,
 // the page <main>) establishes a transform/filter containing block.
 export const ambient = css({
   position: 'fixed',
   inset: '0',
   zIndex: 'hide',
-  backgroundImage: 'var(--thumb)',
+  backgroundImage: '[linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)), var(--thumb)]',
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   filter: '[blur(40px)]',
-  opacity: '[0.2]',
+  opacity: '[0.5]',
   pointerEvents: 'none',
 });
 
