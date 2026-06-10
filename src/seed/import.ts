@@ -4,7 +4,10 @@ import { fileURLToPath } from 'node:url';
 
 import payload from 'payload';
 
+import { applyResolvedMedia, collectUploadSentinels } from './resolve-body-media';
+
 import type { Blog, Log, News, Work } from '@payload-types';
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { Payload, SanitizedConfig } from 'payload';
 
 type TitleSlug = 'news' | 'works' | 'blog' | 'logs';
@@ -121,11 +124,34 @@ const importWorks = async (instance: Payload): Promise<void> => {
   instance.logger.info(`[seed:import] upserted ${records.length} works`);
 };
 
+// Resolves every upload sentinel in a body to a real media id (creating media
+// rows as needed), then rewrites the body: each sentinel becomes its numeric id,
+// or is dropped when the asset is missing (ensureMedia already warns). The raw
+// JSON body is coerced once here (same boundary as asRichText) and a new
+// (resolved) body is returned — the input tree is left untouched.
+const resolveBodyMedia = async (instance: Payload, rawBody: unknown): Promise<RichText> => {
+  const body = rawBody as unknown as SerializedEditorState;
+  const sentinels = collectUploadSentinels(body);
+  if (sentinels.length === 0) return asRichText(body);
+
+  const resolutions = await Promise.all(
+    sentinels.map(async (sentinel) => {
+      const id = await ensureMedia(instance, sentinel.file, sentinel.alt);
+      return { ...sentinel, id };
+    }),
+  );
+
+  return asRichText(applyResolvedMedia(body, resolutions));
+};
+
 type BlogRecord = Omit<Blog, 'id' | 'createdAt' | 'updatedAt' | 'meta'>;
-const importBlog = async (instance: Payload): Promise<void> => {
+// Exported so the body-media resolution wiring (sentinel -> media id) can be
+// exercised end-to-end against a fake Payload in import.test.ts.
+export const importBlog = async (instance: Payload): Promise<void> => {
   const records = await readData<BlogRecord>('blog');
   for (const record of records) {
-    const data = { ...record, body: asRichText(record.body) };
+    const body = await resolveBodyMedia(instance, record.body);
+    const data = { ...record, body };
     await upsertByTitle(instance, 'blog', record.title, data);
   }
   instance.logger.info(`[seed:import] upserted ${records.length} blog`);

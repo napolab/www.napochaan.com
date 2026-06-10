@@ -1,8 +1,15 @@
+import * as s from './styles.css';
+
 import type { ReactNode } from 'react';
 
-// Pass-through: the archive header + <main> live on the index page (works/page.tsx)
-// so the detail page (works/[id]) — which renders its own <main> + PageHeader —
-// doesn't inherit the "works" archive header or end up with nested <main> elements.
-const WorksLayout = ({ children }: { children: ReactNode }) => children;
+// Owns the single `<main>` landmark shared by the list, loading, error, detail,
+// and preview routes. Page-specific headers (list "works" header, work header)
+// live in each page so they never leak across routes — every route renders
+// content only, keeping one `<main>` / one `<h1>` in every state.
+const WorksLayout = ({ children }: { children: ReactNode }) => (
+  <main id="main-content" className={s.main}>
+    {children}
+  </main>
+);
 
 export default WorksLayout;

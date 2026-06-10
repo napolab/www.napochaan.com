@@ -45,6 +45,10 @@ type ChildLike = { type?: string; text?: string; fields?: { linkType: string; ur
 type NodeLike = { type: string; tag?: string; children: ChildLike[] };
 const nodesOf = (state: SerializedEditorState): NodeLike[] => state.root.children as unknown as NodeLike[];
 
+// Narrow an upload node enough to assert on its relationTo and sentinel value.
+type UploadLike = { type: string; relationTo?: string; format?: string; version?: number; fields?: { caption?: string } | null; value?: { __file?: string; __alt?: string } };
+const uploadsOf = (state: SerializedEditorState): UploadLike[] => state.root.children as unknown as UploadLike[];
+
 describe('richTextFromBlocks', () => {
   it('turns an h2 block into a heading node tagged h2', () => {
     const state = richTextFromBlocks([{ type: 'h2', text: 'Section' }]);
@@ -126,5 +130,32 @@ describe('richTextFromBlocks', () => {
     expect(children[0]?.text).toBe('before ');
     expect(children[1]?.children?.[0]?.text).toBe('link');
     expect(children[2]?.text).toBe(' after');
+  });
+
+  it('turns an img block into an upload sentinel node carrying file and alt', () => {
+    const state = richTextFromBlocks([{ type: 'img', file: 'v3-hero.png', alt: 'トップの巨大タイポ' }]);
+
+    const [node] = uploadsOf(state);
+    expect(node?.type).toBe('upload');
+    expect(node?.relationTo).toBe('media');
+    expect(node?.format).toBe('');
+    expect(node?.version).toBe(3);
+    expect(node?.fields).toBeNull();
+    expect(node?.value).toEqual({ __file: 'v3-hero.png', __alt: 'トップの巨大タイポ' });
+  });
+
+  it('leaves an img block without a caption with null fields', () => {
+    const state = richTextFromBlocks([{ type: 'img', file: 'v3-hero.png', alt: 'トップの巨大タイポ' }]);
+
+    const [node] = uploadsOf(state);
+    expect(node?.fields).toBeNull();
+  });
+
+  it('carries an img block caption in fields without touching the sentinel value', () => {
+    const state = richTextFromBlocks([{ type: 'img', file: 'v3-hero.png', alt: 'トップの巨大タイポ', caption: 'milfy v3.0.0' }]);
+
+    const [node] = uploadsOf(state);
+    expect(node?.fields).toEqual({ caption: 'milfy v3.0.0' });
+    expect(node?.value).toEqual({ __file: 'v3-hero.png', __alt: 'トップの巨大タイポ' });
   });
 });

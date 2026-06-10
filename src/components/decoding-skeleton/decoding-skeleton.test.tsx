@@ -36,4 +36,14 @@ describe('DecodingSkeleton', () => {
       expect(row.closest('[aria-hidden="true"]')).not.toBeNull();
     }
   });
+
+  it('reserves page space when used as a full-page fallback (`fill`)', async () => {
+    await render(<DecodingSkeleton fill />);
+    await expect.element(page.getByRole('status')).toHaveAttribute('data-fill');
+  });
+
+  it('does not reserve page space by default', async () => {
+    await render(<DecodingSkeleton />);
+    await expect.element(page.getByRole('status')).not.toHaveAttribute('data-fill');
+  });
 });

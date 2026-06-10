@@ -6,6 +6,10 @@ export const srOnly = css({ srOnly: true });
 // separate aria-hidden child so screen readers never read the decorative glyphs.
 export const root = css({
   display: 'block',
+  // `fill` (page-level fallback) reserves a full dynamic-viewport block so the
+  // loading screen fills the viewport (footer stays off the fold) and the swap to
+  // real content doesn't jump. `dvh` so iOS' collapsing toolbar leaves no gap.
+  '&[data-fill]': { minBlockSize: '[100dvh]' },
 });
 
 // The decorative glyph block. Mono family + xs size mirrors the site's

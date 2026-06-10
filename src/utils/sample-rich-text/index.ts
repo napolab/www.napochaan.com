@@ -59,7 +59,25 @@ const headingNode = (tag: 'h2' | 'h3', value: string): unknown => ({
   children: [textNode(value)],
 });
 
-export type SampleBlock = { type: 'h2'; text: string } | { type: 'h3'; text: string } | { type: 'p'; text: string | readonly RichSegment[] };
+// An upload "sentinel" node: it carries the asset filename + alt text instead of
+// a resolved media id. The seed import (resolveBodyMedia) swaps `value` for the
+// real numeric media id before persisting, so the upload converter can render it.
+// `alt` describes the image content (becomes the media doc alt — a11y/SEO);
+// an optional `caption` rides in `fields` as the decorative figcaption text.
+const uploadNode = (file: string, alt: string, caption: string | undefined): unknown => ({
+  type: 'upload',
+  relationTo: 'media',
+  format: '',
+  version: 3,
+  fields: caption === undefined ? null : { caption },
+  value: { __file: file, __alt: alt },
+});
+
+export type SampleBlock =
+  | { type: 'h2'; text: string }
+  | { type: 'h3'; text: string }
+  | { type: 'p'; text: string | readonly RichSegment[] }
+  | { type: 'img'; file: string; alt: string; caption?: string };
 
 const blockNode = (block: SampleBlock): unknown => {
   switch (block.type) {
@@ -69,6 +87,8 @@ const blockNode = (block: SampleBlock): unknown => {
       return headingNode('h3', block.text);
     case 'p':
       return paragraphNode(block.text);
+    case 'img':
+      return uploadNode(block.file, block.alt, block.caption);
   }
 };
 

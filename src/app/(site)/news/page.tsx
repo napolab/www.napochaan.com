@@ -1,10 +1,14 @@
 import { NewsArchive } from './_components/news-archive';
 import { groupNewsByYearMonth } from './_lib/group-by-year-month';
 
+import { FeedLink } from '@components/feed-link';
+import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 import { findNewsList } from '@lib/payload/news';
 
 import type { Metadata } from 'next';
+
+const crumbs = [{ href: '/', label: 'home' }, { label: 'news' }] as const;
 
 // Revalidate hourly. NOTE: reading `searchParams` below opts this route into
 // dynamic rendering, so this `revalidate` no longer drives static ISR caching —
@@ -47,6 +51,8 @@ const NewsPage = async ({ searchParams }: Props) => {
 
   return (
     <>
+      <PageHeader title="news" breadcrumbs={crumbs} kicker="// お知らせ" lead="近況すぎ〜↑" />
+      <FeedLink href="/news/rss.xml" label="news の RSS フィード" />
       <NewsArchive groups={groups} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={newsHref} /> : null}
     </>

@@ -1,16 +1,13 @@
-import { FeedLink } from '@components/feed-link';
-import { PageHeader } from '@components/page-header';
-
 import * as s from './styles.css';
 
 import type { ReactNode } from 'react';
 
-const crumbs = [{ href: '/', label: 'home' }, { label: 'blog' }] as const;
-
+// Owns the single `<main>` landmark shared by the list, loading, error, detail,
+// and preview routes. Page-specific headers (list "blog" header, article header)
+// live in each page so they never leak across routes — every route renders
+// content only, keeping one `<main>` / one `<h1>` in every state.
 const BlogLayout = ({ children }: { children: ReactNode }) => (
   <main id="main-content" className={s.main}>
-    <PageHeader title="blog" breadcrumbs={crumbs} kicker="// 記事" lead="あ、ほんと(発見)" />
-    <FeedLink href="/blog/rss.xml" label="blog の RSS フィード" />
     {children}
   </main>
 );

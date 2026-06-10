@@ -1,5 +1,7 @@
 import { PostList } from './_components/post-list';
 
+import { FeedLink } from '@components/feed-link';
+import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 import { dayjs } from '@utils/dayjs';
 import { findBlogList } from '@lib/payload/blog';
@@ -12,6 +14,10 @@ import type { Metadata } from 'next';
 export const revalidate = 3600;
 
 const PAGE_SIZE = 10;
+
+// The shared `<main>` lives in `blog/layout.tsx`; this list renders the page
+// header + feed link + list as content only.
+const crumbs = [{ href: '/', label: 'home' }, { label: 'blog' }] as const;
 
 // The feed owns its URL shape: page 1 is the bare path, deeper pages carry
 // ?page=N (Pagination doesn't hard-code it).
@@ -50,6 +56,8 @@ const BlogPage = async ({ searchParams }: Props) => {
 
   return (
     <>
+      <PageHeader title="blog" breadcrumbs={crumbs} kicker="// 記事" lead="あ、ほんと(発見)" />
+      <FeedLink href="/blog/rss.xml" label="blog の RSS フィード" />
       <PostList posts={pagePosts} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={blogHref} /> : null}
     </>

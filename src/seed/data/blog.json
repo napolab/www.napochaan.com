@@ -1,1 +1,559 @@
-[]
+[
+  {
+    "title": "www.napochaan.com v3.0.0 の制作について",
+    "publishedAt": "2026-06-10",
+    "excerpt": "napochaan.com を v3.0.0 に作り直した。落書きみたいな衝動から生まれたこのサイトを、どう壊して、どうほどいて、また組み直したのか。混沌と整列が同じ場所に居座っている、その作りの理由まで含めて、ぜんぶ書いておく。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "なぜ作り直したのか",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "前のサイトは、ちゃんとしていた。情報は整理されていて、導線は通っていて、隙がなかった。だからこそ、ぼくは自分のサイトに心を動かせなかった。整っているものを前にすると、ぼくの心は静かになる。よくできているね、と他人のものを見るみたいに眺めて、それで終わってしまう。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "理由はもうわかっている。曖昧なところはひとつもない。ぼくは自分の感情を片っ端から言語化して、論理に並べ替えて、正しくあろうとしてしまう。動いた心があれば、それがどう動いたのかを知りたくなって、すぐに分解して仕組みを取り出す。前のサイトは、その「正しさ」がそのまま形になったものだった。破綻のない設計図。きれいに閉じた回路。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "でも、ぼくがほしかったのはそれじゃない。崩れたまま抱えていられる場所がほしかった。混沌と調和、相反するものがひとつの場所に平気で居座っている、ぼくが本気で心を動かされるのはそういうものだけだ。物寂しさが安心をくれて、辛さが生の実感をくれる。その矛盾ごと、ぼくはぼくでできている。サイトもそうあってほしかった。だから作り直した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "壊す",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "最初にやったのは、全部ほどくことだった。前のサイトのコードを開いて、整っている部分を端から剥がしていく。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "壊すのにも理屈がいる。ぼくは闇雲には壊せない。どこが「正しすぎる」のか、ひとつずつ名前をつけながら剥がした。この余白は不安に対する防御だ。この整列は、見る人を迷わせない代わりに、ぼく自身の何かを迷わせなくしてしまっている。この導線は親切すぎて、立ち止まる隙を奪っている。そうやって、整っていることの正体に名前をつけ終えてから、はじめて手を下す。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "剥がしていくと、下から殴り書きみたいな衝動が出てくる。落書きをしたいだけなんだと思う。意味も整合性も置いておいて、ただ画面を黒い線で埋めたい。前のサイトは、その衝動の上にきれいな蓋をしていただけだった。蓋を割ると、ずっとそこにあったものが、そのまま出てきた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ほどける",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "おかしいのは、壊しているときも、ぼくは完全に論理的だということだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "衝動から始めたはずなのに、出てきた要素を、ぼくはまた分解して並べ替えている。殴り書きのタイポ。崩壊して、また組み直っていく glitch ――pixelsort と datamosh で、素材がいったん壊れてから戻ってくるあの動き。機械が等幅で淡々と吐くシステム注釈。タイムスタンプ、座標、since 2020、世代と生存数を刻み続けるカウンタ。背景でずっと静かに明滅している Game of Life。混沌のつもりで集めたものを、ぼくは一個ずつ役割をあてがって配置している。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// coord + gen/alive counters, monospaced, never stops"
+            },
+            "value": {
+              "__file": "v3-system-annotations.png",
+              "__alt": "napochaan.com 上部のシステムバー。時計・gen と alive のカウンタ・rec・cursors がモノスペースで並ぶ"
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "この几帳面さが、たぶんいちばん受け入れがたい。落書きすら、ぼくの手にかかると整然と分節されてしまう。全部に名前をつけて、論理で説明し切れてしまう。霧の中にいるのではなくて、剃刀で切ったみたいに、どこに何があるかぜんぶ見えている。その明晰さ自体が、ときどき少しだけしんどい。だから普段はおちゃらけている。ドパガキ、みたいに陽の被膜をかぶせて、明るく振る舞う。ただそれだけのことなんだと思う。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "組み直す",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "最後に組み直すとき、土台に置いたのは方眼グリッドだった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "方眼は秩序だ。すべてを正しく並べたい側のぼくが、いちばん安心する形。その上に、glitch を載せる。過剰な装飾を載せる。さっきの落書きの衝動を載せる。崩したいぼくと、並べたいぼくが、同じ一枚の上で同居する。混沌と整列の共存は、何かの演出じゃない。ぼくの作りをそのまま外に出しただけだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// hero glyphs, oversized, snapped to grid"
+            },
+            "value": {
+              "__file": "v3-hero.png",
+              "__alt": "napochaan.com トップページ。白い方眼の上に「napochaan」の巨大な黒いタイポを重ねたヒーロー"
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "仕掛けは、ページをまたいで効かせるほど雰囲気が増幅するように作った。hover で文字がいったんほどけて戻る ScrambleText。多層のエコーで滲んで光る見出しの EchoText。1文字ずつ打って、打ち間違えて、消して、直していく TypewriterText。フォーカスを四角く囲って、ぐるぐる回り続けるマーチングアンツ。どれも、壊れることそのものを動きにしている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// about, layers stacked past the point of enough"
+            },
+            "value": {
+              "__file": "v3-about-maximalism.png",
+              "__alt": "/about ページ。「naporitan」の巨大なエコータイポと whoami・bio の段組レイアウト"
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "それでも全体が壊れないのは、下に方眼があるからだ。秩序が一枚通っているから、その上でいくら崩しても画面は破綻しない。整列があるから混沌を抱えられる。ぼく自身がそういう作りで生きているのと、たぶん同じことなんだと思う。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// gallery, masonry, uneven heights on a fixed grid"
+            },
+            "value": {
+              "__file": "v3-gallery.png",
+              "__alt": "/gallery ページ。高さの異なるタイルを方眼に詰めたメイソンリーグリッド"
+            }
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "技術スタックという帰結",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "何を使ったか、より先に、なぜそれに落ち着いたかを書いておく。技術選定も、ぼくにとっては感情を分解して並べ替えた結果の一部だから。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Next.js を OpenNext で包んで Cloudflare Workers に載せ、コンテンツは Payload CMS で持つ。スタイルは Panda CSS の strictTokens で、色も余白も全部トークン経由でしか触れないようにした。インタラクションの土台は react-aria-components。崩したい衝動を全部受け止める器に、これだけ厳密な枠を選んだのは矛盾しているように見えて、ぼくの中ではまっすぐ繋がっている。枠が厳密なほど、その上で安心して崩せる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// colophon, every component logged with its reason"
+            },
+            "value": {
+              "__file": "v3-colophon.png",
+              "__alt": "/colophon ページ。所見 01〜04 として設計思想を列挙したカード"
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ひとつだけ、崩すより優先したものがある。アクセシビリティだ。どれだけ過剰に作っても、WCAG 2.1 AA とコントラストだけは手放さなかった。フォーカスリングは、reduced-motion なら静的な破線で、motion-safe ならマーチングアンツが回る。背景の Game of Life も、reduced-motion ならちゃんと止まる。崩したくて作っているのに、それで誰かを置き去りにするのは違う。ぼくが動かしたいのは、ぼくも、あの人たちも、両方なんだから。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "これからの napochaan.com",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "このサイトは、これからも壊れ続ける。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "完成させてしまったら、それはまた「正しすぎる」何かに戻ってしまう。隙のない、よくできた、心の動かないサイト。ぼくがいちばん心を動かせない場所。だから完成はさせない。気づいたら名前をつけて、剥がして、また別の崩れ方を載せていく。止まっていられないんだと思う。作っていない自分に、ぼくはうまく価値を感じられないから。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Payload CMS にしたのは、そのためでもある。記事を足せる。年表を伸ばせる。更新し続けられる場所になった。この記事も、その最初の一本だ。ここまで読んでくれてありがとう。また何か壊したら、書きに来る。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published"
+  }
+]

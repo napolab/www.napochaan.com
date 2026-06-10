@@ -10,6 +10,7 @@ type Props = {
   reset: () => void;
 };
 
+// The shared `<main>` lives in `blog/layout.tsx`; this renders inside it.
 const BlogError = ({ reset }: Props) => (
   <section className={s.errorSection} aria-label="読み込みエラー">
     <SystemAnnotation tone="danger">■ blog の読み込みに失敗しました</SystemAnnotation>

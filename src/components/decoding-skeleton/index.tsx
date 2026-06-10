@@ -3,6 +3,10 @@ import * as s from './styles.css';
 type Props = {
   rows?: number;
   label?: string;
+  // Page-level Suspense fallbacks set this to reserve a minimum block size, so the
+  // footer doesn't ride up while loading and the swap to real content doesn't jump
+  // (CLS). Off by default — inline/demo uses (e.g. the colophon) stay compact.
+  fill?: boolean;
 };
 
 // Per-row cell counts (deterministic, no Math.random so the markup is stable for
@@ -26,11 +30,11 @@ const cellsForRow = (index: number): number => {
 // visually-hidden role="status" / aria-live="polite" node carries `label` so screen
 // readers announce the load without reading any glyphs. Reduced-motion freezes the
 // churn and the caret (handled in CSS).
-export const DecodingSkeleton = ({ rows = 6, label = '読み込み中…' }: Props) => {
+export const DecodingSkeleton = ({ rows = 6, label = '読み込み中…', fill = false }: Props) => {
   const rowIndexes = Array.from({ length: rows }, (_, index) => index);
 
   return (
-    <div className={s.root} role="status" aria-live="polite" aria-busy="true">
+    <div className={s.root} role="status" aria-live="polite" aria-busy="true" data-fill={fill || undefined}>
       <span className={s.srOnly}>{label}</span>
       <div aria-hidden="true" className={s.glyphs}>
         {rowIndexes.map((rowIndex) => {

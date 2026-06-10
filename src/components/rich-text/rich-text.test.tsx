@@ -81,6 +81,17 @@ const quote = (children: unknown[]) => ({
   children,
 });
 
+const upload = (doc: Record<string, unknown>, fields: unknown) => ({
+  type: 'upload',
+  relationTo: 'media',
+  format: '',
+  version: 3,
+  fields,
+  value: doc,
+});
+
+const imageDoc = { url: 'https://cdn.example.com/v3-hero.png', mimeType: 'image/png', alt: 'トップの巨大タイポ', width: 1200, height: 800 };
+
 const link = (url: string, linkChildren: unknown[]) => ({
   type: 'link',
   format: '',
@@ -167,5 +178,23 @@ describe('RichText', () => {
     const code = page.getByText('const x = 1').first();
     await expect.element(code).toBeVisible();
     expect(code.element().querySelectorAll('wbr').length).toBe(0);
+  });
+
+  it('renders an image upload with its alt text from the media doc', async () => {
+    render(<RichText data={state([upload(imageDoc, null)])} />);
+    await expect.element(page.getByRole('img', { name: 'トップの巨大タイポ' })).toBeInTheDocument();
+  });
+
+  it('renders the upload fields caption as a figcaption', async () => {
+    render(<RichText data={state([upload(imageDoc, { caption: 'milfy v3.0.0' })])} />);
+    await expect.element(page.getByText('milfy v3.0.0')).toBeInTheDocument();
+  });
+
+  it('omits the figcaption when the upload fields caption is absent', async () => {
+    render(<RichText data={state([upload(imageDoc, null)])} />);
+    const img = page.getByRole('img', { name: 'トップの巨大タイポ' });
+    await expect.element(img).toBeInTheDocument();
+    const figure = img.element().closest('figure');
+    expect(figure?.querySelector('figcaption')).toBeNull();
   });
 });

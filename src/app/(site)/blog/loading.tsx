@@ -1,5 +1,6 @@
 import { DecodingSkeleton } from '@components/decoding-skeleton';
 
-const Loading = () => <DecodingSkeleton />;
+// The shared `<main>` lives in `blog/layout.tsx`; this fallback renders inside it.
+const Loading = () => <DecodingSkeleton fill />;
 
 export default Loading;

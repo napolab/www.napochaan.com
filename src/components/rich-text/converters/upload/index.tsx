@@ -4,10 +4,22 @@ import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
 import type { NodeTypes } from '../types';
 
+// The upload node's `fields` is a loosely-typed JsonObject in Payload's generated
+// type. A non-empty `caption` there is the decorative figcaption text (distinct
+// from the media doc's `alt`, which is the a11y/SEO description). Read it via a
+// type guard so the Payload type is never widened or edited.
+const captionOf = (fields: unknown): string | undefined => {
+  if (typeof fields !== 'object' || fields === null) return undefined;
+  const { caption } = fields as Record<string, unknown>;
+  if (typeof caption !== 'string' || caption === '') return undefined;
+  return caption;
+};
+
 /**
  * Renders Lexical upload nodes using the project's `Figure` primitive.
  * Only renders fully-populated image uploads (object value with url/width/height).
- * Non-image uploads fall back to a download link.
+ * `alt` comes from the media doc; an optional `fields.caption` becomes the
+ * visible figcaption. Non-image uploads fall back to a download link.
  */
 export const uploadConverter: Partial<JSXConverters<NodeTypes>> = {
   upload: ({ node }) => {
@@ -32,7 +44,8 @@ export const uploadConverter: Partial<JSXConverters<NodeTypes>> = {
     const alt = typeof doc.alt === 'string' ? doc.alt : '';
     const width = typeof doc.width === 'number' ? doc.width : 800;
     const height = typeof doc.height === 'number' ? doc.height : 450;
+    const caption = captionOf(node.fields);
 
-    return <Figure src={url} alt={alt} width={width} height={height} />;
+    return <Figure src={url} alt={alt} width={width} height={height} caption={caption} />;
   },
 };

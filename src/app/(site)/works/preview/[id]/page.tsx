@@ -44,7 +44,8 @@ const WorkPreviewPage = async ({ params }: Props) => {
   const crumbs = buildCrumbs(work.title);
 
   return (
-    <main id="main-content" className={s.main}>
+    // Renders inside the works segment's shared `<main>` (see `works/layout.tsx`).
+    <>
       <LivePreviewListener />
       <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
       <WorkDetail work={work} />
@@ -55,7 +56,7 @@ const WorkPreviewPage = async ({ params }: Props) => {
         </>
       ) : null}
       <AdjacentNav prev={prev} next={next} />
-    </main>
+    </>
   );
 };
 

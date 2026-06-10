@@ -26,11 +26,14 @@ const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/
 export const NewsDetail = ({ item, prev, next }: Props) => {
   const crumbs = buildCrumbs(item.title);
 
+  // Renders inside the news segment's shared `<main>` (see `news/layout.tsx`), so
+  // this contributes content only — no landmark of its own — keeping every detail
+  // and preview page to exactly one `<main>` / one `<h1>`.
   return (
-    <main id="main-content" className={s.root}>
+    <>
       <PageHeader title={item.title} breadcrumbs={crumbs} kicker={`// ${dayjs(item.date).tz('Asia/Tokyo').format('YYYY.MM.DD')} · ${item.category}`} titleTracking="tight" />
       <div className={s.body}>{item.body === undefined ? null : <RichText data={item.body} />}</div>
       <NewsNav prev={prev} next={next} />
-    </main>
+    </>
   );
 };

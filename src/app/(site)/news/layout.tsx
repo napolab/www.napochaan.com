@@ -1,16 +1,13 @@
-import { FeedLink } from '@components/feed-link';
-import { PageHeader } from '@components/page-header';
-
 import * as s from './styles.css';
 
 import type { ReactNode } from 'react';
 
-const crumbs = [{ href: '/', label: 'home' }, { label: 'news' }] as const;
-
+// Owns the single `<main>` landmark shared by the list page, loading, and error
+// states. The page header (title / kicker / lead / RSS) lives in `page.tsx` so it
+// renders for the list only — never leaking onto the detail/preview routes, which
+// bring their own header via `NewsDetail`.
 const NewsLayout = ({ children }: { children: ReactNode }) => (
   <main id="main-content" className={s.main}>
-    <PageHeader title="news" breadcrumbs={crumbs} kicker="// お知らせ" lead="近況すぎ〜↑" />
-    <FeedLink href="/news/rss.xml" label="news の RSS フィード" />
     {children}
   </main>
 );

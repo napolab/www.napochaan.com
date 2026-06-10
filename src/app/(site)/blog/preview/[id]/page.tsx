@@ -42,8 +42,9 @@ const BlogPreviewPage = async ({ params }: Props) => {
   const headings = extractHeadings(post.body ?? null);
   const crumbs = buildCrumbs(post.title);
 
+  // Renders inside the blog segment's shared `<main>` (see `blog/layout.tsx`).
   return (
-    <main id="main-content" className={s.main}>
+    <>
       <LivePreviewListener />
       <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}`} titleTracking="tight" />
       <div className={s.layout}>
@@ -53,7 +54,7 @@ const BlogPreviewPage = async ({ params }: Props) => {
         <div className={s.bodyCol}>{post.body === undefined ? null : <RichText data={post.body} />}</div>
       </div>
       <BlogNav prev={prev} next={next} />
-    </main>
+    </>
   );
 };
 

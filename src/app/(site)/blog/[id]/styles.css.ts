@@ -1,11 +1,5 @@
 import { css } from '@styled/css';
 
-export const main = css({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: { base: '8', desktop: 'section' },
-});
-
 // Single column on mobile (TOC above body in DOM order); two columns on desktop
 // with the body left and a fixed-width TOC rail right.
 export const layout = css({

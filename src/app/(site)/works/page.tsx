@@ -1,5 +1,4 @@
 import { WorksArchive } from './_components/works-archive';
-import * as s from './styles.css';
 
 import { findWorksList } from '@lib/payload/works';
 
@@ -46,12 +45,12 @@ const WorksPage = async ({ searchParams }: Props) => {
   const pageWorks = works.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
-    <main id="main-content" className={s.main}>
+    <>
       <PageHeader title="works" breadcrumbs={crumbs} kicker="// archive — dev·vrchat·video·graphic" lead="なにかを作るって楽しいんだよなぁ〜😁" />
       <FeedLink href="/works/rss.xml" label="works の RSS フィード" />
       <WorksArchive works={pageWorks} />
       {totalPages > 1 ? <Pagination currentPage={page} totalPages={totalPages} href={worksHref} /> : null}
-    </main>
+    </>
   );
 };
 

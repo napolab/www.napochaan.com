@@ -57,8 +57,9 @@ const WorkDetailPage = async ({ params }: Props) => {
   const related = relatedWorks(works, work);
   const crumbs = buildCrumbs(work.title);
 
+  // Renders inside the works segment's shared `<main>` (see `works/layout.tsx`).
   return (
-    <main id="main-content" className={s.main}>
+    <>
       <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
       <WorkDetail work={work} />
       {related.length > 0 ? (
@@ -68,7 +69,7 @@ const WorkDetailPage = async ({ params }: Props) => {
         </>
       ) : null}
       <AdjacentNav prev={prev} next={next} />
-    </main>
+    </>
   );
 };
 
