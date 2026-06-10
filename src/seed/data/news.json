@@ -277,7 +277,39 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "DJ・VJ の出演依頼を受け付けています。ご依頼は Twitter(X) の DM までご連絡ください。DJ・VJ いずれも ¥5,000 で承っています。",
+                "text": "DJ・VJ の出演依頼を受け付けています。ご依頼は ",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "Twitter(X) の DM",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://x.com/naporin24690",
+                  "linkType": "custom",
+                  "newTab": true
+                }
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " までご連絡ください。DJ・VJ いずれも ¥5,000 で承っています。",
                 "type": "text",
                 "version": 1
               }
@@ -337,7 +369,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "機材・システム",
+                "text": "機材・VJ システム",
                 "type": "text",
                 "version": 1
               }
@@ -353,10 +385,19 @@
             "children": [
               {
                 "detail": 0,
+                "format": 1,
+                "mode": "normal",
+                "style": "",
+                "text": "自作の VJ ソフトでプレイしています。",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "detail": 0,
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "映像ミキサー V1-HD を所有しています。必要であれば持参します。",
+                "text": "iPhone を接続して会場や DJ の様子をリアルタイムに映像へ取り込んだり、必要な機能を現場に合わせて実装して足したり、既製ソフトにない演出ができます。映像ミキサー V1-HD も所有しているので、必要であれば持参します。",
                 "type": "text",
                 "version": 1
               }
@@ -392,15 +433,14 @@
                   "url": "https://x.com/naporin24690/status/2042615217952297306",
                   "linkType": "custom",
                   "newTab": true
-                },
-                "id": "6a300001cead56b8577ced01"
+                }
               },
               {
                 "detail": 0,
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": " を希望される方は、箱に回線があるかご確認ください。WiFi、またはお客さんに回線が通っている必要があります。HTML で作られているため OBS で合成でき、他の VJ さんと連携することも可能です。",
+                "text": " を使った演出も可能です。HTML で作られているため OBS で合成でき、他の VJ さんと連携することもできます。利用する場合は、箱に WiFi かお客さん用の回線が通っているかだけご確認ください。",
                 "type": "text",
                 "version": 1
               }
@@ -420,7 +460,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "VJ で特殊な演出が必要な場合は、1ヶ月前にお声がけください。専用の実装を行い、演出をお手伝いします。",
+                "text": "そのほか特殊な演出が必要な場合は、1ヶ月前にお声がけいただければ、専用の実装を行って演出をお手伝いします。",
                 "type": "text",
                 "version": 1
               }
