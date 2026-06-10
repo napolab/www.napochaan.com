@@ -1,5 +1,5 @@
 name = "napochaan-website"
-# account_id = "REPLACE_WITH_YOUR_CLOUDFLARE_ACCOUNT_ID" # TODO: set before deploy
+account_id = "cda8b0a2b410e1ff3a5bcc72c7e46f72"
 main = "./worker/worker.ts"
 compatibility_date = "2025-08-15"
 compatibility_flags = ["nodejs_compat"]
@@ -100,14 +100,18 @@ preview_urls = false
 
 [env.staging.vars]
 BASE_URL = "https://stg.napochaan.com"
-CURSOR_SALT = "stg-cursor-salt-change-me"
+# CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
+
+[[env.staging.routes]]
+pattern = "stg.napochaan.com"
+custom_domain = true
 
 [env.staging.images]
 binding = "IMAGES"
 
 [[env.staging.d1_databases]]
 binding = "D1"
-database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cms-staging
+database_id = "7ff5a88d-f403-48eb-a640-21b53040dcfa"
 database_name = "napochaan-cms-staging"
 remote = true
 
@@ -134,7 +138,7 @@ class_name = "CursorRoom"
 [[env.staging.d1_databases]]
 binding = "NEXT_TAG_CACHE_D1"
 database_name = "napochaan-cache-staging"
-database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cache-staging
+database_id = "0af66616-6458-492f-92b3-0f1d305abd06"
 
 # ===== Production Environment =====
 
