@@ -1,4 +1,5 @@
 import { Figure } from '@components/figure';
+import { formatBlurURL } from '@components/image/helper';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
@@ -18,8 +19,11 @@ const captionOf = (fields: unknown): string | undefined => {
 /**
  * Renders Lexical upload nodes using the project's `Figure` primitive.
  * Only renders fully-populated image uploads (object value with url/width/height).
- * `alt` comes from the media doc; an optional `fields.caption` becomes the
- * visible figcaption. Non-image uploads fall back to a download link.
+ * `alt` comes from the media doc. The corner-tag caption prefers an explicit
+ * `fields.caption`, falling back to the media `alt` so a cover image is never
+ * left without a label. Images use the `cover` Figure variant so a blurred copy
+ * of the same image fills any letterbox gaps (matching the works thumbnail
+ * look). Non-image uploads fall back to a download link.
  */
 export const uploadConverter: Partial<JSXConverters<NodeTypes>> = {
   upload: ({ node }) => {
@@ -44,8 +48,8 @@ export const uploadConverter: Partial<JSXConverters<NodeTypes>> = {
     const alt = typeof doc.alt === 'string' ? doc.alt : '';
     const width = typeof doc.width === 'number' ? doc.width : 800;
     const height = typeof doc.height === 'number' ? doc.height : 450;
-    const caption = captionOf(node.fields);
+    const caption = captionOf(node.fields) ?? (alt === '' ? undefined : alt);
 
-    return <Figure src={url} alt={alt} width={width} height={height} caption={caption} />;
+    return <Figure src={url} alt={alt} width={width} height={height} caption={caption} variant="cover" placeholder="blur" blurDataURL={formatBlurURL(url, { blur: 20 })} />;
   },
 };

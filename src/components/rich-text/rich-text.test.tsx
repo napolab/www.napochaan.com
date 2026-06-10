@@ -190,11 +190,28 @@ describe('RichText', () => {
     await expect.element(page.getByText('milfy v3.0.0')).toBeInTheDocument();
   });
 
-  it('omits the figcaption when the upload fields caption is absent', async () => {
+  it('falls back to the media alt as the caption tag when the fields caption is absent', async () => {
     render(<RichText data={state([upload(imageDoc, null)])} />);
     const img = page.getByRole('img', { name: 'トップの巨大タイポ' });
     await expect.element(img).toBeInTheDocument();
     const figure = img.element().closest('figure');
+    expect(figure?.querySelector('figcaption')?.textContent).toBe('トップの巨大タイポ');
+  });
+
+  it('omits the figcaption when both the fields caption and the media alt are absent', async () => {
+    const noAltDoc = { url: 'https://cdn.example.com/v3-hero.png', mimeType: 'image/png', width: 1200, height: 800 };
+    const { container } = await render(<RichText data={state([upload(noAltDoc, null)])} />);
+    const figure = container.querySelector('figure');
+    expect(figure).not.toBeNull();
     expect(figure?.querySelector('figcaption')).toBeNull();
+  });
+
+  it('renders an image upload as a cover-variant figure with a blurred backdrop', async () => {
+    render(<RichText data={state([upload(imageDoc, null)])} />);
+    const img = page.getByRole('img', { name: 'トップの巨大タイポ' });
+    await expect.element(img).toBeInTheDocument();
+    const figure = img.element().closest('figure');
+    expect(figure?.dataset.variant).toBe('cover');
+    expect(figure?.querySelector('span[aria-hidden="true"]')).not.toBeNull();
   });
 });

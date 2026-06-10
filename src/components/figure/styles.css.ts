@@ -12,14 +12,15 @@ export const root = css({
   '&[data-variant="cover"]': { overflow: 'hidden' },
 });
 
-// Uniform 16/10 frame: the image is contained so the whole picture is shown —
-// never cropped. Portrait or square sources letterbox over a transparent backdrop
-// instead of being clipped, matching the works detail proof frame. In the cover
+// Uniform 16/9 frame: the image is contained so the whole picture is shown —
+// never cropped. A 16:9 source (the common thumbnail ratio) fills the frame edge
+// to edge, so the corner tag sits flush on the picture. Portrait or square sources
+// letterbox over the blurred backdrop instead of being clipped. In the cover
 // variant it is lifted above the blurred backdrop layer.
 export const image = css({
   display: 'block',
   width: 'full',
-  aspectRatio: '[16 / 10]',
+  aspectRatio: '[16 / 9]',
   objectFit: 'contain',
   'figure[data-variant="cover"] &': {
     position: 'relative',
