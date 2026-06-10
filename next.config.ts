@@ -4,6 +4,16 @@ import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // The client-side Router Cache reuses already-visited RSC entries on soft
+  // navigation (and back/forward) WITHOUT refetching — and server-side
+  // `revalidateTag` never evicts it. So a long-open tab keeps serving the RSC it
+  // cached earlier, showing an out-of-date version of a work until a hard reload
+  // discards the client cache. Setting both reuse windows to 0 marks every cached
+  // segment immediately stale, so each navigation re-pulls fresh RSC from the
+  // server. Trade-off: back/forward refetch instead of instant-reusing the cache.
+  experimental: {
+    staleTimes: { static: 0, dynamic: 0 },
+  },
   serverExternalPackages: ['drizzle-kit', 'esbuild', 'esbuild-register'],
   typescript: {
     ignoreBuildErrors: true,
