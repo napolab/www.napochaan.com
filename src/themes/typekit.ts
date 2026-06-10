@@ -7,7 +7,18 @@
 // removed only once fonts have RESOLVED *and* a minimum on-screen time has
 // elapsed — i.e. max(font-load-time, BOOT_MIN_MS). This guarantees the overlay is
 // perceivable even when fonts are cached and resolve in a few ms (without it the
-// overlay would flash for one frame and read as a glitch). A MutationObserver
+// overlay would flash for one frame and read as a glitch).
+//
+// The minimum-display clock (`t0`) is anchored to FIRST PAINT, not to script
+// execution: a requestAnimationFrame callback re-assigns t0 at the first
+// rendering opportunity (≈ first paint, when the overlay actually becomes
+// visible). Measuring from parse time looked fine on desktop, but on mobile the
+// render-blocking CSS download pushes first paint hundreds of ms after this
+// script runs, so the BOOT_MIN_MS budget was mostly spent before anything was on
+// screen and the overlay barely flashed. Because cached fonts can resolve BEFORE
+// that rAF fires (re-anchoring t0 after the wait was scheduled), the boot
+// removal is a self-re-checking callback that keeps deferring until the floor —
+// measured from the latest t0 — has truly elapsed. A MutationObserver
 // watches for wf-active / wf-inactive (set by Web Font Loader on success/failure,
 // or by our own scriptTimeout fallback) so the overlay component itself stays a
 // pure-CSS Server Component (it only reads `html.boot`) — all timing logic lives
@@ -28,11 +39,17 @@ const script = `(function(d) {
       t = setTimeout(function () { h.className = h.className.replace(/\\bwf-loading\\b/g, "") + " wf-inactive"; }, config.scriptTimeout),
       tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a;
   h.className += " wf-loading boot";
+  requestAnimationFrame(function () { t0 = Date.now(); });
   var obs = new MutationObserver(function () {
     var c = h.className;
     if (c.indexOf("wf-active") > -1 || c.indexOf("wf-inactive") > -1) {
       obs.disconnect();
-      setTimeout(function () { h.className = h.className.replace(/\\bboot\\b/g, ""); }, Math.max(0, BOOT_MIN_MS - (Date.now() - t0)));
+      var done = function () {
+        var left = BOOT_MIN_MS - (Date.now() - t0);
+        if (left > 0) { setTimeout(done, left); return; }
+        h.className = h.className.replace(/\\bboot\\b/g, "");
+      };
+      setTimeout(done, Math.max(0, BOOT_MIN_MS - (Date.now() - t0)));
     }
   });
   obs.observe(h, { attributes: true, attributeFilter: ["class"] });
