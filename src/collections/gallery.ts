@@ -1,12 +1,13 @@
 import { CACHE_TAGS } from '@utils/cache-tags';
 
-import { createPublishedTagRevalidateHooks } from './hooks/revalidate';
+import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
 // Gallery photos feed `/gallery` (skyline masonry) and the home teaser. The image
-// is a media upload; width/height/alt come from the media record.
-const revalidateGallery = createPublishedTagRevalidateHooks([CACHE_TAGS.gallery]);
+// is a media upload; width/height/alt come from the media record. There is no per-doc
+// detail page, so revalidatePath('/') and ('/gallery') cover the ISR HTML.
+const revalidateGallery = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.gallery], ['/', '/gallery']);
 
 export const Gallery = {
   slug: 'gallery',

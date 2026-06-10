@@ -25,6 +25,27 @@ const dispatch = (req: PayloadRequest, tags: readonly string[]): void => {
   }
 };
 
+// Read a document's id without an `as` cast. Status-less / id-less docs yield undefined.
+const readId = (doc: unknown): string | number | undefined => {
+  if (typeof doc !== 'object' || doc === null || !('id' in doc)) return undefined;
+  const id: unknown = doc.id;
+  return typeof id === 'string' || typeof id === 'number' ? id : undefined;
+};
+
+// Bust both the cache tags and the ISR path HTML. Mirrors `dispatch`'s opt-out and
+// swallows the throw outside a Next request context (CLI seed/migrate).
+const dispatchTagsAndPaths = (req: PayloadRequest, tags: readonly string[], paths: readonly string[]): void => {
+  const context = req.context as { disableRevalidate?: boolean };
+  if (context.disableRevalidate === true) return;
+  try {
+    for (const tag of tags) revalidateTag(tag);
+    for (const path of paths) revalidatePath(path);
+  } catch {
+    // Outside a request context (CLI seed/migrate). Those writes surface on the next
+    // build/request, so swallowing is safe. `disableRevalidate` is the explicit opt-out.
+  }
+};
+
 /** Safely bust a fixed set of cache tags + ISR paths. Swallows the
  * "static generation store missing" throw that happens outside a Next request
  * context (e.g. CLI seed/migrate). Use for non-draft collections / globals whose
@@ -60,6 +81,28 @@ export const createPublishedTagRevalidateHooks = (tags: readonly string[]): Reva
   },
   afterDelete: ({ doc, req }) => {
     if (isPublished(doc)) dispatch(req, tags);
+    return doc;
+  },
+});
+
+// Resolve the full path set: the static paths, plus the per-doc detail path when one is
+// derivable. Path-keyed ISR HTML lives outside the tag cache, so detail pages need their own bust.
+const resolvePaths = (doc: unknown, paths: readonly string[], detailPath?: (id: string | number) => string): readonly string[] => {
+  const id = readId(doc);
+  if (detailPath === undefined || id === undefined) return paths;
+  return [...paths, detailPath(id)];
+};
+
+/** For draft-enabled collections whose data fans out to ISR pages: bust both the cache
+ * tags AND the path-keyed ISR HTML (list/home + the per-doc detail page) when the
+ * published state is touched. */
+export const createPublishedTagAndPathRevalidateHooks = (tags: readonly string[], paths: readonly string[], detailPath?: (id: string | number) => string): RevalidateHooks => ({
+  afterChange: ({ doc, previousDoc, req }) => {
+    if (isPublishedChange(doc, previousDoc)) dispatchTagsAndPaths(req, tags, resolvePaths(doc, paths, detailPath));
+    return doc;
+  },
+  afterDelete: ({ doc, req }) => {
+    if (isPublished(doc)) dispatchTagsAndPaths(req, tags, resolvePaths(doc, paths, detailPath));
     return doc;
   },
 });

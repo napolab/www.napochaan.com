@@ -1,12 +1,13 @@
 import { CACHE_TAGS } from '@utils/cache-tags';
 
-import { createPublishedTagRevalidateHooks } from './hooks/revalidate';
+import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
 // Blog posts are self-authored articles (the home teaser + `/blog` + `/blog/{id}`).
 // External RSS posts are NOT part of this collection — they stay in the log feed.
-const revalidateBlog = createPublishedTagRevalidateHooks([CACHE_TAGS.blog]);
+// revalidatePath('/'), ('/blog'), and the per-doc detail path bust the ISR HTML.
+const revalidateBlog = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.blog], ['/', '/blog'], (id) => `/blog/${id}`);
 
 export const Blog = {
   slug: 'blog',

@@ -1,15 +1,16 @@
 import { CACHE_TAGS } from '@utils/cache-tags';
 
-import { createPublishedTagRevalidateHooks } from './hooks/revalidate';
+import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
 // News flows into ISR/`unstable_cache` reads tagged with CACHE_TAGS.news (the
 // home teaser `/`, the archive `/news`, the chronicle `/log`, and the detail
-// page `/news/{id}`). Busting the tag on publish/unpublish purges those route +
-// data caches via the NEXT_TAG_CACHE_D1 binding. Drafts are skipped — only a
+// page `/news/{id}`). Busting the tag on publish/unpublish purges the data caches
+// via the NEXT_TAG_CACHE_D1 binding; revalidatePath('/'), ('/news'), and the
+// per-doc detail path cover the path-keyed ISR HTML. Drafts are skipped — only a
 // published-state change reaches the public site.
-const revalidateNews = createPublishedTagRevalidateHooks([CACHE_TAGS.news]);
+const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news], ['/', '/news'], (id) => `/news/${id}`);
 
 export const News = {
   slug: 'news',

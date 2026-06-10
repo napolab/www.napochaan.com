@@ -1,12 +1,13 @@
 import { CACHE_TAGS } from '@utils/cache-tags';
 
-import { createPublishedTagRevalidateHooks } from './hooks/revalidate';
+import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
 // Manual chronicle entries merged into the /log timeline alongside the derived
 // news/works/external-post entries — for milestones that none of those cover.
-const revalidateLogs = createPublishedTagRevalidateHooks([CACHE_TAGS.logs]);
+// There is no per-doc detail page, so revalidatePath('/') and ('/log') cover the ISR HTML.
+const revalidateLogs = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.logs], ['/', '/log']);
 
 export const Logs = {
   slug: 'logs',
