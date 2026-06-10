@@ -3,6 +3,10 @@ import { css } from '@styled/css';
 export const root = css({
   display: 'flex',
   flexDirection: 'column',
+  // Grow to absorb the slack in the shell's filled column so the related works and
+  // prev/next nav settle at the bottom of the fold on short works. The grow resolves
+  // to 0 once the page overflows the viewport, so longer works are unaffected.
+  flexGrow: 1,
   gap: 'block',
 });
 

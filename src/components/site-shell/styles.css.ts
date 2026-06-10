@@ -16,6 +16,15 @@ export const lifeFrame = css({
 export const stage = css({
   position: 'relative',
   zIndex: 'base',
+  // Stack SysBar / page <main> / SiteFooter as a column that is at least one
+  // dynamic viewport tall, so the footer is pinned to the bottom of the fold even
+  // when a page is short. Each page <main> carries `flexGrow: 1` to absorb the
+  // slack, which keeps the footer's section-rhythm top margin intact (the grow
+  // resolves to 0 on pages already taller than the viewport). `dvh` tracks the
+  // iOS dynamic toolbar so the fold height stays correct as it expands/collapses.
+  display: 'flex',
+  flexDirection: 'column',
+  minHeight: '[100dvh]',
   // Clip transient horizontal overflow (e.g. the EchoText glitch momentarily
   // widening the wordmark) so it never reaches the viewport and judders the
   // fixed TypographyBand. `clip` is paint-only and leaves vertical flow intact.

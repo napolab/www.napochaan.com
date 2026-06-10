@@ -5,6 +5,9 @@ import { css } from '@styled/css';
 export const root = css({
   display: 'flex',
   flexDirection: 'column',
+  // Fill the shell's flex column so the footer pins to the bottom of the fold on
+  // this sparse page (see site-shell `stage`). Inert once content exceeds the viewport.
+  flexGrow: 1,
   gap: 'block',
   alignItems: 'flex-start',
   paddingBlock: 'section',

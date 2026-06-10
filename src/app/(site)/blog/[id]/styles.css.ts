@@ -4,6 +4,10 @@ import { css } from '@styled/css';
 // with the body left and a fixed-width TOC rail right.
 export const layout = css({
   display: 'grid',
+  // Grow to absorb the slack in the shell's filled column so the prev/next nav and
+  // footer settle at the bottom of the fold on short posts. The grow resolves to 0
+  // once the post overflows the viewport, so long posts are unaffected.
+  flexGrow: 1,
   gap: 'block',
   gridTemplateColumns: { base: '[1fr]', desktop: '[1fr 14rem]' },
   columnGap: { desktop: 'block' },
@@ -14,7 +18,6 @@ export const layout = css({
 // No weight override: the RichText body inherits the global body weight so the
 // prose matches /about (which renders bio/philosophy through the same RichText).
 export const bodyCol = css({
-  minHeight: '[40vh]',
   gridColumn: { desktop: '1' },
   gridRow: { desktop: '1' },
 });
