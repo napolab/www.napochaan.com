@@ -117,7 +117,11 @@ remote = true
 
 [[env.staging.r2_buckets]]
 binding = "R2"
-bucket_name = "napochaan-cms-staging" # TODO: wrangler r2 bucket create napochaan-cms-staging
+bucket_name = "napochaan-cms-staging"
+# `remote = true` mirrors the D1 binding: Payload CLI seed/export (getPlatformProxy
+# with experimental.remoteBindings) must hit the REAL staging bucket, not local
+# miniflare — otherwise media uploads land locally and the deployed worker 404s them.
+remote = true
 
 [[env.staging.services]]
 binding = "WORKER_SELF_REFERENCE"
@@ -162,6 +166,8 @@ remote = true
 [[env.production.r2_buckets]]
 binding = "R2"
 bucket_name = "napochaan-cms-production" # TODO: wrangler r2 bucket create napochaan-cms-production
+# See staging note: seed/export must hit the real bucket, not local miniflare.
+remote = true
 
 [[env.production.services]]
 binding = "WORKER_SELF_REFERENCE"
