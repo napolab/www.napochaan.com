@@ -23,7 +23,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "初めて作成した web アプリケーション。タスク管理アプリに推しの声をかけ合わせることで、ユニークで面白い体験を作り出した。",
+                "text": "ぼくが初めて作った web アプリケーション。タスク管理アプリに、推しだった名取さなさんの声を掛け合わせた。タスクを片付けるという地味な行為の横にずっと推しがいる。それだけで、毎日触るものの体験がまるごと変わる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "入口が技術じゃなかったのが、振り返るとぼくらしい。解決したい問題があったわけじゃなくて、ただ推しのいる画面がほしかった。プログラミングは問題解決の道具だと思って使ってきたけど、最初に形にしたのは、誰の問題も解決しない、推しと一緒にタスクをこなすためのアプリだった。たぶん、ここから全部始まっているんだと思う。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -62,7 +81,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "桜を見に行くために作成したファンアプリ。iOS で AR を簡単に実現できる web アプリをラップした推し専用アプリ。",
+                "text": "桜を見に行くために作ったファンアプリ。iOS で AR を簡単に実現できる web アプリをラップして、推し専用のアプリに仕立てた。タスク管理アプリのひと月半後で、この頃のぼくは推しを起点にしか手が動いていない。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "先に花見の予定があって、その景色の中に推しを置きたくて、手段としてアプリを書いた。動機はそれだけ。ただ、ほしい体験が先にあって技術をあとから探してくる順番は、このときからずっと変わっていない。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -101,7 +139,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "インターン先で主要な検索ページを作成した。検索 UI の初実装を通じてコンポーネント分割の手法を学んだ。",
+                "text": "インターン先の soelu.com で、サービスの主要な検索ページを担当した。レッスンを探すための画面で、検索 UI をまるごと実装するのはこれが初めてだった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "条件もコンテンツも多い画面を、どう崩さずに組み立てるか。この実装を通じてコンポーネント分割の手法を学んだ。推しのために好きに書いていたコードと違って、サービスのコードには他人の設計と歴史がある。その中に画面をひとつ置かせてもらった経験は大きかった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -140,7 +197,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "新卒で入社した会社のアプリページを作成した。",
+                "text": "新卒で入社した会社のアプリページとして、instructors ページを作成した。会社はインターンをしていた soelu.com で、そのまま新卒で入った。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "推しのために書いていた web が、ここからは仕事になった。やっていること自体は変わらない。画面を作って、人に触ってもらう。それが続いているだけ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -179,7 +255,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "447Records TANA の開発を担当した。主にオーディオプレイヤー周りを実装。Apple Music のような洗練されたインタラクションを目指した。",
+                "text": "447Records TANA の開発を担当した。主に実装したのはオーディオプレイヤー周りで、Apple Music のような洗練されたインタラクションを目指した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "React で複雑な UI に挑戦するのは、これが初めてだった。プレイヤーは画面のあちこちと状態がつながっていて、ひとつ触ると別の場所が追従する。その全部を気持ちよく保ち続けるのは当時のぼくには十分すぎる課題で、Apple Music を横に置いて、挙動を観察しては寄せていった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -218,7 +313,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "flat-工房の買取専用アプリを開発した。デザイン以外の全部分を担当し、Firebase + React + vanilla-extract + react-hook-form で構築。",
+                "text": "flat-工房の買取専用アプリを開発した。デザイン以外の全部分を担当して、Firebase + React + vanilla-extract + react-hook-form で構築した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "買取の申し込みが軸になるアプリなので、中心にあるのは入力フォームで、react-hook-form はそのための選択。flat-工房とは、このあとネットショップの UI、HP のサポートと長く続いていく。その付き合いの最初がこのアプリだった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -257,7 +371,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "ProjectBLUE の公式 HP を作成した。Next.js + styled-components で構築。",
+                "text": "ProjectBLUE の公式 HP を作成した。Next.js + styled-components で構築している。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Next.js に styled-components という組み合わせは 2021 年のぼくの手つきで、いま見るとさすがに時代を感じる。ただ、works を年表として並べたとき、道具の変遷がそのまま残っているのは悪くない。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -296,7 +429,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "satori で作成した LGTM ジェネレーターを Cloudflare Workers にデプロイ。URL パラメーターで文字色と背景画像をカスタマイズ可能。",
+                "text": "satori で LGTM 画像を生成して、Cloudflare Workers で配信するジェネレーター。URL パラメーターで文字色と背景画像を差し替えられる。lgtm.napochaan.com で動いている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "code review に貼る LGTM 画像という、なくても誰も困らないものを、わざわざエッジで動的生成している。この頃のぼくは、Cloudflare Workers の上で高機能なものを再現することに妙にこだわりはじめていた。小さく、早く、安く、高機能。目指すところがそのまま書いてあるようなインフラの上で、どこまでやれるかをずっと試している。ボカコレのアーカイブも、いまのこのサイトも、たぶん全部この延長線上にある。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -335,7 +487,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "flat-工房のネットショップ UI 改善プロジェクトを担当。デザイン以外の全部分を担当し、lit-element をメインに使用して開発。",
+                "text": "flat-工房のネットショップ UI 改善プロジェクトを担当した。買取アプリに続く二度目の flat-工房 案件で、今回もデザイン以外の全部分を受け持った。実装は lit-element をメインにしている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "いつも書いている React ではなく、lit-element、つまり Web Components で UI を組んだ。道具が変わっても、画面を分解して責務を切る作業の中身は変わらない。むしろ道具を替えたときのほうが、その基礎がどこまで自分のものになっているかがよくわかる。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -374,7 +545,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "Figma の勉強を兼ねて作成したポートフォリオサイト。Next.js + Cloudflare Pages で高速表示を実現し、react-spring でキャラクターやコンテンツにアニメーションを付与。（※旧バージョン）",
+                "text": "Figma の勉強を兼ねて作ったポートフォリオサイト。Next.js + Cloudflare Pages で高速表示を実現して、アクセシビリティ対応には Radix UI、キャラクターやコンテンツのアニメーションには react-spring を使った。可愛らしさと楽しさを前に出した作りで、ここから三年ちょっと、ぼくの顔として動いてくれた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "よくできたサイトだった。情報は整理されていて、導線は通っていて、引っかかるところがない。ただ、開くたびに「よくできているね」と思っている自分がいた。他人の作ったものを褒めるときの言い方で。それが三年後に丸ごと作り直す理由になるんだけど、このときのぼくはまだ気づいていない。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -413,7 +603,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "シャノンの熱異常 REMIX のテクニカルサポートを担当した。主にプログラム部分をサポート。",
+                "text": "シャノンの熱異常 REMIX で、テクニカルサポートを担当した。受け持ったのは主にプログラム部分。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "表に出るのは楽曲で、ぼくの仕事はその足元にある。誰かの作品の内側を技術で支える関わり方は、このあたりから少しずつ増えていった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -452,7 +661,45 @@
             "children": [
               {
                 "type": "text",
-                "text": "ボカコレ2023夏の毎時ランキングアーカイブを作成した。縦横両方向の仮想スクロールで大量コンテンツの高速検索を実現。データ基盤は Cloudflare Workers + KV + R2、アプリケーションは Hono で構築。",
+                "text": "ボカコレ2023夏の毎時ランキングを丸ごとアーカイブするサイトを作った。データ基盤は Cloudflare Workers + KV + R2、アプリケーションは Hono。収集側は queue と cron trigger の組み合わせで、取りこぼしなく毎時集計する仕組みにしている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "フロントは縦横両方向の仮想スクロールで、大量のコンテンツを高速にスクロール・検索できるようにした。統計情報や増加量も多角的に整理して、ランキングの傾向そのものが見えるように組んでいる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "毎時ランキングは、次の集計が来るたびに流れて消えていく。お祭りのあいだ動き続けていたあの数字を、あとから何度でも辿れるようにしておきたかった。それを全部 Cloudflare の上だけで組み切るのが、この頃のぼくのこだわりでもあった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -491,7 +738,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "オリジナル名刺を作成した。Figma でデザインから入稿まですべて自力で実施。キャラクターをメインにしたシンプルで情報が伝わりやすいレイアウトにこだわった。",
+                "text": "オリジナルの名刺を作った。Figma でデザインから入稿まで、すべて自力でやっている。キャラクターをメインに据えた、シンプルで情報が伝わりやすいレイアウトにこだわった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "半年前にポートフォリオサイトを作りながら勉強した Figma を、今度は紙に向けて使った。web と違って、刷ってしまったら直せない。ぼくの works のなかでは珍しい、画面の外に出ていったものづくり。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -530,7 +796,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "シャノンの 1st アルバムのランディングページを作成した。Figma でデザインし Astro で実装した。",
+                "text": "シャノンの 1st アルバム「第一象徴体系」のランディングページを作成した。Figma でデザインして、実装は Astro。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "シャノンとは熱異常 REMIX のテクニカルサポート以来の仕事で、今回はデザインから実装までを担当した。プログラムの裏方から一歩出て、アルバムの見え方そのものを任せてもらった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -569,7 +854,45 @@
             "children": [
               {
                 "type": "text",
-                "text": "大阪関西国際芸術祭2023に出展するためのシステムを作成した。感想投稿機能、ChatGPT API と StableDiffusion による自動動画生成システム、ポスター・コメント表示画面を実装した。",
+                "text": "大阪関西国際芸術祭2023に出展された椎乃味醂とたなかの作品「多面体、鏡面」のための展示システムを作成した。来場者の感想投稿機能、ChatGPT API と StableDiffusion による自動動画生成システム、ポスター・コメント表示画面を実装している。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "技術的な挑戦として、大部分を Cloudflare 製品で構築した。会期のあいだ会場で動き続けることが前提のシステムで、ふだんの web サービスとは要求の質が違う。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "問題解決者なだけの自分の殻を破りたくて、ぼくは StudioGnu に応募した。問題解決の道具だったはずのプログラミングが、ここでは芸術作品の内側で動いている。憧れていた世界のほうへ、技術ごと体を入れていった最初の大きな展示だった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -608,7 +931,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに使用し、データ管理には MicroCMS を採用。作品ごとの動的 og:image 生成には next/og を活用した。",
+                "text": "StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに、データ管理には MicroCMS を採用。作品ごとの動的な og:image 生成には next/og を使っている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "作品が増えるたびに CMS から足していけて、リンクを共有したときに見える画像も作品ごとに自動で変わる。殻を破りたくて飛び込んだチームの入口を、気づけば自分の手で作っていた。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -647,7 +989,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "楽曲「デュレエ」の一部で使用されるデータの解析を担当した。データ分析に JupyterLab、pandas、numpy を使用し、描画に matplotlib、NetWorkX、JavaScript canvas を活用。",
+                "text": "楽曲「デュレエ」の一部で使われるデータの解析を担当した。分析には JupyterLab と pandas、numpy。描画には matplotlib と NetworkX、それに JavaScript の canvas を使っている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "題材のひとつは、初音ミクの変遷をデータで辿ること。サムネイル変遷の大量データは matplotlib では処理しきれなくて、canvas で描画した。適切なアウトプットが出るなら言語にはこだわらない、という構えで道具を選んでいる。解析の結果が楽曲の素材になるという、works のなかでもちょっと毛色の違う仕事。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -686,7 +1047,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "StudioGnu で公開した UTAU 彼方のランディングページを作成した。Cloudflare Turnstile で bot 排除後、数分間有効な signed URL でダウンロードリンクを生成。DurableObjects によるダウンロードカウンター機能も搭載。",
+                "text": "StudioGnu で公開した UTAU 彼方のランディングページを作成した。Cloudflare Turnstile で bot を弾いたうえで、数分間だけ有効な signed URL を生成してダウンロードリンクを渡す。ダウンロードカウンターは Durable Objects で実装していて、総ダウンロード数を確認できる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "重視したのは、利用規約を必ず読んでもらう導線と、ダウンロード機能の堅さ。bot には渡さず、ほしい人は待たせない。その線引きが Cloudflare のスタックだけで完結しているのが、この構成の気に入っているところ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -725,7 +1105,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "flat-工房の HP 制作サポートを行った。Next.js を Cloudflare Pages で運用し、コンタクトフォームは ServerAction と Resend で実装し、bot 対策として Cloudflare WAF ページ検証を導入するなど安全な運用を重視した。",
+                "text": "flat-工房の HP 制作をサポートした。Next.js を Cloudflare Pages で運用し、画像最適化には Cloudflare Worker と Cloudflare Images を活用。コンタクトフォームは Server Action と Resend で実装して、bot 対策として Cloudflare WAF のページ検証を導入した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "買取アプリ、ネットショップ UI に続く三度目の flat-工房 案件で、今回いちばんに置いたのは、安全に運用し続けられること。長く付き合いのある相手のサイトは、作って終わりじゃない。壊れずに回り続けるほうがずっと大事だから。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -764,7 +1163,45 @@
             "children": [
               {
                 "type": "text",
-                "text": "Hono Conference 2024 - Our first step に登壇した。大阪関西国際芸術祭での展示システム事例について発表。Hono RPC での型安全通信、ReverseProxy と getPath を併用した画像最適化サーバーの構築手法などを紹介した。",
+                "text": "Hono Conference 2024 - Our first step に登壇した。ぼくにとって初めての登壇で、しかも英語。話したのは大阪関西国際芸術祭での展示システムの事例で、イベント向けの短期間開発で Cloudflare を使うメリットと、Hono を併用したときの効率化について。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "具体的には、Hono RPC での型安全な通信や、ReverseProxy と getPath を併用した画像最適化サーバーの構築手法を紹介した。展示の現場でかき集めてきた知見が、そのまま登壇の題材になっている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "作ったものの話を、作った場所の外でするのは初めてだった。Workers の上であれこれ再現して遊んできたことが、人前で話せる形になっている。話せることは、現場で手を動かした分しか増えないんだよな。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -803,7 +1240,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "Cloudflare Workers DurableObjects での WebSocket 活用のための Tips について登壇した。自身が直面した問題を具体例として挙げながら、実践的な解決策を紹介した。",
+                "text": "Workers Tech Talk #3 で、Cloudflare Workers の DurableObjects と WebSocket の話をしてきた。DurableObjects は WebSocket を扱うときの最適解になりつつあるけれど、実際に使うといくつかの課題に当たる。ぼく自身が直面した問題を具体例として挙げながら、実践的な解決策を紹介した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Workers が使えるということは DurableObjects が使えて、DurableObjects が使えるということは WebSocket が使える。そうするとフロントエンドの表現の幅がまだ広がる。この連鎖をずっと信じて手を動かしてきて、その途中でぶつかった壁を並べたのがこの登壇だった。壁を記録して置いておけば、次に同じ場所を通る人が少し楽になる。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -842,7 +1298,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "OBS のブラウザソースで動作するステージ演出システムを作成した。Cloudflare Workers と WebSocket により OBS とスマホ間の通信を実現。スマホでの正解不正会選択、再生停止操作、回答者位置調整など現場での実用性を重視した機能を搭載。",
+                "text": "工房祭のステージ用に、OBS のブラウザソースで動く演出システムを作った。Cloudflare Workers と WebSocket で OBS とスマホをつないで、手元のスマホから正解・不正解の選択、再生停止、回答者の位置調整までできるようにしてある。通信部分には自作の DurableObjects ライブラリ durabcast を使った。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ステージのシステムは、本番中に止まったら終わりだ。だから凝った見せ方より先に、現場で操作する人が迷わないこと、その場で立て直せることを優先した。配信画面の裏側で WebSocket が淡々と動き続けている、その地味さがいちばんの成果だった気がする。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -881,7 +1356,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "燭の MV で使用する図形を p5.js で生成できるシンプルなエディターを作成した。",
+                "text": "燭の MV 制作のサポートとして、MV で使う図形を p5.js で生成できるシンプルなエディターを作った。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "完成した映像に手を入れたわけではなくて、図形を作るための小さな道具を渡しただけ。派手な関わり方ではないけど、誰かの制作の途中にこういう道具を差し込むタイプの支援は好きだ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -920,7 +1414,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "ボカコレ2024冬のランキングアーカイブを作成した。Cloudflare Cron Trigger で収集したランキングスナップショットを drizzle で Cloudflare D1 に保存する構成に変更した。",
+                "text": "ボカコレ2024冬のランキングアーカイブを作った。画面側は2023夏に作ったものとほぼ同じで、変えたのはサーバーの中身だ。Cloudflare Cron Trigger で集めたランキングのスナップショットを、drizzle を通して Cloudflare D1 に保存する構成に組み替えた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "見た目の変わらない更新は誰にも気づかれない。それでも KV と R2 で組んだ最初の構成を D1 に置き直したのは、Workers の上でどこまでやれるかを確かめ続けたいからで、ぼくにとってこのアーカイブは半分、その実験場になっている。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -959,7 +1472,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "企画展「共に在る音楽」の作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。",
+                "text": "企画展「共に在る音楽」に出展された、椎乃味醂 x ももえの作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "同じ企画展では煮ル果実の「DEMiXUS」のシステムも担当している。作品の中身はアーティストのものだから、ぼくの仕事はそれが会場でちゃんと動き続けるための層を敷くことだった。展示のシステムは、観た人にほとんど気づかれないくらいでちょうどいい。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -998,7 +1530,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "企画展「共に在る音楽」の作品「DEMiXUS」のシステムを設計・実装した。短期間での開発ながら要望実現のため Cloudflare Stack をフル活用した構成とした。",
+                "text": "企画展「共に在る音楽」で、煮ル果実の作品「DEMiXUS」のシステムを設計・実装した。開発期間がかなり短く、それでも要望を全部実現するために、Cloudflare Stack をフルに使った構成にしている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "イベント向けの短期開発は、Cloudflare がいちばん効く場面だと思っている。立ち上げが速くて、終わったあとも軽い。締切が近いほど、インフラの判断だけは迷わずに済むようにしてある。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1037,7 +1588,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "VRChat で好きなオブジェクトを頭上で回転させるヘイローにできるギミックを制作した。ボタン一つで自動配置する仕組みを実装し、フルパック版では13種類のメニューを用意。汎用的な円形配置スクリプトにより頭部以外の部位にも装着可能で、BOOTH で販売中。",
+                "text": "VRChat で、好きなオブジェクトを頭上でくるくる回るヘイローにできるギミックを作って、BOOTH で販売している。ボタン一つで自動配置される仕組みにしてあって、フルパック版には13種類のメニューを用意した。配置のスクリプトは汎用的な円形配置として書いたので、頭の上以外の部位にも付けられる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "いちばん時間を使ったのは、面倒な位置調整を全部ボタン一つに押し込むところだ。アバターを飾るための道具は、設定でつまずいた時点で楽しさが目減りしてしまう。買ってくれた人が自分のアバターに何を回すのか、想像するのは楽しい。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1076,7 +1646,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "AHUB のアルバム「UMANITY」の Web サイトを制作した。アルバム紹介コンテンツやクイズなどのインタラクティブなギミックを搭載した HP を作成した。",
+                "text": "AHUB のアルバム「UMANITY」の Web サイトを制作した。アルバムの紹介コンテンツに加えて、クイズなどのインタラクティブなギミックを載せている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "アルバムのサイトは、ジャケットとリンクを並べるだけでも成立する。そこにわざわざクイズを置いたのは、聴く前の人に作品の世界へ一歩入ってもらうためで、手を動かして遊んだ分だけ、音の届き方も変わると思っている。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1115,7 +1704,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "After Effects を使った初めての動画制作で AKAGE オマージュ動画を作成した。アバターのコンセプトに合わせ、可愛さと面白さを重視した編集を心がけた。",
+                "text": "After Effects を使った初めての動画制作。VRChat のアバターを使って、AKAGE のオマージュ動画を作った。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "初めての道具なので、できることは多くない。そのぶん、アバターのコンセプトが持っている可愛さと面白さがそのまま伝わることだけを考えて編集した。映像の編集がぼくの手札に加わったのは、このときからだ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1154,7 +1762,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "椎乃味醂の楽曲「まだ知らない君がいる - 初音ミク･重音テト」の MV に VRChat で撮影した映像を提供した。",
+                "text": "椎乃味醂の楽曲「まだ知らない君がいる - 初音ミク･重音テト」の MV に、VRChat で撮影した映像を提供した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VRChat の中で見ている景色は、スクリーンショットや配信のほかには、あまり外に出ていくことがない。それが MV という形で曲と一緒に残って、誰かの目に流れていくのは、提供した側からしても少しふしぎな感覚だった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1193,7 +1820,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "VRChat の個人イベント用ポスター・ロゴを制作した。可愛らしさと情報の伝わりやすさを重視したレイアウトを心がけた。",
+                "text": "VRChat の個人イベント用に、ポスターとロゴを制作した。可愛らしさと、情報がちゃんと伝わることの両立を意識したレイアウトにしている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "最近グラフィックデザインを学んでいるのは、フライヤーや VJ みたいな視覚表現に生かすためで、こういう一枚はその置き場としてちょうどいい。イベントの名前と日時が読めること。そのうえで目に留まること。地味な条件を満たしながら可愛くするのが、いちばん難しくて楽しいところだ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1232,7 +1878,45 @@
             "children": [
               {
                 "type": "text",
-                "text": "VRChat の推しの誕生日を祝うためにモザイクアートと HP を作成した。20人の協力により約3000枚の画像から24000タイルのモザイクアートを制作。モザイクアート生成用の Rust ツールも開発した。",
+                "text": "VRChat の推し、おてぃるの誕生日を祝うために、モザイクアートと HP を作った。20人の協力で集まった約3000枚の画像を、24000タイルのモザイクアートに組み上げている。生成にはツールごと自作した Rust 製のモザイクアート生成器を使った。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "HP 側は可愛らしいデザインとローディング画面にこだわって、提供してもらった画像のギャラリーも併設した。個別ページに og:image を設定して、共有されたときにちゃんと顔が見えるようにしてある。opennextjs/cloudflare を本格的に使った最初のプロダクトでもある。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくが最初に作った web アプリは、推しのためのファンアプリだった。技術が増えても、作る理由のいちばん深いところはあまり変わっていない。誰かを祝うためなら、20人を巻き込むことも Rust でツールを書くことも、ぜんぶ普通にやってしまう。我ながらどうかしてると思う。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1271,7 +1955,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "ボカコレ2025夏の統計情報を Web サイトにまとめた。",
+                "text": "ボカコレ2025夏の統計情報を Web サイトにまとめた。2023夏、2024冬と続けてきたアーカイブの三回目になる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "開催のたびに作り続けているのは、ランキングの数字が祭りと一緒に流れていってしまうからだ。あとから振り返れる場所をひとつ置いておきたい。それだけのことを、毎回少しずつ構成を変えながらやっている。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1310,7 +2013,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "VRChat で公開されている VRC PIXELART EXHIBITION 2.0 にドット絵組み合わせギミックを制作・提供した。複数人で同じものを見るための同期機能や、VR・Desktop 環境での最適化など、UX を重視した設計を行った。",
+                "text": "VRChat で公開されている VRC PIXELART EXHIBITION 2.0 に、ドット絵を組み合わせて遊べるギミックを制作・提供した。複数人で同じものを見るための同期機能を入れて、VR と Desktop どちらの環境でも快適に動くように最適化している。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "いちばん気を使ったのは同期だ。VRChat の体験は、隣にいる人と同じものを見ていることで成立するから、ひとりの手元だけで完結するギミックでは足りない。誰かが組み合わせたドット絵が、その場の全員に同じように見えていること。仕様としては一行だけど、そこが本体だった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1349,7 +2071,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "サイト実装を担当。試聴開始で最後まで自動再生される機能を実装した。",
+                "text": "椎乃味醂「解釈系 / ハーモニー」の特設サイトの実装を担当した。試聴を開始すると、途中で止まらず最後まで自動再生される機能を入れている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "機能としてはそれだけ、と言えばそれだけだ。ただ、試聴が途切れないというのは、最後まで聴いてほしいという気持ちをそのまま実装に置き換えたものだと、ぼくは受け取っている。特設サイトの仕事は、そういう一個の体験を確実に通すことだったりする。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1388,7 +2129,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "九龍帝国 欠番街 -無秩序- での一部 Udon 実装を担当した（動画: OrangeLiner / 出演: SwanPute）。",
+                "text": "Vket2025Winter のワールド「九龍帝国 欠番街 -無秩序-」に出展されたクレーンゲームギミック「PrizeSpider」で、一部の Udon 実装を担当した。紹介動画は OrangeLiner、出演は SwanPute。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくの担当は実装の一部で、体験そのものはチームのものだ。VRChat のワールドギミックは、Udon の制約の中でどう確実に動かすかの勝負で、こういう部分参加でもその勝負どころに触れるのはおもしろい。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1427,7 +2187,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "体験型展示作品の背景映像・システム構築を担当した。",
+                "text": "企画展『思弁的な音楽』に出展された r-906 の体験型展示作品《額縁の言葉 : I》で、背景映像とシステムの構築を担当した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "展示のシステムは2023年の「多面体、鏡面」からいくつも作ってきたけど、今回は映像も担当範囲に入っている。システムを組む手と映像を作る手が、同じ作品の中に並んだ。作品の核はあくまで r-906 のもので、ぼくはそれが立つための背景と土台を用意した。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1466,7 +2245,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "パーティ用あみだくじシステムを実装した。",
+                "text": "椎乃味醂のライブイベント「ハーモニー」で、F2F のペアを決めるあみだくじシステムを実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ライブの進行の中で使われる道具だから、凝った演出より、迷わず動いて確実に決まることを優先している。あみだくじという誰でも知っている形式をそのまま画面に置いたのも、説明なしで全員が結果に納得できるからだ。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1505,7 +2303,45 @@
             "children": [
               {
                 "type": "text",
-                "text": "デザイン/実装担当。コンセプト設計重視・高インタラクションな公式サイト（booth2booth.com）を制作した。",
+                "text": "主催している VRDJ イベント Booth²Booth の公式サイト booth2booth.com を、デザインから実装まで担当した。コンセプト設計を重視した、インタラクションの多いサイトになっている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Booth²Booth は、回を重ねながらものをつくっていく制作チームでもある。フライヤーも動画も HP も、世界観ごと自分たちで作ることにこだわっていて、このサイトはその姿勢の置き場所だ。napochaan.com とはまったく別の顔をしているのは、イベントの世界観に従った結果で、同じ手から出ても、出るものは対象によって変わる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "前身は、VRChat でやった「超すごい DJ イベント」だった。あの一回がきっかけでこのイベントが生まれて、サイトを作るところまで来ている。勢いで始まったものに、あとから世界観と名前と場所が追いついてきたんだと思う。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1544,7 +2380,26 @@
             "children": [
               {
                 "type": "text",
-                "text": "モーキャプシステム構築・アニメーション補正を担当した。",
+                "text": "#ProjectCircles の椎乃味醂ライブセクションで、モーションキャプチャのシステム構築とアニメーションの補正を担当した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "キャプチャした素材は、そのまま使えることのほうが少ない。録るためのシステムを組むところから、録れたものを補正して仕上げるところまでを引き受けた。大きなライブの一部に裏方として自分の作業が混ざっているのは、表に名前が出る仕事とはまた違う手応えがある。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1583,7 +2438,45 @@
             "children": [
               {
                 "type": "text",
-                "text": "Next.js + OpenNext + Cloudflare Workers / Payload CMS / Panda CSS で全面リニューアル制作。",
+                "text": "napochaan.com を v3.0.0 として全面リニューアルした。Next.js を OpenNext で包んで Cloudflare Workers で動かし、コンテンツは Payload CMS、スタイルは Panda CSS の strictTokens という構成にしている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "作り方が今までと違う。コンセプトを自分で言語化せず、AI に質問を繰り返させて、ぼくの好みを暴かせるところから始めた。ページより先に design system を作って、token の層に WCAG 2.1 AA をルールとして埋めて、その上で glitch や過剰な装飾を好きなだけやる。方眼の秩序が一枚通っているから、上でいくら崩しても破綻しない。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "インフラが Cloudflare なのは、このサイトに限らないぼくのこだわりだ。小さく、早く、安く、高機能。制作の経緯はブログに一本まるごと書いたので、詳しくはそちらを読んでほしい。このサイトは、たぶんこの先も完成しないまま更新され続ける。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
