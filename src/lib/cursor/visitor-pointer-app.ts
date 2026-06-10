@@ -33,8 +33,10 @@ export interface VisitorPointerApp {
 }
 
 // Throttle outbound `move`s to at most one per interval, always sending the latest position via a
-// trailing timer, so pointermove (~60/s) doesn't flood the socket.
-const MOVE_SEND_INTERVAL_MS = 50;
+// trailing timer, so pointermove (~60/s) doesn't flood the socket. ~10/s is plenty: the receiver
+// lerps between samples, so a sparser stream stays visually smooth. Keep in sync with the server's
+// MOVE_BROADCAST_INTERVAL_MS (worker/durable-objects/cursor-room.ts).
+const MOVE_SEND_INTERVAL_MS = 100;
 const PING_INTERVAL_MS = 30_000;
 
 const safeJsonParse = (raw: string): unknown => {

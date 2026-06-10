@@ -13,8 +13,10 @@ type CursorBindings = { Bindings: Cloudflare.Env };
 type CursorAttachment = WebSocketAttachment & { path?: string };
 
 // Server-side move throttle: at most one broadcast per uid per interval. The timestamp lives in
-// ctx.storage (transactional, survives hibernation) so a fast client can't fan out 60+/sec.
-const MOVE_BROADCAST_INTERVAL_MS = 50;
+// ctx.storage (transactional, survives hibernation) so a fast client can't fan out 60+/sec. Kept in
+// sync with the client's MOVE_SEND_INTERVAL_MS (src/lib/cursor/visitor-pointer-app.ts); ~10/s, since
+// the receiver lerps between samples.
+const MOVE_BROADCAST_INTERVAL_MS = 100;
 const moveThrottleKey = (uid: string): string => `lastMove:${uid}`;
 
 const safeJsonParse = (raw: string): unknown => {

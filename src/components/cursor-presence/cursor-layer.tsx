@@ -5,14 +5,11 @@ import { useEffect, useRef } from 'react';
 import { useResizer } from '@components/canvas-resize';
 
 import { usePlacement } from './placement-context';
+import { stepCursorRender, type CursorRender } from './step-cursor-render';
 import * as styles from './styles.css';
 
 import type { CursorColor } from '@lib/cursor/identity';
 import type { VisitorPointerApp } from '@lib/cursor/visitor-pointer-app';
-
-// Per-cursor render state in screen px. `render*` is the interpolated on-screen position (canvas has
-// no CSS transition, so we lerp it each frame). `seeded` flips true after the first placement.
-type Render = { x: number; y: number; seeded: boolean };
 
 type Props = {
   app: VisitorPointerApp;
@@ -22,14 +19,18 @@ type Props = {
 };
 
 const GLYPH = '✕';
-const LERP = 0.25; // per-frame follow factor toward the target
+const LERP = 0.25; // per-frame position follow factor toward the target
+const ALPHA_LERP = 0.08; // per-frame opacity follow factor (≈0.5s fade at 60fps)
+const IDLE_MS = 5000; // hide a cursor after it sits idle this long; fades back in on the next move
+const MIN_ALPHA = 0.01; // below this a cursor is effectively invisible — skip drawing it
 const GLYPH_FONT = '700 16px "config-mono-vf", monospace';
 const LABEL_FONT = '11px "config-mono-vf", monospace';
 const LABEL_PAD_X = 4;
 const LABEL_HEIGHT = 15;
 const LABEL_GAP = 16;
 
-const drawCursor = (ctx: CanvasRenderingContext2D, color: string, label: string, x: number, y: number): void => {
+const drawCursor = (ctx: CanvasRenderingContext2D, color: string, label: string, x: number, y: number, alpha: number): void => {
+  ctx.globalAlpha = alpha;
   ctx.textBaseline = 'top';
 
   ctx.font = GLYPH_FONT;
@@ -43,6 +44,7 @@ const drawCursor = (ctx: CanvasRenderingContext2D, color: string, label: string,
   ctx.fillRect(labelX, y, width, LABEL_HEIGHT);
   ctx.fillStyle = '#ffffff';
   ctx.fillText(label, labelX + LABEL_PAD_X, y + 2);
+  ctx.globalAlpha = 1;
 };
 
 export const CursorLayer = ({ app, enabled, getColor }: Props) => {
@@ -58,7 +60,7 @@ export const CursorLayer = ({ app, enabled, getColor }: Props) => {
 
     // All per-frame state lives in this effect: render positions (lerped on-screen px), the latest
     // visitor map (kept current via subscribe), the drawing surface's CSS-px size, and the rAF handle.
-    const renders = new Map<string, Render>();
+    const renders = new Map<string, CursorRender>();
     let visitors = app.getState().visitors;
     let rafId = 0;
     const size = { width: 0, height: 0 };
@@ -96,18 +98,19 @@ export const CursorLayer = ({ app, enabled, getColor }: Props) => {
       ctx.clearRect(0, 0, size.width, size.height);
       if (!enabled) return;
 
+      const now = performance.now();
       const current = visitors;
       for (const visitor of current.values()) {
         if (visitor.x === undefined || visitor.y === undefined) continue; // no position yet (just joined)
         const target = placement.place(visitor.x, visitor.y, size);
         if (target === null) continue;
-        const prev = renders.get(visitor.id);
-        const next: Render =
-          prev === undefined || reduceMotion || !prev.seeded
-            ? { x: target.x, y: target.y, seeded: true }
-            : { x: prev.x + (target.x - prev.x) * LERP, y: prev.y + (target.y - prev.y) * LERP, seeded: true };
+        const next = stepCursorRender(
+          { prev: renders.get(visitor.id), nx: visitor.x, ny: visitor.y, targetX: target.x, targetY: target.y, now },
+          { lerp: LERP, alphaLerp: ALPHA_LERP, idleMs: IDLE_MS, reduceMotion },
+        );
         renders.set(visitor.id, next);
-        drawCursor(ctx, getColor(visitor.color), visitor.label, next.x, next.y);
+        if (next.alpha < MIN_ALPHA) continue; // idle long enough to be invisible — skip the draw
+        drawCursor(ctx, getColor(visitor.color), visitor.label, next.x, next.y, next.alpha);
       }
 
       // Drop render entries for visitors that have left.

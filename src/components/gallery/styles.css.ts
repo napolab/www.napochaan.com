@@ -98,6 +98,12 @@ export const caption = css({
   bottom: '0',
   zIndex: '[1]',
   pointerEvents: 'none',
+  // Never wrap: the label is a one-line corner tag; clip overflow with an ellipsis
+  // so long captions can't grow the tag past its cell.
+  maxWidth: 'full',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
   fontFamily: 'mono',
   fontVariationSettings: '"wght" 600',
   fontSize: '[10px]',

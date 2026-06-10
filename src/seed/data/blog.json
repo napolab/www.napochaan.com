@@ -477,21 +477,7 @@
             "fields": {
               "caption": "// coord + gen/alive counters, monospaced, never stops"
             },
-            "value": {
-              "id": 55,
-              "alt": "napochaan.com 上部のシステムバー。時計・gen と alive のカウンタ・rec・cursors がモノスペースで並ぶ",
-              "updatedAt": "2026-06-09T20:20:14.752Z",
-              "createdAt": "2026-06-09T20:20:14.752Z",
-              "url": "/api/media/file/v3-system-annotations.png",
-              "thumbnailURL": null,
-              "filename": "v3-system-annotations.png",
-              "mimeType": "image/png",
-              "filesize": 51647,
-              "width": 2168,
-              "height": 182,
-              "focalX": 50,
-              "focalY": 50
-            }
+            "value": null
           },
           {
             "type": "paragraph",
@@ -577,21 +563,7 @@
             "fields": {
               "caption": "// hero glyphs, oversized, snapped to grid"
             },
-            "value": {
-              "id": 56,
-              "alt": "napochaan.com トップページ。白い方眼の上に「napochaan」の巨大な黒いタイポを重ねたヒーロー",
-              "updatedAt": "2026-06-09T20:20:14.754Z",
-              "createdAt": "2026-06-09T20:20:14.754Z",
-              "url": "/api/media/file/v3-hero.png",
-              "thumbnailURL": null,
-              "filename": "v3-hero.png",
-              "mimeType": "image/png",
-              "filesize": 515841,
-              "width": 2880,
-              "height": 1794,
-              "focalX": 50,
-              "focalY": 50
-            }
+            "value": null
           },
           {
             "type": "paragraph",
@@ -620,21 +592,7 @@
             "fields": {
               "caption": "// about, layers stacked past the point of enough"
             },
-            "value": {
-              "id": 57,
-              "alt": "/about ページ。「naporitan」の巨大なエコータイポと whoami・bio の段組レイアウト",
-              "updatedAt": "2026-06-09T20:20:14.756Z",
-              "createdAt": "2026-06-09T20:20:14.756Z",
-              "url": "/api/media/file/v3-about-maximalism.png",
-              "thumbnailURL": null,
-              "filename": "v3-about-maximalism.png",
-              "mimeType": "image/png",
-              "filesize": 642207,
-              "width": 2880,
-              "height": 1794,
-              "focalX": 50,
-              "focalY": 50
-            }
+            "value": null
           },
           {
             "type": "paragraph",
@@ -663,21 +621,7 @@
             "fields": {
               "caption": "// gallery, masonry, uneven heights on a fixed grid"
             },
-            "value": {
-              "id": 59,
-              "alt": "/gallery ページ。高さの異なるタイルを方眼に詰めたメイソンリーグリッド",
-              "updatedAt": "2026-06-09T20:20:14.767Z",
-              "createdAt": "2026-06-09T20:20:14.767Z",
-              "url": "/api/media/file/v3-gallery.png",
-              "thumbnailURL": null,
-              "filename": "v3-gallery.png",
-              "mimeType": "image/png",
-              "filesize": 4898943,
-              "width": 2880,
-              "height": 1794,
-              "focalX": 50,
-              "focalY": 50
-            }
+            "value": null
           },
           {
             "type": "heading",
@@ -782,21 +726,7 @@
             "fields": {
               "caption": "// colophon, every component logged with its reason"
             },
-            "value": {
-              "id": 58,
-              "alt": "/colophon ページ。所見 01〜04 として設計思想を列挙したカード",
-              "updatedAt": "2026-06-09T20:20:14.758Z",
-              "createdAt": "2026-06-09T20:20:14.758Z",
-              "url": "/api/media/file/v3-colophon.png",
-              "thumbnailURL": null,
-              "filename": "v3-colophon.png",
-              "mimeType": "image/png",
-              "filesize": 963699,
-              "width": 2880,
-              "height": 1794,
-              "focalX": 50,
-              "focalY": 50
-            }
+            "value": null
           },
           {
             "type": "paragraph",

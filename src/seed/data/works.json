@@ -674,45 +674,6 @@
     "thumbnailFile": "OKIAF.png"
   },
   {
-    "title": "StudioGnu HP",
-    "type": "production",
-    "date": "2024-01-24",
-    "url": "https://www.studiognu.org",
-    "description": "StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに使用し、データ管理には MicroCMS を採用。作品ごとの動的 og:image 生成には next/og を活用した。",
-    "body": {
-      "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
-        "children": [
-          {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
-            "children": [
-              {
-                "type": "text",
-                "text": "StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに使用し、データ管理には MicroCMS を採用。Interweave で入稿文字列を HTML 変換し、作品ごとの動的 og:image 生成には next/og を活用した。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
-                "detail": 0,
-                "version": 1
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "_status": "published",
-    "thumbnailFile": "www.studiognu.org_ja.png"
-  },
-  {
     "title": "楽曲「デュレエ」関連データ解析",
     "type": "support",
     "date": "2024-01-24",
@@ -750,6 +711,45 @@
     },
     "_status": "published",
     "thumbnailFile": "work-14.jpg"
+  },
+  {
+    "title": "StudioGnu HP",
+    "type": "production",
+    "date": "2024-01-24",
+    "url": "https://www.studiognu.org",
+    "description": "StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに使用し、データ管理には MicroCMS を採用。作品ごとの動的 og:image 生成には next/og を活用した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "StudioGnu の HP を作成した。Next.js と vanilla-extract をメインに使用し、データ管理には MicroCMS を採用。Interweave で入稿文字列を HTML 変換し、作品ごとの動的 og:image 生成には next/og を活用した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "www.studiognu.org_ja.png"
   },
   {
     "title": "UTAU 彼方公式 HP",
@@ -1159,45 +1159,6 @@
     "thumbnailFile": "vocacolle-2024.png"
   },
   {
-    "title": "企画展『共に在る音楽』 椎乃味醂 x ももえ W♭Y♭K M♭C K システム",
-    "type": "production",
-    "date": "2024-12-12",
-    "url": "https://x.com/naporin24690/status/1867175063893811585",
-    "description": "企画展「共に在る音楽」の作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。",
-    "body": {
-      "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
-        "children": [
-          {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
-            "children": [
-              {
-                "type": "text",
-                "text": "企画展「共に在る音楽」の作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
-                "detail": 0,
-                "version": 1
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "_status": "published",
-    "thumbnailFile": "WYKMCK.jpeg"
-  },
-  {
     "title": "企画展「共に在る音楽」煮ル果実 DEMiXUS システム",
     "type": "production",
     "date": "2024-12-12",
@@ -1235,6 +1196,45 @@
     },
     "_status": "published",
     "thumbnailFile": "DEMiXUS.jpeg"
+  },
+  {
+    "title": "企画展『共に在る音楽』 椎乃味醂 x ももえ W♭Y♭K M♭C K システム",
+    "type": "production",
+    "date": "2024-12-12",
+    "url": "https://x.com/naporin24690/status/1867175063893811585",
+    "description": "企画展「共に在る音楽」の作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "企画展「共に在る音楽」の作品「W ♭Y ♭K M ♭C K」のシステムを設計・実装した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "WYKMCK.jpeg"
   },
   {
     "title": "ヘイロー化ギミック booth 販売",
