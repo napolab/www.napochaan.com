@@ -2,6 +2,7 @@ import { CursorPresence } from '@components/cursor-presence';
 import { CursorSurface } from '@components/cursor-presence/cursor-surface';
 import { GameOfLife } from '@components/game-of-life';
 import { LifeEngineProvider } from '@components/game-of-life/provider';
+import { SafeAreaTint } from '@components/safe-area-tint';
 import { SiteFooter } from '@components/site-footer';
 import { SysBar } from '@components/sys-bar';
 import { formatClock } from '@components/sys-bar/format-clock';
@@ -20,6 +21,11 @@ export const SiteShell = ({ children }: { children: ReactNode }) => {
   return (
     <LifeEngineProvider>
       <CursorPresence>
+        {/* First in the tree so the TypographyBand (same z token, later in DOM)
+            paints above the strip. CursorPresence / LifeEngineProvider add no
+            DOM wrappers, so this lands directly under <body> (not positioned)
+            and the strip anchors to the initial containing block. */}
+        <SafeAreaTint />
         <TypographyBand />
         <div className={styles.lifeFrame}>
           <GameOfLife />

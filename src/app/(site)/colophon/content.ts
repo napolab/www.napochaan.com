@@ -53,6 +53,7 @@ export const colophon = {
     ambient: [
       { label: '画面上のヘッダー', target: 'SysBar' },
       { label: 'このページを包む殻', target: 'SiteShell' },
+      { label: 'iOS のステータスバー裏を追いかけて染める帯', target: 'SafeAreaTint' },
       { label: '上の見出しブロック', target: 'PageHeader' },
       { label: 'いちばん下のフッター', target: 'SiteFooter' },
       { label: 'フォント読込中の起動オーバーレイ', target: 'LoadingOverlay' },

@@ -106,6 +106,24 @@ export default defineConfig({
         marquee: {
           to: { transform: 'translateX(-50%)' },
         },
+        // SafeAreaTint strip: scroll-timeline-driven chase so the strip's bottom
+        // edge tracks (viewport top + band extent) at every scroll position. The
+        // var(--band-top) / 160px values mirror VIEWPORT_OVERLAP / STRIP_HEIGHT
+        // in src/components/safe-area-tint/styles.css.ts — keep them in sync.
+        // --scroll-range (body height - innerHeight) is published by
+        // safe-area-tint/scroll-range-sync.tsx because that range is not
+        // expressible in pure CSS units.
+        safeAreaChase: {
+          from: { transform: 'translateY(calc(var(--band-top, 24px) - 160px))' },
+          to: { transform: 'translateY(calc(var(--scroll-range, 0px) + var(--band-top, 24px) - 160px))' },
+        },
+        // Chin counterpart: stripBottom's static top already encodes
+        // (viewport bottom - overlap) via --viewport-h, so the chase is a pure
+        // scrollY follow.
+        safeAreaChaseBottom: {
+          from: { transform: 'translateY(0)' },
+          to: { transform: 'translateY(var(--scroll-range, 0px))' },
+        },
         marqueeY: {
           to: { transform: 'translateY(-50%)' },
         },

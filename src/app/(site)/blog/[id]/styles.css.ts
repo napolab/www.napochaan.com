@@ -19,11 +19,12 @@ export const bodyCol = css({
   gridRow: { desktop: '1' },
 });
 
-// Desktop: TOC rail in column 2 / row 1, stuck below the fixed sys-bar band.
+// Desktop: TOC rail in column 2 / row 1, stuck below the fixed top band (the
+// safe-area-aware --band-top, see global-css).
 export const tocCol = css({
   gridColumn: { desktop: '2' },
   gridRow: { desktop: '1' },
   alignSelf: 'start',
   position: { desktop: 'sticky' },
-  top: { desktop: '[calc(token(sizes.band) + token(spacing.6))]' },
+  top: { desktop: '[calc(var(--band-top) + token(spacing.6))]' },
 });

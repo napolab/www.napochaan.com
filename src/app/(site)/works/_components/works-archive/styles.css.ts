@@ -32,7 +32,8 @@ export const ambient = css({
   },
 });
 
-// Sticky spine: each year heading tucks under the fixed 24px TypographyBand and
+// Sticky spine: each year heading tucks under the fixed TypographyBand (the
+// safe-area-aware --band-top, see global-css) and
 // stacks below any earlier (newer) spines already pinned — all passed years
 // accumulate at the top (pure-CSS stacking, no cap). `--spine-index` is the
 // group's DOM order (newest-first), set per render; the per-index offset is the
@@ -53,12 +54,12 @@ export const ambient = css({
 export const anchor = css({
   display: 'block',
   height: '0',
-  scrollMarginTop: '[calc(token(sizes.band) + var(--spine-index, 0) * token(spacing.10))]',
+  scrollMarginTop: '[calc(var(--band-top) + var(--spine-index, 0) * token(spacing.10))]',
 });
 
 export const spine = css({
   position: 'sticky',
-  top: '[calc(token(sizes.band) + var(--spine-index, 0) * token(spacing.10))]',
+  top: '[calc(var(--band-top) + var(--spine-index, 0) * token(spacing.10))]',
   zIndex: 'sticky',
   display: 'flex',
   alignItems: 'center',
