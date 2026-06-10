@@ -397,7 +397,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "iPhone を接続して会場や DJ の様子をリアルタイムに映像へ取り込んだり、必要な機能を現場に合わせて実装して足したり、既製ソフトにない演出ができます。映像ミキサー V1-HD も所有しているので、必要であれば持参します。",
+                "text": "iPhone を接続して会場や DJ の様子をリアルタイムに映像へ取り込んだり、必要な機能を現場に合わせて実装して足したり、既製ソフトにない演出ができます。",
                 "type": "text",
                 "version": 1
               }
@@ -472,6 +472,99 @@
             "version": 1,
             "textFormat": 0,
             "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "所有機材",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "heading",
+            "version": 1,
+            "tag": "h3"
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "以下の機材を所有しています。必要であれば現場に持っていけます。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "映像ミキサー ",
+                    "type": "text",
+                    "version": 1
+                  },
+                  {
+                    "children": [
+                      {
+                        "detail": 0,
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "text": "V1-HD",
+                        "type": "text",
+                        "version": 1
+                      }
+                    ],
+                    "direction": null,
+                    "format": "",
+                    "indent": 0,
+                    "type": "link",
+                    "version": 3,
+                    "fields": {
+                      "url": "https://proav.roland.com/jp/products/v-1hd/",
+                      "linkType": "custom",
+                      "newTab": true
+                    }
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "listitem",
+                "version": 1,
+                "value": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "list",
+            "version": 1,
+            "listType": "bullet",
+            "start": 1,
+            "tag": "ul"
           },
           {
             "children": [
