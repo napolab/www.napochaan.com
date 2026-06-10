@@ -9,9 +9,12 @@ import { dayjs } from '@utils/dayjs';
 import type { LogEntry } from '../_lib/build-log-timeline';
 import type { ChannelData, ItemData } from '@utils/rss/types';
 
-// ISR: the route rebuilds the same timeline that /log renders. Each contributing
-// collection's revalidateTag hook will bust the unstable_cache reads feeding it.
-export const revalidate = 3600;
+// Force runtime resolution (mirrors robots.ts / sitemap.ts): at `next build`
+// BASE_URL is unset (would bake in `http://localhost:3000`) and the build guards
+// return [], so a prerendered feed leaks localhost with no items. Resolving
+// per-request reads the real host BASE_URL and rebuilds the timeline at runtime;
+// the contributing reads stay cached via unstable_cache + their revalidateTag hooks.
+export const dynamic = 'force-dynamic';
 
 const linkOf = (entry: LogEntry, origin: string): string => {
   if (entry.href === undefined) return `${origin}/log`;

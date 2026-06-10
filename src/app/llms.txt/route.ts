@@ -4,9 +4,12 @@ import { findNewsList } from '@lib/payload/news';
 import { findWorksList } from '@lib/payload/works';
 import { buildLLMsTxt } from '@utils/llms/build-llms-txt';
 
-// ISR: the data layer's build guard returns empty data at `next build`, so this
-// caches a valid static-only document that ISR fills at runtime.
-export const revalidate = 3600;
+// Force runtime resolution (mirrors robots.ts / sitemap.ts): at `next build`
+// BASE_URL is unset (would bake in `http://localhost:3000`) and the build guard
+// returns empty data. Resolving per-request reads the real host BASE_URL and
+// published content at runtime; the findXList() reads stay cached via
+// unstable_cache + their revalidateTag hooks.
+export const dynamic = 'force-dynamic';
 
 export const GET = async (): Promise<Response> => {
   const baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';

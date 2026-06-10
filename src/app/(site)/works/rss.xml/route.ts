@@ -4,9 +4,12 @@ import { createRssDocument } from '@utils/rss/create-rss-document';
 import type { WorkRow } from '../_lib/work-row';
 import type { ChannelData, ItemData } from '@utils/rss/types';
 
-// ISR: the route reads the `works`-tagged unstable_cache, so the collection's
-// revalidateTag('works') hook busts this feed automatically.
-export const revalidate = 3600;
+// Force runtime resolution (mirrors robots.ts / sitemap.ts): at `next build`
+// BASE_URL is unset (would bake in `http://localhost:3000`) and the build guard
+// returns [], so a prerendered feed leaks localhost with no items. Resolving
+// per-request reads the real host BASE_URL and published content at runtime; the
+// findWorksList() read stays cached via unstable_cache + revalidateTag('works').
+export const dynamic = 'force-dynamic';
 
 // Use the real date when available; fall back to Jan 1 of the year for year-only works.
 const pubDateOf = (work: WorkRow): string => work.date ?? `${work.year}-01-01`;

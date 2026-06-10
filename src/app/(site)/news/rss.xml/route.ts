@@ -5,10 +5,12 @@ import { createRssDocument } from '@utils/rss/create-rss-document';
 
 import type { ChannelData } from '@utils/rss/types';
 
-// ISR: the route reads the `news`-tagged unstable_cache, so the collection's
-// revalidateTag('news') hook busts this feed automatically. At `next build` the
-// build guard returns [], caching an empty-but-valid feed that ISR fills at runtime.
-export const revalidate = 3600;
+// Force runtime resolution (mirrors robots.ts / sitemap.ts): at `next build`
+// BASE_URL is unset (would bake in `http://localhost:3000`) and the build guard
+// returns [], so a prerendered feed leaks localhost with no items. Resolving
+// per-request reads the real host BASE_URL and published content at runtime; the
+// findNewsList() read stays cached via unstable_cache + revalidateTag('news').
+export const dynamic = 'force-dynamic';
 
 export const GET = async (): Promise<Response> => {
   const news = await findNewsList();

@@ -4,9 +4,12 @@ import { createRssDocument } from '@utils/rss/create-rss-document';
 import type { GalleryPhoto } from '@components/gallery-archive';
 import type { ChannelData, ItemData } from '@utils/rss/types';
 
-// ISR: the route reads the `gallery`-tagged unstable_cache, so the collection's
-// revalidateTag('gallery') hook busts this feed automatically.
-export const revalidate = 3600;
+// Force runtime resolution (mirrors robots.ts / sitemap.ts): at `next build`
+// BASE_URL is unset (would bake in `http://localhost:3000`) and the build guard
+// returns [], so a prerendered feed leaks localhost with no items. Resolving
+// per-request reads the real host BASE_URL and published content at runtime; the
+// findGalleryList() read stays cached via unstable_cache + revalidateTag('gallery').
+export const dynamic = 'force-dynamic';
 
 const absolutize = (src: string, origin: string): string => (src.startsWith('http') ? src : `${origin}${src}`);
 
