@@ -16,6 +16,7 @@ const connect = async (room: string, uid: string): Promise<WebSocket> => {
 
 const nav = (ws: WebSocket, path: string): void => ws.send(JSON.stringify({ t: 'nav', path }));
 const settle = (): Promise<void> => new Promise((r) => setTimeout(r, 50));
+const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
 
 describe('CursorRoom', () => {
   it('announces a join to existing peers on the same page', async () => {
@@ -147,6 +148,63 @@ describe('CursorRoom', () => {
 
     const leaves = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'leave');
     expect(leaves).toContainEqual({ t: 'leave', id: aUid });
+  });
+
+  it('keeps the socket on the new page for later moves (no stale-attachment clobber)', async () => {
+    const room = 'move-keep-page';
+    const aUid = 'aaaaaaaa11112222';
+    const bUid = 'bbbbbbbb33334444';
+
+    const a = await connect(room, aUid);
+    const b = await connect(room, bUid);
+    nav(a, '/x');
+    nav(b, '/y');
+    await settle();
+
+    const bSeen: string[] = [];
+    b.addEventListener('message', (e) => bSeen.push(`${e.data}`));
+
+    // a transitions onto /y (where b is). This is a real navigation.
+    a.send(JSON.stringify({ t: 'move', path: '/y', x: 0.4, y: 0.4 }));
+    await wait(150);
+    // a is already on /y; this must NOT be treated as a new transition.
+    a.send(JSON.stringify({ t: 'move', path: '/y', x: 0.5, y: 0.5 }));
+    await wait(150);
+
+    const joins = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'join' && m.id === deriveIdentity(aUid).id);
+    expect(joins).toHaveLength(1);
+  });
+
+  it('throttles rapid moves from the same socket', async () => {
+    const room = 'move-throttle';
+    const aUid = 'aaaa00ff11ee22dd';
+    const bUid = 'bbbb33cc44bb55aa';
+
+    const a = await connect(room, aUid);
+    const b = await connect(room, bUid);
+    nav(a, '/x');
+    nav(b, '/x');
+    await settle();
+
+    const bSeen: string[] = [];
+    b.addEventListener('message', (e) => bSeen.push(`${e.data}`));
+
+    // Three moves back-to-back within the 100ms window collapse to one broadcast.
+    a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.1, y: 0.1 }));
+    a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.2, y: 0.2 }));
+    a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.3, y: 0.3 }));
+    await settle();
+
+    const firstWindow = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move');
+    expect(firstWindow).toHaveLength(1);
+
+    // A 4th move past the throttle window broadcasts again.
+    await wait(150);
+    a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.4, y: 0.4 }));
+    await settle();
+
+    const allMoves = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move');
+    expect(allMoves).toHaveLength(2);
   });
 
   it('counts presence per page', async () => {

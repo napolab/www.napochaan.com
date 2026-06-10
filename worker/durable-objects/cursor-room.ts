@@ -9,15 +9,15 @@ import type { Env } from 'hono';
 type CursorBindings = { Bindings: Cloudflare.Env };
 
 // durabcast sets { roomId, uid, connectedAt } once and never rewrites it, so adding `path`
-// (the socket's current page) is safe — base broadcast/isAliveSocket only read uid/connectedAt.
-type CursorAttachment = WebSocketAttachment & { path?: string };
+// (the socket's current page) and `lastMove` (the socket's last broadcast move timestamp) is safe —
+// base broadcast/isAliveSocket only read uid/connectedAt.
+type CursorAttachment = WebSocketAttachment & { path?: string; lastMove?: number };
 
-// Server-side move throttle: at most one broadcast per uid per interval. The timestamp lives in
-// ctx.storage (transactional, survives hibernation) so a fast client can't fan out 60+/sec. Kept in
-// sync with the client's MOVE_SEND_INTERVAL_MS (src/lib/cursor/visitor-pointer-app.ts); ~10/s, since
-// the receiver lerps between samples.
+// Server-side move throttle: at most one broadcast per socket per interval. The last-move timestamp
+// lives on the WebSocket attachment (survives hibernation, no storage row write/delete per move) so a
+// fast client can't fan out 60+/sec. Kept in sync with the client's MOVE_SEND_INTERVAL_MS
+// (src/lib/cursor/visitor-pointer-app.ts); ~10/s, since the receiver lerps between samples.
 const MOVE_BROADCAST_INTERVAL_MS = 100;
-const moveThrottleKey = (uid: string): string => `lastMove:${uid}`;
 
 const safeJsonParse = (raw: string): unknown => {
   try {
@@ -90,7 +90,7 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     const { id, color, label } = deriveIdentity(att.uid);
 
     // Move this socket onto the new page first so the counts below place it correctly.
-    ws.serializeAttachment({ ...att, path: nextPath });
+    ws.serializeAttachment({ ...att, path: nextPath } satisfies CursorAttachment);
 
     if (prevPath !== undefined) {
       // Leave the old page only when this uid's LAST socket leaves it (multi-tab keeps the cursor).
@@ -116,16 +116,15 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     this.#broadcastCount(nextPath);
   }
 
-  async #handleMove(ws: WebSocket, uid: string, path: string, x: number, y: number): Promise<void> {
-    const key = moveThrottleKey(uid);
+  #handleMove(ws: WebSocket, path: string, x: number, y: number): void {
+    const att = this.#attachmentOf(ws); // re-read: #applyPath may have just rewritten the attachment
     const now = Date.now();
-    const last = (await this.ctx.storage.get<number>(key)) ?? 0;
-    if (now - last < MOVE_BROADCAST_INTERVAL_MS) return;
-    await this.ctx.storage.put(key, now);
-    this.#broadcastToPath(path, JSON.stringify({ t: 'move', id: uid, x, y } satisfies ServerMessage), ws);
+    if (now - (att.lastMove ?? 0) < MOVE_BROADCAST_INTERVAL_MS) return;
+    ws.serializeAttachment({ ...att, lastMove: now } satisfies CursorAttachment);
+    this.#broadcastToPath(path, JSON.stringify({ t: 'move', id: att.uid, x, y } satisfies ServerMessage), ws);
   }
 
-  override async webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): Promise<void> {
+  override webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void {
     if (typeof message !== 'string' || message === this.REQUEST_RESPONSE_PAIR.request) return;
     const parsed = ClientMessage.safeParse(safeJsonParse(message));
     if (!parsed.success) return;
@@ -133,13 +132,12 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     // Every message carries the page — apply the transition first (no-op if unchanged).
     this.#applyPath(ws, att, parsed.data.path);
     if (parsed.data.t === 'move') {
-      await this.#handleMove(ws, att.uid, parsed.data.path, parsed.data.x, parsed.data.y);
+      this.#handleMove(ws, parsed.data.path, parsed.data.x, parsed.data.y);
     }
   }
 
-  override async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): Promise<void> {
+  override webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean): void {
     const att = this.#attachmentOf(ws);
-    await this.ctx.storage.delete(moveThrottleKey(att.uid));
     const path = att.path;
     if (path !== undefined) {
       // Emit leave only when this uid's last socket on the page is closing (keep the cursor alive
