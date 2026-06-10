@@ -397,7 +397,39 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "iPhone を接続して会場や DJ の様子をリアルタイムに映像へ取り込んだり、必要な機能を現場に合わせて実装して足したり、既製ソフトにない演出ができます。",
+                "text": "iPhone を接続して会場や DJ の様子をリアルタイムに映像へ取り込んだり、必要な機能を現場に合わせて実装して足したり、既製ソフトにない演出ができます。Spout / Syphon にも対応していて、YouTube など動的な素材もそのまま映像に出力できます。",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "リアルタイムに 3D テキストを Spout / Syphon で出力するツール",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://x.com/naporin24690/status/2062832219568382210",
+                  "linkType": "custom",
+                  "newTab": true
+                }
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "も自作しているので、こうしたツールと組み合わせた演出もできます。",
                 "type": "text",
                 "version": 1
               }
@@ -499,7 +531,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "以下の機材を所有しています。必要であれば現場に持っていけます。",
+                "text": "以下の機材を所有しています。MacBook Pro と APC Mini MK2 は持参します。V1-HD も必要であれば持っていけます。",
                 "type": "text",
                 "version": 1
               }
@@ -514,6 +546,67 @@
           },
           {
             "children": [
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "MacBook Pro 13inch（M5 Pro）",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "listitem",
+                "version": 1,
+                "value": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "AKAI ",
+                    "type": "text",
+                    "version": 1
+                  },
+                  {
+                    "children": [
+                      {
+                        "detail": 0,
+                        "format": 0,
+                        "mode": "normal",
+                        "style": "",
+                        "text": "APC Mini MK2",
+                        "type": "text",
+                        "version": 1
+                      }
+                    ],
+                    "direction": null,
+                    "format": "",
+                    "indent": 0,
+                    "type": "link",
+                    "version": 3,
+                    "fields": {
+                      "url": "http://akai-pro.jp/apc-mini-mk2/",
+                      "linkType": "custom",
+                      "newTab": true
+                    }
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "listitem",
+                "version": 1,
+                "value": 2
+              },
               {
                 "children": [
                   {
@@ -554,7 +647,7 @@
                 "indent": 0,
                 "type": "listitem",
                 "version": 1,
-                "value": 1
+                "value": 3
               }
             ],
             "direction": null,
@@ -565,6 +658,45 @@
             "listType": "bullet",
             "start": 1,
             "tag": "ul"
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "箱側にお願いしたいこと",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "heading",
+            "version": 1,
+            "tag": "h3"
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "用意していただきたいのは、V1-HD に入力する HDMI 1本だけです。あわせて、VJ スペースの広さと出力解像度、映像の出し先（プロジェクター / LED ディスプレイなど）を事前に教えていただけると助かります。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
           },
           {
             "children": [
