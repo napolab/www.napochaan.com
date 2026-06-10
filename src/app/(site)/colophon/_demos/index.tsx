@@ -143,7 +143,8 @@ export const demos: Record<ComponentName, ReactNode> = {
       alt="VRChat アバターのフレーミングポーズ"
       width={vrchatSquare.width}
       height={vrchatSquare.height}
-      caption="frame"
+      variant="cover"
+      caption="frame / 2024"
       placeholder="blur"
       blurDataURL={formatBlurURL(vrchatSquare.src, { blur: 10, width: 32, quality: 30 })}
     />

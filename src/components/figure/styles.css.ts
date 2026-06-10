@@ -1,22 +1,45 @@
 import { css } from '@styled/css';
 
 export const root = css({
+  position: 'relative',
   display: 'block',
   borderWidth: 'default',
   borderStyle: 'solid',
   borderColor: 'fg.default',
   borderRadius: 'none',
   m: '0',
+  // Cover variant clips the scaled blurred backdrop (and the corner tag) to the frame.
+  '&[data-variant="cover"]': { overflow: 'hidden' },
 });
 
 // Uniform 16/10 frame: the image is contained so the whole picture is shown —
 // never cropped. Portrait or square sources letterbox over a transparent backdrop
-// instead of being clipped, matching the works detail proof frame.
+// instead of being clipped, matching the works detail proof frame. In the cover
+// variant it is lifted above the blurred backdrop layer.
 export const image = css({
   display: 'block',
   width: 'full',
   aspectRatio: '[16 / 10]',
   objectFit: 'contain',
+  'figure[data-variant="cover"] &': {
+    position: 'relative',
+    zIndex: '[1]',
+  },
+});
+
+// Cover-variant backdrop: a heavily-blurred, cover-cropped copy of the image filling
+// the whole frame so the letterbox gaps never reveal the page behind. Scaled up so
+// the blur can't bleed transparent edges into the frame. Purely decorative.
+export const backdrop = css({
+  position: 'absolute',
+  inset: '0',
+  zIndex: '[0]',
+  backgroundImage: 'var(--figure-backdrop)',
+  backgroundSize: 'cover',
+  backgroundPosition: 'center',
+  filter: '[blur(24px)]',
+  transform: '[scale(1.15)]',
+  pointerEvents: 'none',
 });
 
 export const caption = css({
@@ -31,4 +54,24 @@ export const caption = css({
   borderTopWidth: 'hairline',
   borderTopStyle: 'dashed',
   borderTopColor: 'border.subtle',
+});
+
+// Cover-variant caption: a gallery-style solid corner tag pinned to the frame's
+// bottom-left, painted over the image. mono, uppercased (e.g. 'GRAPHIC / 2024').
+export const tag = css({
+  position: 'absolute',
+  left: '0',
+  bottom: '0',
+  zIndex: '[2]',
+  pointerEvents: 'none',
+  fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
+  fontSize: '[10px]',
+  letterSpacing: 'wide',
+  textTransform: 'uppercase',
+  lineHeight: 'snug',
+  bg: 'fg.default',
+  color: 'fg.onSolid',
+  paddingInline: '[6px]',
+  paddingBlock: '[1px]',
 });
