@@ -68,12 +68,33 @@ const findAssetPath = async (filename: string): Promise<string | undefined> => {
   return path.resolve(match.parentPath, match.name);
 };
 
+// Re-upload the binary for an EXISTING media doc when its R2 object is missing.
+// A media row in D1 does not guarantee bytes in R2: e.g. a seed run before the
+// R2 binding was `remote = true` wrote the doc to remote D1 but the upload to
+// local miniflare, so the deployed worker 404s the file. Heading the bucket first
+// keeps re-runs cheap (skip when present). `r2Bucket` is imported lazily, inside
+// this found-branch only, so the unit test (find() returns no docs) never loads
+// payload.config — and at runtime it is the already-evaluated config singleton,
+// resolved to the remote bucket under `CLOUDFLARE_ENV=staging|production`.
+const ensureMediaBytes = async (instance: Payload, filename: string, filePath: string, contentType: string | undefined): Promise<void> => {
+  const { r2Bucket } = await import('../payload.config');
+  const head = await r2Bucket.head(filename);
+  if (head !== null) return;
+  const bytes = await readFile(filePath);
+  await r2Bucket.put(filename, bytes, contentType === undefined ? undefined : { httpMetadata: { contentType } });
+  instance.logger.info(`[seed:import] re-uploaded missing R2 object: ${filename}`);
+};
+
 const ensureMedia = async (instance: Payload, filename: string, alt: string): Promise<number | undefined> => {
   const existing = await instance.find({ collection: 'media', where: { filename: { equals: filename } }, limit: 1, overrideAccess: true });
   const [found] = existing.docs;
-  if (found !== undefined) return found.id;
-
   const filePath = await findAssetPath(filename);
+
+  if (found !== undefined) {
+    if (filePath !== undefined) await ensureMediaBytes(instance, filename, filePath, found.mimeType ?? undefined);
+    return found.id;
+  }
+
   if (filePath === undefined) {
     instance.logger.warn(`[seed:import] asset not found, leaving media unset: ${filename}`);
     return undefined;
