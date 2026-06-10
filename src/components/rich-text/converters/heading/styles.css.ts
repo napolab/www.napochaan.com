@@ -15,6 +15,11 @@ export const heading = css({
   marginBlockEnd: 'block',
   '&:first-child': { marginBlockStart: '0' },
   '&:last-child': { marginBlockEnd: '0' },
+  // h3 and deeper are subsections, not section breaks: a smaller bottom margin
+  // (`element` 12px vs the h1/h2 `block` 24px) binds them tighter to the content
+  // they introduce, so the heading scale reads as a hierarchy rather than a flat
+  // set of equally-spaced rules.
+  '&:is([data-level="3"], [data-level="4"], [data-level="5"], [data-level="6"])': { marginBlockEnd: 'element' },
   // `[data-level]` (presence) keeps the 0-2-0 specificity across every level in a
   // single rule — Heading always renders data-level. The body face wants tighter
   // tracking than the Heading primitive's display-tuned defaults (h3+ ship at 0),
