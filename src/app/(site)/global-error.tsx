@@ -1,5 +1,6 @@
 'use client';
 
+import { motionBootScriptHtml } from '@utils/motion-cookie';
 import { Button } from '@components/button';
 import { css } from '@styled/css';
 import { fontVariables } from '@themes/fonts';
@@ -31,6 +32,8 @@ const GlobalError = ({ reset }: Props) => (
     <head>
       {/* Static vendor snippet, no dynamic content — see @themes/typekit. */}
       <script dangerouslySetInnerHTML={typekitLoaderHtml} />
+      {/* Pre-hydration motion-play boot — see @utils/motion-cookie. */}
+      <script dangerouslySetInnerHTML={motionBootScriptHtml} />
     </head>
     <body className={bodyStyle}>
       <ErrorScreen code="500" kind="fatal" lead="致命的なエラーが発生しました。再読み込みしてください。" tag="■ fatal">

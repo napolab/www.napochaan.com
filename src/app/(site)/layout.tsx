@@ -1,3 +1,4 @@
+import { motionBootScriptHtml } from '@utils/motion-cookie';
 import { getRequestOrigin } from '@utils/request-url';
 import { fontVariables } from '@themes/fonts';
 import { ThemeProvider } from '@themes/provider';
@@ -61,6 +62,9 @@ const SiteLayout = async ({ children }: { children: ReactNode }) => {
         {/* Adobe Fonts (Typekit) async loader — non-blocking; adds wf-loading
             class hook on <html>. Static vendor snippet, no dynamic content. */}
         <script dangerouslySetInnerHTML={typekitLoaderHtml} />
+        {/* Pre-hydration: set --motion-play from the motion cookie before paint to
+            avoid a flash of motion for motion:off visitors. See @utils/motion-cookie. */}
+        <script dangerouslySetInnerHTML={motionBootScriptHtml} />
       </head>
       <ThemeProvider asChild>
         <body>

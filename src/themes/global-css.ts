@@ -11,6 +11,17 @@ export const globalCss: GlobalStyleObject = {
     '--band-bottom': '[calc(token(sizes.band) + env(safe-area-inset-bottom, 0px))]',
     '--band-left': '[calc(token(sizes.band) + env(safe-area-inset-left, 0px))]',
     '--band-right': '[calc(token(sizes.band) + env(safe-area-inset-right, 0px))]',
+    // Master play/pause switch for every CSS animation that opts in via
+    // `animationPlayState: var(--motion-play)`. Default running; the OS preference
+    // sets the no-JS / pre-hydration baseline below, and MotionProvider overrides it
+    // inline on <html> per the user's header toggle (inline beats this stylesheet).
+    '--motion-play': 'running',
+  },
+  // OS reduced-motion is the baseline before JS runs (and the whole story with JS
+  // disabled): pause every opted-in animation. The header toggle can override this
+  // either way via the inline var MotionProvider writes on <html>.
+  '@media (prefers-reduced-motion: reduce)': {
+    ':root': { '--motion-play': 'paused' },
   },
   // iOS 26 Safari ignores the theme-color meta and tints its Liquid Glass chrome
   // (status-bar "forehead" / toolbar "chin") from the root elements'
@@ -44,30 +55,32 @@ export const globalCss: GlobalStyleObject = {
   h1: { lineHeight: 'tight', letterSpacing: 'tighter' },
   h2: { lineHeight: 'tight', letterSpacing: 'tight' },
   h3: { lineHeight: 'tight' },
-  // Marching-ants focus ring: animated ::after under prefers-reduced-motion: no-preference.
-  // The focusRing layerStyle provides the static dashed fallback for reduced-motion.
-  // Under motion-safe conditions, the outline is hidden and this ::after renders the animation.
+  // Marching-ants focus ring. The ::after always renders (the outline is hidden);
+  // its march is driven by var(--motion-play), so when motion is paused (OS reduce
+  // and/or the header toggle) the dashes freeze into a static 2px dashed ring — the
+  // reduced-motion fallback — and resume marching when motion is on.
+  '*:focus-visible': {
+    outlineStyle: 'none',
+    position: 'relative',
+  },
+  '*:focus-visible::after': {
+    content: '""',
+    position: 'absolute',
+    inset: '[-3px]',
+    pointerEvents: 'none',
+    backgroundImage:
+      '[repeating-linear-gradient(90deg, var(--colors-blue-9) 0 4px, transparent 4px 8px), repeating-linear-gradient(90deg, var(--colors-blue-9) 0 4px, transparent 4px 8px), repeating-linear-gradient(0deg, var(--colors-blue-9) 0 4px, transparent 4px 8px), repeating-linear-gradient(0deg, var(--colors-blue-9) 0 4px, transparent 4px 8px)]',
+    backgroundSize: '[8px 2px, 8px 2px, 2px 8px, 2px 8px]',
+    backgroundPosition: '[0 0, 0 100%, 0 0, 100% 0]',
+    backgroundRepeat: '[repeat-x, repeat-x, repeat-y, repeat-y]',
+    animation: '[marchingAnts 0.6s linear infinite]',
+    animationPlayState: 'var(--motion-play, running)',
+  },
+  // Smooth in-page navigation (e.g. the works year-heading anchors). Stays gated on
+  // the OS query — scroll-behavior isn't an animation, so the toggle doesn't drive it.
   '@media (prefers-reduced-motion: no-preference)': {
-    // Smooth in-page navigation (e.g. the works year-heading anchors). Gated
-    // under motion-safe so reduced-motion users get instant jumps.
     html: {
       scrollBehavior: 'smooth',
-    },
-    '*:focus-visible': {
-      outlineStyle: 'none',
-      position: 'relative',
-    },
-    '*:focus-visible::after': {
-      content: '""',
-      position: 'absolute',
-      inset: '[-3px]',
-      pointerEvents: 'none',
-      backgroundImage:
-        '[repeating-linear-gradient(90deg, var(--colors-blue-9) 0 4px, transparent 4px 8px), repeating-linear-gradient(90deg, var(--colors-blue-9) 0 4px, transparent 4px 8px), repeating-linear-gradient(0deg, var(--colors-blue-9) 0 4px, transparent 4px 8px), repeating-linear-gradient(0deg, var(--colors-blue-9) 0 4px, transparent 4px 8px)]',
-      backgroundSize: '[8px 2px, 8px 2px, 2px 8px, 2px 8px]',
-      backgroundPosition: '[0 0, 0 100%, 0 0, 100% 0]',
-      backgroundRepeat: '[repeat-x, repeat-x, repeat-y, repeat-y]',
-      animation: '[marchingAnts 0.6s linear infinite]',
     },
   },
 };
