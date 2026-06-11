@@ -1,5 +1,6 @@
 import { Link } from '@components/link';
 import { clsx } from '@utils/clsx';
+import { isExternal } from '@utils/is-external';
 
 import * as styles from './styles.css';
 
@@ -17,8 +18,6 @@ export type TimelineItem = {
 type Props = {
   items: TimelineItem[];
 };
-
-const isExternal = (href: string): boolean => href.startsWith('http://') || href.startsWith('https://');
 
 // The title cell. `tone="inherit"` keeps the timeline's own label colour (which
 // carries the data-upcoming accent), so the link only adds the underline

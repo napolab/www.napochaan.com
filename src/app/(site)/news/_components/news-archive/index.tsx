@@ -1,6 +1,4 @@
-import { Link } from '@components/link';
-import { ScrambleText } from '@components/scramble-text';
-import { Tag } from '@components/tag';
+import { NewsRow } from '@components/news-row';
 import { dayjs } from '@utils/dayjs';
 
 import * as s from './styles.css';
@@ -28,33 +26,9 @@ type Props = {
   groups: readonly ArchiveGroup[];
 };
 
-const isExternal = (href: string): boolean => href.startsWith('http://') || href.startsWith('https://');
-
-const NewsRow = ({ item }: { item: ArchiveItem }) => {
-  const href = item.url ?? `/news/${item.id}`;
-  const external = isExternal(href);
-
-  return (
-    <li className={s.row}>
-      <span className={s.date}>{dayjs(item.date).tz('Asia/Tokyo').format('MM.DD')}</span>
-      <span className={s.category}>
-        <Tag tone="outline">{item.category}</Tag>
-      </span>
-      <Link href={href} tone="accent" className={s.title} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
-        <ScrambleText>{item.title}</ScrambleText>
-        {external ? (
-          <span className={s.externalMark} aria-hidden="true">
-            ↗
-          </span>
-        ) : null}
-      </Link>
-    </li>
-  );
-};
-
 // The full announcement archive grouped by year-month, newest first. A Server
-// Component — the title links are plain anchors; the only client island is the
-// ScrambleText that decodes the title on hover.
+// Component — each row's title link is the only client island (a ScrambleText
+// that decodes on hover). The row layout itself lives in the shared NewsRow.
 export const NewsArchive = ({ groups }: Props) => {
   return (
     <div className={s.root}>
@@ -65,7 +39,7 @@ export const NewsArchive = ({ groups }: Props) => {
           </h2>
           <ol className={s.rows}>
             {group.items.map((item) => (
-              <NewsRow key={item.id} item={item} />
+              <NewsRow key={item.id} date={dayjs(item.date).tz('Asia/Tokyo').format('MM.DD')} category={item.category} title={item.title} href={item.url ?? `/news/${item.id}`} />
             ))}
           </ol>
         </section>

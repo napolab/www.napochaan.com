@@ -33,6 +33,7 @@ import { GalleryArchiveLazy } from './gallery-archive-lazy';
 import { GalleryLazy } from './gallery-lazy';
 import { GameOfLifeDemo } from './game-of-life-demo';
 import { LoadingOverlayDemo } from './loading-overlay-demo';
+import { NewsRowDemo } from './news-row-demo';
 import { NoAction } from './no-action';
 import { richTextSample } from './rich-text-sample';
 import { TypographyBandDemo } from './typography-band-demo';
@@ -168,6 +169,7 @@ export const demos: Record<ComponentName, ReactNode> = {
     </Suspense>
   ),
   Timeline: <Timeline items={timelineItems} />,
+  NewsRow: <NewsRowDemo />,
   Table: <Table columns={tableColumns} rows={tableRows} caption="event history 2024" />,
   List: (
     <>

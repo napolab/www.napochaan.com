@@ -77,6 +77,10 @@ export const colophon = {
         why: 'skyline で詰める可変メイソン-リー。レイアウトは CSS(cqw/calc)だけで測定なし・無段差、空きマスは図面みたいに採寸して埋めてる。',
       },
       { name: 'Timeline', why: '年表。これからの予定だけ accent で立てて、各項目のタイトルは詳細ページや外部リンクへ飛べる。' },
+      {
+        name: 'NewsRow',
+        why: 'お知らせ1件分の行。date · タグ · タイトルを方眼の3カラムに揃える。トップの news フィードと /news の一覧で共用してて、href 無しはプレーン、外部リンクは別タブ + ↗ で開く。',
+      },
       { name: 'Table', why: '素朴な表。caption 付きで、event ログとかに使ってる。' },
       { name: 'List', why: '箇条書きと定義リスト。順序あり / なし、どっちもいける。' },
       { name: 'Badge', why: '状態の小札。now playing / rec / offline みたいなやつ。' },
