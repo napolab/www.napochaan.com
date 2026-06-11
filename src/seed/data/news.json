@@ -1,6 +1,7 @@
 [
   {
     "title": "企画展『拡張される音楽』椎乃味醂・たなか 「多面体、鏡面」@ 大阪関西国際芸術祭2023のシステム構築を担当",
+    "pinned": false,
     "publishedAt": "2023-12-20",
     "category": "work",
     "url": "https://x.com/sheeno3rin/status/1738184053508239618",
@@ -9,6 +10,7 @@
   },
   {
     "title": "Hono Conference 2024 に登壇",
+    "pinned": false,
     "publishedAt": "2024-06-22",
     "category": "talk",
     "url": "https://x.com/naporin24690/status/1804542363895001374",
@@ -17,6 +19,7 @@
   },
   {
     "title": "Cloudflare Workers Tech Talks in Tokyo #3 に登壇",
+    "pinned": false,
     "publishedAt": "2024-08-01",
     "category": "talk",
     "url": "",
@@ -177,6 +180,7 @@
   },
   {
     "title": "企画展『拡張される音楽』椎乃味醂・たなか 「多面体、鏡面」のシステム構築を担当",
+    "pinned": false,
     "publishedAt": "2024-11-29",
     "category": "work",
     "url": "https://x.com/naporin24690/status/1862529523344187817",
@@ -185,6 +189,7 @@
   },
   {
     "title": "企画展『共に在る音楽』煮ル果実DEMiXUSシステム構築を担当",
+    "pinned": false,
     "publishedAt": "2024-12-12",
     "category": "work",
     "url": "https://x.com/naporin24690/status/1867179943060504598",
@@ -193,6 +198,7 @@
   },
   {
     "title": "企画展『共に在る音楽』椎乃味醂xももえ W♭Y♭K M♭C K システム構築を担当",
+    "pinned": false,
     "publishedAt": "2024-12-12",
     "category": "work",
     "url": "https://x.com/naporin24690/status/1867179943060504598",
@@ -201,6 +207,7 @@
   },
   {
     "title": "企画展『思弁的な音楽』r-906《額縁の言葉 : I》の背景映像・システム構築を担当",
+    "pinned": false,
     "publishedAt": "2025-12-10",
     "category": "work",
     "url": "https://x.com/naporin24690/status/1998715240075374793",
@@ -208,15 +215,17 @@
     "_status": "published"
   },
   {
-    "title": "VRDJイベントBooth²Boothの立ち上げ",
+    "title": "VRDJイベント&制作チームBooth²Boothの立ち上げ",
+    "pinned": false,
     "publishedAt": "2026-04-12",
-    "category": "work",
+    "category": "notification",
     "url": "https://x.com/naporin24690/status/2043185292337975601",
     "body": null,
     "_status": "published"
   },
   {
     "title": "#ProjectCircles 椎乃味醂ライブセクションの一部にモーキャプシステムを提供",
+    "pinned": false,
     "publishedAt": "2026-05-05",
     "category": "support",
     "url": "https://x.com/naporin24690/status/2051632371590701138",
@@ -245,6 +254,7 @@
   },
   {
     "title": "DJ・VJ の出演依頼について",
+    "pinned": true,
     "publishedAt": "2026-06-10",
     "category": "notification",
     "url": "",

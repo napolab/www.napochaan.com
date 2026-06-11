@@ -1432,90 +1432,208 @@
     "thumbnailFile": "vrchat-event-poster.png"
   },
   {
-    "title": "おてぃるバースデーHP、モザイクアート",
+    "title": "risrill.club birthday 2025 website",
     "type": "production",
     "date": "2025-07-07",
     "url": "https://ristill.club/2025",
     "description": "VRChat の推しの誕生日を祝うためにモザイクアートと HP を作成した。20人の協力により約3000枚の画像から24000タイルのモザイクアートを制作。モザイクアート生成用の Rust ツールも開発した。",
     "body": {
       "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
         "children": [
           {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
             "children": [
               {
-                "type": "text",
-                "text": "VRChat の推しの誕生日を祝うために、モザイクアートと HP を作成した。20人の協力により約3000枚の画像から24000タイルのモザイクアートを制作し、生成用の Rust ツール ",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
                 "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "VRChat の推しの誕生日を祝うために、モザイクアートと HP を作成した。20人の協力により約3000枚の画像から24000タイルのモザイクアートを制作し、生成用の Rust ツール ",
+                "type": "text",
                 "version": 1
               },
               {
-                "type": "link",
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "mosaic-art-rust",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": "ltr",
                 "format": "",
                 "indent": 0,
-                "version": 1,
-                "direction": "ltr",
+                "type": "link",
+                "version": 3,
                 "fields": {
                   "linkType": "custom",
                   "url": "https://github.com/naporin0624/mosaic-art-rust",
                   "newTab": true
-                },
-                "children": [
-                  {
-                    "type": "text",
-                    "text": "mosaic-art-rust",
-                    "format": 0,
-                    "style": "",
-                    "mode": "normal",
-                    "detail": 0,
-                    "version": 1
-                  }
-                ]
+                }
               },
               {
-                "type": "text",
-                "text": " も開発した。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
                 "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " も開発した。",
+                "type": "text",
                 "version": 1
               }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "textFormat": 0,
+            ],
+            "direction": "ltr",
             "format": "",
             "indent": 0,
+            "type": "paragraph",
             "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
             "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
             "children": [
               {
-                "type": "text",
-                "text": "可愛らしいデザインとローディング画面にこだわり、提供画像のギャラリーサイトも併設。個別ページの og:image 設定により共有時の見え方を整えた。opennextjs/cloudflare を初めて本格活用したプロダクト。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
                 "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "可愛らしいデザインとローディング画面にこだわり、提供画像のギャラリーサイトも併設。個別ページの og:image 設定により共有時の見え方を整えた。opennextjs/cloudflare を初めて本格活用したプロダクト。",
+                "type": "text",
                 "version": 1
               }
-            ]
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "type": "autolink",
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "https://ristill.club/2025",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://ristill.club/2025"
+                },
+                "format": "",
+                "indent": 0,
+                "version": 2
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "type": "upload",
+            "version": 3,
+            "format": "",
+            "id": "6a2984f0f4635c3fd4f2cdfa",
+            "fields": {},
+            "relationTo": "media",
+            "value": {
+              "id": 54,
+              "alt": "ristill.club/2025 first view",
+              "updatedAt": "2026-06-10T15:38:23.976Z",
+              "createdAt": "2026-06-10T15:38:23.976Z",
+              "url": "/api/media/file/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-06-11%200.37.35.png",
+              "thumbnailURL": null,
+              "filename": "スクリーンショット 2026-06-11 0.37.35.png",
+              "mimeType": "image/png",
+              "filesize": 4512038,
+              "width": 3600,
+              "height": 2086,
+              "focalX": 50,
+              "focalY": 50
+            }
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
           }
-        ]
+        ],
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
       }
     },
     "_status": "published",
@@ -1930,7 +2048,7 @@
     "thumbnailFile": "work-41.jpg"
   },
   {
-    "title": "napochaan.com を v3.0.0 に更新",
+    "title": "v3.0.0 www.napochaan.com",
     "type": "production",
     "date": "2026-06-09",
     "url": "https://github.com/napolab/www.napochaan.com",
