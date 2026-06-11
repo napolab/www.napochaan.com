@@ -32,6 +32,7 @@ import { CursorPresenceDemo } from './cursor-presence-demo';
 import { GalleryArchiveLazy } from './gallery-archive-lazy';
 import { GalleryLazy } from './gallery-lazy';
 import { GameOfLifeDemo } from './game-of-life-demo';
+import { LoadingOverlayDemo } from './loading-overlay-demo';
 import { NoAction } from './no-action';
 import { richTextSample } from './rich-text-sample';
 import { TypographyBandDemo } from './typography-band-demo';
@@ -236,4 +237,5 @@ export const demos: Record<ComponentName, ReactNode> = {
   TypographyBand: <TypographyBandDemo />,
   GameOfLife: <GameOfLifeDemo />,
   CursorPresence: <CursorPresenceDemo />,
+  LoadingOverlay: <LoadingOverlayDemo />,
 };

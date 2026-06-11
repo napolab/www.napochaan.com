@@ -11,10 +11,11 @@ describe('LoadingOverlay', () => {
     expect(root).not.toBeNull();
   });
 
-  it('shows the system-boot brand and loading status text', async () => {
+  it('shows the system-boot brand and no longer shows the old loading status text', async () => {
     const screen = await render(<LoadingOverlay />);
-    expect(screen.container.textContent).toContain('napochaan');
-    expect(screen.container.textContent).toContain('LOADING TYPEFACES');
+    const text = screen.container.textContent ?? '';
+    expect(text).toContain('napochaan');
+    expect(text).not.toContain('LOADING TYPEFACES');
   });
 
   it('exposes no interactive controls or headings to the accessibility tree', async () => {

@@ -56,8 +56,8 @@ export const colophon = {
       { label: 'iOS のステータスバー裏を追いかけて染める帯', target: 'SafeAreaTint' },
       { label: '上の見出しブロック', target: 'PageHeader' },
       { label: 'いちばん下のフッター', target: 'SiteFooter' },
-      { label: 'フォント読込中の起動オーバーレイ', target: 'LoadingOverlay' },
       { label: '起動演出を待たせる土台', target: 'BootStatusProvider' },
+      { label: 'アニメーションの on/off を束ねる土台（ヘッダーの motion トグル）', target: 'MotionProvider' },
     ],
     // フロー要素 — 生デモは _demos に置き、name で対応付ける。
     items: [
@@ -102,6 +102,10 @@ export const colophon = {
       {
         name: 'CursorPresence',
         why: '同じページを見てる人のカーソル。実物の描画レイヤー(CursorLayer)そのままに、socket を張らないサンプル engine を差して動かしてる。engine が waypoint を投げ、レイヤー側の lerp がキビキビ補間する——本番と同じ経路。',
+      },
+      {
+        name: 'LoadingOverlay',
+        why: 'フォント読込中の起動オーバーレイ。本来は全画面を覆う fixed だけど、ここは枠に収めた版。問いかけを typewriter で次々と。',
       },
     ],
   },
