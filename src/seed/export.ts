@@ -9,8 +9,10 @@ import { dayjs } from '@utils/dayjs';
 import { r2Bucket } from '../payload.config';
 
 import { saveMediaFile } from './save-media-file';
+import { applyBodySentinels, collectBodyMedia } from './sentinelize-body-media';
 
-import type { Gallery, Media, Work } from '@payload-types';
+import type { Blog, Gallery, Media, Work } from '@payload-types';
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { Payload, SanitizedConfig } from 'payload';
 
 // Decouples seed data from migrations: dumps the live CMS content to editable
@@ -21,6 +23,7 @@ import type { Payload, SanitizedConfig } from 'payload';
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.resolve(dirname, 'data');
 const assetsDir = path.resolve(dirname, 'assets');
+const blogAssetsDir = path.resolve(assetsDir, 'blog');
 
 // Keys Payload manages for us — never hand-edited, regenerated on import.
 // `globalType` is injected by findGlobal and rejected by updateGlobal on the way back.
@@ -106,10 +109,11 @@ const exportGallery = async (instance: Payload): Promise<void> => {
   await writeJson(instance, 'gallery', docs.map(toGalleryRecord));
 };
 
-// News / blog / logs carry no media relationship — strip system keys only.
+// News / logs carry no media relationship — strip system keys only. (Blog
+// bodies may embed lexical upload nodes, so blog has its own exporter below.)
 // `logs.meta` is real content (the メタラベル type label), so logs keeps `meta`
-// while news/blog drop the seoPlugin-generated `meta` group.
-const exportSimple = async (instance: Payload, slug: 'news' | 'blog' | 'logs', sort: string): Promise<void> => {
+// while news drops the seoPlugin-generated `meta` group.
+const exportSimple = async (instance: Payload, slug: 'news' | 'logs', sort: string): Promise<void> => {
   const { docs } = await instance.find({ collection: slug, depth: 1, limit: 0, sort, overrideAccess: true });
   const keys = slug === 'logs' ? LOGS_SYSTEM_KEYS : SYSTEM_KEYS;
   const dateKey = slug === 'logs' ? 'date' : 'publishedAt';
@@ -118,6 +122,33 @@ const exportSimple = async (instance: Payload, slug: 'news' | 'blog' | 'logs', s
     slug,
     docs.map((doc) => formatDayField(stripKeys(doc, keys), dateKey)),
   );
+};
+
+// Lexical richText: the generated body shape carries an index signature the
+// serialized lexical types don't, so coerce once at this read boundary (same
+// rationale as import.ts's `asRichText`).
+const asEditorState = (value: unknown): SerializedEditorState => value as unknown as SerializedEditorState;
+
+// Sentinelize the lexical `body` in place, preserving the surrounding key order
+// (mirrors formatDayField) so the exported JSON diff stays minimal.
+const sentinelizeBodyField = (record: Record<string, unknown>): Record<string, unknown> =>
+  Object.fromEntries(Object.entries(record).map(([k, v]) => (k === 'body' ? [k, applyBodySentinels(asEditorState(v))] : [k, v])));
+
+const toBlogRecord = (doc: Blog): Record<string, unknown> => sentinelizeBodyField(formatDayField(stripSystemKeys(doc), 'publishedAt'));
+
+// Blog bodies may embed lexical upload nodes; at depth: 1 each carries the full
+// populated Media object, which is tied to this database's ids. Save every
+// embedded binary under assets/blog/ and rewrite the value back to a portable
+// `{ __file, __alt }` sentinel so `seed:import` (resolve-body-media) can
+// re-resolve it against whatever database it runs on.
+const exportBlog = async (instance: Payload): Promise<void> => {
+  const { docs } = await instance.find({ collection: 'blog', depth: 1, limit: 0, sort: 'publishedAt', overrideAccess: true });
+  for (const doc of docs) {
+    for (const media of collectBodyMedia(asEditorState(doc.body))) {
+      await saveMediaFile(media, blogAssetsDir, r2Bucket, instance.logger);
+    }
+  }
+  await writeJson(instance, 'blog', docs.map(toBlogRecord));
 };
 
 const exportProfile = async (instance: Payload): Promise<void> => {
@@ -133,9 +164,10 @@ export const script = async (config: SanitizedConfig): Promise<void> => {
   await payload.init({ config });
   await mkdir(dataDir, { recursive: true });
   await mkdir(assetsDir, { recursive: true });
+  await mkdir(blogAssetsDir, { recursive: true });
   await exportWorks(payload);
   await exportSimple(payload, 'news', 'publishedAt');
-  await exportSimple(payload, 'blog', 'publishedAt');
+  await exportBlog(payload);
   await exportSimple(payload, 'logs', 'date');
   await exportGallery(payload);
   await exportProfile(payload);
