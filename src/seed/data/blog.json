@@ -772,6 +772,82 @@
             "children": [
               {
                 "type": "text",
+                "text": "そこに誰かがいる",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "カーソルがふっと見えることに、意味なんてない。誰のものかもわからないし、何かが起こるわけでもない。ただ、自分のほかにもう一つ、画面のどこかが動いている。それだけで、ぼくはここに一人ではないと感じる。深く知り合う必要はない。話さなくていい。うすく、なんとなくそこに誰かがいる。あの感じが、ずっと好きだった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくは Twitter と VRChat にずっといた。Twitter は、とくに用がなくてもタイムラインを上から下へ流していた。誰かの独り言、どうでもいい報告、流れて消えていくだけの言葉。それを眺めている時間そのものが、ぼくの一日のかなりの部分だった。VRChat は、ログインしたまま夜が明けることがよくあった。アバターになって、ワールドに転がって、しゃべるでもなく、ただ同じ空間に誰かがいる。人間性が溶けていく、あの時間。あそこで過ごした時間が、たぶん「ぼく」という形のかなりの部分を作っている。濃い関係だけがつながりじゃない。視界の端に他人の気配があって、それが消えないでいてくれる。ぼくにとってのインターネットは、ずっとそういう場所だった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "その気配が、web から少しずつ失われている気がする。だからカーソルを共有する。誰かのいた痕跡を、静的なサイトの上にもう一度置いておきたかった。それだけのために、Durable Objects も WebSocket も引っぱってきた。技術スタックの長い帰結の先にあったのは、結局これくらい単純なことだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
                 "text": "これからの napochaan.com",
                 "format": 0,
                 "style": "",

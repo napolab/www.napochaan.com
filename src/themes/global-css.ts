@@ -47,8 +47,14 @@ export const globalCss: GlobalStyleObject = {
     wordBreak: 'auto-phrase',
   },
   // Anchor-scroll targets clear the fixed top TypographyBand (safe-area-aware
-  // --band-top) plus a gutter.
-  'section[id]': {
+  // --band-top) plus a gutter. Covers both section landmarks (`section[id]`) and
+  // id-bearing headings — the actual fragment targets for in-page deep links: the
+  // blog/news article TOC points at `#${slug}` on rich-text body headings, and the
+  // news archive carries the `id` on its month `<h2>` (the `<section>` only holds
+  // `aria-labelledby`). Without this the smooth scroll lands the heading tucked
+  // under the band. Components that compute their own offset (e.g. the works sticky
+  // year spine) target a non-heading anchor element, so they're unaffected.
+  'section[id], :is(h1, h2, h3, h4, h5, h6)[id]': {
     scrollMarginTop: '[calc(var(--band-top) + token(spacing.6))]',
   },
   'h1, h2, h3, h4, h5, h6': { fontFamily: 'display', fontWeight: 'normal' },
