@@ -13,13 +13,22 @@ export const revalidate = 3600;
 
 const crumbs = [{ href: '/', label: 'home' }, { label: 'contact' }];
 
+const contactDescription = 'お問い合わせ — フォーム、または各種 SNS から直接どうぞ。';
+
 export const generateMetadata = (): Metadata => {
   return {
     get title() {
       return 'contact';
     },
     get description() {
-      return 'お問い合わせ — フォーム、または各種 SNS から直接どうぞ。';
+      return contactDescription;
+    },
+    alternates: { canonical: '/contact' },
+    get openGraph() {
+      return { title: 'contact — napochaan', description: contactDescription };
+    },
+    get twitter() {
+      return { title: 'contact — napochaan', description: contactDescription };
     },
   };
 };

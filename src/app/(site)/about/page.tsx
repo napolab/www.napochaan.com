@@ -11,13 +11,21 @@ export const revalidate = 3600;
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const profile = await findProfile();
+  const description = profile?.tagline;
 
   return {
     get title() {
       return 'about';
     },
     get description() {
-      return profile?.tagline;
+      return description;
+    },
+    alternates: { canonical: '/about' },
+    get openGraph() {
+      return { title: 'about — napochaan', description };
+    },
+    get twitter() {
+      return { title: 'about — napochaan', description };
     },
   };
 };

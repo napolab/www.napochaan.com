@@ -29,18 +29,25 @@ type Props = {
   searchParams: SearchParams;
 };
 
+const blogDescription = '記事 — プログラミング・DJ・VJ についての覚え書き。';
+
 export const generateMetadata = (): Metadata => {
   return {
     get title() {
       return 'blog';
     },
     get description() {
-      return '記事 — プログラミング・DJ・VJ についての覚え書き。';
+      return blogDescription;
     },
     alternates: {
-      types: {
-        'application/rss+xml': [{ url: '/blog/rss.xml', title: 'napochaan — blog' }],
-      },
+      canonical: '/blog',
+      types: { 'application/rss+xml': [{ url: '/blog/rss.xml', title: 'napochaan — blog' }] },
+    },
+    get openGraph() {
+      return { title: 'blog — napochaan', description: blogDescription };
+    },
+    get twitter() {
+      return { title: 'blog — napochaan', description: blogDescription };
     },
   };
 };

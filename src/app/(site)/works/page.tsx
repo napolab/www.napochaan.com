@@ -14,12 +14,27 @@ import type { Metadata } from 'next';
 // future build emits a "dynamic route ignores revalidate" warning.
 export const revalidate = 3600;
 
-export const metadata: Metadata = {
-  alternates: {
-    types: {
-      'application/rss+xml': [{ url: '/works/rss.xml', title: 'napochaan — works' }],
+const worksDescription = '制作物のアーカイブ — 開発・VRChat・映像・グラフィック。';
+
+export const generateMetadata = (): Metadata => {
+  return {
+    get title() {
+      return 'works';
     },
-  },
+    get description() {
+      return worksDescription;
+    },
+    alternates: {
+      canonical: '/works',
+      types: { 'application/rss+xml': [{ url: '/works/rss.xml', title: 'napochaan — works' }] },
+    },
+    get openGraph() {
+      return { title: 'works — napochaan', description: worksDescription };
+    },
+    get twitter() {
+      return { title: 'works — napochaan', description: worksDescription };
+    },
+  };
 };
 
 const PAGE_SIZE = 50;

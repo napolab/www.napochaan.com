@@ -27,15 +27,26 @@ type Props = {
   searchParams: SearchParams;
 };
 
+const newsDescription = 'お知らせ — 制作・出演・公開のアナウンス。';
+
 export const generateMetadata = (): Metadata => {
   return {
     get title() {
       return 'news';
     },
     get description() {
-      return 'お知らせ — 制作・出演・公開のアナウンス。';
+      return newsDescription;
     },
-    alternates: { types: { 'application/rss+xml': [{ url: '/news/rss.xml', title: 'napochaan — news' }] } },
+    alternates: {
+      canonical: '/news',
+      types: { 'application/rss+xml': [{ url: '/news/rss.xml', title: 'napochaan — news' }] },
+    },
+    get openGraph() {
+      return { title: 'news — napochaan', description: newsDescription };
+    },
+    get twitter() {
+      return { title: 'news — napochaan', description: newsDescription };
+    },
   };
 };
 

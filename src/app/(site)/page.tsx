@@ -16,9 +16,27 @@ import { dayjs } from '@utils/dayjs';
 import * as s from './styles.css';
 
 import type { NewsItem } from './news/_lib/news-item';
+import type { Metadata } from 'next';
 
 // Revalidate hourly so OpenNext serves the page via ISR.
 export const revalidate = 3600;
+
+const homeDescription = 'DJ・VJ・グラフィック・デジタル制作。napochaan の個人サイト。';
+
+export const generateMetadata = (): Metadata => {
+  return {
+    get description() {
+      return homeDescription;
+    },
+    alternates: { canonical: '/' },
+    get openGraph() {
+      return { title: 'napochaan', description: homeDescription };
+    },
+    get twitter() {
+      return { title: 'napochaan', description: homeDescription };
+    },
+  };
+};
 
 type NewsFeedItem = {
   id: string;

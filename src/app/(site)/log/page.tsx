@@ -12,18 +12,25 @@ import type { Metadata } from 'next';
 // continuous page — no pagination — so the whole timeline is statically cached.
 export const revalidate = 3600;
 
+const logDescription = '活動年表 — DJ・VJ・リリース・制作物の記録。';
+
 export const generateMetadata = (): Metadata => {
   return {
     get title() {
       return 'log';
     },
     get description() {
-      return '活動年表 — DJ・VJ・リリース・制作物の記録。';
+      return logDescription;
     },
     alternates: {
-      types: {
-        'application/rss+xml': [{ url: '/log/rss.xml', title: 'napochaan — log' }],
-      },
+      canonical: '/log',
+      types: { 'application/rss+xml': [{ url: '/log/rss.xml', title: 'napochaan — log' }] },
+    },
+    get openGraph() {
+      return { title: 'log — napochaan', description: logDescription };
+    },
+    get twitter() {
+      return { title: 'log — napochaan', description: logDescription };
     },
   };
 };
