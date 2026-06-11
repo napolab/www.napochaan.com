@@ -7,6 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
 import { useBootReady } from '@components/boot-status';
+import { prefersReducedMotion } from '@utils/prefers-reduced-motion';
 
 import { clsx } from '@utils/clsx';
 
@@ -28,8 +29,6 @@ const DURATION = 0.5;
 // Mobile/tablet in-view decode. Slower than desktop: the touch user does not
 // trigger it, so a gentler reveal reads better as the text scrolls into view.
 const MOBILE_DURATION = 1.2;
-
-const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 type BaseProps = {
   children: string;
@@ -83,7 +82,7 @@ export const ScrambleText = (props: Props) => {
       // fill to the ghost-reserved box for the decode (see styles) so a multi-line
       // title keeps wrapping, dropping on complete to settle into the resolved wrap.
       const runDecode = (duration: number) => {
-        if (reduced()) return;
+        if (prefersReducedMotion()) return;
         const fill = fillRef.current;
         if (fill === null) return;
         gsap.to(fill, {

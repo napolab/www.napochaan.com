@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { useResizer } from '@components/canvas-resize';
 import { useIsClient } from '@hooks/use-is-client';
+import { usePrefersReducedMotion } from '@hooks/use-prefers-reduced-motion';
 import { useLifeEngine } from './provider';
 
 import type { LifeState } from './engine';
@@ -44,7 +45,7 @@ export const GameOfLife = () => {
 
   const engine = useLifeEngine();
   const resizer = useResizer();
-  const reduced = useMemo(() => (isClient ? matchMedia('(prefers-reduced-motion: reduce)').matches : false), [isClient]);
+  const reduced = usePrefersReducedMotion();
 
   // Effect 1: Resize — sizes the canvas and re-seeds the engine on layout change
   useEffect(() => {

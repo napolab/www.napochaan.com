@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 
 import { useResizer } from '@components/canvas-resize';
+import { prefersReducedMotion, subscribeReducedMotion } from '@utils/prefers-reduced-motion';
 
 import { usePlacement } from './placement-context';
 import { stepCursorRender, type CursorRender } from './step-cursor-render';
@@ -65,13 +66,12 @@ export const CursorLayer = ({ app, enabled, getColor }: Props) => {
     let rafId = 0;
     const size = { width: 0, height: 0 };
 
-    // Track prefers-reduced-motion live so an OS setting change takes effect without a remount.
-    const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
-    let reduceMotion = motionQuery.matches;
-    const onMotionChange = (): void => {
-      reduceMotion = motionQuery.matches;
-    };
-    motionQuery.addEventListener('change', onMotionChange);
+    // Track the effective reduced-motion preference (OS setting + the header motion
+    // toggle) live, so a change takes effect on the next frame without a remount.
+    let reduceMotion = prefersReducedMotion();
+    const offMotion = subscribeReducedMotion(() => {
+      reduceMotion = prefersReducedMotion();
+    });
 
     const unsub = app.subscribe((s) => {
       visitors = s.visitors;
@@ -124,7 +124,7 @@ export const CursorLayer = ({ app, enabled, getColor }: Props) => {
       unsub();
       cancelAnimationFrame(rafId);
       unobserve();
-      motionQuery.removeEventListener('change', onMotionChange);
+      offMotion();
     };
   }, [app, enabled, getColor, resizer, placement]);
 

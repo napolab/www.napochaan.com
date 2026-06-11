@@ -8,6 +8,7 @@ import { usePresence } from '@components/cursor-presence/presence-context';
 import { useLifeState } from '@components/game-of-life/provider';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
+import { useMotion } from '@hooks/use-prefers-reduced-motion';
 
 import { isNavActive } from './is-nav-active';
 import * as styles from './styles.css';
@@ -44,6 +45,7 @@ export const SysBar = ({ initialTime }: { initialTime: string }) => {
   const state = useLifeState();
   const pathname = usePathname();
   const presence = usePresence();
+  const motion = useMotion();
   const gen = `${state.generation}`.padStart(4, '0');
 
   return (
@@ -86,6 +88,9 @@ export const SysBar = ({ initialTime }: { initialTime: string }) => {
           <span className={styles.watching}>watching {presence.count}</span>
           <button type="button" className={styles.toggle} onClick={presence.toggle}>
             {presence.enabled ? 'cursors: on' : 'cursors: off'}
+          </button>
+          <button type="button" className={styles.toggle} onClick={motion.toggle}>
+            {motion.reduced ? 'motion: off' : 'motion: on'}
           </button>
         </div>
       </header>

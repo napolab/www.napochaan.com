@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useSyncExternalStore } from 'react';
 
+import { usePrefersReducedMotion } from '@hooks/use-prefers-reduced-motion';
+
 type Snapshot = {
   displayText: string;
   isDone: boolean;
@@ -136,18 +138,19 @@ export const useTypewriter = (fullText: string, options: UseTypewriterOptions = 
   const { speed = 46, jitter = 0.6, typoChance = 0.08, pauseChance = 0.06, startWhen = true } = options;
   const [controller] = useState(() => createTypewriter(fullText, { speed, jitter, typoChance, pauseChance }));
   const snapshot = useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getServerSnapshot);
+  const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
     // USEEFFECT_JUSTIFICATION: imperative typewriter timer — starts the reveal on
     // mount (jumping to the full text under reduced-motion) and clears it on unmount.
     if (!startWhen) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    if (reduced) {
       controller.finish();
       return;
     }
     controller.start();
     return controller.stop;
-  }, [controller, startWhen]);
+  }, [controller, startWhen, reduced]);
 
   return snapshot;
 };

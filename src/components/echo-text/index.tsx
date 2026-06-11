@@ -6,6 +6,7 @@ import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { useGSAP } from '@gsap/react';
 
 import { useBootReady } from '@components/boot-status';
+import { prefersReducedMotion } from '@utils/prefers-reduced-motion';
 
 import * as styles from './styles.css';
 
@@ -13,8 +14,6 @@ gsap.registerPlugin(ScrambleTextPlugin);
 
 const CHARS = '█▓▒░#%&@/\\<>0123456789';
 const DURATION = 1.1;
-
-const reduced = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 type Props = {
   children: string;
@@ -29,7 +28,7 @@ export const EchoText = ({ children, size = 'hero' }: Props) => {
   const fillRef = useRef<HTMLSpanElement>(null);
 
   const decode = () => {
-    if (reduced()) return;
+    if (prefersReducedMotion()) return;
     // revealDelay holds the full scramble before decoding; low speed keeps the
     // glyph refresh chunky (digital) rather than a 60fps blur; tweenLength off
     // since the word length never changes.
