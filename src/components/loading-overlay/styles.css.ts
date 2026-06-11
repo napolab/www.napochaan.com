@@ -56,10 +56,14 @@ export const square = css({
   flexShrink: 0,
 });
 
-// Status line: mono uppercase caption with a blinking caret (system-boot feel).
+// Question line: mono uppercase prompt with a blinking caret (system-boot feel).
+// The typed text itself is produced by the BootQuestion client island, which
+// cycles the prompts via the useTypewriter hook; this style only dresses the line.
+// nowrap keeps the longest prompt on one line so cycling never changes the height.
 export const status = css({
   display: 'flex',
   alignItems: 'center',
+  whiteSpace: 'nowrap',
   fontFamily: 'mono',
   fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
@@ -76,10 +80,10 @@ export const caret = css({
   height: '[1em]',
   marginInlineStart: '[0.3em]',
   bg: 'fg.onSolid',
-  // Blink only when motion is welcome; reduced-motion keeps a steady caret.
-  '@media (prefers-reduced-motion: no-preference)': {
-    animation: '[blink 1s steps(1) infinite]',
-  },
+  // Blink driven by the global motion switch: paused (OS reduce / header toggle)
+  // freezes the caret steady.
+  animation: '[blink 1s steps(1) infinite]',
+  animationPlayState: 'var(--motion-play, running)',
 });
 
 // Progress track. The fill eases toward 90% over ~2.8s; because the Typekit

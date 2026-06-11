@@ -6,6 +6,8 @@ import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
+import { usePrefersReducedMotion } from '@hooks/use-prefers-reduced-motion';
+
 import { wrap } from './band-scroll';
 import * as styles from './styles.css';
 
@@ -32,16 +34,22 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
   const trackLeftRef = useRef<HTMLDivElement>(null);
   const trackRightRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(() => {
-    const topTrack = trackTopRef.current;
-    const bottomTrack = trackBottomRef.current;
-    const leftTrack = trackLeftRef.current;
-    const rightTrack = trackRightRef.current;
+  // Effective reduced-motion (OS setting + the header motion toggle). Listed as a
+  // dependency so useGSAP reverts and re-runs when it flips — replacing the old
+  // gsap.matchMedia(OS-only) gate so the toggle can stop / resume the band too.
+  const reduced = usePrefersReducedMotion();
 
-    if (!topTrack || !bottomTrack || !leftTrack || !rightTrack) return;
+  useGSAP(
+    () => {
+      if (reduced) return;
 
-    const mm = gsap.matchMedia();
-    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const topTrack = trackTopRef.current;
+      const bottomTrack = trackBottomRef.current;
+      const leftTrack = trackLeftRef.current;
+      const rightTrack = trackRightRef.current;
+
+      if (!topTrack || !bottomTrack || !leftTrack || !rightTrack) return;
+
       const topHalf = topTrack.scrollWidth / 2;
       const leftHalf = leftTrack.scrollHeight / 2;
 
@@ -117,8 +125,9 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
         cancelSnap();
         trigger.kill();
       };
-    });
-  });
+    },
+    { dependencies: [reduced], revertOnUpdate: true },
+  );
 
   return (
     <>

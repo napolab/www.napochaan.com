@@ -30,6 +30,7 @@ export const caret = css({
     animationDuration: '[1s]',
     animationTimingFunction: '[steps(1)]',
     animationIterationCount: 'infinite',
-    _motionReduce: { animationName: '[none]' },
+    // Global motion switch: paused (OS reduce / header toggle) freezes the caret.
+    animationPlayState: 'var(--motion-play, running)',
   },
 });

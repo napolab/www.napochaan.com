@@ -89,7 +89,7 @@ const trackXBase = {
   animationDuration: '[14s]',
   animationTimingFunction: 'linear',
   animationIterationCount: 'infinite',
-  _motionReduce: { animationName: '[none]' },
+  animationPlayState: 'var(--motion-play, running)',
 } as const;
 
 export const trackX = css(trackXBase);
@@ -105,7 +105,7 @@ const trackYBase = {
   animationDuration: '[14s]',
   animationTimingFunction: 'linear',
   animationIterationCount: 'infinite',
-  _motionReduce: { animationName: '[none]' },
+  animationPlayState: 'var(--motion-play, running)',
 } as const;
 
 export const trackY = css(trackYBase);

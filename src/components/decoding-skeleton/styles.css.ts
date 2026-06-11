@@ -37,6 +37,9 @@ export const row = css({
   animationDuration: '[2.4s]',
   animationTimingFunction: '[ease-in-out]',
   animationIterationCount: 'infinite',
+  // Driven by the global motion switch: paused (OS reduce and/or the header toggle)
+  // freezes the pulse at its dim 0% opacity — the static reduced-motion look.
+  animationPlayState: 'var(--motion-play, running)',
   // Per-row phase offset. Six declared rows cover the default; extra rows reuse the
   // last offset, which is fine — the goal is "not in lockstep", not uniqueness.
   '&:nth-child(2)': { animationDelay: '[-0.4s]' },
@@ -44,7 +47,6 @@ export const row = css({
   '&:nth-child(4)': { animationDelay: '[-1.2s]' },
   '&:nth-child(5)': { animationDelay: '[-1.6s]' },
   '&:nth-child(6)': { animationDelay: '[-2s]' },
-  _motionReduce: { animationName: '[none]', opacity: 'overlay' },
 });
 
 // A single glyph cell. The glyph itself is drawn by ::before whose `content` is
@@ -63,6 +65,8 @@ export const cell = css({
     animationDuration: '[0.45s]',
     animationTimingFunction: '[steps(1)]',
     animationIterationCount: 'infinite',
+    // Global motion switch: paused freezes each cell on a single static glyph.
+    animationPlayState: 'var(--motion-play, running)',
   },
   // Column → churn variant (3-way cycle).
   '&:nth-child(3n+1)::before': { animationName: 'churnA' },
@@ -80,7 +84,6 @@ export const cell = css({
   '&:nth-child(10)::before': { animationDelay: '[-0.45s]' },
   '&:nth-child(11)::before': { animationDelay: '[-0.5s]' },
   '&:nth-child(12)::before': { animationDelay: '[-0.55s]' },
-  _motionReduce: { _before: { animationName: '[none]' } },
 });
 
 // Blinking electric-blue block caret at the end of the first row — the decode
@@ -95,5 +98,5 @@ export const caret = css({
   animationDuration: '[1s]',
   animationTimingFunction: '[steps(1)]',
   animationIterationCount: 'infinite',
-  _motionReduce: { animationName: '[none]' },
+  animationPlayState: 'var(--motion-play, running)',
 });
