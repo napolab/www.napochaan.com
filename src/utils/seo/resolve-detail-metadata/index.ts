@@ -14,6 +14,8 @@ type DetailSeo = {
 
 export type ResolveDetailMetadataArgs = {
   docTitle: string;
+  // Canonical path, emitted as the relative og:url (resolved via metadataBase).
+  path: string;
   seo?: DetailSeo;
   body?: SerializedEditorState;
   // Entity-specific description sources tried in order before the body excerpt
@@ -29,6 +31,7 @@ export type ResolveDetailMetadataArgs = {
 };
 
 const SUFFIX = ' — napochaan';
+const SITE_NAME = 'napochaan';
 const MAX_DESCRIPTION = 120;
 
 // The first non-empty string in a candidate list, or undefined when none qualify.
@@ -94,7 +97,16 @@ export const resolveDetailMetadata = (args: ResolveDetailMetadataArgs): Metadata
   return {
     title: hasMetaTitle ? { absolute: metaTitle } : args.docTitle,
     description,
-    openGraph: { title: displayTitle, description, images: [{ url: image }] },
-    twitter: { title: displayTitle, description, images: [image] },
+    alternates: { canonical: args.path },
+    openGraph: {
+      type: 'website',
+      siteName: SITE_NAME,
+      locale: 'ja_JP',
+      url: args.path,
+      title: displayTitle,
+      description,
+      images: [{ url: image }],
+    },
+    twitter: { card: 'summary_large_image', title: displayTitle, description, images: [image] },
   };
 };

@@ -25,6 +25,7 @@ export const generateMetadata = (): Metadata => {
     get description() {
       return colophon.description;
     },
+    alternates: { canonical: '/colophon' },
   };
 };
 

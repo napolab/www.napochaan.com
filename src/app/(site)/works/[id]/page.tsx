@@ -40,6 +40,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 
   return resolveDetailMetadata({
     docTitle: work.title,
+    path: `/works/${id}`,
     seo: work.seo,
     body: work.body,
     descriptionCandidates: [work.description],

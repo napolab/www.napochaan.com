@@ -4,6 +4,7 @@ import { FeedLink } from '@components/feed-link';
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
 import { dayjs } from '@utils/dayjs';
+import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 import { findBlogList } from '@lib/payload/blog';
 
 import type { Metadata } from 'next';
@@ -31,26 +32,13 @@ type Props = {
 
 const blogDescription = '記事 — プログラミング・DJ・VJ についての覚え書き。';
 
-export const generateMetadata = (): Metadata => {
-  return {
-    get title() {
-      return 'blog';
-    },
-    get description() {
-      return blogDescription;
-    },
-    alternates: {
-      canonical: '/blog',
-      types: { 'application/rss+xml': [{ url: '/blog/rss.xml', title: 'napochaan — blog' }] },
-    },
-    get openGraph() {
-      return { title: 'blog — napochaan', description: blogDescription };
-    },
-    get twitter() {
-      return { title: 'blog — napochaan', description: blogDescription };
-    },
-  };
-};
+export const generateMetadata = (): Metadata =>
+  resolveSectionMetadata({
+    docTitle: 'blog',
+    description: blogDescription,
+    path: '/blog',
+    feed: { url: '/blog/rss.xml', title: 'napochaan — blog' },
+  });
 
 const BlogPage = async ({ searchParams }: Props) => {
   const { page: raw } = await searchParams;

@@ -5,6 +5,7 @@ import { findWorksList } from '@lib/payload/works';
 import { FeedLink } from '@components/feed-link';
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
+import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
@@ -16,26 +17,13 @@ export const revalidate = 3600;
 
 const worksDescription = '制作物のアーカイブ — 開発・VRChat・映像・グラフィック。';
 
-export const generateMetadata = (): Metadata => {
-  return {
-    get title() {
-      return 'works';
-    },
-    get description() {
-      return worksDescription;
-    },
-    alternates: {
-      canonical: '/works',
-      types: { 'application/rss+xml': [{ url: '/works/rss.xml', title: 'napochaan — works' }] },
-    },
-    get openGraph() {
-      return { title: 'works — napochaan', description: worksDescription };
-    },
-    get twitter() {
-      return { title: 'works — napochaan', description: worksDescription };
-    },
-  };
-};
+export const generateMetadata = (): Metadata =>
+  resolveSectionMetadata({
+    docTitle: 'works',
+    description: worksDescription,
+    path: '/works',
+    feed: { url: '/works/rss.xml', title: 'napochaan — works' },
+  });
 
 const PAGE_SIZE = 50;
 

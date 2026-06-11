@@ -4,6 +4,7 @@ import { groupNewsByYearMonth } from './_lib/group-by-year-month';
 import { FeedLink } from '@components/feed-link';
 import { PageHeader } from '@components/page-header';
 import { Pagination } from '@components/pagination';
+import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 import { findNewsList } from '@lib/payload/news';
 
 import type { Metadata } from 'next';
@@ -29,26 +30,13 @@ type Props = {
 
 const newsDescription = 'お知らせ — 制作・出演・公開のアナウンス。';
 
-export const generateMetadata = (): Metadata => {
-  return {
-    get title() {
-      return 'news';
-    },
-    get description() {
-      return newsDescription;
-    },
-    alternates: {
-      canonical: '/news',
-      types: { 'application/rss+xml': [{ url: '/news/rss.xml', title: 'napochaan — news' }] },
-    },
-    get openGraph() {
-      return { title: 'news — napochaan', description: newsDescription };
-    },
-    get twitter() {
-      return { title: 'news — napochaan', description: newsDescription };
-    },
-  };
-};
+export const generateMetadata = (): Metadata =>
+  resolveSectionMetadata({
+    docTitle: 'news',
+    description: newsDescription,
+    path: '/news',
+    feed: { url: '/news/rss.xml', title: 'napochaan — news' },
+  });
 
 const NewsPage = async ({ searchParams }: Props) => {
   const { page: raw } = await searchParams;

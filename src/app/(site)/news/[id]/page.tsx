@@ -33,6 +33,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 
   return resolveDetailMetadata({
     docTitle: item.title,
+    path: `/news/${id}`,
     seo: item.seo,
     body: item.body,
     genericDescription: 'お知らせ',

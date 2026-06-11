@@ -29,6 +29,7 @@ describe('resolveDetailMetadata', () => {
   it('uses meta.title as an absolute title and the display title in og/twitter', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc title',
+      path: '/works/sample',
       seo: { title: 'Admin Title' },
       genericDescription: 'お知らせ',
       defaultImage: '/og-default.png',
@@ -42,6 +43,7 @@ describe('resolveDetailMetadata', () => {
   it('falls back to docTitle as a template-able title with display title appending the suffix', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc title',
+      path: '/works/sample',
       genericDescription: 'お知らせ',
       defaultImage: '/og-default.png',
     });
@@ -54,6 +56,7 @@ describe('resolveDetailMetadata', () => {
   it('prefers meta.description over every other candidate', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       seo: { description: 'admin description' },
       descriptionCandidates: ['field description'],
       body: richTextFromParagraphs(['body text']),
@@ -67,6 +70,7 @@ describe('resolveDetailMetadata', () => {
   it('falls back to a non-empty field candidate when meta.description is absent', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       descriptionCandidates: [undefined, '', 'field description'],
       body: richTextFromParagraphs(['body text']),
       genericDescription: 'お知らせ',
@@ -79,6 +83,7 @@ describe('resolveDetailMetadata', () => {
   it('derives the description from the body when meta and field candidates are empty', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       body: richTextFromParagraphs(['  derived   body  text  ']),
       genericDescription: 'お知らせ',
       defaultImage: '/og-default.png',
@@ -91,6 +96,7 @@ describe('resolveDetailMetadata', () => {
     const long = `${'word '.repeat(60)}`.trim();
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       body: richTextFromParagraphs([long]),
       genericDescription: 'お知らせ',
       defaultImage: '/og-default.png',
@@ -105,6 +111,7 @@ describe('resolveDetailMetadata', () => {
   it('falls back to the generic description when nothing else is available', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       genericDescription: 'お知らせ',
       defaultImage: '/og-default.png',
     });
@@ -112,9 +119,32 @@ describe('resolveDetailMetadata', () => {
     expect(meta.description).toBe('お知らせ');
   });
 
+  it('emits the shared site-wide og fields, og:url from path, and the large twitter card', () => {
+    const meta = resolveDetailMetadata({
+      docTitle: 'doc',
+      path: '/works/w1',
+      genericDescription: 'works',
+      defaultImage: '/og-default.png',
+    });
+
+    const openGraph = meta.openGraph;
+    const type = openGraph !== null && openGraph !== undefined && 'type' in openGraph ? openGraph.type : undefined;
+    expect(type).toBe('website');
+    expect(openGraph?.siteName).toBe('napochaan');
+    expect(openGraph?.locale).toBe('ja_JP');
+    expect(openGraph?.url).toBe('/works/w1');
+
+    const twitter = meta.twitter;
+    const card = twitter !== null && twitter !== undefined && 'card' in twitter ? twitter.card : undefined;
+    expect(card).toBe('summary_large_image');
+
+    expect(meta.alternates?.canonical).toBe('/works/w1');
+  });
+
   it('prefers meta.image and emits it on og and twitter', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       seo: { image: '/media/admin.jpg' },
       imageCandidates: ['/media/field.jpg'],
       body: bodyWithImage(),
@@ -129,6 +159,7 @@ describe('resolveDetailMetadata', () => {
   it('falls back to a field image candidate when meta.image is absent', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       imageCandidates: [undefined, '/media/field.jpg'],
       body: bodyWithImage(),
       genericDescription: 'works',
@@ -141,6 +172,7 @@ describe('resolveDetailMetadata', () => {
   it('falls back to the first body image when meta and field images are absent', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       body: bodyWithImage(),
       genericDescription: '記事',
       defaultImage: '/og-default.png',
@@ -152,6 +184,7 @@ describe('resolveDetailMetadata', () => {
   it('falls back to the default image when no source is available', () => {
     const meta = resolveDetailMetadata({
       docTitle: 'doc',
+      path: '/works/sample',
       body: richTextFromBlocks([{ type: 'p', text: 'no image here' }]),
       genericDescription: 'お知らせ',
       defaultImage: '/og-default.png',
