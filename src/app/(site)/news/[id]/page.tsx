@@ -5,6 +5,8 @@ import { adjacentNews } from '../_lib/adjacent-news';
 
 import { findNewsById, findNewsList } from '@lib/payload/news';
 
+import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
+
 import type { Metadata } from 'next';
 
 // Revalidate hourly — ISR. Detail pages render on demand and are then cached;
@@ -27,17 +29,15 @@ type Props = {
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const { id } = await params;
   const item = await findNewsById(id);
+  if (item === undefined) return { title: 'news', description: 'お知らせ' };
 
-  return {
-    get title() {
-      if (item === undefined) return 'news';
-      return item.title;
-    },
-    get description() {
-      if (item === undefined) return 'お知らせ';
-      return item.title;
-    },
-  };
+  return resolveDetailMetadata({
+    docTitle: item.title,
+    seo: item.seo,
+    body: item.body,
+    genericDescription: 'お知らせ',
+    defaultImage: '/og-default.png',
+  });
 };
 
 const NewsDetailPage = async ({ params }: Props) => {

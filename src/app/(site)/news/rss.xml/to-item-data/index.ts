@@ -1,4 +1,4 @@
-import { extractPlainText } from '../extract-plain-text';
+import { extractPlainText } from '@utils/lexical/extract-plain-text';
 
 import type { NewsItem } from '../../_lib/news-item';
 import type { ItemData } from '@utils/rss/types';

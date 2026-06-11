@@ -52,4 +52,21 @@ describe('toWorkItem', () => {
     expect(toWorkItem({ ...base, thumbnail: 1 } as unknown as Work, '01').thumbnail).toBeUndefined();
     expect(toWorkItem(base, '01').thumbnail).toBeUndefined();
   });
+
+  it('maps the SEO meta group (title/description/populated image)', () => {
+    const withMeta = {
+      ...base,
+      meta: { title: 'Meta Title', description: 'meta desc', image: { id: 9, alt: '', url: '/media/og.jpg', updatedAt: '', createdAt: '' } },
+    } as unknown as Work;
+    expect(toWorkItem(withMeta, '01').seo).toEqual({ title: 'Meta Title', description: 'meta desc', image: '/media/og.jpg' });
+  });
+
+  it('leaves seo undefined when meta is absent', () => {
+    expect(toWorkItem(base, '01').seo).toBeUndefined();
+  });
+
+  it('omits the seo image when meta.image is an unpopulated id', () => {
+    const withMeta = { ...base, meta: { title: 'T', image: 7 } } as unknown as Work;
+    expect(toWorkItem(withMeta, '01').seo).toEqual({ title: 'T', description: undefined, image: undefined });
+  });
 });

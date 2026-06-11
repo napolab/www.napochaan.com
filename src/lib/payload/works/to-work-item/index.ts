@@ -1,12 +1,11 @@
 import { dayjs } from '@utils/dayjs';
 
+import { isPopulatedMedia } from '../../is-populated-media';
+import { toDetailSeo } from '../../to-detail-seo';
+
 import type { WorkRow } from '../../../../app/(site)/works/_lib/work-row';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
-import type { Media, Work } from '@payload-types';
-
-// A populated media upload (depth >= 1) is an object with url/width/height; an
-// unpopulated one is just the numeric id. Narrow to the object case.
-const isPopulatedMedia = (value: unknown): value is Media => typeof value === 'object' && value !== null && 'url' in value;
+import type { Work } from '@payload-types';
 
 const toThumbnail = (thumbnail: Work['thumbnail']): WorkRow['thumbnail'] => {
   if (!isPopulatedMedia(thumbnail)) return undefined;
@@ -35,5 +34,6 @@ export const toWorkItem = (doc: Work, no: string): WorkRow => {
     thumbnail: toThumbnail(doc.thumbnail),
     description: doc.description ?? undefined,
     body: (doc.body ?? undefined) as SerializedEditorState | undefined,
+    seo: toDetailSeo(doc.meta),
   };
 };

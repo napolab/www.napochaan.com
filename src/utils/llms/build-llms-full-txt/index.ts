@@ -1,4 +1,4 @@
-import { extractPlainText } from '../../../app/(site)/news/rss.xml/extract-plain-text';
+import { extractPlainText } from '@utils/lexical/extract-plain-text';
 
 import type { Profile } from '../../../app/(site)/about/_lib/profile';
 import type { Post } from '../../../app/(site)/blog/_lib/post';

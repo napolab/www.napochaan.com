@@ -1,6 +1,8 @@
-import { extractPlainText } from '../../../../app/(site)/news/rss.xml/extract-plain-text';
+import { extractPlainText } from '@utils/lexical/extract-plain-text';
 import { dayjs } from '@utils/dayjs';
 import { readingMinutes } from '@utils/reading-minutes';
+
+import { toDetailSeo } from '../../to-detail-seo';
 
 import type { Post } from '../../../../app/(site)/blog/_lib/post';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
@@ -20,5 +22,6 @@ export const toBlogPost = (doc: Blog, index: string): Post => {
     excerpt: doc.excerpt,
     readMin: readingMinutes(extractPlainText(body)),
     body,
+    seo: toDetailSeo(doc.meta),
   };
 };

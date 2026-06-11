@@ -55,4 +55,18 @@ describe('toNewsItem', () => {
     expect(item.title).toBe('お知らせ');
     expect(item.category).toBe('dj');
   });
+
+  it('maps the SEO meta group (title/description/populated image)', () => {
+    const meta = { title: 'Meta Title', description: 'meta desc', image: { id: 9, alt: '', url: '/media/og.jpg', updatedAt: '', createdAt: '' } } as News['meta'];
+    expect(toNewsItem(makeDoc({ meta })).seo).toEqual({ title: 'Meta Title', description: 'meta desc', image: '/media/og.jpg' });
+  });
+
+  it('leaves seo undefined when meta is absent', () => {
+    expect(toNewsItem(makeDoc({})).seo).toBeUndefined();
+  });
+
+  it('omits the seo image when meta.image is an unpopulated id', () => {
+    const meta = { title: 'T', image: 7 } as News['meta'];
+    expect(toNewsItem(makeDoc({ meta })).seo).toEqual({ title: 'T', description: undefined, image: undefined });
+  });
 });

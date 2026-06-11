@@ -11,6 +11,7 @@ import { PageHeader } from '@components/page-header';
 import { RichText } from '@components/rich-text';
 import { extractHeadings } from '@components/rich-text/toc';
 import { dayjs } from '@utils/dayjs';
+import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
 
@@ -36,17 +37,16 @@ const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const { id } = await params;
   const post = await findBlogById(id);
+  if (post === undefined) return { title: 'blog', description: '記事' };
 
-  return {
-    get title() {
-      if (post === undefined) return 'blog';
-      return post.title;
-    },
-    get description() {
-      if (post === undefined) return '記事';
-      return post.excerpt;
-    },
-  };
+  return resolveDetailMetadata({
+    docTitle: post.title,
+    seo: post.seo,
+    body: post.body,
+    descriptionCandidates: [post.excerpt],
+    genericDescription: '記事',
+    defaultImage: '/og-default.png',
+  });
 };
 
 const BlogDetailPage = async ({ params }: Props) => {

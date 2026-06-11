@@ -10,6 +10,7 @@ import * as s from './styles.css';
 import { findWorkById, findWorksList } from '@lib/payload/works';
 
 import { PageHeader } from '@components/page-header';
+import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
 
@@ -35,16 +36,17 @@ const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const { id } = await params;
   const work = await findWorkById(id);
+  if (work === undefined) return { title: 'works' };
 
-  return {
-    get title() {
-      if (work === undefined) return 'works';
-      return work.title;
-    },
-    get description() {
-      return work?.description;
-    },
-  };
+  return resolveDetailMetadata({
+    docTitle: work.title,
+    seo: work.seo,
+    body: work.body,
+    descriptionCandidates: [work.description],
+    imageCandidates: [work.thumbnail?.src],
+    genericDescription: 'works',
+    defaultImage: '/og-default.png',
+  });
 };
 
 const WorkDetailPage = async ({ params }: Props) => {

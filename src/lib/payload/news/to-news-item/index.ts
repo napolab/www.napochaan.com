@@ -1,5 +1,7 @@
 import { dayjs } from '@utils/dayjs';
 
+import { toDetailSeo } from '../../to-detail-seo';
+
 import type { NewsItem } from '../../../../app/(site)/news/_lib/news-item';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { News } from '@payload-types';
@@ -19,4 +21,5 @@ export const toNewsItem = (doc: News): NewsItem => ({
   title: doc.title,
   url: doc.url !== null && doc.url !== '' ? doc.url : undefined,
   body: (doc.body ?? undefined) as SerializedEditorState | undefined,
+  seo: toDetailSeo(doc.meta),
 });

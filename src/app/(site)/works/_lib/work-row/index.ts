@@ -16,4 +16,8 @@ export type WorkRow = {
   thumbnail?: { src: string; width: number; height: number };
   description?: string;
   body?: SerializedEditorState;
+  // Admin-entered SEO overrides (Payload SEO plugin `meta` group), coerced from
+  // the wire format: NULLs → undefined and the populated media → its url string.
+  // Consumed by the detail page's generateMetadata.
+  seo?: { title?: string; description?: string; image?: string };
 };

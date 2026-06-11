@@ -32,4 +32,21 @@ describe('toBlogPost', () => {
   it('derives readMin from the body (minimum 1)', () => {
     expect(toBlogPost(base, '01').readMin).toBe(1);
   });
+
+  it('maps the SEO meta group (title/description/populated image)', () => {
+    const withMeta = {
+      ...base,
+      meta: { title: 'Meta Title', description: 'meta desc', image: { id: 9, alt: '', url: '/media/og.jpg', updatedAt: '', createdAt: '' } },
+    } as unknown as Blog;
+    expect(toBlogPost(withMeta, '01').seo).toEqual({ title: 'Meta Title', description: 'meta desc', image: '/media/og.jpg' });
+  });
+
+  it('leaves seo undefined when meta is absent', () => {
+    expect(toBlogPost(base, '01').seo).toBeUndefined();
+  });
+
+  it('omits the seo image when meta.image is an unpopulated id', () => {
+    const withMeta = { ...base, meta: { title: 'T', image: 7 } } as unknown as Blog;
+    expect(toBlogPost(withMeta, '01').seo).toEqual({ title: 'T', description: undefined, image: undefined });
+  });
 });
