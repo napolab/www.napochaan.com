@@ -32,6 +32,7 @@ import { CursorPresenceDemo } from './cursor-presence-demo';
 import { GalleryArchiveLazy } from './gallery-archive-lazy';
 import { GalleryLazy } from './gallery-lazy';
 import { GameOfLifeDemo } from './game-of-life-demo';
+import { NoAction } from './no-action';
 import { richTextSample } from './rich-text-sample';
 import { TypographyBandDemo } from './typography-band-demo';
 
@@ -50,9 +51,10 @@ import type { ReactNode } from 'react';
 // demo without a content entry) is a compile error.
 type ComponentName = (typeof colophon.components.items)[number]['name'];
 
-// Demo data only — every href is dropped / neutralized so interacting with a
-// showcased component on the colophon never navigates off the page. Timeline
-// reads as plain (no clickable title) when href is omitted.
+// Demo data only — every demo that carries an href is wrapped in <NoAction>
+// (capture-phase preventDefault) so interacting with a showcased component on
+// the colophon never navigates. Timeline reads as plain (no clickable title)
+// when href is omitted.
 const timelineItems: TimelineItem[] = [
   { id: '1', date: '06/14', label: 'night vol.19 @ club eleven', meta: 'Tokyo', upcoming: true },
   { id: '2', date: '05/03', label: 'dawn session @ rooftop', meta: 'DJ set' },
@@ -107,12 +109,13 @@ const descItems = [
   { term: 'equipment', description: 'Technics SL-1200, Pioneer DJM-900' },
 ];
 
-// '#' keeps every demo link on the colophon (no cross-page navigation).
-const breadcrumbItems = [{ href: '#', label: 'home' }, { href: '#', label: 'works' }, { label: 'night vol.13' }];
+// Realistic hrefs — navigation is neutralized by the <NoAction> wrapper, not by
+// dummy URLs, so the markup matches real usage.
+const breadcrumbItems = [{ href: '/', label: 'home' }, { href: '/works', label: 'works' }, { label: 'night vol.13' }];
 
-// Demo-only href: stays on the page. (In real use the consumer owns the URL shape;
+// Demo-only href builder. (In real use the consumer owns the URL shape;
 // Pagination owns layout / a11y / routing.)
-const paginationHref = (): string => '#';
+const paginationHref = (page: number): string => `?page=${page}`;
 
 // Live demos keyed by component name, mapped against colophon.components.items in
 // the page. Kept out of content.ts so the data file stays JSX-free.
@@ -134,7 +137,11 @@ export const demos: Record<ComponentName, ReactNode> = {
       works
     </SectionHeading>
   ),
-  RichText: <RichText data={richTextSample} />,
+  RichText: (
+    <NoAction>
+      <RichText data={richTextSample} />
+    </NoAction>
+  ),
   PhrasedText: <PhrasedText>文章は、読みやすい位置でちゃんと折り返したいんだよなぁ。</PhrasedText>,
   Card: <Card as="div">night vol.13 — 2024.03.15 at Club Eleven</Card>,
   Figure: (
@@ -197,12 +204,12 @@ export const demos: Record<ComponentName, ReactNode> = {
   TextField: <TextField label="name / お名前" name="demo-name" defaultValue="napochaan" autoComplete="off" />,
   TextArea: <TextArea label="message / 本文" name="demo-message" rows={3} defaultValue="はじめまして。" autoComplete="off" />,
   Link: (
-    <>
-      <Link href="#">作品一覧</Link>{' '}
-      <Link href="#" tone="muted">
+    <NoAction>
+      <Link href="/works">作品一覧</Link>{' '}
+      <Link href="/about" tone="muted">
         About
       </Link>
-    </>
+    </NoAction>
   ),
   Divider: (
     <>
@@ -210,9 +217,21 @@ export const demos: Record<ComponentName, ReactNode> = {
       <Divider variant="dashed" />
     </>
   ),
-  Pagination: <Pagination currentPage={3} totalPages={5} href={paginationHref} />,
-  Breadcrumbs: <Breadcrumbs items={breadcrumbItems} />,
-  FeedLink: <FeedLink href="/news/rss.xml" label="サンプル RSS フィード" />,
+  Pagination: (
+    <NoAction>
+      <Pagination currentPage={3} totalPages={5} href={paginationHref} />
+    </NoAction>
+  ),
+  Breadcrumbs: (
+    <NoAction>
+      <Breadcrumbs items={breadcrumbItems} />
+    </NoAction>
+  ),
+  FeedLink: (
+    <NoAction>
+      <FeedLink href="/news/rss.xml" label="サンプル RSS フィード" />
+    </NoAction>
+  ),
   DecodingSkeleton: <DecodingSkeleton rows={4} />,
   TypographyBand: <TypographyBandDemo />,
   GameOfLife: <GameOfLifeDemo />,
