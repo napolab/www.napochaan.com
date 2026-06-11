@@ -27,7 +27,9 @@ const fetchNewsList = unstable_cache(
     const result = await payload.find({
       collection: 'news',
       where: publishedWhere,
-      sort: '-publishedAt',
+      // Pinned items first (the `pinned` checkbox), then newest by date. Among
+      // pinned items, newest date still wins.
+      sort: ['-pinned', '-publishedAt'],
       limit: 0,
     });
 
@@ -95,7 +97,9 @@ const fetchLatestNews = unstable_cache(
     const result = await payload.find({
       collection: 'news',
       where: publishedWhere,
-      sort: '-publishedAt',
+      // Pinned items first, then newest by date. The home teaser shows the top
+      // `limit` of this order, so a pinned item is always featured.
+      sort: ['-pinned', '-publishedAt'],
       limit,
     });
 

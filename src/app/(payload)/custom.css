@@ -14,3 +14,40 @@
 .rich-text-lexical .ContentEditable__root {
   font-family: var(--font-line-seed-jp), system-ui, sans-serif;
 }
+
+/* Pinned-news strip (admin.components.beforeListTable). A plain vertical list of
+ * every pinned item above the news list table — no background fill, so it sits
+ * flat on the admin surface. Colors borrow Payload's elevation variables so it
+ * tracks the active theme. */
+.news-pinned-strip {
+  margin-bottom: var(--base);
+}
+
+.news-pinned-strip__heading {
+  font-size: 0.875rem;
+  color: var(--theme-elevation-600);
+}
+
+.news-pinned-strip__list {
+  list-style: none;
+  margin: calc(var(--base) * 0.5) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base) * 0.5);
+}
+
+.news-pinned-strip__item {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--base) * 0.1);
+}
+
+.news-pinned-strip__title {
+  font-weight: 600;
+}
+
+.news-pinned-strip__meta {
+  font-size: 0.8125rem;
+  color: var(--theme-elevation-500);
+}

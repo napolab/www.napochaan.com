@@ -185,8 +185,11 @@ export interface Media {
  */
 export interface News {
   id: number;
-  _order?: string | null;
   title: string;
+  /**
+   * オンにすると、このお知らせを news の先頭に固定表示する。
+   */
+  pinned?: boolean | null;
   publishedAt: string;
   /**
    * お知らせの活動カテゴリ。お知らせ/サポート/登壇/DJ/VJ/フライヤー/制作 から選ぶ。
@@ -492,8 +495,8 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "news_select".
  */
 export interface NewsSelect<T extends boolean = true> {
-  _order?: T;
   title?: T;
+  pinned?: T;
   publishedAt?: T;
   category?: T;
   url?: T;

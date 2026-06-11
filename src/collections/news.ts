@@ -15,13 +15,18 @@ const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news
 export const News = {
   slug: 'news',
   labels: { singular: 'news', plural: 'news' },
-  // Drag-and-drop reordering in the admin list view (Payload stores a hidden
-  // fractional-index `_order` and sorts by it by default). Public reads keep their
-  // own explicit publishedAt sort (see lib/payload/news), so only the admin order is manual.
-  orderable: true,
+  // Default to newest-first so the admin list mirrors the public order (pinned
+  // items still float to the top of the public feed via the explicit
+  // `['-pinned', '-publishedAt']` sort in lib/payload/news).
+  defaultSort: '-publishedAt',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'category', 'publishedAt', '_status'],
+    defaultColumns: ['pinned', 'title', 'category', 'publishedAt', '_status'],
+    components: {
+      // A strip above the list table that always shows every pinned item,
+      // independent of the table's pagination/filtering. See the component.
+      beforeListTable: ['/components/admin/news-pinned-strip#NewsPinnedStrip'],
+    },
   },
   access: {
     // Logged-in admins see everything (drafts included); the public site only
@@ -45,6 +50,19 @@ export const News = {
       label: 'タイトル',
       type: 'text',
       required: true,
+    },
+    {
+      // Pinned items float to the top of the public feed (home teaser + /news),
+      // ahead of the default newest-first date order. Among pinned items, newest
+      // date wins. See the `['-pinned', '-publishedAt']` sort in lib/payload/news.
+      name: 'pinned',
+      label: 'ピン留め',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description: 'オンにすると、このお知らせを news の先頭に固定表示する。',
+      },
     },
     {
       name: 'publishedAt',
