@@ -19,7 +19,7 @@ type TitleSlug = 'news' | 'works' | 'blog' | 'logs';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.resolve(dirname, 'data');
-const assetsDir = path.resolve(dirname, '..', 'assets');
+const assetsDir = path.resolve(dirname, 'assets');
 
 const ADMIN_EMAIL = process.env.PAYLOAD_SEED_EMAIL ?? 'dev@napochaan.com';
 const ADMIN_PASSWORD = process.env.PAYLOAD_SEED_PASSWORD ?? 'password';
@@ -57,7 +57,7 @@ export const ensureAdminUser = async (instance: Payload): Promise<void> => {
 };
 
 // ---------------------------------------------------------------------------
-// Media resolution: find a file by name anywhere under src/assets, then
+// Media resolution: find a file by name anywhere under src/seed/assets, then
 // find-or-create its media row. Returns the media id, or undefined if the file
 // is missing (caller leaves the relationship unset rather than crashing).
 // ---------------------------------------------------------------------------

@@ -20,7 +20,7 @@ import type { Payload, SanitizedConfig } from 'payload';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.resolve(dirname, 'data');
-const assetsDir = path.resolve(dirname, '..', 'assets');
+const assetsDir = path.resolve(dirname, 'assets');
 
 // Keys Payload manages for us — never hand-edited, regenerated on import.
 // `globalType` is injected by findGlobal and rejected by updateGlobal on the way back.
@@ -59,7 +59,7 @@ const toDayDate = (value: unknown): unknown => (typeof value === 'string' ? dayj
 const formatDayField = (record: Record<string, unknown>, key: string): Record<string, unknown> => Object.fromEntries(Object.entries(record).map(([k, v]) => (k === key ? [k, toDayDate(v)] : [k, v])));
 
 // A populated upload relationship (depth: 1) is the Media object; pull its
-// filename so the import side can re-resolve the file from src/assets.
+// filename so the import side can re-resolve the file from src/seed/assets.
 const mediaFilename = (value: number | Media | null | undefined): string | undefined => {
   if (value === null || value === undefined) return undefined;
   if (typeof value === 'number') return undefined;
