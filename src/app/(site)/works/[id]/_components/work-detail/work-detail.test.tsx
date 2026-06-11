@@ -25,12 +25,11 @@ describe('WorkDetail', () => {
     expect(img?.getAttribute('alt')).toBe('ALICE portrait series');
   });
 
-  it('renders the spec dl with type, year and no', async () => {
-    await render(<WorkDetail work={work} />);
+  it('renders the type and year meta line', async () => {
+    const { container } = await render(<WorkDetail work={work} />);
 
-    await expect.element(page.getByText('graphic', { exact: true })).toBeInTheDocument();
-    await expect.element(page.getByText('2024', { exact: true })).toBeInTheDocument();
-    await expect.element(page.getByText('07', { exact: true })).toBeInTheDocument();
+    // WorkDetail renders a single mono meta line "<type> · <year>" (no `no`).
+    expect(container.textContent).toContain('graphic · 2024');
   });
 
   it('renders the rich-text body when present', async () => {
