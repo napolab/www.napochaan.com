@@ -29,7 +29,7 @@ type Props = {
 export const GallerySection = ({ id, photos }: Props) => {
   return (
     <section id={id} className={styles.root}>
-      <SectionHeading no="04" href="/gallery" more="flyer / VRChat →" moreHref="/gallery">
+      <SectionHeading no="04" href="/gallery" more="$ open gallery/" moreHref="/gallery">
         gallery
       </SectionHeading>
       <Gallery items={toGalleryItems(photos)} />

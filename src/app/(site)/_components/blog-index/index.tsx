@@ -15,7 +15,7 @@ type Props = {
 export const BlogIndex = ({ id, posts }: Props) => {
   return (
     <section id={id} className={styles.root}>
-      <SectionHeading no="05" more="zenn / blog →" moreHref="/blog">
+      <SectionHeading no="05" more="$ cat blog/" moreHref="/blog">
         blog
       </SectionHeading>
       <ol className={styles.list}>

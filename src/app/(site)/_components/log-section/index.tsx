@@ -17,7 +17,7 @@ const toTimelineItems = (entries: readonly LogEntry[]): TimelineItem[] =>
 export const LogSection = ({ id, entries }: Props) => {
   return (
     <section id={id} className={styles.root}>
-      <SectionHeading no="03" href="/log" more="活動年表 →" moreHref="/log">
+      <SectionHeading no="03" href="/log" more="$ git log" moreHref="/log">
         log
       </SectionHeading>
       <Timeline items={toTimelineItems(entries)} />

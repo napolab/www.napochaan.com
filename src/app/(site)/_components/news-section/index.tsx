@@ -37,12 +37,12 @@ const NewsTitle = ({ title, href }: { title: string; href?: string }) => {
 export const NewsSection = ({ items }: Props) => {
   return (
     <section className={styles.root}>
-      <SectionHeading no="01" more="お知らせ →" moreHref="/news">
+      <SectionHeading no="01" more="$ tail news" moreHref="/news">
         news
       </SectionHeading>
-      {/* news = curated important notices; the home feed shows the latest 3, full list at /news. */}
+      {/* news = curated important notices; the home feed shows the top 5 (pinned first, then newest), full list at /news. */}
       <ol className={styles.log}>
-        {items.slice(0, 3).map((item) => (
+        {items.slice(0, 5).map((item) => (
           <li key={item.id} className={styles.item}>
             <span className={styles.date}>{item.date}</span>
             <span className={styles.category}>

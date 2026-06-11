@@ -54,7 +54,7 @@ const toRows = (works: readonly WorkRow[]): Record<string, ReactNode>[] =>
 export const WorksSection = ({ id, works }: Props) => {
   return (
     <section id={id} className={styles.root}>
-      <SectionHeading no="02" more="実績 →" moreHref="/works">
+      <SectionHeading no="02" more="$ ls works/" moreHref="/works">
         works
       </SectionHeading>
       <Table columns={columns} rows={toRows(works)} />

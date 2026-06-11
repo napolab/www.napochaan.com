@@ -53,7 +53,7 @@ const HOME_LOG_LIMIT = 5;
 
 const HomePage = async () => {
   const [latest, works, blogPosts, galleryPhotos, logs, externalPosts] = await Promise.all([
-    findLatestNews(3),
+    findLatestNews(5),
     findWorksList(),
     findBlogList(),
     findGalleryList(),
