@@ -30,6 +30,20 @@ describe('ScrambleText', () => {
     expect(exposed.some((el) => el.textContent === 'archive')).toBe(true);
   });
 
+  // A trailing adornment (e.g. an external-link ↗) renders as an in-flow sibling of
+  // the inline ghost so it tucks against the LAST wrapped line instead of orphaning
+  // below the atomic inline-block box. Decorative — the caller marks it aria-hidden,
+  // so it must not leak into the link's accessible name (which stays the text only).
+  it('renders a trailing adornment without leaking into the accessible name', async () => {
+    const screen = await render(
+      <a href="/x">
+        <ScrambleText trailing={<span aria-hidden="true">↗</span>}>archive</ScrambleText>
+      </a>,
+    );
+    await expect.element(page.getByRole('link', { name: 'archive' })).toBeInTheDocument();
+    expect(screen.container.textContent).toContain('↗');
+  });
+
   // truncate drives a `data-truncate` hook the styles target so the painted (absolute)
   // fill and the in-flow ghost both clip to a single ellipsised line — a parent's
   // `text-overflow:ellipsis` can't reach the absolute fill on its own.

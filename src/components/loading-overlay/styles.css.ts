@@ -74,6 +74,16 @@ export const status = css({
   color: 'fg.onSolid',
 });
 
+// Static markdown-style quote marker that prefixes the typed prompt. It sits
+// before the question and never types — the line reads like a quoted boot log
+// (`> ARE YOU HERE…`). Lives outside the BootQuestion island so the typewriter
+// only owns the question text. flex-shrink:0 keeps it pinned while the nowrap
+// prompt cycles to its longest variant.
+export const quote = css({
+  flexShrink: 0,
+  marginInlineEnd: '[0.5em]',
+});
+
 export const caret = css({
   display: 'inline-block',
   width: '[0.6em]',

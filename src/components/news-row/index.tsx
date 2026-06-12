@@ -21,14 +21,18 @@ const NewsRowTitle = ({ title, href }: { title: string; href?: string }) => {
 
   const external = isExternal(href);
 
+  // The ↗ rides inside ScrambleText as a trailing slot so it tucks against the last
+  // wrapped line of the title — as a sibling of the atomic inline-block scramble box
+  // it would orphan onto its own line whenever the title wraps.
+  const externalMark = external ? (
+    <span className={styles.externalMark} aria-hidden="true">
+      ↗
+    </span>
+  ) : undefined;
+
   return (
     <Link href={href} tone="accent" className={styles.titleLink} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
-      <ScrambleText>{title}</ScrambleText>
-      {external ? (
-        <span className={styles.externalMark} aria-hidden="true">
-          ↗
-        </span>
-      ) : null}
+      <ScrambleText trailing={externalMark}>{title}</ScrambleText>
     </Link>
   );
 };

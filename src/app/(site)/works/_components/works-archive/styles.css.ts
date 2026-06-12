@@ -184,12 +184,14 @@ export const title = css({
   fontSize: 'md',
 });
 
-// Bottom meta row: type label + go-to arrow. On mobile the arrow sits right next
-// to the type (left-packed); on desktop it's pushed to the row's right edge.
+// Bottom meta row: type label + go-to arrow. The arrow sits right next to the type
+// (left-packed) at every breakpoint — `gap: inline` is the only space between them —
+// so the affordance reads as one unit with the tag instead of floating at the row's
+// far right.
 export const meta = css({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: { base: 'flex-start', desktop: 'space-between' },
+  justifyContent: 'flex-start',
   gap: 'inline',
 });
 

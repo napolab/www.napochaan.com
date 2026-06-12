@@ -13,6 +13,8 @@ import { clsx } from '@utils/clsx';
 
 import * as styles from './styles.css';
 
+import type { ReactNode } from 'react';
+
 gsap.registerPlugin(ScrambleTextPlugin, ScrollTrigger);
 
 // Desktop hover starts here (768px = the `desktop` breakpoint). Below it there is
@@ -43,6 +45,13 @@ type BaseProps = {
   // the styles cap the root width and apply the ellipsis to BOTH the in-flow ghost
   // (reserves the capped line) and the fill (paints the "…"). Used by adjacent-nav.
   truncate?: boolean;
+  // Optional decoration painted right after the text (e.g. an external-link ↗). It
+  // renders as an in-flow sibling of the inline ghost, so it tucks against the LAST
+  // wrapped line instead of orphaning below the atomic inline-block box — a trailing
+  // sibling of the whole ScrambleText would drop to its own line on wrap. It is NOT
+  // scrambled (the decode only churns the fill's text). Pass an aria-hidden node:
+  // the accessible name stays the text alone (carried by the clipped srOnly copy).
+  trailing?: ReactNode;
 };
 
 // The hover host is always passed as a value — never resolved by walking up the
@@ -64,7 +73,7 @@ type Props = BaseProps & ({ trigger?: 'self' } | { trigger: 'group'; host: HTMLE
 // name stays stable while the glyphs churn — and the name survives even in plain
 // text context, where `aria-label` on the generic root span would be prohibited.
 export const ScrambleText = (props: Props) => {
-  const { children, className, clamp, truncate } = props;
+  const { children, className, clamp, truncate, trailing } = props;
   const rootRef = useRef<HTMLSpanElement>(null);
   const fillRef = useRef<HTMLSpanElement>(null);
 
@@ -162,6 +171,10 @@ export const ScrambleText = (props: Props) => {
       <span ref={fillRef} aria-hidden className={styles.fill}>
         {children}
       </span>
+      {/* In-flow sibling of the inline ghost — tucks against the last wrapped line.
+          srOnly and fill are out of flow (clipped / absolute), so this follows the
+          ghost's last glyph directly. The caller styles + aria-hides it. */}
+      {trailing}
     </span>
   );
 };

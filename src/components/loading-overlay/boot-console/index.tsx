@@ -13,6 +13,7 @@ export const BootConsole = () => {
         napochaan
       </p>
       <p className={styles.status}>
+        <span className={styles.quote}>{'>'}</span>
         <BootQuestion />
       </p>
       <div className={styles.bar}>
