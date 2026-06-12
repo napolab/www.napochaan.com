@@ -1,5 +1,4 @@
 import { extractPlainText } from '@utils/lexical/extract-plain-text';
-import { firstImageSrc } from '@utils/lexical/first-image-src';
 
 import type { Metadata } from 'next';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
@@ -21,12 +20,13 @@ export type ResolveDetailMetadataArgs = {
   // Entity-specific description sources tried in order before the body excerpt
   // (e.g. blog `excerpt`, works `description`). Empty strings are ignored.
   descriptionCandidates?: readonly (string | undefined)[];
-  // Entity-specific image sources tried in order before the body image
-  // (e.g. works `thumbnail.src`). Empty strings are ignored.
+  // Accepted but ignored: the file-convention `opengraph-image.tsx` route now
+  // owns og:image / twitter:image for detail pages, so this helper no longer
+  // emits explicit images. Kept so the three call sites compile unchanged.
   imageCandidates?: readonly (string | undefined)[];
   // Per-page generic JP fallback when no description source yields text.
   genericDescription: string;
-  // Site default og:image used when no other image source is found.
+  // Accepted but ignored — see `imageCandidates`.
   defaultImage: string;
 };
 
@@ -75,21 +75,14 @@ const resolveDescription = (args: ResolveDetailMetadataArgs): string => {
   return bodyExcerpt(args.body) ?? args.genericDescription;
 };
 
-// First non-empty: meta → field candidates → first body image → site default.
-const resolveImage = (args: ResolveDetailMetadataArgs): string => {
-  const fromCandidates = firstNonEmpty([args.seo?.image, ...(args.imageCandidates ?? [])]);
-  if (fromCandidates !== undefined) return fromCandidates;
-
-  return firstImageSrc(args.body) ?? args.defaultImage;
-};
-
 // Builds a Next `Metadata` object from the admin `meta` group with content-derived
 // fallbacks. When `meta.title` is set it is the complete title (bypasses the root
 // `%s — napochaan` template via `absolute`); otherwise the bare docTitle is
-// returned so the template appends the suffix. Pure.
+// returned so the template appends the suffix. og:image / twitter:image are
+// intentionally NOT emitted — the file-convention `opengraph-image.tsx` route
+// owns them for detail pages (emitting them here would override that). Pure.
 export const resolveDetailMetadata = (args: ResolveDetailMetadataArgs): Metadata => {
   const description = resolveDescription(args);
-  const image = resolveImage(args);
   const metaTitle = args.seo?.title;
   const hasMetaTitle = metaTitle !== undefined && metaTitle !== '';
   const displayTitle = hasMetaTitle ? metaTitle : `${args.docTitle}${SUFFIX}`;
@@ -105,8 +98,7 @@ export const resolveDetailMetadata = (args: ResolveDetailMetadataArgs): Metadata
       url: args.path,
       title: displayTitle,
       description,
-      images: [{ url: image }],
     },
-    twitter: { card: 'summary_large_image', title: displayTitle, description, images: [image] },
+    twitter: { card: 'summary_large_image', title: displayTitle, description },
   };
 };
