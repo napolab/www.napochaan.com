@@ -3,5 +3,5 @@
 // the same localhost fallback used by robots / llms.txt.
 export const absoluteUrl = (path: string): string => {
   const base = process.env.BASE_URL ?? 'http://localhost:3000';
-  return `${base}${path}`;
+  return new URL(path, base).toString();
 };
