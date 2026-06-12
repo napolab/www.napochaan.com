@@ -159,138 +159,267 @@
     "title": "v1.0.0 www.napochaan.com",
     "type": "production",
     "date": "2020-04-10",
-    "url": "https://naporitan.hatenablog.com/entry/2020/04/10/025705",
+    "url": "",
     "description": "イメージキャラクターのイラストを ひそなさん に描いてもらったのをきっかけに作った、初めてのポートフォリオサイト。HTML と React で構築した。",
     "body": {
       "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
         "children": [
           {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
             "children": [
               {
-                "type": "text",
-                "text": "イメージキャラクターのイラストを ",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
                 "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "イメージキャラクターのイラストを ",
+                "type": "text",
                 "version": 1
               },
               {
-                "type": "link",
-                "format": "",
-                "indent": 0,
-                "version": 1,
-                "direction": "ltr",
-                "fields": {
-                  "linkType": "custom",
-                  "url": "https://skeb.jp/@Hisona_",
-                  "newTab": true
-                },
                 "children": [
                   {
-                    "type": "text",
-                    "text": "ひそなさん",
-                    "format": 0,
-                    "style": "",
-                    "mode": "normal",
                     "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "ひそなさん",
+                    "type": "text",
                     "version": 1
                   }
-                ]
-              },
-              {
-                "type": "text",
-                "text": " に描いてもらったことをきっかけに、初めてのポートフォリオサイト napochaan.me を作成した。HTML と React で構築した、自分にとって最初のホームページ。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
-                "detail": 0,
-                "version": 1
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
-            "children": [
-              {
-                "type": "text",
-                "text": "数年カレンダーを買い続けるほど好きなイラストレーターに描いてもらったキャラクターで、特に目の表現が気に入っている。このイラストを主役に据えてサイトを組み立てた。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
-                "detail": 0,
-                "version": 1
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
-            "children": [
-              {
-                "type": "text",
-                "text": "ここから始まり、後に ",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
-                "detail": 0,
-                "version": 1
-              },
-              {
-                "type": "link",
+                ],
+                "direction": "ltr",
                 "format": "",
                 "indent": 0,
-                "version": 1,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "http://suoiretsym.com/",
+                  "newTab": true,
+                  "linkType": "custom"
+                }
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " に描いてもらったことをきっかけに、初めてのポートフォリオサイト napochaan.me を React で構築した。(ドメイン失効済み。",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "napochaan.com",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://napochaan.com",
+                  "newTab": true,
+                  "linkType": "custom"
+                },
+                "id": "6a2bbdff4783cbf7499178c6"
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " に移行した。)",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "自分にとって最初のホームページ制作となった。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "数年カレンダーを買い続けるほど好きなイラストレーターに描いてもらったキャラクターで、特に目の表現が気に入っている。このイラストを主役に据えてサイトを組み立てた。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "ここから始まり、後に ",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "v2.0.0",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
                 "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
                 "fields": {
                   "linkType": "custom",
                   "url": "/works/10",
                   "newTab": false
-                },
-                "children": [
-                  {
-                    "type": "text",
-                    "text": "v2.0.0",
-                    "format": 0,
-                    "style": "",
-                    "mode": "normal",
-                    "detail": 0,
-                    "version": 1
-                  }
-                ]
+                }
               },
               {
-                "type": "text",
-                "text": " として作り直した。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
                 "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " として作り直した。",
+                "type": "text",
                 "version": 1
               }
-            ]
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "はてなブログ",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://naporitan.hatenablog.com/entry/2020/04/10/025705",
+                  "linkType": "custom"
+                },
+                "id": "6a2bb2304783cbf7499178bd"
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " から移植",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
           }
-        ]
+        ],
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
       }
     },
     "_status": "published",
@@ -1573,7 +1702,7 @@
     "thumbnailFile": "vrchat-event-poster.png"
   },
   {
-    "title": "risrill.club birthday 2025 website",
+    "title": "BirthdayWebSite risrill.club 2025",
     "type": "production",
     "date": "2025-07-07",
     "url": "https://ristill.club/2025",
@@ -1993,36 +2122,80 @@
     "title": "企画展『思弁的な音楽』 r-906《額縁の言葉 : I》",
     "type": "support",
     "date": "2025-12-10",
-    "url": "https://x.com/naporin24690/status/1998715240075374793",
+    "url": "",
     "description": "体験型展示作品の背景映像・システム構築を担当した。",
     "body": {
       "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
         "children": [
           {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
             "children": [
               {
-                "type": "text",
-                "text": "企画展『思弁的な音楽』に出展された r-906 の体験型展示作品《額縁の言葉 : I》で、背景映像とシステム構築を担当した。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
                 "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "企画展『思弁的な音楽』に出展された r-906 の体験型展示作品《額縁の言葉 : I》で、背景映像とシステム構築を担当した。",
+                "type": "text",
                 "version": 1
               }
-            ]
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "type": "autolink",
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "https://x.com/naporin24690/status/1998715240075374793",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/naporin24690/status/1998715240075374793"
+                },
+                "format": "",
+                "indent": 0,
+                "version": 2
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
           }
-        ]
+        ],
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
       }
     },
     "_status": "published",
@@ -2032,36 +2205,80 @@
     "title": "椎乃味醂ライブイベント「ハーモニー」ペア決めあみだくじシステム",
     "type": "production",
     "date": "2026-01-18",
-    "url": "https://x.com/naporin24690/status/2012874773630685212",
+    "url": "",
     "description": "F2Fのペアを決めるあみだくじシステムを実装した。",
     "body": {
       "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
         "children": [
           {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
             "children": [
               {
-                "type": "text",
-                "text": "椎乃味醂のライブイベント「ハーモニー」で、F2F のペアを決めるあみだくじシステムを実装した。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
                 "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "椎乃味醂のライブイベント「ハーモニー」で、F2F のペアを決めるあみだくじシステムを実装した。",
+                "type": "text",
                 "version": 1
               }
-            ]
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "type": "autolink",
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "https://x.com/naporin24690/status/2012874773630685212",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/naporin24690/status/2012874773630685212"
+                },
+                "format": "",
+                "indent": 0,
+                "version": 2
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
           }
-        ]
+        ],
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
       }
     },
     "_status": "published",
@@ -2071,7 +2288,7 @@
     "title": "VRDJイベント Booth2Booth 公式サイト",
     "type": "production",
     "date": "2026-04-12",
-    "url": "https://x.com/naporin24690/status/2043185292337975601",
+    "url": "",
     "description": "デザイン/実装担当。コンセプト設計重視・高インタラクションな公式サイト（booth2booth.com）を制作した。",
     "body": {
       "root": {
@@ -2146,32 +2363,57 @@
     "description": "モーキャプシステム構築・アニメーション補正を担当した。",
     "body": {
       "root": {
-        "type": "root",
-        "format": "",
-        "indent": 0,
-        "version": 1,
-        "direction": "ltr",
         "children": [
           {
-            "type": "paragraph",
-            "textFormat": 0,
-            "format": "",
-            "indent": 0,
-            "version": 1,
-            "direction": "ltr",
             "children": [
               {
-                "type": "text",
-                "text": "#ProjectCircles の椎乃味醂ライブセクションで、モーションキャプチャシステムの構築とアニメーション補正を担当した。",
-                "format": 0,
-                "style": "",
-                "mode": "normal",
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "#ProjectCircles",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "linkType": "custom",
+                  "newTab": false,
+                  "url": "https://pjcircles.com/"
+                },
+                "id": "6a2bc39916529d76406cfa5a"
+              },
+              {
                 "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " の椎乃味醂ライブセクションで、モーションキャプチャシステムの構築とアニメーション補正を担当した。",
+                "type": "text",
                 "version": 1
               }
-            ]
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
           }
-        ]
+        ],
+        "direction": "ltr",
+        "format": "",
+        "indent": 0,
+        "type": "root",
+        "version": 1
       }
     },
     "_status": "published",
