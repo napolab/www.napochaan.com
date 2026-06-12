@@ -18,7 +18,6 @@
 - review で繰り返し受けた内容は rules, skills にすることで永続化して
     - review の内容はまず memory に記憶して繰り返し指摘されるものは skills にすること
 
-
 ## coding rules
 
 - あなたは実装計画、ステークホルダーである私に対して要件のブレがなくなるまで AskUserQuestion で質問することに努め、実装は subagent に任せること
@@ -39,7 +38,12 @@
   2. `react-aria-components` で実装
   3. 独自実装を行う前に UI の変更の提案をする
   4. 独自実装で UI を実装する
-
+- リンクを使いたい時は `react-aria-components` の Link を利用すること
+    - `react-aria-components` の RouterProvider が利用されていることが前提
+- `next/image` の代わりに `src/components/image` を利用すること
+    - 初期画像表示最適化のために `src/components/image/helper.ts` にある `formatBlurURL` をセットしておくこと
+- `src/components` に UI を追加したら colophon にも追加すること
+    - colophon で link/href を設定するときは `e.preventDefault` して noaction にしてほしい
 
 ## ref repository
 
