@@ -26,6 +26,70 @@ type Props = {
   board: OgLifeBoard; // full-card GoL board (faint background texture)
 };
 
+const Chip = ({ label }: { label: string }) => (
+  <div style={{ display: 'flex' }}>
+    <div style={{ background: BLUE, color: '#fff', padding: '5px 12px', fontFamily: MONO, fontSize: 15 }}>{label}</div>
+  </div>
+);
+
+const Signature = ({ wordmarkUrl, meta }: { wordmarkUrl: string; meta: string }) => (
+  <div style={{ display: 'flex', flexDirection: 'column' }}>
+    <img src={wordmarkUrl} width={344} height={84} style={{ width: 344, height: 84 }} />
+    <div style={{ marginTop: 14, fontFamily: MONO, fontSize: 12, letterSpacing: 2, color: SUBTLE }}>{meta}</div>
+  </div>
+);
+
+// Image present → two columns split by a divider, thumbnail on the right.
+const ImageLayout = ({ data, wordmarkUrl }: { data: OgCardData; wordmarkUrl: string }) => (
+  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'row' }}>
+    <div
+      style={{
+        width: COL_W,
+        flexShrink: 0,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: 40,
+        borderRight: `2px solid ${INK}`,
+        overflow: 'hidden',
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: 2, color: MUTED }}>NAPOCHAAN.COM</div>
+        <div style={{ display: 'flex', marginTop: 22 }}>
+          <Chip label={data.label} />
+        </div>
+        <div style={{ marginTop: 18, fontFamily: JP, fontWeight: 700, fontSize: 30, lineHeight: 1.28, letterSpacing: '-0.02em' }}>{data.title.chunks.join('')}</div>
+      </div>
+      <Signature wordmarkUrl={wordmarkUrl} meta={data.meta} />
+    </div>
+    <div style={{ flex: 1, height: '100%', display: 'flex' }}>
+      <img src={data.imageUrl} width={SIZE.width - COL_W} height={SIZE.height} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+    </div>
+  </div>
+);
+
+// No image → no divider; the title goes full-width and large over the faint GoL.
+const TextLayout = ({ data, wordmarkUrl, board }: Props) => (
+  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: 48 }}>
+    <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+        <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: 2, color: MUTED }}>NAPOCHAAN.COM</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: 2, color: BLUE }}>{`alive ${board.alive}`}</span>
+      </div>
+      <div style={{ display: 'flex', marginTop: 28 }}>
+        <Chip label={data.label} />
+      </div>
+      <div style={{ marginTop: 28, fontFamily: JP, fontWeight: 700, fontSize: 60, lineHeight: 1.18, letterSpacing: '-0.02em', maxWidth: 980 }}>{data.title.chunks.join('')}</div>
+    </div>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <Signature wordmarkUrl={wordmarkUrl} meta={data.meta} />
+      <span style={{ fontFamily: MONO, fontSize: 13, letterSpacing: 2, color: BLUE }}>gen 0042</span>
+    </div>
+  </div>
+);
+
 // Returns the Satori element tree. Exported as a plain function (not a React
 // component) so the route can pass it straight to ImageResponse.
 export const OgCard = ({ data, wordmarkUrl, board }: Props) => {
@@ -38,45 +102,7 @@ export const OgCard = ({ data, wordmarkUrl, board }: Props) => {
         ))}
       </div>
 
-      {/* foreground: info column + right field */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'row' }}>
-        <div
-          style={{
-            width: COL_W,
-            flexShrink: 0,
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: 40,
-            borderRight: `2px solid ${INK}`,
-            overflow: 'hidden',
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ fontFamily: MONO, fontSize: 13, letterSpacing: 2, color: MUTED }}>NAPOCHAAN.COM</div>
-            <div style={{ display: 'flex', marginTop: 22 }}>
-              <div style={{ background: BLUE, color: '#fff', padding: '5px 12px', fontFamily: MONO, fontSize: 15 }}>{data.label}</div>
-            </div>
-            <div style={{ marginTop: 18, fontFamily: JP, fontWeight: 700, fontSize: 30, lineHeight: 1.28, letterSpacing: '-0.02em' }}>{data.title.chunks.join('')}</div>
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <img src={wordmarkUrl} width={344} height={84} style={{ width: 344, height: 84 }} />
-            <div style={{ marginTop: 14, fontFamily: MONO, fontSize: 12, letterSpacing: 2, color: SUBTLE }}>{data.meta}</div>
-          </div>
-        </div>
-
-        <div style={{ flex: 1, height: '100%', position: 'relative', display: 'flex' }}>
-          {data.hasImage ? (
-            <img src={data.imageUrl} width={SIZE.width - COL_W} height={SIZE.height} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          ) : (
-            <div style={{ width: '100%', height: '100%', position: 'relative', display: 'flex' }}>
-              <div style={{ position: 'absolute', left: 28, top: 36, display: 'flex', fontFamily: MONO, fontSize: 12, letterSpacing: 2, color: BLUE }}>{`alive ${board.alive}`}</div>
-              <div style={{ position: 'absolute', right: 36, bottom: 32, display: 'flex', fontFamily: MONO, fontSize: 12, letterSpacing: 2, color: BLUE }}>gen 0042</div>
-            </div>
-          )}
-        </div>
-      </div>
+      {data.hasImage ? <ImageLayout data={data} wordmarkUrl={wordmarkUrl} /> : <TextLayout data={data} wordmarkUrl={wordmarkUrl} board={board} />}
     </div>
   );
 };

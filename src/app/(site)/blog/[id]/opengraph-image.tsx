@@ -33,8 +33,7 @@ const Image = async ({ params }: Params) => {
     imageUrl: absoluteMediaUrl(firstImageSrc(post?.body), origin), // first body image → image field; else GoL.
   });
 
-  const idNum = parseInt(id, 10);
-  const board = ogLifeBoard(FIELD_COLS, FIELD_ROWS, { seed: (Number.isNaN(idNum) ? 1 : idNum) * 9973 + 53 });
+  const board = ogLifeBoard(FIELD_COLS, FIELD_ROWS); // fixed seed → consistent GoL texture across all cards
   const { fonts, wordmarkUrl } = await loadOgAssets();
 
   return new ImageResponse(<OgCard data={data} wordmarkUrl={wordmarkUrl} board={board} />, { ...size, fonts });
