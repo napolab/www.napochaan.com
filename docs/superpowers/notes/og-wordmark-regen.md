@@ -1,6 +1,6 @@
 # Regenerating the OG wordmark PNG
 
-`src/assets/og/wordmark.png` is a transparent, pre-rendered PNG of the real
+`public/og/wordmark.png` is a transparent, pre-rendered PNG of the real
 digibop **EchoText** `napochaan.` wordmark. Satori (used by `next/og`) cannot
 embed the Typekit-loaded EchoText typeface at render time, so the wordmark is
 baked into a transparent PNG and passed to the card renderer as an `<img>`.
@@ -40,12 +40,12 @@ glyphs, weight, or the "napochaan." text itself).
    (RGBA, ~1549×379, with a real alpha channel), then copy it into source:
 
    ```bash
-   cp reports/og-mockups/echo-wordmark.png src/assets/og/wordmark.png
+   cp reports/og-mockups/echo-wordmark.png public/og/wordmark.png
    ```
 
 ## Verify
 
 ```bash
-file src/assets/og/wordmark.png
+file public/og/wordmark.png
 # Expected: PNG image data, ~1549 x 379, 8-bit/color RGBA
 ```
