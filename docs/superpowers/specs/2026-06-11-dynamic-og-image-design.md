@@ -242,3 +242,14 @@ src/
 - 日本語タイトルが BudouX 文節境界で改行。digibop ワードマークが PNG 合成で表示。
 - `pnpm lint && pnpm typecheck` green。純関数テスト green。
 - difit でレビュー依頼済み。
+
+## Spike 結果 (2026-06-12)
+
+- `next build` 成功、`/news/[id]/opengraph-image` ルートが出力に出現。
+- `opennextjs-cloudflare build` 成功。`@vercel/og` の `resvg.wasm` / `yoga.wasm` が
+  worker バンドルに同梱されることを確認（`.open-next/server-functions/default/.../@vercel/og/`）。
+  致命的エラー無し（payload admin chunk の benign な typeof 警告のみ）。
+- 結論: **next/og はこの OpenNext 1.18 スタックで利用可能**。workers-og への転換は不要。
+- 訂正: OpenNext 変換は `opennextjs-cloudflare build`（`pnpm preview`/`deploy` 内）。
+  `pnpm build` は `next build` のみ。ランタイム PNG 200 確認は `opennextjs-cloudflare preview` で別途。
+- フォント方式の最終判断（fetch vs 同梱）は実フォント投入後にバンドルサイズで確定。
