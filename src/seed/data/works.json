@@ -156,6 +156,147 @@
     "thumbnailFile": "soelu-instructor.png"
   },
   {
+    "title": "v1.0.0 www.napochaan.com",
+    "type": "production",
+    "date": "2020-04-10",
+    "url": "https://naporitan.hatenablog.com/entry/2020/04/10/025705",
+    "description": "イメージキャラクターのイラストを ひそなさん に描いてもらったのをきっかけに作った、初めてのポートフォリオサイト。HTML と React で構築した。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "イメージキャラクターのイラストを ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://skeb.jp/@Hisona_",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "ひそなさん",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " に描いてもらったことをきっかけに、初めてのポートフォリオサイト napochaan.me を作成した。HTML と React で構築した、自分にとって最初のホームページ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "数年カレンダーを買い続けるほど好きなイラストレーターに描いてもらったキャラクターで、特に目の表現が気に入っている。このイラストを主役に据えてサイトを組み立てた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ここから始まり、後に ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "/works/10",
+                  "newTab": false
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "v2.0.0",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " として作り直した。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_status": "published",
+    "thumbnailFile": "napochaan-me-v1.png"
+  },
+  {
     "title": "447Records TANA",
     "type": "production",
     "date": "2021-01-17",
