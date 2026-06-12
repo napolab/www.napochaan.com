@@ -1,3 +1,5 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
+
 import * as s from './styles.css';
 
 import { ContactForm } from './_components/contact-form';
@@ -33,7 +35,9 @@ export const generateMetadata = (): Metadata => {
   };
 };
 
-const ContactPage = () => {
+const ContactPage = async () => {
+  const { env } = await getCloudflareContext({ async: true });
+
   return (
     <main id="main-content" className={s.main}>
       <PageHeader title="contact" breadcrumbs={crumbs} kicker="// お問い合わせ" lead="お仕事のご依頼・ご相談はこちらから。" />
@@ -42,7 +46,7 @@ const ContactPage = () => {
           <SectionHeading no="01" more="// メッセージ">
             message
           </SectionHeading>
-          <ContactForm />
+          <ContactForm turnstileSiteKey={env.TURNSTILE_SITE_KEY} />
         </section>
         <aside className={s.directCell}>
           <SectionHeading no="02">direct</SectionHeading>

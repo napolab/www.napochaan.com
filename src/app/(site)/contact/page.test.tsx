@@ -10,24 +10,29 @@ vi.mock('./_components/contact-form', () => ({
   ContactForm: () => null,
 }));
 
+// The page reads the Turnstile site key from the Cloudflare env at render time.
+vi.mock('@opennextjs/cloudflare', () => ({
+  getCloudflareContext: vi.fn(async () => ({ env: { TURNSTILE_SITE_KEY: 'test-site-key' } })),
+}));
+
 describe('ContactPage', () => {
   it('renders the page heading', async () => {
-    render(<ContactPage />);
+    render(await ContactPage());
     await expect.element(page.getByRole('heading', { level: 1, name: 'contact' })).toBeVisible();
   });
 
   it('renders the message section heading', async () => {
-    render(<ContactPage />);
+    render(await ContactPage());
     await expect.element(page.getByRole('heading', { name: 'message' })).toBeVisible();
   });
 
   it('renders the direct section heading', async () => {
-    render(<ContactPage />);
+    render(await ContactPage());
     await expect.element(page.getByRole('heading', { name: 'direct' })).toBeVisible();
   });
 
   it('renders the direct-contact links', async () => {
-    render(<ContactPage />);
+    render(await ContactPage());
     await expect.element(page.getByRole('link', { name: /github/ })).toHaveAttribute('href', 'https://github.com/naporin0624');
   });
 });

@@ -35,6 +35,7 @@
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@hono/zod-validator": "^0.7.6",
+    "@marsidev/react-turnstile": "^1.5.3",
     "@opennextjs/cloudflare": "1.18.0",
     "@payloadcms/db-d1-sqlite": "3.84.1",
     "@payloadcms/live-preview-react": "3.84.1",

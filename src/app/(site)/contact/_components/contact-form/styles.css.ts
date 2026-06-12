@@ -11,6 +11,12 @@ export const actions = css({
   justifyContent: 'flex-end',
 });
 
+// Turnstile widget host — flexible size fills the column; min-height reserves
+// space so the layout does not shift when the challenge mounts.
+export const turnstile = css({
+  minHeight: '[65px]',
+});
+
 // General (non-field) error banner — danger left bar marks the whole-form failure.
 export const formError = css({
   paddingLeft: 'element',
