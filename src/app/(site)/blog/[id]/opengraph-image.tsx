@@ -6,6 +6,7 @@ import { dayjs } from '@utils/dayjs';
 import { firstImageSrc } from '@utils/lexical/first-image-src';
 import { loadOgAssets } from '@utils/og/load-og-assets';
 import { CONTENT_TYPE, OgCard, SIZE } from '@utils/og/og-card';
+import { absoluteMediaUrl, requestOrigin } from '@utils/og/og-image-url';
 import { ogLifeBoard } from '@utils/og/og-life-board';
 import { resolveOgCardData } from '@utils/og/resolve-og-card-data';
 
@@ -22,13 +23,14 @@ const FIELD_ROWS = Math.ceil(SIZE.height / 24);
 const Image = async ({ params }: Params) => {
   const { id } = await params;
   const post = await findBlogById(id);
+  const origin = await requestOrigin();
 
   const formattedDate = post === undefined ? '' : dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD');
   const data = resolveOgCardData({
     section: 'blog',
     title: post?.title ?? 'blog',
     meta: `${formattedDate} · blog`,
-    imageUrl: firstImageSrc(post?.body) ?? undefined, // first body image → image field; else GoL.
+    imageUrl: absoluteMediaUrl(firstImageSrc(post?.body), origin), // first body image → image field; else GoL.
   });
 
   const idNum = parseInt(id, 10);

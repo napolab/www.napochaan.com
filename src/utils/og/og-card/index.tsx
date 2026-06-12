@@ -66,6 +66,7 @@ export const OgCard = ({ data, wordmarkUrl, board }: Props) => {
           padding: 40,
           background: CANVAS,
           borderRight: `2px solid ${INK}`,
+          overflow: 'hidden',
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -73,13 +74,7 @@ export const OgCard = ({ data, wordmarkUrl, board }: Props) => {
           <div style={{ display: 'flex', marginTop: 22 }}>
             <div style={{ background: BLUE, color: '#fff', padding: '5px 12px', fontFamily: MONO, fontSize: 15 }}>{data.label}</div>
           </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 18, fontFamily: JP, fontWeight: 700, fontSize: 33, lineHeight: 1.24, letterSpacing: '-0.02em' }}>
-            {data.title.chunks.map((chunk, i) => (
-              <span key={`${i}-${chunk}`} style={{ whiteSpace: 'nowrap' }}>
-                {chunk}
-              </span>
-            ))}
-          </div>
+          <div style={{ marginTop: 18, fontFamily: JP, fontWeight: 700, fontSize: 30, lineHeight: 1.28, letterSpacing: '-0.02em' }}>{data.title.chunks.join('')}</div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           <img src={wordmarkUrl} width={344} height={84} style={{ width: 344, height: 84 }} />

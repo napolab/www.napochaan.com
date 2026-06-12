@@ -4,6 +4,7 @@ import { findWorkById } from '@lib/payload/works';
 
 import { loadOgAssets } from '@utils/og/load-og-assets';
 import { CONTENT_TYPE, OgCard, SIZE } from '@utils/og/og-card';
+import { absoluteMediaUrl, requestOrigin } from '@utils/og/og-image-url';
 import { ogLifeBoard } from '@utils/og/og-life-board';
 import { resolveOgCardData } from '@utils/og/resolve-og-card-data';
 
@@ -20,12 +21,13 @@ const FIELD_ROWS = Math.ceil(SIZE.height / 24);
 const Image = async ({ params }: Params) => {
   const { id } = await params;
   const work = await findWorkById(id);
+  const origin = await requestOrigin();
 
   const data = resolveOgCardData({
     section: 'works',
     title: work?.title ?? 'works',
     meta: `no.${id} · ${work?.type ?? 'works'}`,
-    imageUrl: work?.thumbnail?.src ?? undefined, // present → image field; absent → GoL.
+    imageUrl: absoluteMediaUrl(work?.thumbnail?.src, origin), // present → image field; absent → GoL.
   });
 
   const idNum = parseInt(id, 10);

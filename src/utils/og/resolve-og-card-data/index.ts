@@ -1,9 +1,10 @@
 import { clampTitle, type ClampedTitle } from '../clamp-title';
 import { sectionLabel, type OgSection } from '../section-label';
 
-// Title char budget tuned for the 432px info column at ~33px. The spike / first
-// real render confirms the exact value; adjust here only.
-const TITLE_MAX_CHARS = 24;
+// Title char budget for the 432px info column at 33px. Generous so typical
+// titles render in full (wrapping to ~4 lines); the ellipsis only trims
+// genuinely long titles. The column's overflow:hidden is the final safety net.
+const TITLE_MAX_CHARS = 60;
 
 export type OgCardInput = {
   section: OgSection;
