@@ -3,11 +3,20 @@ import { describe, expect, it } from 'vitest';
 import type { OgCardData } from '../resolve-og-card-data';
 import { OgCard, SIZE } from './index';
 
-// Recursively collect all string children in the element tree.
+// Recursively collect all string children in the element tree. Function-component
+// elements (e.g. the extracted Field) are invoked so their output is traversed too.
 const texts = (node: unknown): string[] => {
   if (typeof node === 'string') return [node];
+  if (typeof node === 'number') return [`${node}`];
   if (Array.isArray(node)) return node.flatMap(texts);
-  if (node && typeof node === 'object' && 'props' in node) return texts((node as { props: { children?: unknown } }).props.children);
+
+  if (node !== null && typeof node === 'object' && 'type' in node && typeof (node as { type: unknown }).type === 'function') {
+    const el = node as { type: (props: unknown) => unknown; props: unknown };
+
+    return texts(el.type(el.props));
+  }
+
+  if (node !== null && typeof node === 'object' && 'props' in node) return texts((node as { props: { children?: unknown } }).props.children);
 
   return [];
 };
