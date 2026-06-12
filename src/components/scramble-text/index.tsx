@@ -59,9 +59,10 @@ type Props = BaseProps & ({ trigger?: 'self' } | { trigger: 'group'; host: HTMLE
 // Inline text that decodes through glitch glyphs on hover (a terminal/command-line
 // reveal). Client Component — the scramble needs GSAP. The text is rendered as a
 // width-reserving ghost plus an absolutely-overlaid animated copy, so the churning
-// glyphs never reflow surrounding layout (see styles). `aria-label` pins the
-// accessible name to the text so an ancestor link's name stays stable while the
-// glyphs churn (and reduced-motion users just see the plain text).
+// glyphs never reflow surrounding layout (see styles). A clipped srOnly copy carries
+// the accessible name (both ghost and fill are aria-hidden), so an ancestor link's
+// name stays stable while the glyphs churn — and the name survives even in plain
+// text context, where `aria-label` on the generic root span would be prohibited.
 export const ScrambleText = (props: Props) => {
   const { children, className, clamp, truncate } = props;
   const rootRef = useRef<HTMLSpanElement>(null);
@@ -152,7 +153,9 @@ export const ScrambleText = (props: Props) => {
   );
 
   return (
-    <span ref={rootRef} className={clsx(styles.root, className)} aria-label={children} data-clamp={clamp || undefined} data-truncate={truncate || undefined}>
+    <span ref={rootRef} className={clsx(styles.root, className)} data-clamp={clamp || undefined} data-truncate={truncate || undefined}>
+      {/* Full text stays available to SR / crawlers; the ghost and fill are visual only. */}
+      <span className={styles.srOnly}>{children}</span>
       <span aria-hidden className={styles.ghost}>
         {children}
       </span>

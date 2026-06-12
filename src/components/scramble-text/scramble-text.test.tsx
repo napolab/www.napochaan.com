@@ -20,6 +20,16 @@ describe('ScrambleText', () => {
     await expect.element(page.getByRole('link', { name: 'archive' })).toBeInTheDocument();
   });
 
+  // `aria-label` is prohibited on a generic (role-less) span — outside a link the
+  // text would go silent to AT. Expose the text via a real, non-aria-hidden node
+  // (the srOnly copy) instead, and keep the visual ghost/fill aria-hidden.
+  it('exposes the text to assistive tech without a prohibited aria-label', async () => {
+    const screen = await render(<ScrambleText>archive</ScrambleText>);
+    expect(screen.container.querySelector('[aria-label]')).toBeNull();
+    const exposed = [...screen.container.querySelectorAll('span')].filter((el) => el.getAttribute('aria-hidden') === null);
+    expect(exposed.some((el) => el.textContent === 'archive')).toBe(true);
+  });
+
   // truncate drives a `data-truncate` hook the styles target so the painted (absolute)
   // fill and the in-flow ghost both clip to a single ellipsised line — a parent's
   // `text-overflow:ellipsis` can't reach the absolute fill on its own.

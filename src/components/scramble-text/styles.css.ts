@@ -30,6 +30,11 @@ export const root = css({
   '&[data-truncate]': { maxWidth: 'full', overflow: 'hidden' },
 });
 
+// Real text for assistive tech / crawlers. `aria-label` is prohibited on the
+// generic root span (WAI-ARIA 1.2), and both the ghost and fill are aria-hidden,
+// so this clipped copy is the only node that carries the accessible name.
+export const srOnly = css({ srOnly: true });
+
 export const ghost = css({
   visibility: 'hidden',
   // Clamp mode (mobile): the in-flow ghost reserves the 2-line-max height that the

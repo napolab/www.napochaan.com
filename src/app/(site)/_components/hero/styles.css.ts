@@ -5,9 +5,13 @@ export const root = css({
   display: 'flex',
   flexDirection: 'column',
   gap: 'block',
-  // Desktop: an airy hero so the absolutely-positioned annotations have empty
-  // space to sit in (the coords no longer overlap the buttons).
+  // Desktop airiness: the absolutely-positioned annotations sit in this empty space.
   minHeight: { base: '[auto]', desktop: '[58vh]' },
+  // Reserve a bottom band for the desktop-only annotations (coords + "▸ not found"),
+  // both pinned to bottom:0. The padding keeps the content/buttons above the band on
+  // ANY viewport height — minHeight alone collapses on short viewports and let the
+  // annotations overlap the buttons.
+  paddingBottom: { base: '0', desktop: 'section' },
 });
 
 export const kicker = css({
@@ -58,10 +62,11 @@ export const annotationStart = css({
   right: 'page',
 });
 
+// Bottom-right of the reserved band, sharing the baseline with the coords on the left.
 export const annotationEnd = css({
   display: { base: 'none', desktop: 'block' },
   position: 'absolute',
-  bottom: 'section',
+  bottom: '0',
   right: 'page',
 });
 
