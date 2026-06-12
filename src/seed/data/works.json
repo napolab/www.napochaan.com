@@ -1911,7 +1911,39 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "も併設した。高解像度版も置いて、個別ページにはひとつずつ og:image を入れて、SNS でシェアするのがちょっと楽しくなる見え方まで作り込んだ。opennextjs/cloudflare をちゃんと使ったのはこれが初めてで、誕生日に間に合わせながら手探りしていた感じだった……。",
+                "text": "も併設した。高解像度版も置いて、個別ページにはひとつずつ og:image を入れて、SNS でシェアするのがちょっと楽しくなる見え方まで作り込んだ。",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "opennextjs/cloudflare",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://opennext.js.org/cloudflare",
+                  "newTab": true
+                }
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " をちゃんと使ったのはこれが初めてで、誕生日に間に合わせながら手探りしていた感じだった……。",
                 "type": "text",
                 "version": 1
               }
