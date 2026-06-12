@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/reports/og-mockups/srv-base.css" />
+    <style>
+      .card{overflow:hidden;}
+      /* Game of Life board fills the whole right field (no shape clip) */
+      .gol{position:absolute;left:432px;top:0;right:0;bottom:0;}
+      .gol b{position:absolute;width:22px;height:22px;display:block;}
+      .col{position:absolute;left:0;top:0;bottom:0;width:432px;border-right:2px solid var(--ink);
+        background:var(--canvas);padding:40px 36px;display:flex;flex-direction:column;z-index:2;}
+      .top{font-family:ui-monospace,monospace;font-size:13px;letter-spacing:0.12em;color:var(--muted);text-transform:uppercase;}
+      .label{align-self:flex-start;margin-top:22px;background:var(--blue);color:var(--paper);padding:5px 12px;font-size:15px;}
+      .title{margin-top:18px;font-weight:700;font-size:33px;line-height:1.24;letter-spacing:-0.02em;
+        color:var(--ink);word-break:keep-all;overflow-wrap:anywhere;}
+      .sign{margin-top:auto;}
+      .sign img{display:block;width:344px;height:auto;margin-left:-4px;}
+      .meta{margin-top:14px;font-family:ui-monospace,monospace;font-size:12px;letter-spacing:0.12em;
+        color:var(--subtle);text-transform:uppercase;}
+      .mark{position:absolute;display:flex;gap:7px;font-family:ui-monospace,monospace;z-index:6;
+        font-size:12px;letter-spacing:0.12em;text-transform:uppercase;line-height:1;color:var(--blue);}
+      .mark i{display:block;width:18px;height:18px;border:2px solid var(--blue);flex:0 0 auto;}
+      .mark.tt{top:40px;left:472px;}
+      .mark.tt i{border-right:0;border-bottom:0;}
+      .mark.br{bottom:40px;right:44px;flex-direction:row-reverse;align-items:flex-end;}
+      .mark.br i{border-left:0;border-top:0;}
+      .mark span{padding-top:3px;}
+      .mark.br span{padding-top:0;padding-bottom:3px;}
+    </style>
+    <script>
+      // Faithful port of src/components/game-of-life/life.ts (toroidal Conway).
+      addEventListener('DOMContentLoaded', () => {
+        const boost = new URLSearchParams(location.search).get('boost') === '1';
+        const gol = document.querySelector('.gol');
+        const cols = Math.ceil(gol.clientWidth / 24), rows = Math.ceil(gol.clientHeight / 24);
+        let s = 20260611;
+        const rnd = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+        const idx = (x, y) => ((y + rows) % rows) * cols + ((x + cols) % cols);
+        let cells = Uint8Array.from({length: cols * rows}, () => rnd() < 0.16 ? 1 : 0); // production density
+        const step = () => {
+          const next = new Uint8Array(cols * rows);
+          for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+            let n = 0;
+            for (const [dx, dy] of [[-1,-1],[0,-1],[1,-1],[-1,0],[1,0],[-1,1],[0,1],[1,1]]) n += cells[idx(x+dx, y+dy)];
+            next[y*cols+x] = cells[y*cols+x] ? (n === 2 || n === 3 ? 1 : 0) : (n === 3 ? 1 : 0);
+          }
+          cells = next;
+        };
+        for (let i = 0; i < 8; i++) step(); // settle to organic structures
+        const blue = boost ? 'rgba(26,52,255,0.92)' : 'rgba(26,52,255,0.11)';
+        const red  = boost ? 'rgba(255,0,43,0.85)'  : 'rgba(255,0,43,0.10)';
+        let html = '', alive = 0;
+        for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) {
+          if (cells[y*cols+x]) {
+            const isRed = (x*31 + y*17) % 23 === 0; // production red rule
+            html += '<b style="left:' + (x*24+1) + 'px;top:' + (y*24+1) + 'px;background:' + (isRed?red:blue) + '"></b>';
+            alive++;
+          }
+        }
+        gol.innerHTML = html;
+        document.querySelector('.alive').textContent = 'alive ' + alive;
+      });
+    </script>
+  </head>
+  <body>
+    <div class="card">
+      <div class="grid"></div>
+      <div class="gol"></div>
+      <div class="col">
+        <span class="top">napochaan.com</span>
+        <span class="label mono">news</span>
+        <h1 class="title">サイトを<wbr /> v3 に<wbr />リニューアルしました</h1>
+        <div class="sign"><img src="/reports/og-mockups/echo-wordmark.png" alt="" /></div>
+        <span class="meta">2026.06.11 · og:image · 1200×630</span>
+      </div>
+      <div class="mark tt"><i></i><span class="alive">alive</span></div>
+      <div class="mark br"><i></i><span>gen 0042</span></div>
+    </div>
+  </body>
+</html>

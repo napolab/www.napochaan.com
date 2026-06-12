@@ -1,0 +1,56 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/reports/og-mockups/srv-base.css" />
+    <style>
+      .card{overflow:hidden;}
+      /* huge cropped wordmark as full-bleed texture */
+      .bg{position:absolute;left:-260px;bottom:-200px;pointer-events:none;}
+      .bg img{display:block;width:2320px;}
+      /* small precise tags floating over it */
+      .header{position:absolute;top:0;left:0;right:0;height:60px;border-bottom:2px solid var(--ink);
+        display:flex;align-items:center;justify-content:space-between;padding:0 36px;z-index:5;
+        background:oklch(0.952 0.004 265 / 0.0);}
+      .header .mono{font-size:14px;color:var(--muted);}
+      .dot{color:var(--subtle);letter-spacing:0.3em;}
+      .tagrow{position:absolute;top:88px;left:52px;display:flex;align-items:center;gap:14px;z-index:5;}
+      .label{background:var(--blue);color:var(--paper);padding:5px 12px;font-size:15px;}
+      .title{position:absolute;top:128px;left:52px;font-weight:700;font-size:34px;line-height:1.16;
+        letter-spacing:-0.02em;max-width:560px;color:var(--ink);z-index:5;
+        text-shadow:0 1px 0 var(--canvas),0 0 14px var(--canvas);}
+      .footer{position:absolute;left:0;right:0;bottom:0;height:56px;border-top:2px solid var(--ink);
+        display:flex;align-items:center;justify-content:space-between;padding:0 36px;z-index:5;}
+      .footer .mono{font-size:13px;color:var(--subtle);}
+      .blue{color:var(--blue);}
+      .mark{position:absolute;display:flex;gap:7px;font-family:ui-monospace,monospace;z-index:6;
+        font-size:12px;letter-spacing:0.12em;color:var(--blue);text-transform:uppercase;line-height:1;}
+      .mark i{display:block;width:18px;height:18px;border:2px solid var(--blue);flex:0 0 auto;}
+      .mark.tr{top:74px;right:50px;flex-direction:row-reverse;align-items:flex-start;}
+      .mark.tr i{border-left:0;border-bottom:0;}
+      .mark.br{bottom:70px;right:50px;flex-direction:row-reverse;align-items:flex-end;}
+      .mark.br i{border-left:0;border-top:0;}
+      .mark span{padding-top:3px;}
+      .mark.br span{padding-top:0;padding-bottom:3px;}
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="grid"></div>
+      <div class="bg"><img src="/reports/og-mockups/echo-wordmark.png" alt="" /></div>
+      <div class="header">
+        <span class="mono">napochaan.com</span>
+        <span class="mono dot">— — — — — —</span>
+        <span class="mono">2026</span>
+      </div>
+      <div class="tagrow"><span class="label mono">news</span></div>
+      <h1 class="title">サイトを v3 にリニューアルしました</h1>
+      <div class="footer">
+        <span class="mono"><span class="blue">●</span> rec</span>
+        <span class="mono">gen 0042 · alive 128 · watching 3</span>
+      </div>
+      <div class="mark tr"><i></i><span>1200×630</span></div>
+      <div class="mark br"><i></i><span>og:image</span></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/reports/og-mockups/srv-base.css" />
+    <style>
+      /* Inner frame defined by the four corner brackets:
+         left 50 · right 1150 · top 74 · bottom 556. All content snaps to these lines. */
+      .card{padding:0;overflow:hidden;}
+      .header{position:absolute;top:0;left:0;right:0;height:60px;border-bottom:2px solid var(--ink);
+        display:flex;align-items:center;justify-content:space-between;padding:0 36px;}
+      .header .mono{font-size:14px;color:var(--muted);}
+      .dot{color:var(--subtle);letter-spacing:0.3em;}
+      .footer{position:absolute;left:0;right:0;bottom:0;height:56px;border-top:2px solid var(--ink);
+        display:flex;align-items:center;justify-content:space-between;padding:0 36px;}
+      .footer .mono{font-size:13px;color:var(--subtle);}
+      .blue{color:var(--blue);}
+
+      /* content snapped to the frame's left line (x=50) */
+      .label{position:absolute;left:50px;top:108px;background:var(--blue);color:var(--paper);
+        padding:5px 12px;font-size:15px;}
+      .accent{position:absolute;left:50px;top:150px;width:96px;height:8px;background:var(--blue);}
+      .title{position:absolute;left:50px;top:184px;right:50px;font-weight:700;font-size:54px;
+        line-height:1.16;letter-spacing:-0.02em;max-width:900px;}
+      /* wordmark contained inside the frame: left line x=50, bottom line y=556 */
+      .sign{position:absolute;left:48px;bottom:74px;}
+      .sign img{display:block;width:600px;height:auto;}
+
+      .mark{position:absolute;display:flex;gap:7px;font-family:ui-monospace,monospace;
+        font-size:12px;letter-spacing:0.12em;color:var(--blue);text-transform:uppercase;line-height:1;}
+      .mark i{display:block;width:18px;height:18px;border:2px solid var(--blue);flex:0 0 auto;}
+      .mark.tl{top:74px;left:50px;align-items:flex-start;}
+      .mark.tl i{border-right:0;border-bottom:0;}
+      .mark.tr{top:74px;right:50px;flex-direction:row-reverse;align-items:flex-start;}
+      .mark.tr i{border-left:0;border-bottom:0;}
+      .mark.bl{bottom:70px;left:50px;align-items:flex-end;}
+      .mark.bl i{border-right:0;border-top:0;}
+      .mark.br{bottom:70px;right:50px;flex-direction:row-reverse;align-items:flex-end;}
+      .mark.br i{border-left:0;border-top:0;}
+      .mark span{padding-top:3px;}
+      .mark.bl span,.mark.br span{padding-top:0;padding-bottom:3px;}
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="grid"></div>
+      <div class="header">
+        <span class="mono">napochaan.com</span>
+        <span class="mono dot">— — — — — —</span>
+        <span class="mono">2026</span>
+      </div>
+
+      <span class="label mono">news</span>
+      <div class="accent"></div>
+      <h1 class="title">サイトを v3 にリニューアルしました</h1>
+      <div class="sign">
+        <img src="/reports/og-mockups/echo-wordmark.png" alt="" />
+      </div>
+
+      <div class="footer">
+        <span class="mono"><span class="blue">●</span> rec</span>
+        <span class="mono">gen 0042 · alive 128 · watching 3</span>
+      </div>
+      <div class="mark tl"><i></i><span>og:image</span></div>
+      <div class="mark tr"><i></i><span>1200×630</span></div>
+      <div class="mark bl"><i></i><span>2026.06.11</span></div>
+      <div class="mark br"><i></i><span>no.img</span></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/reports/og-mockups/srv-base.css" />
+    <style>
+      .card{overflow:hidden;}
+      /* Game-of-Life field: live cells (blue) on the 24px grid, clipped to the s1 triangle */
+      .gol{position:absolute;right:0;top:0;width:792px;height:630px;
+        clip-path:polygon(100% 0,100% 100%,16% 100%);}
+      .gol b{position:absolute;width:20px;height:20px;background:var(--blue);display:block;}
+      .col{position:absolute;left:0;top:0;bottom:0;width:420px;border-right:2px solid var(--ink);
+        background:var(--canvas);padding:40px 36px;display:flex;flex-direction:column;z-index:2;}
+      .top{font-family:ui-monospace,monospace;font-size:13px;letter-spacing:0.12em;color:var(--muted);text-transform:uppercase;}
+      .label{align-self:flex-start;margin-top:22px;background:var(--blue);color:var(--paper);padding:5px 12px;font-size:15px;}
+      .title{margin-top:18px;font-weight:700;font-size:32px;line-height:1.24;letter-spacing:-0.02em;
+        color:var(--ink);word-break:keep-all;overflow-wrap:anywhere;}
+      .sign{margin-top:auto;}
+      .sign img{display:block;width:340px;height:auto;margin-left:-4px;}
+      .meta{margin-top:14px;font-family:ui-monospace,monospace;font-size:12px;letter-spacing:0.12em;
+        color:var(--subtle);text-transform:uppercase;}
+      .mark{position:absolute;display:flex;gap:7px;font-family:ui-monospace,monospace;z-index:6;
+        font-size:12px;letter-spacing:0.12em;text-transform:uppercase;line-height:1;}
+      .mark i{display:block;width:18px;height:18px;border:2px solid;flex:0 0 auto;}
+      .mark.tt{top:40px;left:460px;color:var(--blue);}
+      .mark.tt i{border-right:0;border-bottom:0;border-color:var(--blue);}
+      .tag{position:absolute;right:44px;bottom:40px;font-family:ui-monospace,monospace;font-size:12px;
+        letter-spacing:0.12em;color:var(--blue);text-transform:uppercase;z-index:6;}
+    </style>
+    <script>
+      // Render a believable Game-of-Life snapshot: high-density live cells with
+      // organic holes, aligned to the 24px grid. (OG impl: 1 real GoL step server-side.)
+      addEventListener('DOMContentLoaded', () => {
+        const gol = document.querySelector('.gol');
+        const cols = 33, rows = 27;
+        // simple LCG for deterministic pattern (no Math.random dependency on seed)
+        let s = 1337;
+        const rnd = () => (s = (s * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
+        let html = '';
+        for (let r = 0; r < rows; r++) {
+          for (let c = 0; c < cols; c++) {
+            // bias: denser toward bottom-right (the mass of the triangle)
+            const bias = 0.55 + 0.30 * (c / cols) + 0.10 * (r / rows);
+            if (rnd() < bias) html += '<b style="left:' + (c*24+2) + 'px;top:' + (r*24+2) + 'px"></b>';
+          }
+        }
+        gol.innerHTML = html;
+      });
+    </script>
+  </head>
+  <body>
+    <div class="card">
+      <div class="grid"></div>
+      <div class="gol"></div>
+      <div class="col">
+        <span class="top">napochaan.com</span>
+        <span class="label mono">news</span>
+        <h1 class="title">サイトを<wbr /> v3 に<wbr />リニューアルしました</h1>
+        <div class="sign"><img src="/reports/og-mockups/echo-wordmark.png" alt="" /></div>
+        <span class="meta">2026.06.11 · og:image · 1200×630</span>
+      </div>
+      <div class="mark tt"><i></i><span>alive 128</span></div>
+      <span class="tag">gen 0042</span>
+    </div>
+  </body>
+</html>

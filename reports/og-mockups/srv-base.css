@@ -1,0 +1,54 @@
+:root {
+  --canvas: oklch(0.952 0.004 265);
+  --paper: oklch(1 0 0);
+  --ink: oklch(0.185 0.02 265);
+  --muted: oklch(0.43 0.018 265);
+  --subtle: oklch(0.56 0.016 265);
+  --grid: oklch(0.884 0.007 265);
+  --blue: oklch(0.49 0.287 266);
+  --cell: 24px;
+}
+@font-face {
+  font-family: 'LINE Seed JP';
+  src: url('/src/themes/fonts/line-seed-jp/LINESeedJP-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'LINE Seed JP';
+  src: url('/src/themes/fonts/line-seed-jp/LINESeedJP-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html,
+body {
+  width: 1200px;
+  height: 630px;
+  overflow: hidden;
+}
+.card {
+  width: 1200px;
+  height: 630px;
+  position: relative;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: 'LINE Seed JP', system-ui, sans-serif;
+}
+.grid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to right, var(--grid) 1px, transparent 1px), linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
+  background-size: var(--cell) var(--cell);
+}
+.mono {
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
