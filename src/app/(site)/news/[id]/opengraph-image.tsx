@@ -15,8 +15,8 @@ export const contentType = CONTENT_TYPE;
 
 type Params = { params: Promise<{ id: string }> };
 
-const FIELD_COLS = Math.ceil((SIZE.width - 432) / 24);
-const FIELD_ROWS = Math.ceil(SIZE.height / 24);
+const FIELD_COLS = Math.ceil(SIZE.width / 56);
+const FIELD_ROWS = Math.ceil(SIZE.height / 56);
 
 const Image = async ({ params }: Params) => {
   const { id } = await params;
