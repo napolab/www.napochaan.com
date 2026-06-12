@@ -28,7 +28,7 @@ const GalleryPreviewPage = async () => {
   return (
     <main id="main-content" className={s.main}>
       <LivePreviewListener />
-      <PageHeader title="gallery" breadcrumbs={galleryCrumbs} kicker="// flyer · VRChat · photo — 2024–2026" lead="やっていきを、やっていく....." />
+      <PageHeader title="gallery" breadcrumbs={galleryCrumbs} kicker="// flyer · VRChat · photo — 2024-2026" lead="まだ知らない君がいる！" />
       <FeedLink href="/gallery/rss.xml" label="gallery の RSS フィード" />
       <section aria-label="作品ギャラリー一覧">
         <GalleryArchive photos={galleryPhotos} />
