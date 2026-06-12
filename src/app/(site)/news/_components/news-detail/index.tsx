@@ -4,7 +4,9 @@ import * as s from './styles.css';
 
 import { PageHeader } from '@components/page-header';
 import { RichText } from '@components/rich-text';
+import { ShareBar } from '@components/share-bar';
 import { dayjs } from '@utils/dayjs';
+import { absoluteUrl } from '@utils/site-url';
 
 import type { Adjacent } from '../../_lib/adjacent-news';
 import type { NewsItem } from '../../_lib/news-item';
@@ -33,6 +35,7 @@ export const NewsDetail = ({ item, prev, next }: Props) => {
     <>
       <PageHeader title={item.title} breadcrumbs={crumbs} kicker={`// ${dayjs(item.date).tz('Asia/Tokyo').format('YYYY.MM.DD')} · ${item.category}`} titleTracking="tight" />
       <div className={s.body}>{item.body === undefined ? null : <RichText data={item.body} />}</div>
+      <ShareBar url={absoluteUrl(`/news/${item.id}`)} title={item.title} />
       <NewsNav prev={prev} next={next} />
     </>
   );

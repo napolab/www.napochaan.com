@@ -10,7 +10,9 @@ import { findBlogById, findBlogList } from '@lib/payload/blog';
 import { PageHeader } from '@components/page-header';
 import { RichText } from '@components/rich-text';
 import { extractHeadings } from '@components/rich-text/toc';
+import { ShareBar } from '@components/share-bar';
 import { dayjs } from '@utils/dayjs';
+import { absoluteUrl } from '@utils/site-url';
 import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
@@ -70,6 +72,7 @@ const BlogDetailPage = async ({ params }: Props) => {
         </div>
         <div className={s.bodyCol}>{post.body === undefined ? null : <RichText data={post.body} />}</div>
       </div>
+      <ShareBar url={absoluteUrl(`/blog/${id}`)} title={post.title} />
       <BlogNav prev={prev} next={next} />
     </>
   );
