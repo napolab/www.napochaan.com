@@ -171,15 +171,19 @@ export const importWorks = async (instance: Payload): Promise<void> => {
   instance.logger.info(`[seed:import] upserted ${records.length} works`);
 };
 
-type BlogRecord = Omit<Blog, 'id' | 'createdAt' | 'updatedAt' | 'meta'>;
+type BlogRecord = Omit<Blog, 'id' | 'createdAt' | 'updatedAt' | 'meta' | 'thumbnail'> & { thumbnailFile?: string };
 // Exported so the body-media resolution wiring (sentinel -> media id) can be
-// exercised end-to-end against a fake Payload in import.test.ts.
+// exercised end-to-end against a fake Payload in import.test.ts. The thumbnail is a
+// top-level `thumbnailFile` (resolved via ensureMedia, same as works), distinct from
+// the body's `__file` upload sentinels.
 export const importBlog = async (instance: Payload): Promise<void> => {
   const records = await readData<BlogRecord>('blog');
   for (const record of records) {
-    const body = await resolveBodyMedia(instance, record.body);
-    const data = { ...record, body };
-    await upsertByTitle(instance, 'blog', record.title, data);
+    const { thumbnailFile, ...rest } = record;
+    const thumbnail = thumbnailFile === undefined ? undefined : await ensureMedia(instance, thumbnailFile, rest.title);
+    const body = await resolveBodyMedia(instance, rest.body);
+    const data = { ...rest, body, ...(thumbnail === undefined ? {} : { thumbnail }) };
+    await upsertByTitle(instance, 'blog', rest.title, data);
   }
   instance.logger.info(`[seed:import] upserted ${records.length} blog`);
 };

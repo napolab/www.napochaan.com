@@ -3,7 +3,6 @@ import { ImageResponse } from 'next/og';
 import { findBlogById } from '@lib/payload/blog';
 
 import { dayjs } from '@utils/dayjs';
-import { firstImageSrc } from '@utils/lexical/first-image-src';
 import { loadOgAssets } from '@utils/og/load-og-assets';
 import { CONTENT_TYPE, OgCard, SIZE } from '@utils/og/og-card';
 import { absoluteMediaUrl, requestOrigin } from '@utils/og/og-image-url';
@@ -30,7 +29,7 @@ const Image = async ({ params }: Params) => {
     section: 'blog',
     title: post?.title ?? 'blog',
     meta: `${formattedDate} · blog`,
-    imageUrl: absoluteMediaUrl(firstImageSrc(post?.body), origin), // first body image → image field; else GoL.
+    imageUrl: absoluteMediaUrl(post?.thumbnail?.src, origin), // the post's thumbnail → image field; else GoL.
   });
 
   const board = ogLifeBoard(FIELD_COLS, FIELD_ROWS); // fixed seed → consistent GoL texture across all cards

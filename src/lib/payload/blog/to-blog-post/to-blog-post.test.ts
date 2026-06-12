@@ -49,4 +49,21 @@ describe('toBlogPost', () => {
     const withMeta = { ...base, meta: { title: 'T', image: 7 } } as unknown as Blog;
     expect(toBlogPost(withMeta, '01').seo).toEqual({ title: 'T', description: undefined, image: undefined });
   });
+
+  it('maps a populated thumbnail to { src, width, height }', () => {
+    const withThumb = {
+      ...base,
+      thumbnail: { id: 5, alt: '', url: '/media/top.png', width: 1280, height: 720, updatedAt: '', createdAt: '' },
+    } as unknown as Blog;
+    expect(toBlogPost(withThumb, '01').thumbnail).toEqual({ src: '/media/top.png', width: 1280, height: 720 });
+  });
+
+  it('leaves thumbnail undefined when it is an unpopulated id', () => {
+    const withThumb = { ...base, thumbnail: 5 } as unknown as Blog;
+    expect(toBlogPost(withThumb, '01').thumbnail).toBeUndefined();
+  });
+
+  it('leaves thumbnail undefined when absent', () => {
+    expect(toBlogPost(base, '01').thumbnail).toBeUndefined();
+  });
 });

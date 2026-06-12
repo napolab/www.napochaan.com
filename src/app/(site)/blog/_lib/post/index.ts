@@ -11,6 +11,10 @@ export type Post = {
   readMin: number;
   date: string;
   excerpt: string;
+  // Representative image: drives the detail hero (Figure + ambient) and the OG
+  // card. Required in the CMS, but optional here — the wire format can be a NULL
+  // or an unpopulated id, both coerced to undefined at the mapper boundary.
+  thumbnail?: { src: string; width: number; height: number };
   body?: SerializedEditorState;
   // Admin-entered SEO overrides (Payload SEO plugin `meta` group), coerced from
   // the wire format: NULLs → undefined and the populated media → its url string.

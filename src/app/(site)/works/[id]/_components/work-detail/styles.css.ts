@@ -38,28 +38,6 @@ export const meta = css({
   color: 'fg.subtle',
 });
 
-// Persistent per-work ambient backdrop. Fixed to the viewport and sunk to zIndex.hide
-// (-1) — between the body's 方眼 grid (the rootmost background) and the GameOfLife
-// canvas (zIndex.base). The work's thumb url is passed via `--thumb` and rendered
-// full-viewport with heavy blur. An 82% white veil is stacked over the image via a
-// flat linear-gradient so the artwork's residual contrast can't bleed behind body
-// text; the whole layer then runs at partial opacity so the site's signature grid
-// keeps showing through underneath rather than being slabbed over by an opaque image.
-// The net read: near-white page, the grid intact, a faint blurred trace of the work's
-// colour as ambience. Fixed positioning holds because no ancestor (WorkDetail root,
-// the page <main>) establishes a transform/filter containing block.
-export const ambient = css({
-  position: 'fixed',
-  inset: '0',
-  zIndex: 'hide',
-  backgroundImage: '[linear-gradient(rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.82)), var(--thumb)]',
-  backgroundSize: 'cover',
-  backgroundPosition: 'center',
-  filter: '[blur(40px)]',
-  opacity: '[0.5]',
-  pointerEvents: 'none',
-});
-
 // Thin override on top of RichText's own `styles.root` (which already owns color
 // fg.default / fontSize md / lineHeight jp). Dims the prose to the muted ink so
 // the body sits quieter than the spec ledger — the proof aesthetic. No weight

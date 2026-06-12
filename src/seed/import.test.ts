@@ -146,6 +146,18 @@ describe('importBlog — body image media resolution', () => {
     const blogWrite = writes.find((call) => call.collection === 'blog');
     expect(uploadValuesOf(blogWrite?.data)).toEqual([]);
   });
+
+  it('resolves a top-level thumbnailFile to a media id and strips the raw key', async () => {
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'post', thumbnailFile: 'v3-top.png' }]));
+    direntsOnce([asDirent('v3-top.png')]);
+
+    const { payload, writes } = makeMediaFakePayload();
+    await importBlog(payload);
+
+    const blogWrite = writes.find((call) => call.collection === 'blog');
+    expect(blogWrite?.data?.thumbnail).toBe(101);
+    expect(blogWrite?.data?.thumbnailFile).toBeUndefined();
+  });
 });
 
 describe('importWorks — body image media resolution', () => {

@@ -58,6 +58,7 @@ export const colophon = {
       { label: 'いちばん下のフッター', target: 'SiteFooter' },
       { label: '起動演出を待たせる土台', target: 'BootStatusProvider' },
       { label: 'アニメーションの on/off を束ねる土台（ヘッダーの motion トグル）', target: 'MotionProvider' },
+      { label: 'works・blog 詳細の背後に敷くサムネイルのぼかし', target: 'AmbientBackdrop' },
     ],
     // フロー要素 — 生デモは _demos に置き、name で対応付ける。
     items: [
