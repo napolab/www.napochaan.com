@@ -1702,7 +1702,7 @@
     "thumbnailFile": "vrchat-event-poster.png"
   },
   {
-    "title": "BirthdayWebSite risrill.club 2025",
+    "title": "BirthdayWebSite ristill.club 2025",
     "type": "production",
     "date": "2025-07-07",
     "url": "https://ristill.club/2025",
@@ -1717,104 +1717,35 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "VRChat の推しの誕生日を祝うために、モザイクアートと HP を作成した。20人の協力により約3000枚の画像から24000タイルのモザイクアートを制作し、生成用の Rust ツール ",
+                "text": "VRChat って、とにかく写真をたくさん撮る場所。だからこの誕生日も、ぼくが一からお祝いの絵を描くんじゃなくて、みんながこれまで撮りためてきた写真からお祝いされる形にしたかった。",
                 "type": "text",
                 "version": 1
               },
               {
-                "children": [
-                  {
-                    "detail": 0,
-                    "format": 0,
-                    "mode": "normal",
-                    "style": "",
-                    "text": "mosaic-art-rust",
-                    "type": "text",
-                    "version": 1
-                  }
-                ],
-                "direction": "ltr",
-                "format": "",
-                "indent": 0,
-                "type": "link",
-                "version": 3,
-                "fields": {
-                  "linkType": "custom",
-                  "url": "https://github.com/naporin0624/mosaic-art-rust",
-                  "newTab": true
-                }
+                "type": "linebreak",
+                "version": 1
               },
               {
                 "detail": 0,
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": " も開発した。",
+                "text": "撮りためてきた写真は、そのまま歩いてきた歴史でもあるから。",
                 "type": "text",
                 "version": 1
-              }
-            ],
-            "direction": "ltr",
-            "format": "",
-            "indent": 0,
-            "type": "paragraph",
-            "version": 1,
-            "textFormat": 0,
-            "textStyle": ""
-          },
-          {
-            "children": [],
-            "direction": "ltr",
-            "format": "",
-            "indent": 0,
-            "type": "paragraph",
-            "version": 1,
-            "textFormat": 0,
-            "textStyle": ""
-          },
-          {
-            "children": [
+              },
+              {
+                "type": "linebreak",
+                "version": 1
+              },
               {
                 "detail": 0,
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "可愛らしいデザインとローディング画面にこだわり、提供画像のギャラリーサイトも併設。個別ページの og:image 設定により共有時の見え方を整えた。opennextjs/cloudflare を初めて本格活用したプロダクト。",
+                "text": "その積み重ねを一枚に束ねる方法を探していて、タイルアートにたどり着いた。先にこのコンセプトがあって、それを成立させるために手を動かした制作だったと思う。",
                 "type": "text",
                 "version": 1
-              }
-            ],
-            "direction": "ltr",
-            "format": "",
-            "indent": 0,
-            "type": "paragraph",
-            "version": 1,
-            "textFormat": 0,
-            "textStyle": ""
-          },
-          {
-            "children": [
-              {
-                "type": "autolink",
-                "children": [
-                  {
-                    "detail": 0,
-                    "format": 0,
-                    "mode": "normal",
-                    "style": "",
-                    "text": "https://ristill.club/2025",
-                    "type": "text",
-                    "version": 1
-                  }
-                ],
-                "direction": null,
-                "fields": {
-                  "linkType": "custom",
-                  "url": "https://ristill.club/2025"
-                },
-                "format": "",
-                "indent": 0,
-                "version": 2
               }
             ],
             "direction": "ltr",
@@ -1858,7 +1789,49 @@
             "textStyle": ""
           },
           {
-            "children": [],
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "この仕組みのおかげで、近づけば提供画像のひとつひとつが見えて、離れれば",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "ばつしるし",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/zakoyowadane",
+                  "newTab": true
+                }
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "に描いてもらった推しの一枚絵が浮かび上がる。キービジュアルを描いてもらえたから、集まった写真がそのままお祝いになっている絵を、ちゃんと形にできたんだと思う。",
+                "type": "text",
+                "version": 1
+              }
+            ],
             "direction": "ltr",
             "format": "",
             "indent": 0,
@@ -1869,6 +1842,222 @@
           },
           {
             "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "type": "upload",
+            "version": 3,
+            "format": "",
+            "id": "ce3dc552187a137d5c6ce3ca",
+            "fields": {},
+            "relationTo": "media",
+            "value": {
+              "__file": "ristill-2025-materials.png",
+              "__alt": "みんなで集めた約3000枚を全部見られる素材ギャラリーページ（ristill.club/2025/materials）"
+            }
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "サイトのほうは、可愛らしいデザインとローディング画面をかなり作り込んで、みんなで集めた提供画像をぜんぶ見られる",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "ギャラリー",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://ristill.club/2025/materials",
+                  "newTab": true
+                }
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "も併設した。高解像度版も置いて、個別ページにはひとつずつ og:image を入れて、SNS でシェアするのがちょっと楽しくなる見え方まで作り込んだ。opennextjs/cloudflare をちゃんと使ったのはこれが初めてで、誕生日に間に合わせながら手探りしていた感じだった……。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "type": "block",
+            "format": "",
+            "version": 2,
+            "fields": {
+              "id": "94afbc1614c4c8eea1a1f7c5",
+              "blockType": "image-row",
+              "cells": [
+                {
+                  "id": "465070ae87e50eb04c98ad79",
+                  "image": {
+                    "__file": "ristill-2025-loading-1.png",
+                    "__alt": "ristill.club/2025 のローディング画面（おてぃるわかんなーい！）"
+                  },
+                  "caption": "おてぃるわかんなーい！"
+                },
+                {
+                  "id": "2cc1e41fa8d37084230770b8",
+                  "image": {
+                    "__file": "ristill-2025-loading-2.png",
+                    "__alt": "読み込み完了時のローディング画面（おてぃるわかったっ！）"
+                  },
+                  "caption": "おてぃるわかったっ！"
+                }
+              ]
+            }
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "集めたのは約20人の協力で集まった約3000枚の VRChat 写真で、それを 2025/07/07 に向けて、24000タイルのモザイクアートにした。生成エンジンは Rust で自分で書いた（",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "mosaic-art-rust",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": "ltr",
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/naporin0624/mosaic-art-rust",
+                  "newTab": true
+                }
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "）。集まった画像を Lab 色空間で k-d 木に載せて、ターゲットを細かく区切ったタイルごとに、いちばん色の近い一枚を探して敷き詰めていく。ただ近い順に選ぶだけだと同じ写真が一か所に固まってしまうので、一枚あたりの使用回数に上限をつけたり、隣り合うタイルが似すぎたらペナルティを足したりして、全体がほどよく散らばるようにスコアを組んだ。並べ終わったあともシミュレーテッドアニーリングで少しずつ入れ替えて、ターゲットへの近さを上げている。処理中はターミナルに ASCII のグリッドで進捗が流れて、24000枚が埋まっていくのをただ眺められるようにした。CLI でも GUI でも動く。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [],
+            "direction": "ltr",
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "type": "autolink",
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "https://ristill.club/2025",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://ristill.club/2025"
+                },
+                "format": "",
+                "indent": 0,
+                "version": 2
+              }
+            ],
             "direction": "ltr",
             "format": "",
             "indent": 0,
