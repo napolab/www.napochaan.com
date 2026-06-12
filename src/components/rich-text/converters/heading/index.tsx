@@ -27,6 +27,9 @@ const tagToLevel = (tag: string): 1 | 2 | 3 | 4 | 5 | 6 => {
 /**
  * Renders Lexical heading nodes using the project's `Heading` primitive.
  * Each heading gets a slug `id` derived from its text content for TOC deep-linking.
+ * The blog TOC's reading-progress colours attach to these headings positionally via a
+ * static `view-timeline-name` rule (`:nth-child(N of :is(h2,h3))`, see global-css), so
+ * no per-heading markup is needed here.
  */
 export const headingConverter: Partial<JSXConverters<NodeTypes>> = {
   heading: ({ node, nodesToJSX }) => {

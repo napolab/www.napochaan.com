@@ -66,11 +66,13 @@ const BlogDetailPage = async ({ params }: Props) => {
   return (
     <>
       <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}`} titleTracking="tight" />
-      <div className={s.layout}>
+      <div className={s.layout} data-toc-scope>
         <div className={s.tocCol}>
           <Toc headings={headings} />
         </div>
-        <div className={s.bodyCol}>{post.body === undefined ? null : <RichText data={post.body} />}</div>
+        <div className={s.bodyCol} data-toc-body>
+          {post.body === undefined ? null : <RichText data={post.body} />}
+        </div>
       </div>
       <ShareBar url={absoluteUrl(`/blog/${id}`)} title={post.title} />
       <BlogNav prev={prev} next={next} />

@@ -27,6 +27,10 @@ export const item = css({
   '&[data-level="3"]': { paddingInlineStart: 'block' },
 });
 
+// Resting colour comes from the Link `tone="muted"` recipe — the static fallback
+// where scroll-driven animations are unsupported. Where they are supported, the
+// global `@supports` block animates `color` along each heading's view timeline
+// (animations override normal declarations), so this class just owns typography.
 export const link = css({
   display: 'inline-block',
   fontFamily: 'mono',

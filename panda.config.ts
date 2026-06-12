@@ -44,6 +44,14 @@ export default defineConfig({
         marchingAnts: {
           to: { backgroundPosition: '8px 0, -8px 100%, 0 -8px, 100% 8px' },
         },
+        // Blog TOC reading-progress colour, driven by each heading's scroll-driven
+        // view-timeline (see global-css `@supports` block). Unread (fg.muted) → read
+        // (accent.text), held by `animation-fill-mode: both`. Both ends clear WCAG AA
+        // on the page surface; colours reference the emitted token CSS variables.
+        blogTocProgress: {
+          '0%': { color: 'var(--colors-fg-muted)' },
+          '100%': { color: 'var(--colors-accent-text)' },
+        },
         fadeInUp: {
           '0%': { opacity: '0', transform: 'translateY(16px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },

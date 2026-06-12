@@ -1,6 +1,34 @@
 import type { GlobalStyleObject } from '@pandacss/dev';
 
+// Blog TOC reading-progress, in pure CSS (no JS, no generated stylesheet). Each
+// heading defines a scroll-driven `view-timeline`; the matching TOC link binds to it
+// and runs the `blogTocProgress` colour sweep, so the accent accumulates down the list
+// as the reader scrolls. Heading ↔ link are paired by document order: the Nth heading
+// (`:nth-child(N of :is(h2,h3))`, type-agnostic so h2/h3 share one sequence) and the
+// Nth TOC entry both get `--tl-N`. Enumerated up to a cap because `view-timeline-name`
+// / `animation-timeline` take literal idents (no var(), and `ident()` isn't shipped).
+// `[data-toc-scope]` (the layout wrapping both columns) hoists the names via
+// `timeline-scope` so the TOC column — a sibling subtree — can reach them. All gated
+// behind @supports, so unsupported browsers keep the static `tone="muted"` fallback.
+const TOC_PROGRESS_CAP = 30;
+
+const tocProgressIndices = [...Array(TOC_PROGRESS_CAP).keys()].map((index) => index + 1);
+
+const tocTimelineNames = tocProgressIndices.map((n) => `--tl-${n}`).join(', ');
+
+const tocProgressBindings = Object.fromEntries(
+  tocProgressIndices.flatMap((n) => [
+    [`[data-toc-body] :nth-child(${n} of :is(h2, h3))`, { viewTimelineName: `[--tl-${n}]` }],
+    [`[data-toc-list] > li:nth-child(${n}) > a`, { animationTimeline: `[--tl-${n}]` }],
+  ]),
+);
+
 export const globalCss: GlobalStyleObject = {
+  '@supports (animation-timeline: view())': {
+    '[data-toc-scope]': { timelineScope: `[${tocTimelineNames}]` },
+    '[data-toc-list] a': { animation: '[blogTocProgress linear both]', animationRange: '[cover 60% cover 75%]' },
+    ...tocProgressBindings,
+  },
   // Safe-area-aware extents of the fixed TypographyBand frame. Each edge is the
   // 24px band plus the device safe-area inset (iOS notch / home indicator /
   // landscape ears), so the brand-blue frame paints the whole physical edge
