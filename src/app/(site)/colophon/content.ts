@@ -67,7 +67,7 @@ export const colophon = {
       { name: 'Marquee', why: '横に流れる帯。2トラックで継ぎ目なくループさせてる。' },
       { name: 'Heading', why: '見出しのレベル本体。h1 / h2 はページと節に取ってあるから、ここは h3 以降。' },
       { name: 'SectionHeading', why: '番号付きの節見出し。mono の連番に 2px の罫線で締める。' },
-      { name: 'RichText', why: 'Payload の lexical を描く係。見出し・引用・コード・リスト、ぜんぶこいつが面倒みてる。' },
+      { name: 'RichText', why: 'Payload の lexical を描く係。見出し・引用・コード・リスト・画像（単体／横並び）、ぜんぶこいつが面倒みてる。' },
       { name: 'PhrasedText', why: 'BudouX で日本語を文節ごとに折り返す。auto-phrase が効かない iOS でも改行位置がそろうやつ。' },
       { name: 'Card', why: 'コンテンツの最小枠。as で中の要素を差し替えられるようにしてあるよ。' },
       { name: 'Figure', why: '画像とキャプションのセット。比率を保ったまま枠に収める。' },

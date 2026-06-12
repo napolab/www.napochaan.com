@@ -1,8 +1,12 @@
+import vrchatGlitch from '@assets/vrchat-glitch.jpg';
+import vrchatSquare from '@assets/vrchat-square.jpg';
+
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 
 // A lexical document exercising every node the RichText renderer supports —
-// headings, inline formats, links, lists, blockquote, and a horizontal rule.
-// Used only by the colophon RichText demo.
+// headings, inline formats, links, lists, blockquote, a horizontal rule, a single
+// image upload, and the custom image-row block. Used only by the colophon RichText
+// demo.
 const makeText = (text: string, format = 0) => ({
   type: 'text',
   text,
@@ -11,6 +15,25 @@ const makeText = (text: string, format = 0) => ({
   mode: 'normal',
   detail: 0,
   version: 1,
+});
+
+// A populated-media image-row cell shaped like Payload returns it (url/width/
+// height/alt), built from a static demo asset.
+const makeCell = (asset: { src: string; width: number; height: number }, alt: string, caption: string) => ({
+  image: { url: asset.src, alt, width: asset.width, height: asset.height, filename: alt, mimeType: 'image/jpeg' },
+  caption,
+});
+
+// A single image upload node shaped like Payload returns it, exercising the
+// standalone in-body figure (intrinsic when small, capped to 85% when large).
+const makeUpload = (asset: { src: string; width: number; height: number }, alt: string, caption: string) => ({
+  type: 'upload',
+  version: 3,
+  format: '',
+  id: 'demo-upload',
+  fields: { caption },
+  relationTo: 'media',
+  value: { url: asset.src, alt, width: asset.width, height: asset.height, filename: alt, mimeType: 'image/jpeg' },
 });
 
 const raw: unknown = {
@@ -124,6 +147,17 @@ const raw: unknown = {
         version: 1,
         direction: 'ltr',
         children: [makeText('TERMINAL-style blockquote. Monospaced, muted, prefixed with "> ".')],
+      },
+      makeUpload(vrchatGlitch, 'VRChat アバター glitch', 'single / 2024'),
+      {
+        type: 'block',
+        format: '',
+        version: 2,
+        fields: {
+          id: 'demo-image-row',
+          blockType: 'image-row',
+          cells: [makeCell(vrchatSquare, 'VRChat アバター square', 'left / 2024'), makeCell(vrchatGlitch, 'VRChat アバター glitch', 'right / 2024')],
+        },
       },
       {
         type: 'horizontalrule',

@@ -4,10 +4,11 @@ import { fileURLToPath } from 'node:url';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite';
 import { seoPlugin } from '@payloadcms/plugin-seo';
-import { lexicalEditor } from '@payloadcms/richtext-lexical';
+import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import { r2Storage } from '@payloadcms/storage-r2';
 import { buildConfig } from 'payload';
 
+import { ImageRow } from './blocks/image-row';
 import { Blog } from './collections/blog';
 import { Gallery } from './collections/gallery';
 import { Logs } from './collections/logs';
@@ -149,7 +150,7 @@ export default buildConfig({
   csrf: [serverURL],
   collections: [Users, Media, News, Works, Blog, Gallery, Logs],
   globals: [Profile],
-  editor: lexicalEditor(),
+  editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow] })] }),
   secret,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),

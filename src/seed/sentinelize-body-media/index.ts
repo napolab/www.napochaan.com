@@ -26,13 +26,39 @@ const populatedMediaOf = (node: Record<string, unknown>): PopulatedMedia | undef
   return value as unknown as PopulatedMedia;
 };
 
+// Same populated-media predicate as populatedMediaOf, applied to a bare value
+// rather than an upload node's `.value`. Block fields (e.g. image-row cells) hold
+// media at `fields.cells[i].image`, not in a `value` slot.
+const populatedMediaValueOf = (value: unknown): PopulatedMedia | undefined => {
+  if (!isObject(value)) return undefined;
+  if (typeof value.__file === 'string') return undefined;
+  if (typeof value.filename !== 'string') return undefined;
+  return value as unknown as PopulatedMedia;
+};
+
 const childrenOf = (node: Record<string, unknown>): readonly unknown[] => (Array.isArray(node.children) ? node.children : []);
+
+// Deterministic deep walk of an arbitrary block-fields value: arrays in index
+// order, objects in key (Object.values) order. Any populated-media value found is
+// collected; the order MUST match collectFromValue's rewrite in
+// sentinelize-body-media's import counterpart for positional resolution.
+const collectFromValue = (value: unknown): Media[] => {
+  const media = populatedMediaValueOf(value);
+  if (media !== undefined) return [media];
+  if (Array.isArray(value)) return value.flatMap((item) => collectFromValue(item));
+  if (isObject(value)) return Object.values(value).flatMap((item) => collectFromValue(item));
+  return [];
+};
 
 const collectFromNodes = (nodes: readonly unknown[]): Media[] =>
   nodes.reduce<Media[]>((acc, node) => {
     if (!isObject(node)) return acc;
     const media = populatedMediaOf(node);
     if (media !== undefined) return [...acc, media];
+    // Block nodes carry media inside `fields` (e.g. image-row cells), real lexical
+    // containers carry it in `children`. Walk fields first, then children, so a
+    // node that happens to have both stays in a fixed, document order.
+    if (node.type === 'block') return [...acc, ...collectFromValue(node.fields), ...collectFromNodes(childrenOf(node))];
     return [...acc, ...collectFromNodes(childrenOf(node))];
   }, []);
 
@@ -47,12 +73,31 @@ export const collectBodyMedia = (body: SerializedEditorState): readonly Media[] 
 // Rebuilds a node list with every populated upload value replaced by its
 // sentinel. Non-upload nodes recurse through children; everything else is
 // passed through untouched, which makes the transform idempotent.
+const sentinelOf = (media: PopulatedMedia): { __file: string; __alt: string } => ({ __file: media.filename, __alt: media.alt ?? '' });
+
+// Deep rewrite mirroring collectFromValue's traversal: every populated-media
+// value (at any depth in block fields) becomes its sentinel; arrays/objects are
+// rebuilt in the same order. Idempotent — already-sentinel values are skipped.
+const sentinelizeValue = (value: unknown): unknown => {
+  const media = populatedMediaValueOf(value);
+  if (media !== undefined) return sentinelOf(media);
+  if (Array.isArray(value)) return value.map((item) => sentinelizeValue(item));
+  if (isObject(value)) return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, sentinelizeValue(item)]));
+  return value;
+};
+
 const sentinelizeNodes = (nodes: readonly unknown[]): unknown[] =>
   nodes.map((node) => {
     if (!isObject(node)) return node;
 
     const media = populatedMediaOf(node);
-    if (media !== undefined) return { ...node, value: { __file: media.filename, __alt: media.alt ?? '' } };
+    if (media !== undefined) return { ...node, value: sentinelOf(media) };
+
+    if (node.type === 'block') {
+      const withFields = node.fields === undefined ? node : { ...node, fields: sentinelizeValue(node.fields) };
+      if (!Array.isArray(withFields.children)) return withFields;
+      return { ...withFields, children: sentinelizeNodes(withFields.children) };
+    }
 
     if (!Array.isArray(node.children)) return node;
     return { ...node, children: sentinelizeNodes(node.children) };

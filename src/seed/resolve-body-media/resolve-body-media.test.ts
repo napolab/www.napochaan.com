@@ -30,6 +30,17 @@ const paragraph = (text: string): unknown => ({
   children: [{ type: 'text', text, format: 0, style: '', mode: 'normal', detail: 0, version: 1 }],
 });
 
+// An image-row block node: media lives at node.fields.cells[i].image as a
+// `{ __file, __alt }` sentinel, NOT in `value` nor in `children`.
+const imageRowBlock = (cells: readonly unknown[]): unknown => ({
+  type: 'block',
+  format: '',
+  version: 2,
+  fields: { id: 'b1', blockType: 'image-row', cells },
+});
+
+const cell = (file: string, alt: string, caption?: string): unknown => ({ image: { __file: file, __alt: alt }, caption });
+
 const sentinelWithFields = (file: string, alt: string, fields: unknown): unknown => ({
   type: 'upload',
   relationTo: 'media',
@@ -71,6 +82,21 @@ describe('collectUploadSentinels', () => {
     const body = bodyOf([container]);
 
     expect(collectUploadSentinels(body)).toEqual([{ file: 'nested.png', alt: 'nested alt' }]);
+  });
+
+  it('collects sentinels embedded in a block node fields (image-row cells)', () => {
+    const body = bodyOf([imageRowBlock([cell('left.png', 'left alt'), cell('right.png', 'right alt')])]);
+
+    expect(collectUploadSentinels(body)).toEqual([
+      { file: 'left.png', alt: 'left alt' },
+      { file: 'right.png', alt: 'right alt' },
+    ]);
+  });
+
+  it('collects block-embedded sentinels in document order alongside upload nodes', () => {
+    const body = bodyOf([sentinel('a.png', 'alt a'), imageRowBlock([cell('left.png', 'left alt'), cell('right.png', 'right alt')]), sentinel('b.png', 'alt b')]);
+
+    expect(collectUploadSentinels(body).map((s) => s.file)).toEqual(['a.png', 'left.png', 'right.png', 'b.png']);
   });
 
   it('does not mutate the input body', () => {
@@ -144,6 +170,36 @@ describe('applyResolvedMedia', () => {
     const [outer] = next.root.children as unknown as { children?: UploadLike[] }[];
     expect(outer?.children).toHaveLength(1);
     expect(outer?.children?.[0]?.type).toBe('paragraph');
+  });
+
+  it('rewrites sentinels embedded in a block node fields (image-row cells) to numeric ids, preserving captions', () => {
+    const body = bodyOf([imageRowBlock([cell('left.png', 'left alt', 'left tag'), cell('right.png', 'right alt', 'right tag')])]);
+
+    const next = applyResolvedMedia(body, [
+      { file: 'left.png', alt: 'left alt', id: 10 },
+      { file: 'right.png', alt: 'right alt', id: 11 },
+    ]);
+
+    const [block] = next.root.children as unknown as { fields?: { cells?: { image?: unknown; caption?: unknown }[] } }[];
+    expect(block?.fields?.cells?.[0]?.image).toBe(10);
+    expect(block?.fields?.cells?.[0]?.caption).toBe('left tag');
+    expect(block?.fields?.cells?.[1]?.image).toBe(11);
+    expect(block?.fields?.cells?.[1]?.caption).toBe('right tag');
+  });
+
+  it('leaves an unresolved block-embedded sentinel as-is when its id is undefined (import must not break)', () => {
+    const body = bodyOf([imageRowBlock([cell('left.png', 'left alt'), cell('missing.png', 'gone')])]);
+
+    const next = applyResolvedMedia(body, [
+      { file: 'left.png', alt: 'left alt', id: 10 },
+      { file: 'missing.png', alt: 'gone', id: undefined },
+    ]);
+
+    const [block] = next.root.children as unknown as { fields?: { cells?: { image?: unknown }[] } }[];
+    expect(block?.fields?.cells?.[0]?.image).toBe(10);
+    // Unresolved cell keeps its sentinel rather than being dropped (a block cell
+    // cannot be safely removed the way a top-level upload node can).
+    expect(block?.fields?.cells?.[1]?.image).toEqual({ __file: 'missing.png', __alt: 'gone' });
   });
 
   it('leaves non-upload nodes untouched', () => {

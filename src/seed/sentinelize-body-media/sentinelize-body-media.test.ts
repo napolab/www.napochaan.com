@@ -47,6 +47,18 @@ const sentinelUpload = (file: string, alt: string): unknown => ({
   value: { __file: file, __alt: alt },
 });
 
+// An image-row block node: media lives at node.fields.cells[i].image as a
+// populated Media object (the staging shape seed:export sees), NOT in `value`
+// nor in `children`.
+const imageRowBlock = (cells: readonly unknown[]): unknown => ({
+  type: 'block',
+  format: '',
+  version: 2,
+  fields: { id: 'b1', blockType: 'image-row', cells },
+});
+
+const cell = (id: number, filename: string, alt: unknown, caption?: string): unknown => ({ image: populatedMedia(id, filename, alt), caption });
+
 const paragraph = (text: string): unknown => ({
   type: 'paragraph',
   textFormat: 0,
@@ -95,6 +107,21 @@ describe('collectBodyMedia', () => {
     const body = bodyOf([sentinelUpload('done.png', 'done alt'), populatedUpload(55, 'a.png', 'alt a')]);
 
     expect(collectBodyMedia(body).map((media) => media.filename)).toEqual(['a.png']);
+  });
+
+  it('collects populated media nested inside a block node fields (image-row cells)', () => {
+    const body = bodyOf([imageRowBlock([cell(60, 'left.png', 'left alt'), cell(61, 'right.png', 'right alt')])]);
+
+    const collected = collectBodyMedia(body);
+
+    expect(collected.map((media) => media.filename)).toEqual(['left.png', 'right.png']);
+    expect(collected.map((media) => media.id)).toEqual([60, 61]);
+  });
+
+  it('collects block-embedded media in document order alongside upload nodes', () => {
+    const body = bodyOf([populatedUpload(55, 'a.png', 'alt a'), imageRowBlock([cell(60, 'left.png', 'left alt'), cell(61, 'right.png', 'right alt')]), populatedUpload(56, 'b.png', 'alt b')]);
+
+    expect(collectBodyMedia(body).map((media) => media.filename)).toEqual(['a.png', 'left.png', 'right.png', 'b.png']);
   });
 
   it('ignores upload nodes whose value object has no string filename', () => {
@@ -146,6 +173,18 @@ describe('applyBodySentinels', () => {
 
     const [outer] = next.root.children as unknown as { children?: UploadLike[] }[];
     expect(outer?.children?.[0]?.value).toEqual({ __file: 'nested.png', __alt: 'nested alt' });
+  });
+
+  it('sentinelizes populated media embedded in a block node fields (image-row cells), preserving captions', () => {
+    const body = bodyOf([imageRowBlock([cell(60, 'left.png', 'left alt', 'left tag'), cell(61, 'right.png', 'right alt', 'right tag')])]);
+
+    const next = applyBodySentinels(body);
+
+    const [block] = next.root.children as unknown as { fields?: { cells?: { image?: unknown; caption?: unknown }[] } }[];
+    expect(block?.fields?.cells?.[0]?.image).toEqual({ __file: 'left.png', __alt: 'left alt' });
+    expect(block?.fields?.cells?.[0]?.caption).toBe('left tag');
+    expect(block?.fields?.cells?.[1]?.image).toEqual({ __file: 'right.png', __alt: 'right alt' });
+    expect(block?.fields?.cells?.[1]?.caption).toBe('right tag');
   });
 
   it('maps a missing or null alt to an empty __alt', () => {
