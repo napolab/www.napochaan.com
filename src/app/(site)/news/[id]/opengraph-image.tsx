@@ -33,7 +33,8 @@ const Image = async ({ params }: Params) => {
     // news has no image source → always the GoL field.
   });
 
-  const board = ogLifeBoard(FIELD_COLS, FIELD_ROWS, { seed: id.length * 9973 + 17 });
+  const idNum = parseInt(id, 10);
+  const board = ogLifeBoard(FIELD_COLS, FIELD_ROWS, { seed: (Number.isNaN(idNum) ? 1 : idNum) * 9973 + 17 });
   const fonts = await loadOgFonts(baseUrl);
 
   return new ImageResponse(<OgCard data={data} wordmarkUrl={`${baseUrl}${wordmark.src}`} board={board} />, { ...size, fonts });

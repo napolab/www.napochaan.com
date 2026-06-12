@@ -31,7 +31,8 @@ const Image = async ({ params }: Params) => {
     imageUrl: work?.thumbnail?.src ?? undefined, // present → image field; absent → GoL.
   });
 
-  const board = ogLifeBoard(FIELD_COLS, FIELD_ROWS, { seed: id.length * 9973 + 31 });
+  const idNum = parseInt(id, 10);
+  const board = ogLifeBoard(FIELD_COLS, FIELD_ROWS, { seed: (Number.isNaN(idNum) ? 1 : idNum) * 9973 + 31 });
   const fonts = await loadOgFonts(baseUrl);
 
   return new ImageResponse(<OgCard data={data} wordmarkUrl={`${baseUrl}${wordmark.src}`} board={board} />, { ...size, fonts });
