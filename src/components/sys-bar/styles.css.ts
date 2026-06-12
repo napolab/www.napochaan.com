@@ -43,10 +43,15 @@ export const nav = css({
   flexWrap: 'wrap',
 });
 
-// The menu trigger is mobile-only: it carries the full nav once the inline row
-// is trimmed to the primary shortcuts below 768px. `margin-inline-start: auto`
-// absorbs the slack, pinning the compact trigger to the right edge while the
-// primary shortcuts (index / about / works) stay clustered on the left.
+// The menu trigger carries the full nav whenever any inline slot has collapsed.
+// It hides at desktop (768px), the same width where the last slot (blog) reappears
+// and the full seven sit inline — so the trigger and the seventh slot never show
+// at once. It must vanish exactly when blog appears (not at ~670 where the other
+// six already fit): the trigger is as wide as a slot (~75.6px measured), so "six
+// inline + trigger" and "seven inline, no trigger" cost the same width — collapse
+// them at one threshold and gallery + blog would pop in together. Holding the
+// trigger to 768 keeps blog in the menu through the 678–767 band so the row still
+// fills one slot at a time. `margin-inline-start: auto` pins the trigger right.
 export const menuRoot = css({
   display: { base: 'block', desktop: 'none' },
   marginInlineStart: 'auto',
@@ -110,22 +115,37 @@ export const menuItem = css({
 });
 
 export const navLink = css({
-  // Below 768px only the primary shortcuts (index/about/works) show inline; the
-  // rest live in the menu. From desktop up, every slot is inline.
-  display: { base: 'none', desktop: 'block' },
-  '&[data-primary]': { display: 'block' },
+  // Progressive collapse, tuned to the *measured* one-line fit so the row stays
+  // as full as possible and only sheds an item right before it would wrap. As the
+  // viewport shrinks the row drops one slot at a time from the right (blog → … →
+  // index, which always stays); whatever is hidden stays reachable in the menu,
+  // which always lists the full set. Each threshold is the min-width at which the
+  // N leftmost slots + the menu trigger fit on one line. Geometry was read off the
+  // live bar: slot 75.6px, gap 12px, navRow→trigger gap 16px, trigger 75.6px,
+  // mobile gutter 64px → required(M) = 87.6·M + 143.6, plus ~8px slack. blog is
+  // the exception: it appears at desktop (768) as the trigger hides, because "6
+  // slots + trigger" and "7 slots, no trigger" cost the same width (see menuRoot),
+  // so giving blog its own sub-768 threshold would pop it in alongside gallery.
+  // Raw @media keeps these per-row widths out of the shared breakpoint scale;
+  // order 6 reuses the desktop token since it is precisely the full-row width.
+  display: 'none',
+  '&[data-order="0"]': { display: 'block' },
+  '&[data-order="1"]': { '@media (min-width: 325px)': { display: 'block' } },
+  '&[data-order="2"]': { '@media (min-width: 414px)': { display: 'block' } },
+  '&[data-order="3"]': { '@media (min-width: 502px)': { display: 'block' } },
+  '&[data-order="4"]': { '@media (min-width: 590px)': { display: 'block' } },
+  '&[data-order="5"]': { '@media (min-width: 678px)': { display: 'block' } },
+  '&[data-order="6"]': { display: { base: 'none', desktop: 'block' } },
   // Fixed-width slots so the active (black) highlight box is the same size on
-  // every item and never resizes as the current page changes. Desktop sizes to
-  // the longest label ("gallery"); the mobile shortcuts are all 5 chars
-  // (index/about/works). NOTE these widths are border-box, so the inline padding
-  // below is subtracted from them: a slot must hold its label *plus* 12px of
-  // padding. 7ch (≈46.8px content) clears the 42px label with ~2.4px each side —
-  // the same slack desktop's 9ch leaves "gallery" — while keeping the three links
-  // + menu on one row down to 375px. 6ch (≈38.4px content) was narrower than the
-  // label, so the fill overflowed into its padding and read as off-center.
+  // every item and never resizes as the current page changes. 9ch at every width:
+  // long labels now collapse inline (not just into the menu), so every slot must
+  // hold the longest one ("gallery", 7 chars) plus its 12px inline padding —
+  // border-box, so the padding is subtracted from the 9ch. 9ch (≈75.6px) leaves
+  // "gallery" (≈58.8px) comfortable slack and keeps the run evenly clustered
+  // however many slots remain after the collapse.
   flex: 'none',
-  width: { base: '[7ch]', desktop: '[9ch]' },
-  minWidth: { base: '[7ch]', desktop: '[9ch]' },
+  width: '[9ch]',
+  minWidth: '[9ch]',
   textAlign: 'center',
   fontFamily: 'mono',
   fontVariationSettings: '"wght" 600',
