@@ -10,6 +10,8 @@ import * as s from './styles.css';
 import { findWorkById, findWorksList } from '@lib/payload/works';
 
 import { PageHeader } from '@components/page-header';
+import { ShareBar } from '@components/share-bar';
+import { absoluteUrl } from '@utils/site-url';
 import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
@@ -71,6 +73,7 @@ const WorkDetailPage = async ({ params }: Props) => {
           <RelatedWorks works={related} />
         </>
       ) : null}
+      <ShareBar url={absoluteUrl(`/works/${id}`)} title={work.title} />
       <AdjacentNav prev={prev} next={next} />
     </>
   );
