@@ -15,7 +15,7 @@ export const Blog = {
   defaultSort: '-publishedAt',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'publishedAt', '_status'],
+    defaultColumns: ['title', 'thumbnail', 'publishedAt', '_status'],
   },
   access: {
     read: ({ req: { user } }) => (user !== null ? true : { _status: { equals: 'published' } }),
@@ -30,6 +30,14 @@ export const Blog = {
   },
   fields: [
     { name: 'title', label: 'タイトル', type: 'text', required: true },
+    {
+      name: 'thumbnail',
+      label: 'サムネイル',
+      type: 'upload',
+      relationTo: 'media',
+      required: true,
+      admin: { description: '一覧・記事ヘッダーの hero と OG 画像（og:image / twitter:image）に使われる代表画像。' },
+    },
     {
       name: 'publishedAt',
       label: '公開日',

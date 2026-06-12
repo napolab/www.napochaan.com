@@ -1,3 +1,4 @@
+import { AmbientBackdrop } from '@components/ambient-backdrop';
 import { Figure } from '@components/figure';
 import { formatBlurURL } from '@components/image/helper';
 import { RichText } from '@components/rich-text';
@@ -5,7 +6,6 @@ import { RichText } from '@components/rich-text';
 import * as s from './styles.css';
 
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
-import type { CSSProperties } from 'react';
 
 type WorkDetailData = {
   title: string;
@@ -18,10 +18,6 @@ type WorkDetailData = {
 type Props = {
   work: WorkDetailData;
 };
-
-// The blurred ambient background url for the work, set as a CSS variable so the
-// fixed s.ambient layer can paint this work's thumb behind all content.
-const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})` }) as CSSProperties;
 
 // The detail body of a single work: a uniform contact-sheet proof image, a mono
 // spec ledger (type / year), then the body prose rendered as Payload-Lexical rich
@@ -37,7 +33,7 @@ export const WorkDetail = ({ work }: Props) => {
 
   return (
     <section className={s.root} aria-label="work detail">
-      {thumbnail === undefined ? null : <span className={s.ambient} aria-hidden="true" style={ambientStyle(thumbnail.src)} />}
+      {thumbnail === undefined ? null : <AmbientBackdrop src={thumbnail.src} />}
       {thumbnail === undefined ? (
         <span className={s.imagePlaceholder} aria-hidden="true" />
       ) : (

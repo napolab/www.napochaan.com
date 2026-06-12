@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation';
 
+import { BlogHero } from './_components/blog-hero';
 import { BlogNav } from './_components/blog-nav';
 import { Toc } from './_components/toc';
 import { adjacentPosts } from '../_lib/adjacent-posts';
@@ -61,11 +62,13 @@ const BlogDetailPage = async ({ params }: Props) => {
   const { prev, next } = adjacentPosts(posts, id);
   const headings = extractHeadings(post.body ?? null);
   const crumbs = buildCrumbs(post.title);
+  const formattedDate = dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD');
 
   // Renders inside the blog segment's shared `<main>` (see `blog/layout.tsx`).
   return (
     <>
-      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}`} titleTracking="tight" />
+      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} titleTracking="tight" />
+      {post.thumbnail === undefined ? null : <BlogHero thumbnail={post.thumbnail} title={post.title} caption={`blog / ${formattedDate}`} />}
       <div className={s.layout} data-toc-scope>
         <div className={s.tocCol}>
           <Toc headings={headings} />

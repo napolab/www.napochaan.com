@@ -150,16 +150,25 @@ const exportSimple = async (instance: Payload, slug: 'news' | 'logs', sort: stri
   );
 };
 
-const toBlogRecord = (doc: Blog): Record<string, unknown> => sentinelizeBodyField(formatDayField(stripSystemKeys(doc), 'publishedAt'));
+// The `thumbnail` upload is lifted to a portable `thumbnailFile` (mirrors works);
+// the populated Media object never reaches the JSON (import re-resolves the file).
+const toBlogRecord = (doc: Blog): Record<string, unknown> => {
+  const { thumbnail, ...rest } = doc;
+  const thumbnailFile = mediaFilename(thumbnail);
+  const base = sentinelizeBodyField(formatDayField(stripSystemKeys(rest), 'publishedAt'));
+  if (thumbnailFile === undefined) return base;
+  return { ...base, thumbnailFile };
+};
 
-// Blog bodies may embed lexical upload nodes; at depth: 1 each carries the full
-// populated Media object, which is tied to this database's ids. Save every
-// embedded binary under assets/blog/ and rewrite the value back to a portable
-// `{ __file, __alt }` sentinel so `seed:import` (resolve-body-media) can
-// re-resolve it against whatever database it runs on.
+// Blog carries a `thumbnail` upload plus a body that may embed lexical upload
+// nodes; at depth: 1 each carries the full populated Media object, tied to this
+// database's ids. Save the thumbnail and every embedded binary under assets/blog/
+// and rewrite the values back to portable file references so `seed:import` can
+// re-resolve them against whatever database it runs on.
 const exportBlog = async (instance: Payload): Promise<void> => {
   const { docs } = await instance.find({ collection: 'blog', depth: 1, limit: 0, sort: 'publishedAt', overrideAccess: true });
   for (const doc of docs) {
+    await saveMediaFile(doc.thumbnail, blogAssetsDir, r2Bucket, instance.logger);
     for (const media of collectBodyMedia(asEditorState(doc.body))) {
       await saveMediaFile(media, blogAssetsDir, r2Bucket, instance.logger);
     }
