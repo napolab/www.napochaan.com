@@ -49,7 +49,6 @@ export const OgCard = ({ data, wordmarkUrl, board }: Props) => {
             flexDirection: 'column',
             justifyContent: 'space-between',
             padding: 40,
-            background: CANVAS,
             borderRight: `2px solid ${INK}`,
             overflow: 'hidden',
           }}
