@@ -19,6 +19,7 @@ import { PhrasedText } from '@components/phrased-text';
 import { RichText } from '@components/rich-text';
 import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
+import { ShareBar } from '@components/share-bar';
 import { SystemAnnotation } from '@components/system-annotation';
 import { Table } from '@components/table';
 import { Tag } from '@components/tag';
@@ -233,6 +234,11 @@ export const demos: Record<ComponentName, ReactNode> = {
   FeedLink: (
     <NoAction>
       <FeedLink href="/news/rss.xml" label="サンプル RSS フィード" />
+    </NoAction>
+  ),
+  ShareBar: (
+    <NoAction>
+      <ShareBar url="https://www.napochaan.com/works/1" title="サンプル作品タイトル" />
     </NoAction>
   ),
   DecodingSkeleton: <DecodingSkeleton rows={4} />,
