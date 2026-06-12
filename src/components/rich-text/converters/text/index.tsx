@@ -93,15 +93,28 @@ const FORMATTERS: readonly [number, (content: ReactNode) => ReactNode][] = [
 
 const applyFormat = (format: number, content: ReactNode): ReactNode => FORMATTERS.reduce((acc, [bit, wrap]) => ((format & bit) === 0 ? acc : wrap(acc)), content);
 
+// Lexical node types that already render an <a>. Text inside one must NOT be
+// re-linkified — doing so nests <a> inside <a> and breaks hydration.
+const LINK_PARENT_TYPES: ReadonlySet<string> = new Set(['link', 'autolink']);
+
+/**
+ * True when this text node is a child of a link node, so `linkify` must be
+ * skipped (the ancestor link already provides the anchor).
+ */
+const isInsideLink = (parentType: string | undefined): boolean => {
+  return parentType !== undefined && LINK_PARENT_TYPES.has(parentType);
+};
+
 /**
  * Overrides Payload's default `text` converter.
  * Auto-links bare emails / http(s) URLs and applies Panda-styled inline formatting
  * (bold → accent, strikethrough → danger, code → terminal-style).
  */
 export const textConverter: Partial<JSXConverters<NodeTypes>> = {
-  text: ({ node }) => {
+  text: ({ node, parent }) => {
     const isCode = (node.format & IS_CODE) !== 0;
-    const content = isCode ? node.text : linkify(node.text);
+    const skipLinkify = isCode || isInsideLink(parent?.type);
+    const content = skipLinkify ? node.text : linkify(node.text);
     return applyFormat(node.format, content);
   },
 };
