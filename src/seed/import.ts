@@ -133,24 +133,14 @@ const importNews = async (instance: Payload): Promise<void> => {
   instance.logger.info(`[seed:import] upserted ${records.length} news`);
 };
 
-type WorkRecord = Omit<Work, 'id' | 'createdAt' | 'updatedAt' | 'meta' | 'thumbnail'> & { thumbnailFile?: string };
-const importWorks = async (instance: Payload): Promise<void> => {
-  const records = await readData<WorkRecord>('works');
-  for (const record of records) {
-    const { thumbnailFile, ...rest } = record;
-    const thumbnail = thumbnailFile === undefined ? undefined : await ensureMedia(instance, thumbnailFile, rest.title);
-    const data = { ...rest, body: asRichText(rest.body), ...(thumbnail === undefined ? {} : { thumbnail }) };
-    await upsertByTitle(instance, 'works', rest.title, data);
-  }
-  instance.logger.info(`[seed:import] upserted ${records.length} works`);
-};
-
 // Resolves every upload sentinel in a body to a real media id (creating media
 // rows as needed), then rewrites the body: each sentinel becomes its numeric id,
 // or is dropped when the asset is missing (ensureMedia already warns). The raw
 // JSON body is coerced once here (same boundary as asRichText) and a new
-// (resolved) body is returned — the input tree is left untouched.
+// (resolved) body is returned — the input tree is left untouched. Works bodies
+// are optional, so an absent body (null / undefined) passes straight through.
 const resolveBodyMedia = async (instance: Payload, rawBody: unknown): Promise<RichText> => {
+  if (rawBody === null || rawBody === undefined) return asRichText(rawBody);
   const body = rawBody as unknown as SerializedEditorState;
   const sentinels = collectUploadSentinels(body);
   if (sentinels.length === 0) return asRichText(body);
@@ -163,6 +153,22 @@ const resolveBodyMedia = async (instance: Payload, rawBody: unknown): Promise<Ri
   );
 
   return asRichText(applyResolvedMedia(body, resolutions));
+};
+
+type WorkRecord = Omit<Work, 'id' | 'createdAt' | 'updatedAt' | 'meta' | 'thumbnail'> & { thumbnailFile?: string };
+// Exported so the body-media resolution wiring (sentinel -> media id) can be
+// exercised end-to-end against a fake Payload in import.test.ts, and reused by
+// the separate works body-media repair step.
+export const importWorks = async (instance: Payload): Promise<void> => {
+  const records = await readData<WorkRecord>('works');
+  for (const record of records) {
+    const { thumbnailFile, ...rest } = record;
+    const thumbnail = thumbnailFile === undefined ? undefined : await ensureMedia(instance, thumbnailFile, rest.title);
+    const body = await resolveBodyMedia(instance, rest.body);
+    const data = { ...rest, body, ...(thumbnail === undefined ? {} : { thumbnail }) };
+    await upsertByTitle(instance, 'works', rest.title, data);
+  }
+  instance.logger.info(`[seed:import] upserted ${records.length} works`);
 };
 
 type BlogRecord = Omit<Blog, 'id' | 'createdAt' | 'updatedAt' | 'meta'>;

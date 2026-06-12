@@ -351,7 +351,7 @@
     "thumbnailFile": "flat-shop.jpg"
   },
   {
-    "title": "napochaan.com の作成 v.2.0.0",
+    "title": "v2.0.0 www.napochaan.com",
     "type": "production",
     "date": "2023-03-26",
     "url": "https://github.com/napolab/www.napochaan.com",
@@ -1573,19 +1573,8 @@
             "fields": {},
             "relationTo": "media",
             "value": {
-              "id": 54,
-              "alt": "ristill.club/2025 first view",
-              "updatedAt": "2026-06-10T15:38:23.976Z",
-              "createdAt": "2026-06-10T15:38:23.976Z",
-              "url": "/api/media/file/%E3%82%B9%E3%82%AF%E3%83%AA%E3%83%BC%E3%83%B3%E3%82%B7%E3%83%A7%E3%83%83%E3%83%88%202026-06-11%200.37.35.png",
-              "thumbnailURL": null,
-              "filename": "スクリーンショット 2026-06-11 0.37.35.png",
-              "mimeType": "image/png",
-              "filesize": 4512038,
-              "width": 3600,
-              "height": 2086,
-              "focalX": 50,
-              "focalY": 50
+              "__file": "スクリーンショット 2026-06-11 0.37.35.png",
+              "__alt": "ristill.club/2025 first view"
             }
           },
           {

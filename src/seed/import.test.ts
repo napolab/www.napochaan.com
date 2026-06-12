@@ -2,7 +2,7 @@ import { readdir, readFile } from 'node:fs/promises';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ensureAdminUser, importBlog, importContent, importSeedData } from './import';
+import { ensureAdminUser, importBlog, importContent, importSeedData, importWorks } from './import';
 
 import { richTextFromBlocks } from '@utils/sample-rich-text';
 
@@ -145,5 +145,51 @@ describe('importBlog — body image media resolution', () => {
 
     const blogWrite = writes.find((call) => call.collection === 'blog');
     expect(uploadValuesOf(blogWrite?.data)).toEqual([]);
+  });
+});
+
+describe('importWorks — body image media resolution', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('resolves an upload sentinel in the body to a numeric media id before upsert', async () => {
+    const body = richTextFromBlocks([
+      { type: 'p', text: 'intro' },
+      { type: 'img', file: 'work-shot.png', alt: 'shot' },
+    ]);
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'work', body }]));
+    direntsOnce([asDirent('work-shot.png')]);
+
+    const { payload, writes } = makeMediaFakePayload();
+    await importWorks(payload);
+
+    expect(writes.some((call) => call.collection === 'media')).toBe(true);
+    const workWrite = writes.find((call) => call.collection === 'works');
+    expect(uploadValuesOf(workWrite?.data)).toEqual([101]);
+  });
+
+  it('drops an upload node whose asset is missing (ensureMedia returns undefined)', async () => {
+    const body = richTextFromBlocks([
+      { type: 'p', text: 'intro' },
+      { type: 'img', file: 'missing.png', alt: 'gone' },
+    ]);
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'work', body }]));
+    direntsOnce([]);
+
+    const { payload, writes } = makeMediaFakePayload();
+    await importWorks(payload);
+
+    const workWrite = writes.find((call) => call.collection === 'works');
+    expect(uploadValuesOf(workWrite?.data)).toEqual([]);
+  });
+
+  it('passes a work with no body through without throwing', async () => {
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'w' }]));
+
+    const { payload, writes } = makeMediaFakePayload();
+    await importWorks(payload);
+
+    expect(writes.some((call) => call.collection === 'works')).toBe(true);
   });
 });

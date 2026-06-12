@@ -69,10 +69,29 @@ const mediaFilename = (value: number | Media | null | undefined): string | undef
   return value.filename ?? undefined;
 };
 
+// Lexical richText: the generated body shape carries an index signature the
+// serialized lexical types don't, so coerce once at this read boundary (same
+// rationale as import.ts's `asRichText`).
+const asEditorState = (value: unknown): SerializedEditorState => value as unknown as SerializedEditorState;
+
+// True only for a value shaped like a lexical editor state (an object whose
+// `root.children` is an array). Works bodies are optional, so an absent body
+// (undefined / null / non-editor-state) must pass through untouched.
+const isEditorState = (value: unknown): boolean => isPlainObject(value) && isPlainObject(value.root) && Array.isArray(value.root.children);
+
+// Sentinelize the lexical `body` in place, preserving the surrounding key order
+// (mirrors formatDayField) so the exported JSON diff stays minimal. No-ops when
+// the body is absent / not an editor state (works bodies are optional; blog
+// always has one, so blog is unchanged).
+const sentinelizeBodyField = (record: Record<string, unknown>): Record<string, unknown> =>
+  Object.fromEntries(
+    record.body === undefined || !isEditorState(record.body) ? Object.entries(record) : Object.entries(record).map(([k, v]) => (k === 'body' ? [k, applyBodySentinels(asEditorState(v))] : [k, v])),
+  );
+
 const toWorkRecord = (work: Work): Record<string, unknown> => {
   const { thumbnail, ...rest } = work;
   const thumbnailFile = mediaFilename(thumbnail);
-  const base = formatDayField(stripSystemKeys(rest), 'date');
+  const base = sentinelizeBodyField(formatDayField(stripSystemKeys(rest), 'date'));
   if (thumbnailFile === undefined) return base;
   return { ...base, thumbnailFile };
 };
@@ -97,6 +116,13 @@ const exportWorks = async (instance: Payload): Promise<void> => {
   const { docs } = await instance.find({ collection: 'works', depth: 1, limit: 0, sort: 'date', overrideAccess: true });
   for (const doc of docs) {
     await saveMediaFile(doc.thumbnail, assetsDir, r2Bucket, instance.logger);
+    // Works bodies are optional and may embed lexical upload nodes (mirrors
+    // blog). Only walk a present body; keep the binaries alongside the thumbnail
+    // in the root assetsDir (no works subfolder).
+    if (!isEditorState(doc.body)) continue;
+    for (const media of collectBodyMedia(asEditorState(doc.body))) {
+      await saveMediaFile(media, assetsDir, r2Bucket, instance.logger);
+    }
   }
   await writeJson(instance, 'works', docs.map(toWorkRecord));
 };
@@ -123,16 +149,6 @@ const exportSimple = async (instance: Payload, slug: 'news' | 'logs', sort: stri
     docs.map((doc) => formatDayField(stripKeys(doc, keys), dateKey)),
   );
 };
-
-// Lexical richText: the generated body shape carries an index signature the
-// serialized lexical types don't, so coerce once at this read boundary (same
-// rationale as import.ts's `asRichText`).
-const asEditorState = (value: unknown): SerializedEditorState => value as unknown as SerializedEditorState;
-
-// Sentinelize the lexical `body` in place, preserving the surrounding key order
-// (mirrors formatDayField) so the exported JSON diff stays minimal.
-const sentinelizeBodyField = (record: Record<string, unknown>): Record<string, unknown> =>
-  Object.fromEntries(Object.entries(record).map(([k, v]) => (k === 'body' ? [k, applyBodySentinels(asEditorState(v))] : [k, v])));
 
 const toBlogRecord = (doc: Blog): Record<string, unknown> => sentinelizeBodyField(formatDayField(stripSystemKeys(doc), 'publishedAt'));
 
