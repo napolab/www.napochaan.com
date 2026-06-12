@@ -3,7 +3,7 @@
 import { useCallback } from 'react';
 
 import { Button } from '@components/button';
-import { useAutoResetFlag } from '@hooks/use-auto-reset-flag';
+import { useAutoResetState } from '@hooks/use-auto-reset-state';
 
 import { buildTweetUrl } from './build-tweet-url';
 import * as styles from './styles.css';
@@ -15,15 +15,15 @@ type Props = {
 
 // Public detail-page share bar. X (Twitter) is a stateless web-intent link; Copy
 // writes the canonical URL to the clipboard and flips its label to a transient
-// confirmation (the auto-reset flag). Instagram is intentionally omitted — it has
-// no URL share intent.
+// confirmation (the auto-reset state). Instagram is intentionally omitted — it
+// has no URL share intent.
 export const ShareBar = ({ url, title }: Props) => {
-  const { active: copied, trigger: markCopied } = useAutoResetFlag();
+  const [copied, setCopied] = useAutoResetState(false);
 
   const handleCopy = useCallback(async () => {
     await navigator.clipboard.writeText(url);
-    markCopied();
-  }, [url, markCopied]);
+    setCopied(true);
+  }, [url, setCopied]);
 
   return (
     <div className={styles.root} role="group" aria-label="この記事を共有">
