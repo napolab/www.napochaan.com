@@ -10,6 +10,17 @@ export const root = css({
   m: '0',
   // Cover variant clips the scaled blurred backdrop (and the corner tag) to the frame.
   '&[data-variant="cover"]': { overflow: 'hidden' },
+  // Intrinsic fit (cover only): the frame width follows the source's real width,
+  // capped to 85% of the content column (a touch narrower than the body text),
+  // keeping the 16:9 ratio. A small source shrinks the whole frame; a large source
+  // settles at the 85% cap. Centred in the column, with a little breathing room
+  // above and below so the picture sits apart from the surrounding body text.
+  '&[data-variant="cover"][data-fit="intrinsic"]': {
+    width: '[min(var(--figure-width), 85%)]',
+    aspectRatio: '[16 / 9]',
+    marginInline: '[auto]',
+    marginBlock: '8',
+  },
 });
 
 // Uniform 16/9 frame: the image is contained so the whole picture is shown —
@@ -23,6 +34,17 @@ export const image = css({
   aspectRatio: '[16 / 9]',
   objectFit: 'contain',
   'figure[data-variant="cover"] &': {
+    position: 'relative',
+    zIndex: '[1]',
+  },
+  // Intrinsic fit: fill the (intrinsic-width) 16:9 frame and contain, so the
+  // picture is letterboxed over the blurred backdrop — the cover look at a smaller
+  // size. The base 16/9 aspect ratio is cleared so the frame governs the box.
+  'figure[data-variant="cover"][data-fit="intrinsic"] &': {
+    width: 'full',
+    height: 'full',
+    objectFit: 'contain',
+    aspectRatio: '[auto]',
     position: 'relative',
     zIndex: '[1]',
   },

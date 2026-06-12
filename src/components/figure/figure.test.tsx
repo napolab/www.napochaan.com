@@ -28,4 +28,20 @@ describe('Figure', () => {
 
     expect(container.querySelector('span[aria-hidden="true"]')).toBeNull();
   });
+
+  it('marks the figure data-fit="intrinsic" and sets --figure-width to the width prop when fit is intrinsic', async () => {
+    const { container } = await render(<Figure src="/x.jpg" alt="flyer" width={480} height={250} variant="cover" fit="intrinsic" />);
+
+    const figure = container.querySelector('figure[data-variant="cover"][data-fit="intrinsic"]');
+    expect(figure).not.toBeNull();
+    expect((figure as HTMLElement).style.getPropertyValue('--figure-width')).toBe('480px');
+  });
+
+  it('defaults to data-fit="fill" and omits --figure-width when fit is not specified', async () => {
+    const { container } = await render(<Figure src="/x.jpg" alt="flyer" width={200} height={300} variant="cover" />);
+
+    const figure = container.querySelector('figure[data-fit="fill"]');
+    expect(figure).not.toBeNull();
+    expect((figure as HTMLElement).style.getPropertyValue('--figure-width')).toBe('');
+  });
 });
