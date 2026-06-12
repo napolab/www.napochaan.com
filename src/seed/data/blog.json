@@ -205,7 +205,39 @@
               },
               {
                 "type": "text",
-                "text": " さんのタイポが持つ空気が好きなこと、",
+                "text": " さんの ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/ariiol_/status/1991529666973467029",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "typing",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " が持つ graphics や MV がとても好きなこと、",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
