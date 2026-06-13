@@ -9,9 +9,9 @@ import { css } from '@styled/css';
 // and bold (wght 700) so it reads as a deliberate mark, vertically centered on the
 // heading's first line via `top: 0.5lh` + `translateY(-50%)` (the anchor inherits
 // the heading's line-height, so `lh` resolves to its line box). `var()` opacity,
-// the transitions, glow, transform and sizes are strictTokens escape-hatch values.
-// The revealed `#` is neutral (hover darkens); electric-blue is reserved for the
-// copied flash so it stays visible against the hover tone.
+// the transitions, transform and sizes are strictTokens escape-hatch values. The
+// revealed `#` is neutral (hover darkens); electric-blue is reserved for the copied
+// flash (a plain colour change, no glow) so it stays visible against the hover tone.
 export const root = css({
   position: 'absolute',
   insetInlineEnd: '[100%]',
@@ -28,12 +28,12 @@ export const root = css({
   color: 'fg.muted',
   cursor: 'pointer',
   opacity: '[var(--anchor-opacity, 0)]',
-  transitionProperty: '[opacity, color, text-shadow]',
+  transitionProperty: '[opacity, color]',
   transitionDuration: '[150ms]',
   transitionTimingFunction: '[ease]',
   _before: { content: '"#"' },
   '&[data-hovered]': { color: 'fg.default' },
-  '&[data-copied]': { color: 'accent.solid', textShadow: '[0 0 6px token(colors.accent.solid)]' },
+  '&[data-copied]': { color: 'accent.solid' },
   // Standard marching-ants focus ring, pulled INSIDE the box. The global
   // `*:focus-visible::after` sits at `inset: -3px` (outside the box), which the
   // SiteShell's `overflowX: clip` crops when the box is in the gutter — and
