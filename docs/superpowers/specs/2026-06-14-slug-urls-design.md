@@ -293,3 +293,14 @@ Conventions applied:
 6. Link-site sweep + revalidate hook.
 7. Feeds + sitemap + llms.
 8. `pnpm lint && pnpm typecheck`, then difit review.
+
+---
+
+## Addendum (2026-06-14): revised data strategy
+
+Mid-implementation the data strategy changed (supersedes the "Migration backfill match" decision above):
+
+- **Migration is schema-only.** It adds the `slug` columns (+ unique index on the main tables, `version_slug` on the version tables) and does NOT backfill. There is no in-migration `title → slug` map.
+- **Seed import upserts by `slug`, not title.** `src/seed/import.ts` `upsertBySlug` matches existing news/works/blog rows on `slug`, so renaming a title follows the same record instead of orphaning it. `logs`/`gallery` keep delete-all + recreate (no slug).
+- **Population path:** staging is **dropped + re-seeded** from the slug-carrying JSON; a fresh local DB is seeded the same way; the local dev DB was backfilled once when the migration first ran (before it was simplified) and already carries slugs.
+- **Production is out of scope here.** Prod is live and has data; its one-time slug bootstrap (drop+reseed, or a one-off title backfill) is deferred to a later, explicit decision — see the runbook note at the end of the plan.
