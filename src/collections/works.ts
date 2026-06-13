@@ -1,5 +1,6 @@
 import { CACHE_TAGS } from '@utils/cache-tags';
 
+import { slugField } from './fields/slug';
 import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
@@ -8,7 +9,7 @@ import type { CollectionConfig } from 'payload';
 // teaser, and the log chronicle. Busting CACHE_TAGS.works purges those reads via
 // the unstable_cache tags; revalidatePath('/'), ('/works'), ('/log'), and the
 // per-doc detail path cover the path-keyed ISR HTML.
-const revalidateWorks = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.works], ['/', '/works', '/log'], (id) => `/works/${id}`);
+const revalidateWorks = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.works], ['/', '/works', '/log'], (slug) => `/works/${slug}`);
 
 export const Works = {
   slug: 'works',
@@ -32,6 +33,7 @@ export const Works = {
     afterDelete: [revalidateWorks.afterDelete],
   },
   fields: [
+    slugField(),
     { name: 'title', label: 'タイトル', type: 'text', required: true },
     { name: 'thumbnail', label: 'サムネイル', type: 'upload', relationTo: 'media' },
     {

@@ -1,5 +1,6 @@
 import { CACHE_TAGS } from '@utils/cache-tags';
 
+import { slugField } from './fields/slug';
 import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
@@ -10,7 +11,7 @@ import type { CollectionConfig } from 'payload';
 // via the NEXT_TAG_CACHE_D1 binding; revalidatePath('/'), ('/news'), and the
 // per-doc detail path cover the path-keyed ISR HTML. Drafts are skipped — only a
 // published-state change reaches the public site.
-const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news], ['/', '/news'], (id) => `/news/${id}`);
+const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news], ['/', '/news'], (slug) => `/news/${slug}`);
 
 export const News = {
   slug: 'news',
@@ -45,6 +46,7 @@ export const News = {
     afterDelete: [revalidateNews.afterDelete],
   },
   fields: [
+    slugField(),
     {
       name: 'title',
       label: 'タイトル',
