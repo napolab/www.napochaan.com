@@ -78,7 +78,7 @@
             "children": [
               {
                 "type": "text",
-                "text": "いっぽうで、ぼくの手元にはずっと、もっと単純な衝動がある。落書きがしたい。意味も整合性も置いて、ただ画面を殴り書きのタイポで埋めたい。このサイトはもともと、その衝動から生まれている。前のサイトには、それの置き場がなかった。整いすぎた画面のどこに殴り書きを置けばいいのか、わからなかった。",
+                "text": "ぼくがほしいのは、複雑さだ。画面を刺激で埋めたい。うるさくていい。というより、そのうるささはぼくにとって心地いいほうのうるささだと、ずっと思っている。刺激のひとつひとつは小さくていい。それが個別に、ばらばらに発火する。数が増えるほど、画面は勝手に複雑になっていく。ぼくが体現したかったのは、その複雑さそのものだった。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1040,5 +1040,2065 @@
     },
     "_status": "published",
     "thumbnailFile": "v3-top.png"
+  },
+  {
+    "title": "VJ ソフト(Genovese)を作っている",
+    "publishedAt": "2026-06-13",
+    "excerpt": "感じたものを人に渡したくて DJ を始めて、それでも「作った」と言い切れない引っかかりから、VJ ソフトを自分で書くことにした。datamosh、GPU ZeroCopy の出力、観客そのものを素材にする web カメラ、53 個の FX。naporitan の相棒、Genovese の話。",
+    "body": {
+      "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくは VJ ソフトを自分で書いている。Genovese という名前で、Electron と ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "WebGPU",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " で動く。市販のものを使えばいいのに、わざわざ自分で書いている。なぜそんなことをしているのか、ここに残しておこうと思う。たぶん、書きながらでないと、ぼく自身もうまく辿り着けないので…。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "名前のことを先に書いておく。ぼくは naporitan という名前で活動している。パスタのナポリタンだ。Genovese も、ジェノベーゼ、同じくパスタの名前から取った。好きなパスタの中からもう一皿選んで、作っているソフトの名前にした。自分とおなじ仲間の名前にして、一緒に育っていけたらいいなと思ったんだよな。道具というより、相棒に名前をつけるみたいな気持ちだった気がする。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "なぜ作るのか",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくは、自分が何かを感じたとき、それを表現できる何かがずっと欲しかった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "最初の手がかりは DJ だった。自分が感じた音の衝撃。この曲とこの曲がつながった瞬間に得られる、圧倒的なドーパミン。あの気持ちよさ。自分が感じたそれを、人にも伝えたい。そして実際にそれが伝わったとき、ああ、自分にはこれが必要なんだ、と思った。手応えというより、欠けていた部品がやっとはまったような感覚だった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ただ、ひとつだけ引っかかっていることがある。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "DJ はパフォーマーだ。人の曲を使っている。だから、胸を張って「ぼくは何かを作っています」とは言えない。表現してはいると思う。そこは疑っていない。でも「作った」と言えるかというと、それは別の話なんだよな。VJ も同じで、人の素材を使うことが多い。誰かの映像、誰かの音、誰かが撮った何か。それを並べ替えて、混ぜて、客に渡している。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "この引っかかりは、たぶんこの記事の最後までついてくる。先に置いておく。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "hyperflip と datamosh",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくは hyperflip がとても好きだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "hyperflip には物語が凝縮されている。聴いていると、コンポーザーの人生や、まとまり切らない感情の渦みたいなものが、だんだん見えてくる。あの刻まれた音。コロコロ切り替わる展開。歪んでいる音。その全部が好きだった。身に余るほどの激情をいきなり受けたような、楽しいの極致みたいな感覚がある。散らばりまくった音とサンプリングの渦の、まんなかにいるような。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "それを、どうにか映像で表現したかった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "散らばった音と、サンプリングの渦。それに一番近い崩れ方をする映像が、ぼくにとっては datamosh だった。フレームが置いていかれて、動きだけが残って、絵が溶けていく。あの崩壊が、あの音にちゃんと対応している気がした。pixelsort も datamosh も、崩壊そのものに惹かれているのは前から自覚していて、それを単に眺めるんじゃなくて、現場で自分の手で出したくなった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "だから、datamosh を出せる VJ ソフトを作った。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "順番としてはこれが先で、ほかは後だった。datamosh が一度ちゃんと出せてしまえば、あとはこっちのものだった。hyperflip に感じていた要素を、ひたすら FX として足していくだけ。刻む、歪ませる、切り替える。感じていたものに、ひとつずつ名前と機能をつけていく作業に変わった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// 現場の手元。APC mini、Genovese を映した MacBook、奥のスクリーンに出力"
+            },
+            "value": {
+              "__file": "genovese-rig.jpg",
+              "__alt": "クラブの暗い卓上に AKAI APC mini と MacBook。MacBook には Genovese の UI が映り、奥のスクリーンには投影された Genovese の出力（青いダイヤ柄）が見える"
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "（datamosh を出している様子は",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/naporin24690/status/2031718276972323063",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "これ",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "。）",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "アーキテクチャ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// 型が1本 IPC を貫く / one-shot は route を逆走 / push は Subject 直行"
+            },
+            "value": {
+              "__file": "genovese-ipc-arch.png",
+              "__alt": "Genovese の IPC アーキテクチャ図。renderer（component → Jotai atom → hc client）と main（Hono router → service → Subject）が IPC を挟み、one-shot は firstValueFrom で Hono route を逆にたどって返り、状態変化は Observable.subscribe → webContents.send で push される"
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ここからは、中身の話。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "Genovese は ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/electron/electron",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "Electron",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " + ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/facebook/react",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "React",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " + ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/pmndrs/jotai",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "Jotai",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " + ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/ReactiveX/rxjs",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "RxJS",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " + ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/honojs/hono",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "Hono",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " + ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/drizzle-team/drizzle-orm",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "drizzle",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " で組んでいる。なぜ ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "Electron",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " かというと、クロスプラットフォームである必要があったからだ。ぼくはリアルの会場でも VJ をするし、VRChat でも VJ をする。そして VRChat は Windows でしか満足に動かない。だから Mac でも Windows でも同じソフトが立ち上がってほしくて、Web の技術スタックをそのままデスクトップに持ち込める ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "Electron",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " を選んだ。全体の組み方は、別で公開している",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/naporin0624/claude-plugin-hono-electron",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "この構成",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "が下敷きになっている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "IPC のところは地味だけど、気に入っている。main と renderer の通信を、Hono の RPC として書いた。route の型がそのまま renderer 側の ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "hc",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " に通るから、両プロセスが同じ型を共有して、手書きの IPC 配線も、チャンネル名の取り回しもいらない。型が合わなければビルドで止まる。状態は service の持つ ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "Subject",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " が単一ソースで、返却は全部 ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "Observable",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " にしてある。一度きりの値が欲しい route は ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "firstValueFrom",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " で1つ取り出して、Hono route を逆にたどって返す。変化そのものは ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "subscribe",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " して ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "webContents.send",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " で push する。renderer は取りに行かない。slot や FX や deck が変わった瞬間に、その値が画面まで流れてくる。最後に Jotai の atom が、その初回の RPC と以降の stream を1つに束ねる。component は atom を読むだけで、すぐ出るし、勝手に追従する。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "画面の中心には 4×4×2 の grid がある。slot がたくさん並んでいて、その slot ひとつひとつに ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "WebWorker",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " を割り当てている。映像のデコードは重い処理なので、メインのスレッドでやると全部が引っかかる。だから slot ごとに切り離して、別のスレッドに逃がしている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// Genovese の全体。左に素材、中央に grid、右に effect の棚"
+            },
+            "value": {
+              "__file": "genovese-ui.png",
+              "__alt": "Genovese の操作画面全体。左に素材ブラウザ、中央に P×C の grid と Deck フェーダ、右に effect パネルと ADD EFFECT の一覧が並ぶ"
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "各 slot の中では、",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "WebCodecs",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " API で映像を 1 フレームずつに分解している。分解したフレームを GPU に渡して、並列で処理させる。そこで ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "WGSL",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " を書いて shading をかけて、最後に全部を合成する。デコードを GPU 側でやらせて、エフェクトも GPU 側で書く。CPU はなるべく指揮だけして、重いところには触らない。そういう pipeline になっている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "この作りには、ひとつ面白い性質がある。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ひとつひとつの FX は、単純でいい。色をずらす。ブロックを揺らす。フレームを置いていく。それぞれは地味な処理だ。でも、この pipeline の上で複数を重ねると、組み合わせが予測不可能になる。自分で書いたはずなのに、何が出てくるか読めない。破壊的で、何かを企んでいるみたいな絵が出てくる瞬間がある。バグが好きなぼくにとって、これは設計というより、わざと事故が起きやすい場所を作っている感覚に近い。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "出力という難問",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "中身ができても、それを会場のモニターに映すところで、しばらく詰まっていた。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "renderer の中で作った映像を、サイズの違う外のモニターに、低い負荷で映したい。これが思っていたより難しかった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "初期は、操作する control panel とは別に output window を併設して、そっちをモニターに映していた。素直なやり方だ。でもこれには二つ問題があった。ひとつは、canvas が大きくなりすぎること。大画面の機材につなぐと canvas がそのサイズまで膨らんで、パフォーマンスが激落ちした。もうひとつは、ソフトが落ちたときだ。output window が消えるので、もう一度立ち上げてモニターに置き直すオペが要る。現場の本番中に、それはやりたくない。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "そこで、",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/leadedge/Spout2",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "Spout",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " と ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/Syphon/Syphon-Framework",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "Syphon",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " を使うことにした。Windows なら Spout、Mac なら Syphon。映像を、アプリからアプリへ直接渡す仕組みだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "肝は「コピーしない」ところにある。ふつう、映像を別のアプリに渡そうとすると、GPU で描いた絵を一度 CPU 側のメモリに焼き戻して、それをまた相手に渡して…と、行き来が発生する。毎フレームこれをやると、それだけで重い。Spout / Syphon は、GPU 上にあるテクスチャの handle だけを渡す。中身の画素は GPU に置いたまま、動かさない。これが GPU ZeroCopy で、大きな canvas を抱えても破綻しない理由だ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ただ、Electron には標準で Spout / Syphon に出す機能がない。ないなら、書くしかない。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "鍵は、Electron のオフスクリーンレンダリングにあった。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "webPreferences.offscreen.useSharedTexture",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " を ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "true",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " にすると、",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://www.electronjs.org/docs/latest/api/web-contents#event-paint",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "paint event",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " が、CPU 側のビットマップではなく、GPU 上の共有テクスチャの handle を渡してくれるようになる。Chromium のハードウェアアクセラレーションに乗ったまま、そのテクスチャ handle を外のレンダリングパイプラインに渡せる。つまり Electron が描いた絵を、CPU と GPU のあいだでコピーすることなく、そのまま外へ出せるということだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "この共有テクスチャを掴んで Spout / Syphon に橋渡しする、",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://github.com/naporin0624/electron-texture-bridge",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "electron-texture-bridge",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " というものを自作した。これで Electron → Spout / Syphon の、文字どおりコピーのない出力ができるようになった。さっき言った GPU ZeroCopy が、ここでようやく端から端までつながる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "このブリッジは入力にも対応させてある。出すだけじゃなくて、外から Spout / Syphon の映像を受け取れる。これが地味に効いていて、Genovese で YouTube を再生できるのはこのおかげだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://grabduct.konalab.work/",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "GrabDuct",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " というツールで YouTube の映像を Spout / Syphon に出して、それを Genovese 側で受け取っている。ブラウザの中で YouTube をまともに素材化するのは権利的にも技術的にも面倒なので、いったん外に出して、テクスチャとして拾い直すという回り道をしている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "その場の人を、素材にする",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ここが、ぼくにとって一番おもしろいところだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくは MacBook を VJ 機材にしている。MacBook は、iPhone を web カメラとして扱える。ここまでは、まあよくある話だ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくがやっているのは、その web カメラをクラブに遊びに来た人に渡すことだ。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "客が客自身を撮る。楽しんでいる様子そのものが、その場で素材になる。それを YouTube や、ほかの動画素材と切り替えたり、FX をかけたりする。さっきまで grid に並べていた datamosh の隣に、今まさに踊っている人の顔が溶けながら映る。観客と一体になって盛り上がることを、ほかの何より優先している。きれいな絵を出すことより、その場の温度を上げることのほうが、ぼくにとってはずっと大事なんだよな。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "upload",
+            "relationTo": "media",
+            "format": "",
+            "version": 3,
+            "fields": {
+              "caption": "// 客席に出る画。datamosh が空間に投影される"
+            },
+            "value": {
+              "__file": "genovese-live.png",
+              "__alt": "暗いクラブのスクリーンに datamosh / glitch の映像が青く投影され、観客のシルエットが手を上げている"
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "（web カメラを客に渡している様子は",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/naporin24690/status/2042631445458620604",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "これ",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "。）",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VJ は、オペアンプなんだと思う。DJ が届けている楽しみを、何倍にもできる。増幅器みたいなものだ。元の信号は DJ が作っていて、ぼくはそれをブーストしている。だからこそ、この楽しみをみんなに知ってほしくて、こんなことをやっている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "コメント機能を入れたのも同じ理由だ。客が打ったコメントが映像に乗る。観客が画面の中に入ってくる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "（コメント機能のギミックは",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/naporin24690/status/2042615217952297306",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "これ",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "。）",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "ぼくは、自分が一番楽しんでいる旗振り役の一員になりたい。傍で操作している人じゃなくて、まんなかで一番はしゃいでいる側でいたい。だから、自分が一番楽しめるギミックを先に用意する。客を楽しませる装置を作っているようでいて、本当は自分が一番楽しむための装置を作っているのかもしれない。たぶん、その二つはぼくの中で分かれていない。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "VRChat でも同じことをやっている。あっちでは、アバターの動きや空間そのものを Effect の入力にできる。リアルとは入力が違うだけで、やりたいことは変わらない。その場にいる人を素材にして、その場の楽しさを増幅する。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "（VRChat の動きを Effect の入力にしている様子は",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/naporin24690/status/2046634327874973711",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "これ",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "。）",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "プラグイン設計",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "FX は、増やしやすいように作ってある。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "WGSL",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " のシェーダと ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "presets.ts",
+                "format": 16,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": " を書くだけで、新しい FX がひとつ増える。本体のコードには手を入れない。open/closed 原則を守っていて、既存を触らずに plugins として足していける形にしてある。hyperflip に感じた要素を「ひたすら足すだけ」と前に書いたけれど、それが成立するのは、足す作業がここまで軽いからだ。何か感じたら、シェーダを一枚書いて、preset に登録する。それで終わる。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "現状、FX は 53 個ある。Color、Distort、Glitch、Pattern、Transform、Time の 6 カテゴリに分かれている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "block",
+            "format": "",
+            "version": 2,
+            "fields": {
+              "id": "b510b84ab9059eca39844acd",
+              "blockType": "image-row",
+              "cells": [
+                {
+                  "id": "ae3b6dd4a3940993e2aa4490",
+                  "image": {
+                    "__file": "genovese-grid.png",
+                    "__alt": "Genovese の grid と Deck。P0〜P3 のページに C0〜C3 の slot が並び、右に Deck1〜4 のフェーダがある"
+                  },
+                  "caption": "// slot の grid と Deck"
+                },
+                {
+                  "id": "a315afe38e3b2a429b06b21a",
+                  "image": {
+                    "__file": "genovese-fx.png",
+                    "__alt": "ADD EFFECT の一覧。Color / Distort / Glitch / Pattern / Transform / Time の 6 カテゴリに 53 個の FX が並ぶ"
+                  },
+                  "caption": "// FX の棚。wgsl と presets.ts を足すだけで増える"
+                }
+              ]
+            }
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "（FX を増やす設計の話は",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://x.com/naporin24690/status/2039993156507415028",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "これ",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": "。）",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "数を誇りたいわけじゃない。ただ、感じたものに片っぱしから名前をつけて、機能に落として、いつでも呼び出せる棚に並べていったら、53 になっていた、というだけだ。ぼくは自分の感情が動いたとき、それがどう動いたのかをいつも知りたくなる。仕組みがわかると、今度はそれを自分以外の人にも起こしてみたくなる。FX が 53 個あるのは、たぶんその癖の、いちばん直接的な産物なんだと思う。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "heading",
+            "tag": "h2",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "それでも「作った」と言える場所",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "最初に置いた引っかかりに戻る。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "基本的に、ぼくは目に見えるもの全部を自分の手で作りたい。なにかに触れると、それがどんな仕組みでできているのか知りたくなって、すぐに分解したくなる。その延長で、いつのまにかなんでも自分で作っている。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "DJ はパフォーマーだ。人の曲を使っている以上、胸を張って「作っています」とは言えない。表現者ではあると思う。そこは譲らない。でも「作った」とは言えない。VJ も、人の素材を使うことが多い。客の映像、誰かの動画、誰かの音。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "だから、VJ ソフトそのものを自分で作ることにした。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "DJ も VJ も、人の素材を扱う行為だ。その行為自体は変えられないし、変えたいとも思っていない。素材を借りること自体は、悪いことじゃない。ただ、ぼくはどこかに一箇所、「これはぼくが作った」と自信を持って言える場所を持っておきたかった。映像は借り物でも、その映像を流している道具は、ぼくがゼロから書いた。pipeline も、ブリッジも、53 個のシェーダも。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "それが、ぼくのアイデンティティになると思っている。というより、それをアイデンティティにしたいんだと思う。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "textFormat": 0,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+              {
+                "type": "text",
+                "text": "最初に、naporitan と Genovese はおなじパスタの仲間で、一緒に育っていけたらいいと書いた。たぶんぼくは、Genovese を道具としてじゃなく、ぼくの一部として育てたいんだと思う。借り物の素材を流すその手元に、ぼくがゼロから書いて、これからも書き足していくものがある。それがあるかぎり、どこかで「作っている」と言える気がしている。まだ、言える「気がしている」くらいなんだけどね…。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "thumbnailFile": "genovese-thumbnail.png",
+    "_status": "published"
   }
 ]
