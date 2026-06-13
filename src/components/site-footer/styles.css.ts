@@ -27,7 +27,9 @@ export const nav = css({
 });
 
 // Each link draws its own leading "·" via ::before so the separator is CSS, never
-// JSX. The first item suppresses it.
+// JSX. The first item suppresses it. Note: :first-child only suppresses the
+// DOM-first item — on narrow widths the nav wraps and a wrapped line's first item
+// keeps a leading "·". Accepted: the separator is decorative, not structural.
 export const navLink = css({
   _before: {
     content: '"·"',
