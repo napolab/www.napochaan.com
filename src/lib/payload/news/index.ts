@@ -69,6 +69,30 @@ export const findNewsById = async (id: string): Promise<NewsItem | undefined> =>
   return fetchNewsById(id);
 };
 
+const fetchNewsBySlug = unstable_cache(
+  async (slug: string): Promise<NewsItem | undefined> => {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: 'news',
+      where: { and: [{ slug: { equals: slug } }, publishedWhere] },
+      limit: 1,
+    });
+
+    const [doc] = result.docs;
+    if (doc === undefined) return undefined;
+
+    return toNewsItem(doc);
+  },
+  ['news-by-slug'],
+  { tags: [CACHE_TAGS.news] },
+);
+
+export const findNewsBySlug = async (slug: string): Promise<NewsItem | undefined> => {
+  if (isBuildPhase()) return undefined;
+
+  return fetchNewsBySlug(slug);
+};
+
 // The draft path is intentionally uncached (never wrapped in `unstable_cache`)
 // and bypasses the published filter via `draft: true`, so it always returns the
 // latest draft regardless of `_status`. Only reachable from the secret-gated

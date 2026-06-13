@@ -67,6 +67,30 @@ export const findBlogById = async (id: string): Promise<Post | undefined> => {
   return fetchBlogById(id);
 };
 
+const fetchBlogBySlug = unstable_cache(
+  async (slug: string): Promise<Post | undefined> => {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: 'blog',
+      where: { and: [{ slug: { equals: slug } }, publishedWhere] },
+      limit: 1,
+    });
+
+    const [doc] = result.docs;
+    if (doc === undefined) return undefined;
+
+    return toBlogPost(doc, '01');
+  },
+  ['blog-by-slug'],
+  { tags: [CACHE_TAGS.blog] },
+);
+
+export const findBlogBySlug = async (slug: string): Promise<Post | undefined> => {
+  if (isBuildPhase()) return undefined;
+
+  return fetchBlogBySlug(slug);
+};
+
 // The draft path is intentionally uncached (never wrapped in `unstable_cache`)
 // and bypasses the published filter via `draft: true`, so it always returns the
 // latest draft regardless of `_status`. Only reachable from the secret-gated

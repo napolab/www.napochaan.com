@@ -69,6 +69,31 @@ export const findWorkById = async (id: string): Promise<WorkRow | undefined> => 
   return fetchWorkById(id);
 };
 
+const fetchWorkBySlug = unstable_cache(
+  async (slug: string): Promise<WorkRow | undefined> => {
+    const payload = await getPayloadClient();
+    const result = await payload.find({
+      collection: 'works',
+      where: { and: [{ slug: { equals: slug } }, publishedWhere] },
+      depth: 1,
+      limit: 1,
+    });
+
+    const [doc] = result.docs;
+    if (doc === undefined) return undefined;
+
+    return toWorkItem(doc, '01');
+  },
+  ['works-by-slug'],
+  { tags: [CACHE_TAGS.works] },
+);
+
+export const findWorkBySlug = async (slug: string): Promise<WorkRow | undefined> => {
+  if (isBuildPhase()) return undefined;
+
+  return fetchWorkBySlug(slug);
+};
+
 // The draft path is intentionally uncached (never wrapped in `unstable_cache`)
 // and bypasses the published filter via `draft: true`, so it always returns the
 // latest draft regardless of `_status`. Only reachable from the secret-gated
