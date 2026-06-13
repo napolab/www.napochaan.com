@@ -54,6 +54,52 @@ describe('QuoteShare', () => {
     await expect.element(page.getByRole('button', { name: 'コピーしました' })).toBeInTheDocument();
   });
 
+  it('does not open when the selection escapes the body container', async () => {
+    stubFinePointer();
+    await render(
+      <div>
+        <QuoteShare url="https://www.napochaan.com/blog/1">
+          <p>本文の内側のテキスト</p>
+        </QuoteShare>
+        <p>本文の外側のテキスト</p>
+      </div>,
+    );
+
+    const inside = page.getByText('本文の内側のテキスト').element();
+    const outside = page.getByText('本文の外側のテキスト').element();
+    const insideText = inside.firstChild;
+    const outsideText = outside.firstChild;
+
+    if (insideText === null || outsideText === null) {
+      throw new Error('Test setup failed: could not find text nodes');
+    }
+
+    // Spy on getSelection to simulate a selection anchored inside the body but
+    // focused outside it — the exact cross-boundary case the guard must reject.
+    // We fabricate this because Chromium may collapse a programmatically-set
+    // cross-boundary range, making it impossible to exercise this path via DOM APIs.
+    const fakeRect = new DOMRect(0, 0, 100, 20);
+    const fakeRange = { getBoundingClientRect: () => fakeRect };
+    const fakeSelection = {
+      isCollapsed: false,
+      toString: () => '本文の内側のテキスト',
+      anchorNode: insideText,
+      focusNode: outsideText,
+      getRangeAt: () => fakeRange,
+    };
+    const spy = vi.spyOn(window, 'getSelection').mockReturnValue(fakeSelection as unknown as Selection);
+
+    inside.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
+
+    // Restore before assertion so other checks aren't affected.
+    spy.mockRestore();
+
+    // No toolbar action should appear — focus is outside the container.
+    // Use `await expect.element(...).not.toBeInTheDocument()` to wait for any
+    // async React re-render and then assert absence.
+    await expect.element(page.getByRole('button', { name: '引用リンク' })).not.toBeInTheDocument();
+  });
+
   it('exposes an X quote link whose href carries the text-fragment url', async () => {
     stubFinePointer();
     await render(

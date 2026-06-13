@@ -47,8 +47,8 @@ const QuoteShareActive = ({ url, children }: Props) => {
       return;
     }
     const text = selection.toString().trim();
-    const anchorNode = selection.anchorNode;
-    if (text === '' || anchorNode === null || !container.contains(anchorNode)) {
+    const { anchorNode, focusNode } = selection;
+    if (text === '' || anchorNode === null || focusNode === null || !container.contains(anchorNode) || !container.contains(focusNode)) {
       setSnapshot(null);
       return;
     }
