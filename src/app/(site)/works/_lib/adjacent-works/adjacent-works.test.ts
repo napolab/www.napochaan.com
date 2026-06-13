@@ -12,35 +12,35 @@ const works: readonly WorkRow[] = [
 
 describe('adjacentWorks', () => {
   it('returns the previous and next neighbours by array index', () => {
-    const { prev, next } = adjacentWorks(works, '2');
+    const { prev, next } = adjacentWorks(works, 'work-b');
 
-    expect(prev?.id).toBe('1');
-    expect(next?.id).toBe('3');
+    expect(prev?.slug).toBe('work-a');
+    expect(next?.slug).toBe('work-c');
   });
 
   it('has no prev at the first item', () => {
-    const { prev, next } = adjacentWorks(works, '1');
+    const { prev, next } = adjacentWorks(works, 'work-a');
 
     expect(prev).toBeUndefined();
-    expect(next?.id).toBe('2');
+    expect(next?.slug).toBe('work-b');
   });
 
   it('has no next at the last item', () => {
-    const { prev, next } = adjacentWorks(works, '3');
+    const { prev, next } = adjacentWorks(works, 'work-c');
 
-    expect(prev?.id).toBe('2');
+    expect(prev?.slug).toBe('work-b');
     expect(next).toBeUndefined();
   });
 
-  it('returns both undefined when the id is absent', () => {
-    const { prev, next } = adjacentWorks(works, '99');
+  it('returns both undefined when the slug is absent', () => {
+    const { prev, next } = adjacentWorks(works, 'work-z');
 
     expect(prev).toBeUndefined();
     expect(next).toBeUndefined();
   });
 
   it('returns both undefined for an empty list', () => {
-    const { prev, next } = adjacentWorks([], '1');
+    const { prev, next } = adjacentWorks([], 'work-a');
 
     expect(prev).toBeUndefined();
     expect(next).toBeUndefined();

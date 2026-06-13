@@ -13,35 +13,35 @@ const news: readonly NewsItem[] = [
 
 describe('adjacentNews', () => {
   it('pairs a middle item with its newer (prev) and older (next) neighbours', () => {
-    const { prev, next } = adjacentNews(news, '2');
+    const { prev, next } = adjacentNews(news, 'news-2');
 
-    expect(prev?.id).toBe('1');
-    expect(next?.id).toBe('3');
+    expect(prev?.slug).toBe('news-1');
+    expect(next?.slug).toBe('news-3');
   });
 
   it('has no prev at the newest item', () => {
-    const { prev, next } = adjacentNews(news, '1');
+    const { prev, next } = adjacentNews(news, 'news-1');
 
     expect(prev).toBeUndefined();
-    expect(next?.id).toBe('2');
+    expect(next?.slug).toBe('news-2');
   });
 
   it('has no next at the oldest item', () => {
-    const { prev, next } = adjacentNews(news, '3');
+    const { prev, next } = adjacentNews(news, 'news-3');
 
-    expect(prev?.id).toBe('2');
+    expect(prev?.slug).toBe('news-2');
     expect(next).toBeUndefined();
   });
 
-  it('returns both undefined when the id is absent', () => {
-    const { prev, next } = adjacentNews(news, '99');
+  it('returns both undefined when the slug is absent', () => {
+    const { prev, next } = adjacentNews(news, 'news-99');
 
     expect(prev).toBeUndefined();
     expect(next).toBeUndefined();
   });
 
   it('returns both undefined for an empty list', () => {
-    const { prev, next } = adjacentNews([], '1');
+    const { prev, next } = adjacentNews([], 'news-1');
 
     expect(prev).toBeUndefined();
     expect(next).toBeUndefined();

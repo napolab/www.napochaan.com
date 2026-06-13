@@ -10,15 +10,15 @@ const news: readonly NewsItem[] = [
 ];
 
 describe('findNews', () => {
-  it('returns the item matching the id', () => {
-    expect(findNews(news, '2')?.title).toBe('b');
+  it('returns the item matching the slug', () => {
+    expect(findNews(news, 'news-2')?.title).toBe('b');
   });
 
   it('returns undefined when no item matches', () => {
-    expect(findNews(news, '99')).toBeUndefined();
+    expect(findNews(news, 'news-99')).toBeUndefined();
   });
 
   it('returns undefined for an empty list', () => {
-    expect(findNews([], '1')).toBeUndefined();
+    expect(findNews([], 'news-1')).toBeUndefined();
   });
 });

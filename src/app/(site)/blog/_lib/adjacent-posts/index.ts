@@ -9,13 +9,13 @@ export type Adjacent = {
 // chronological order.
 const byDateDesc = (a: Post, b: Post): number => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0);
 
-// Neighbours of `id` within the feed ordered newest-first: prev = the newer post
+// Neighbours of `slug` within the feed ordered newest-first: prev = the newer post
 // (previous in the sorted list), next = the older post (next in the sorted list).
-// Both are undefined at the ends, and both are undefined when the id is absent.
+// Both are undefined at the ends, and both are undefined when the slug is absent.
 // Pure — sorts a copy without mutating the input.
-export const adjacentPosts = (posts: readonly Post[], id: string): Adjacent => {
+export const adjacentPosts = (posts: readonly Post[], slug: string): Adjacent => {
   const sorted = [...posts].sort(byDateDesc);
-  const index = sorted.findIndex((post) => post.id === id);
+  const index = sorted.findIndex((post) => post.slug === slug);
   if (index === -1) return {};
 
   return { prev: sorted[index - 1], next: sorted[index + 1] };

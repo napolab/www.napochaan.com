@@ -11,15 +11,15 @@ const works: readonly WorkRow[] = [
 ];
 
 describe('findWork', () => {
-  it('returns the work matching the id', () => {
-    expect(findWork(works, '2')?.title).toBe('b');
+  it('returns the work matching the slug', () => {
+    expect(findWork(works, 'work-b')?.title).toBe('b');
   });
 
-  it('returns undefined when the id is absent', () => {
-    expect(findWork(works, '99')).toBeUndefined();
+  it('returns undefined when the slug is absent', () => {
+    expect(findWork(works, 'work-z')).toBeUndefined();
   });
 
   it('returns undefined for an empty list', () => {
-    expect(findWork([], '1')).toBeUndefined();
+    expect(findWork([], 'work-a')).toBeUndefined();
   });
 });

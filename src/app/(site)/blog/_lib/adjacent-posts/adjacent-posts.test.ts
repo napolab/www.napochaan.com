@@ -11,24 +11,24 @@ const feed = [post('b', '2026-01-01'), post('a', '2026-03-01'), post('c', '2025-
 
 describe('adjacentPosts', () => {
   it('returns the newer neighbour as prev and the older neighbour as next', () => {
-    const { prev, next } = adjacentPosts(feed, 'b');
-    expect(prev?.id).toBe('a');
-    expect(next?.id).toBe('c');
+    const { prev, next } = adjacentPosts(feed, 'post-b');
+    expect(prev?.slug).toBe('post-a');
+    expect(next?.slug).toBe('post-c');
   });
 
   it('has no prev for the newest post', () => {
-    const { prev, next } = adjacentPosts(feed, 'a');
+    const { prev, next } = adjacentPosts(feed, 'post-a');
     expect(prev).toBeUndefined();
-    expect(next?.id).toBe('b');
+    expect(next?.slug).toBe('post-b');
   });
 
   it('has no next for the oldest post', () => {
-    const { prev, next } = adjacentPosts(feed, 'c');
-    expect(prev?.id).toBe('b');
+    const { prev, next } = adjacentPosts(feed, 'post-c');
+    expect(prev?.slug).toBe('post-b');
     expect(next).toBeUndefined();
   });
 
-  it('returns empty when the id is absent', () => {
-    expect(adjacentPosts(feed, 'x')).toEqual({});
+  it('returns empty when the slug is absent', () => {
+    expect(adjacentPosts(feed, 'post-x')).toEqual({});
   });
 });
