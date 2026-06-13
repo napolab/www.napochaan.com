@@ -37,4 +37,10 @@ describe('AdjacentNav', () => {
     await expect.element(page.getByRole('link', { name: /next work/ })).not.toBeInTheDocument();
     await expect.element(page.getByRole('link', { name: /prev work/ })).toBeInTheDocument();
   });
+
+  it('renders a back link to /works', async () => {
+    await render(<AdjacentNav prev={prev} next={next} />);
+
+    await expect.element(page.getByRole('link', { name: /works 一覧/ })).toHaveAttribute('href', '/works');
+  });
 });
