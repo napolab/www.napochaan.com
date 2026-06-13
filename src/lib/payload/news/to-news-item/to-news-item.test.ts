@@ -10,6 +10,7 @@ import type { News } from '@payload-types';
 const makeDoc = (overrides: Partial<News>): News =>
   ({
     id: 1,
+    slug: 'title-news',
     title: 'タイトル',
     publishedAt: '2026-06-05T00:00:00.000Z',
     category: 'site',
@@ -24,6 +25,10 @@ const makeDoc = (overrides: Partial<News>): News =>
 describe('toNewsItem', () => {
   it('stringifies the numeric id', () => {
     expect(toNewsItem(makeDoc({ id: 42 })).id).toBe('42');
+  });
+
+  it('carries slug through from the document', () => {
+    expect(toNewsItem(makeDoc({ slug: 'title-news' })).slug).toBe('title-news');
   });
 
   it('formats publishedAt as YYYY-MM-DD in Asia/Tokyo', () => {

@@ -5,12 +5,12 @@ import { relatedWorks } from './index';
 import type { WorkRow } from '../work-row';
 
 const works: readonly WorkRow[] = [
-  { id: '1', no: '01', title: 'a', type: 'flyer', year: 2024 },
-  { id: '2', no: '02', title: 'b', type: 'graphic', year: 2026 },
-  { id: '3', no: '03', title: 'c', type: 'vj', year: 2025 },
-  { id: '4', no: '04', title: 'd', type: 'graphic', year: 2023 },
-  { id: '5', no: '05', title: 'e', type: 'graphic', year: 2022 },
-  { id: '6', no: '06', title: 'f', type: 'graphic', year: 2021 },
+  { id: '1', slug: 'work-a', no: '01', title: 'a', type: 'flyer', year: 2024 },
+  { id: '2', slug: 'work-b', no: '02', title: 'b', type: 'graphic', year: 2026 },
+  { id: '3', slug: 'work-c', no: '03', title: 'c', type: 'vj', year: 2025 },
+  { id: '4', slug: 'work-d', no: '04', title: 'd', type: 'graphic', year: 2023 },
+  { id: '5', slug: 'work-e', no: '05', title: 'e', type: 'graphic', year: 2022 },
+  { id: '6', slug: 'work-f', no: '06', title: 'f', type: 'graphic', year: 2021 },
 ];
 
 describe('relatedWorks', () => {

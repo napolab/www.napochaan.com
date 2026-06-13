@@ -18,10 +18,11 @@ const bodyOf = (text: string): SerializedEditorState =>
     },
   }) as unknown as SerializedEditorState;
 
-const news: readonly NewsItem[] = [{ id: 'n1', date: '2026-06-01', category: 'release', title: 'News Headline', body: bodyOf('news body text') }];
+const news: readonly NewsItem[] = [{ id: 'n1', slug: 'news-headline', date: '2026-06-01', category: 'release', title: 'News Headline', body: bodyOf('news body text') }];
 const blog: readonly Post[] = [
   {
     id: 'b1',
+    slug: 'blog-headline',
     index: '01',
     title: 'Blog Headline',
     readMin: 3,
@@ -30,7 +31,7 @@ const blog: readonly Post[] = [
     body: bodyOf('blog body text'),
   },
 ];
-const works: readonly WorkRow[] = [{ id: 'w1', no: '01', title: 'Work Headline', type: 'DJ', year: 2026 }];
+const works: readonly WorkRow[] = [{ id: 'w1', slug: 'work-headline', no: '01', title: 'Work Headline', type: 'DJ', year: 2026 }];
 const profile: Profile = {
   name: 'napochaan',
   aka: 'naporitan',

@@ -6,6 +6,7 @@ import type { Work } from '@payload-types';
 
 const base = {
   id: 7,
+  slug: 'glitch-study',
   title: 'glitch study',
   type: 'production',
   date: '2025-03-15T00:00:00.000Z',
@@ -17,6 +18,7 @@ describe('toWorkItem', () => {
   it('maps required fields and stringifies the id', () => {
     const row = toWorkItem(base, '03');
     expect(row.id).toBe('7');
+    expect(row.slug).toBe('glitch-study');
     expect(row.no).toBe('03');
     expect(row.title).toBe('glitch study');
     expect(row.type).toBe('production');

@@ -4,7 +4,7 @@ import { page } from 'vitest/browser';
 
 import { WorksSection } from './index';
 
-const works = [{ id: '1', no: '01', title: 'night graphics vol.13', type: 'flyer', year: 2024 }];
+const works = [{ id: '1', slug: 'night-graphics-vol-13', no: '01', title: 'night graphics vol.13', type: 'flyer', year: 2024 }];
 
 describe('WorksSection', () => {
   it('renders works in a table under a heading', async () => {

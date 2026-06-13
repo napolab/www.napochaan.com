@@ -6,6 +6,7 @@ import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical
 // `blog` collection later; the home teaser shows the latest few of this feed.
 export type Post = {
   id: string;
+  slug: string;
   index: string;
   title: string;
   readMin: number;

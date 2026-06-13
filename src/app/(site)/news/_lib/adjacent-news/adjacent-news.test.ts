@@ -6,9 +6,9 @@ import type { NewsItem } from '../news-item';
 
 // Deliberately out of date order so the helper must sort before pairing.
 const news: readonly NewsItem[] = [
-  { id: '2', date: '2026-05-23', category: 'live', title: 'b' },
-  { id: '1', date: '2026-06-05', category: 'site', title: 'a' },
-  { id: '3', date: '2026-04-04', category: 'blog', title: 'c' },
+  { id: '2', slug: 'news-2', date: '2026-05-23', category: 'live', title: 'b' },
+  { id: '1', slug: 'news-1', date: '2026-06-05', category: 'site', title: 'a' },
+  { id: '3', slug: 'news-3', date: '2026-04-04', category: 'blog', title: 'c' },
 ];
 
 describe('adjacentNews', () => {

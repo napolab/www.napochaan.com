@@ -9,9 +9,9 @@ import type { WorkRow } from '../../../app/(site)/works/_lib/work-row';
 
 const baseUrl = 'https://www.napochaan.com';
 
-const news: readonly NewsItem[] = [{ id: 'n1', date: '2026-06-01', category: 'release', title: 'News Headline' }];
-const blog: readonly Post[] = [{ id: 'b1', index: '01', title: 'Blog Headline', readMin: 3, date: '2026-05-01', excerpt: 'an excerpt' }];
-const works: readonly WorkRow[] = [{ id: 'w1', no: '01', title: 'Work Headline', type: 'DJ', year: 2026, date: '2026-04-01' }];
+const news: readonly NewsItem[] = [{ id: 'n1', slug: 'news-headline', date: '2026-06-01', category: 'release', title: 'News Headline' }];
+const blog: readonly Post[] = [{ id: 'b1', slug: 'blog-headline', index: '01', title: 'Blog Headline', readMin: 3, date: '2026-05-01', excerpt: 'an excerpt' }];
+const works: readonly WorkRow[] = [{ id: 'w1', slug: 'work-headline', no: '01', title: 'Work Headline', type: 'DJ', year: 2026, date: '2026-04-01' }];
 const profile: Profile = {
   name: 'napochaan',
   aka: 'naporitan',

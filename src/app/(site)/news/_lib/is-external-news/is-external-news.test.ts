@@ -4,7 +4,7 @@ import { isExternalNews } from './index';
 
 import type { NewsItem } from '../news-item';
 
-const internal: NewsItem = { id: '1', date: '2026-06-05', category: 'notification', title: 'a' };
+const internal: NewsItem = { id: '1', slug: 'news-1', date: '2026-06-05', category: 'notification', title: 'a' };
 const external: NewsItem = { ...internal, id: '2', url: 'https://example.com' };
 
 describe('isExternalNews', () => {

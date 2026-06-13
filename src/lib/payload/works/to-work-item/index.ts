@@ -25,6 +25,7 @@ export const toWorkItem = (doc: Work, no: string): WorkRow => {
 
   return {
     id: `${doc.id}`,
+    slug: doc.slug,
     no,
     title: doc.title,
     type: doc.type,

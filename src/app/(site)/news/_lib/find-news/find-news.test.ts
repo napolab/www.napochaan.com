@@ -5,8 +5,8 @@ import { findNews } from './index';
 import type { NewsItem } from '../news-item';
 
 const news: readonly NewsItem[] = [
-  { id: '1', date: '2026-06-05', category: 'site', title: 'a' },
-  { id: '2', date: '2026-05-23', category: 'live', title: 'b' },
+  { id: '1', slug: 'news-1', date: '2026-06-05', category: 'site', title: 'a' },
+  { id: '2', slug: 'news-2', date: '2026-05-23', category: 'live', title: 'b' },
 ];
 
 describe('findNews', () => {

@@ -16,6 +16,7 @@ import type { News } from '@payload-types';
 // /news/{id}` fallback (an empty href stops the title from linking).
 export const toNewsItem = (doc: News): NewsItem => ({
   id: `${doc.id}`,
+  slug: doc.slug,
   date: dayjs(doc.publishedAt).tz('Asia/Tokyo').format('YYYY-MM-DD'),
   category: doc.category,
   title: doc.title,

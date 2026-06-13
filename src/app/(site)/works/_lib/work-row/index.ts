@@ -2,6 +2,7 @@ import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical
 
 export type WorkRow = {
   id: string;
+  slug: string;
   no: string;
   title: string;
   type: string;

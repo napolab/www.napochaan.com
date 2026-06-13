@@ -4,7 +4,7 @@ import { page } from 'vitest/browser';
 
 import { BlogIndex } from './index';
 
-const posts = [{ id: '1', index: '01', title: '静かなインターネットの話', readMin: 5, date: '2026.05.20', excerpt: '個人サイトを…', href: '/blog/1' }];
+const posts = [{ id: '1', slug: 'shizuka-internet', index: '01', title: '静かなインターネットの話', readMin: 5, date: '2026.05.20', excerpt: '個人サイトを…', href: '/blog/1' }];
 
 describe('BlogIndex', () => {
   it('renders posts with index, title and meta', async () => {

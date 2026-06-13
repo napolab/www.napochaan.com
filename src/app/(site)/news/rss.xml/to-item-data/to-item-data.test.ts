@@ -10,6 +10,7 @@ const ORIGIN = 'https://www.napochaan.com';
 
 const item = (overrides: Partial<NewsItem> = {}): NewsItem => ({
   id: 'abc',
+  slug: 'sample-news',
   date: '2026-01-01',
   category: 'release',
   title: 'sample',

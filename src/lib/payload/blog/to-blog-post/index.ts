@@ -28,6 +28,7 @@ export const toBlogPost = (doc: Blog, index: string): Post => {
 
   return {
     id: `${doc.id}`,
+    slug: doc.slug,
     index,
     title: doc.title,
     date: dayjs(doc.publishedAt).tz('Asia/Tokyo').format('YYYY-MM-DD'),

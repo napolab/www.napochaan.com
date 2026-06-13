@@ -4,7 +4,7 @@ import { findPost } from './index';
 
 import type { Post } from '../post';
 
-const post = (id: string): Post => ({ id, index: id, title: `t${id}`, readMin: 1, date: '2026-01-01', excerpt: '' });
+const post = (id: string): Post => ({ id, slug: `post-${id}`, index: id, title: `t${id}`, readMin: 1, date: '2026-01-01', excerpt: '' });
 
 describe('findPost', () => {
   it('returns the post matching the id', () => {

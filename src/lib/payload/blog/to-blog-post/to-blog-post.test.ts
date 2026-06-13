@@ -11,6 +11,7 @@ const body = {
 
 const base = {
   id: 3,
+  slug: 'panda-css-design-token',
   title: 'Panda CSS で作る design token',
   publishedAt: '2026-05-10T00:00:00.000Z',
   excerpt: 'OKLCH の話',
@@ -23,6 +24,7 @@ describe('toBlogPost', () => {
   it('maps fields, stringifies id, formats date as YYYY-MM-DD', () => {
     const post = toBlogPost(base, '02');
     expect(post.id).toBe('3');
+    expect(post.slug).toBe('panda-css-design-token');
     expect(post.index).toBe('02');
     expect(post.title).toBe('Panda CSS で作る design token');
     expect(post.date).toBe('2026-05-10');

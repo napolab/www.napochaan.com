@@ -8,11 +8,11 @@ import type { WorkRow } from '../../../app/(site)/works/_lib/work-row';
 
 const baseUrl = 'https://www.napochaan.com';
 
-const news: readonly NewsItem[] = [{ id: 'n1', date: '2026-06-01', category: 'release', title: 'News One' }];
-const blog: readonly Post[] = [{ id: 'b1', index: '01', title: 'Blog One', readMin: 3, date: '2026-05-01', excerpt: 'x' }];
+const news: readonly NewsItem[] = [{ id: 'n1', slug: 'news-one', date: '2026-06-01', category: 'release', title: 'News One' }];
+const blog: readonly Post[] = [{ id: 'b1', slug: 'blog-one', index: '01', title: 'Blog One', readMin: 3, date: '2026-05-01', excerpt: 'x' }];
 const works: readonly WorkRow[] = [
-  { id: 'w1', no: '01', title: 'Work One', type: 'DJ', year: 2026, date: '2026-04-01' },
-  { id: 'w2', no: '02', title: 'Work Two', type: 'VJ', year: 2025 },
+  { id: 'w1', slug: 'work-one', no: '01', title: 'Work One', type: 'DJ', year: 2026, date: '2026-04-01' },
+  { id: 'w2', slug: 'work-two', no: '02', title: 'Work Two', type: 'VJ', year: 2025 },
 ];
 
 describe('buildSitemap', () => {
