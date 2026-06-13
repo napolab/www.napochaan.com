@@ -29,13 +29,6 @@ export const stage = css({
   // widening the wordmark) so it never reaches the viewport and judders the
   // fixed TypographyBand. `clip` is paint-only and leaves vertical flow intact.
   overflowX: 'clip',
-  // Keep ink that sits in the left/right gutter visible while still clipping the
-  // wider transient overflow — the colophon demo-stage pattern. Sized to clear the
-  // richtext heading copy-anchor, which sits a full `-1.5em` into the gutter (up to
-  // ~49px at an h2) plus its focus ring; `8px` clipped it. `clip` never creates a
-  // scrollbar, so a larger margin cannot reintroduce the band-judder this guards
-  // against — it only lets a little more edge ink paint.
-  overflowClipMargin: '[2.5rem]',
   maxWidth: '[1180px]',
   marginInline: 'auto',
   // Clear the fixed TypographyBand on each side (safe-area-aware --band-*, see
