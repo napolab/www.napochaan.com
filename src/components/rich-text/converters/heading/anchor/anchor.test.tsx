@@ -70,8 +70,10 @@ describe('HeadingAnchor', () => {
 
     await render(
       <MotionContext.Provider value={motion(false)}>
-        <h2 id="intro">見出し</h2>
-        <HeadingAnchor slug="intro" />
+        <h2 id="intro">
+          <HeadingAnchor slug="intro" />
+          見出し
+        </h2>
       </MotionContext.Provider>,
     );
     await page.getByRole('button', { name: 'この見出しへのリンクをコピー' }).click();
@@ -84,8 +86,10 @@ describe('HeadingAnchor', () => {
 
     await render(
       <MotionContext.Provider value={motion(true)}>
-        <h2 id="intro">見出し</h2>
-        <HeadingAnchor slug="intro" />
+        <h2 id="intro">
+          <HeadingAnchor slug="intro" />
+          見出し
+        </h2>
       </MotionContext.Provider>,
     );
     await page.getByRole('button', { name: 'この見出しへのリンクをコピー' }).click();
