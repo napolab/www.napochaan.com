@@ -35,7 +35,7 @@ const aboutSection = (profile?: Profile): string => {
 };
 
 const newsEntry = (baseUrl: string, item: NewsItem): string => {
-  const url = `${baseUrl}/news/${item.id}`;
+  const url = `${baseUrl}/news/${item.slug}`;
   const body = extractPlainText(item.body ?? undefined);
   const lines = [`### ${item.title}`, `${item.date} · ${item.category} · ${url}`];
   if (body === '') return lines.join('\n');
@@ -44,7 +44,7 @@ const newsEntry = (baseUrl: string, item: NewsItem): string => {
 };
 
 const blogEntry = (baseUrl: string, post: Post): string => {
-  const url = `${baseUrl}/blog/${post.id}`;
+  const url = `${baseUrl}/blog/${post.slug}`;
   const body = extractPlainText(post.body ?? undefined);
   const lines = [`### ${post.title}`, `${post.date} · ${url}`, '', post.excerpt];
   if (body === '') return lines.join('\n');
@@ -53,7 +53,7 @@ const blogEntry = (baseUrl: string, post: Post): string => {
 };
 
 const workEntry = (baseUrl: string, work: WorkRow): string => {
-  const url = `${baseUrl}/works/${work.id}`;
+  const url = `${baseUrl}/works/${work.slug}`;
 
   return [`### ${work.title}`, `${work.type} · ${work.year} · ${url}`].join('\n');
 };

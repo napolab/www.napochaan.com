@@ -44,9 +44,9 @@ const feedsSection = (baseUrl: string): string =>
   ]);
 
 export const buildLLMsTxt = ({ baseUrl, news, blog, works, profile }: BuildLLMsTxtArgs): string => {
-  const newsLines = news.slice(0, LATEST_LIMIT).map((item) => bulletLink(item.title, `${baseUrl}/news/${item.id}`, `${item.date} · ${item.category}`));
-  const blogLines = blog.slice(0, LATEST_LIMIT).map((post) => bulletLink(post.title, `${baseUrl}/blog/${post.id}`, post.excerpt));
-  const worksLines = works.slice(0, LATEST_LIMIT).map((work) => bulletLink(work.title, `${baseUrl}/works/${work.id}`, `${work.type} · ${work.year}`));
+  const newsLines = news.slice(0, LATEST_LIMIT).map((item) => bulletLink(item.title, `${baseUrl}/news/${item.slug}`, `${item.date} · ${item.category}`));
+  const blogLines = blog.slice(0, LATEST_LIMIT).map((post) => bulletLink(post.title, `${baseUrl}/blog/${post.slug}`, post.excerpt));
+  const worksLines = works.slice(0, LATEST_LIMIT).map((work) => bulletLink(work.title, `${baseUrl}/works/${work.slug}`, `${work.type} · ${work.year}`));
 
   const sections = [
     '# napochaan',

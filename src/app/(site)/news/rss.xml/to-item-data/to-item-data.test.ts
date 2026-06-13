@@ -30,13 +30,13 @@ describe('toItemData', () => {
     const data = toItemData({ item: item({ url: 'https://external.example/post' }), origin: ORIGIN });
 
     expect(data.link).toBe('https://external.example/post');
-    expect(data.guid).toBe(`${ORIGIN}/news/abc`);
+    expect(data.guid).toBe(`${ORIGIN}/news/sample-news`);
   });
 
   it('falls back to the internal permalink for link when url is absent', () => {
     const data = toItemData({ item: item(), origin: ORIGIN });
 
-    expect(data.link).toBe(`${ORIGIN}/news/abc`);
+    expect(data.link).toBe(`${ORIGIN}/news/sample-news`);
   });
 
   it('absolutizes an internal relative url override against the origin', () => {

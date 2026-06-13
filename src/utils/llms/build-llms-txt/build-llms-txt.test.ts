@@ -48,9 +48,9 @@ describe('buildLLMsTxt', () => {
 
   it('renders absolute markdown bullet links for each entry', () => {
     const text = buildLLMsTxt({ baseUrl, news, blog, works, profile });
-    expect(text).toContain(`- [News Headline](${baseUrl}/news/n1)`);
-    expect(text).toContain(`- [Blog Headline](${baseUrl}/blog/b1)`);
-    expect(text).toContain(`- [Work Headline](${baseUrl}/works/w1)`);
+    expect(text).toContain(`- [News Headline](${baseUrl}/news/news-headline)`);
+    expect(text).toContain(`- [Blog Headline](${baseUrl}/blog/blog-headline)`);
+    expect(text).toContain(`- [Work Headline](${baseUrl}/works/work-headline)`);
   });
 
   it('links the three rss feeds in the Feeds section', () => {

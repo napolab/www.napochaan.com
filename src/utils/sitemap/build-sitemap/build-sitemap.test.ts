@@ -39,10 +39,10 @@ describe('buildSitemap', () => {
   it('includes dynamic detail pages for news, blog, and works', () => {
     const entries = buildSitemap({ baseUrl, news, blog, works });
     const urls = entries.map((entry) => entry.url);
-    expect(urls).toContain(`${baseUrl}/news/n1`);
-    expect(urls).toContain(`${baseUrl}/blog/b1`);
-    expect(urls).toContain(`${baseUrl}/works/w1`);
-    expect(urls).toContain(`${baseUrl}/works/w2`);
+    expect(urls).toContain(`${baseUrl}/news/news-one`);
+    expect(urls).toContain(`${baseUrl}/blog/blog-one`);
+    expect(urls).toContain(`${baseUrl}/works/work-one`);
+    expect(urls).toContain(`${baseUrl}/works/work-two`);
   });
 
   it('never emits preview, admin, or api urls', () => {
@@ -58,13 +58,13 @@ describe('buildSitemap', () => {
 
   it('sets lastModified from the item date', () => {
     const entries = buildSitemap({ baseUrl, news, blog, works });
-    const detail = entries.find((entry) => entry.url === `${baseUrl}/news/n1`);
+    const detail = entries.find((entry) => entry.url === `${baseUrl}/news/news-one`);
     expect(detail?.lastModified).toBe('2026-06-01');
   });
 
   it('omits lastModified for a work without a date', () => {
     const entries = buildSitemap({ baseUrl, news, blog, works });
-    const detail = entries.find((entry) => entry.url === `${baseUrl}/works/w2`);
+    const detail = entries.find((entry) => entry.url === `${baseUrl}/works/work-two`);
     expect(detail?.lastModified).toBeUndefined();
   });
 

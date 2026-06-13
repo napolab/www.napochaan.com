@@ -8,13 +8,13 @@ export type ToItemDataInput = {
   origin: string;
 };
 
-const permalink = (origin: string, id: string): string => `${origin}/news/${id}`;
+const permalink = (origin: string, slug: string): string => `${origin}/news/${slug}`;
 
 // RSS `<link>` MUST be absolute. An external `url` (http/https) is used as-is; an
 // internal relative override (e.g. `/works`) is resolved against `origin`; an
 // absent `url` falls back to the canonical permalink.
 const resolveLink = (item: NewsItem, origin: string): string => {
-  if (item.url === undefined) return permalink(origin, item.id);
+  if (item.url === undefined) return permalink(origin, item.slug);
   if (item.url.startsWith('/')) return `${origin}${item.url}`;
 
   return item.url;
@@ -26,7 +26,7 @@ const resolveLink = (item: NewsItem, origin: string): string => {
 export const toItemData = ({ item, origin }: ToItemDataInput): ItemData => ({
   title: item.title,
   link: resolveLink(item, origin),
-  guid: permalink(origin, item.id),
+  guid: permalink(origin, item.slug),
   pubDate: item.date,
   category: item.category,
   description: extractPlainText(item.body),

@@ -15,7 +15,7 @@ export const dynamic = 'force-dynamic';
 const pubDateOf = (work: WorkRow): string => work.date ?? `${work.year}-01-01`;
 
 const linkOf = (work: WorkRow, origin: string): string => {
-  if (work.url === undefined) return `${origin}/works/${work.id}`;
+  if (work.url === undefined) return `${origin}/works/${work.slug}`;
   if (work.url.startsWith('/')) return `${origin}${work.url}`;
 
   return work.url;
@@ -27,7 +27,7 @@ export const GET = async (): Promise<Response> => {
   const items: ItemData[] = works.map((work) => ({
     title: work.title,
     link: linkOf(work, origin),
-    guid: `${origin}/works/${work.id}`,
+    guid: `${origin}/works/${work.slug}`,
     pubDate: pubDateOf(work),
     category: work.type,
     description: work.description,

@@ -43,9 +43,9 @@ const toDetailEntry = (url: string, date?: string): SitemapEntry => {
 
 export const buildSitemap = ({ baseUrl, news, blog, works }: BuildSitemapArgs): MetadataRoute.Sitemap => {
   const staticEntries = STATIC_PATHS.map((path) => toStaticEntry(baseUrl, path));
-  const newsEntries = news.map((item) => toDetailEntry(`${baseUrl}/news/${item.id}`, item.date));
-  const blogEntries = blog.map((post) => toDetailEntry(`${baseUrl}/blog/${post.id}`, post.date));
-  const worksEntries = works.map((work) => toDetailEntry(`${baseUrl}/works/${work.id}`, work.date));
+  const newsEntries = news.map((item) => toDetailEntry(`${baseUrl}/news/${item.slug}`, item.date));
+  const blogEntries = blog.map((post) => toDetailEntry(`${baseUrl}/blog/${post.slug}`, post.date));
+  const worksEntries = works.map((work) => toDetailEntry(`${baseUrl}/works/${work.slug}`, work.date));
 
   return [...staticEntries, ...newsEntries, ...blogEntries, ...worksEntries];
 };

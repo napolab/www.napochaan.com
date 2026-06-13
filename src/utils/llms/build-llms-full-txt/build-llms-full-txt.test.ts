@@ -67,9 +67,9 @@ describe('buildLLMsFullTxt', () => {
   it('includes absolute urls, titles, and dates for entries', () => {
     const text = buildLLMsFullTxt({ baseUrl, news, blog, works, profile });
     expect(text).toContain('News Headline');
-    expect(text).toContain(`${baseUrl}/news/n1`);
+    expect(text).toContain(`${baseUrl}/news/news-headline`);
     expect(text).toContain('2026-06-01');
-    expect(text).toContain(`${baseUrl}/blog/b1`);
+    expect(text).toContain(`${baseUrl}/blog/blog-headline`);
   });
 
   it('includes works title, type, and year', () => {
@@ -77,7 +77,7 @@ describe('buildLLMsFullTxt', () => {
     expect(text).toContain('Work Headline');
     expect(text).toContain('DJ');
     expect(text).toContain('2026');
-    expect(text).toContain(`${baseUrl}/works/w1`);
+    expect(text).toContain(`${baseUrl}/works/work-headline`);
   });
 
   it('renders without a profile', () => {

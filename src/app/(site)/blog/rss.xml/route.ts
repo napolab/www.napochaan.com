@@ -15,8 +15,8 @@ export const GET = async (): Promise<Response> => {
   const origin = process.env.BASE_URL ?? 'http://localhost:3000';
   const items: ItemData[] = posts.map((post) => ({
     title: post.title,
-    link: `${origin}/blog/${post.id}`,
-    guid: `${origin}/blog/${post.id}`,
+    link: `${origin}/blog/${post.slug}`,
+    guid: `${origin}/blog/${post.slug}`,
     pubDate: post.date,
     description: post.excerpt,
   }));
