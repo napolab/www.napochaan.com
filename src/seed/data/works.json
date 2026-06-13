@@ -344,7 +344,7 @@
                 "version": 3,
                 "fields": {
                   "linkType": "custom",
-                  "url": "/works/10",
+                  "url": "/works/napochaan-v2-0-0",
                   "newTab": false
                 }
               },
@@ -689,7 +689,7 @@
                 "direction": "ltr",
                 "fields": {
                   "linkType": "custom",
-                  "url": "/works/41",
+                  "url": "/works/napochaan-v3-0-0",
                   "newTab": false
                 },
                 "children": [
@@ -707,6 +707,47 @@
               {
                 "type": "text",
                 "text": " として全面リニューアル済み。",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "text",
+                "text": "当時のサイトは ",
+                "format": 0,
+                "style": "",
+                "mode": "normal",
+                "detail": 0,
+                "version": 1
+              },
+              {
+                "type": "link",
+                "format": "",
+                "indent": 0,
+                "version": 1,
+                "direction": "ltr",
+                "fields": {
+                  "linkType": "custom",
+                  "url": "https://v2.napochaan.com/",
+                  "newTab": true
+                },
+                "children": [
+                  {
+                    "type": "text",
+                    "text": "v2.napochaan.com",
+                    "format": 0,
+                    "style": "",
+                    "mode": "normal",
+                    "detail": 0,
+                    "version": 1
+                  }
+                ]
+              },
+              {
+                "type": "text",
+                "text": " でアーカイブとして公開している。",
                 "format": 0,
                 "style": "",
                 "mode": "normal",
@@ -1178,7 +1219,7 @@
                 "direction": "ltr",
                 "fields": {
                   "linkType": "custom",
-                  "url": "/works/15",
+                  "url": "/works/augmented-music-polyhedron",
                   "newTab": false
                 },
                 "children": [
@@ -1421,7 +1462,7 @@
                 "direction": "ltr",
                 "fields": {
                   "linkType": "custom",
-                  "url": "/works/12",
+                  "url": "/works/vocacolle-2023-summer-archive",
                   "newTab": false
                 },
                 "children": [
@@ -2192,7 +2233,7 @@
                 "direction": "ltr",
                 "fields": {
                   "linkType": "custom",
-                  "url": "/works/12",
+                  "url": "/works/vocacolle-2023-summer-archive",
                   "newTab": false
                 },
                 "children": [
@@ -2224,7 +2265,7 @@
                 "direction": "ltr",
                 "fields": {
                   "linkType": "custom",
-                  "url": "/works/24",
+                  "url": "/works/vocacolle-2024-winter-archive",
                   "newTab": false
                 },
                 "children": [
@@ -2740,7 +2781,7 @@
                 "direction": "ltr",
                 "fields": {
                   "linkType": "custom",
-                  "url": "/blog/1",
+                  "url": "/blog/napochaan-v3-0-0-making",
                   "newTab": false
                 },
                 "children": [
