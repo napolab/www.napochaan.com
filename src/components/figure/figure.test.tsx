@@ -44,4 +44,20 @@ describe('Figure', () => {
     expect(figure).not.toBeNull();
     expect((figure as HTMLElement).style.getPropertyValue('--figure-width')).toBe('');
   });
+
+  it('does not wrap the image in a button by default', async () => {
+    render(<Figure src="/a.jpg" alt="a" width={1200} height={800} variant="cover" fit="intrinsic" />);
+    const locator = page.getByRole('img', { name: 'a' });
+    await expect.element(locator).toBeInTheDocument();
+    expect(locator.element().closest('button')).toBeNull();
+  });
+
+  it('opens a lightbox overlay when a zoomable image is tapped', async () => {
+    render(<Figure src="/a.jpg" alt="a" width={1200} height={800} variant="cover" fit="intrinsic" zoomable />);
+    const locator = page.getByRole('img', { name: 'a' });
+    await expect.element(locator).toBeInTheDocument();
+    expect(locator.element().closest('button')).not.toBeNull();
+    await page.getByRole('button', { name: 'a' }).click();
+    await expect.element(page.getByRole('dialog')).toBeInTheDocument();
+  });
 });

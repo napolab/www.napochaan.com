@@ -219,4 +219,10 @@ describe('RichText', () => {
     expect(figure?.dataset.variant).toBe('cover');
     expect(figure?.querySelector('span[aria-hidden="true"]')).not.toBeNull();
   });
+
+  it('opens a lightbox overlay when a body image is tapped', async () => {
+    render(<RichText data={state([upload(imageDoc, null)])} />);
+    await page.getByRole('button', { name: 'トップの巨大タイポ' }).click();
+    await expect.element(page.getByRole('dialog')).toBeInTheDocument();
+  });
 });

@@ -1,3 +1,4 @@
+import { Lightbox } from '@components/gallery/lightbox';
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
@@ -26,6 +27,11 @@ type Props = {
   // frame renders at its own intrinsic size, centred over the blurred backdrop;
   // a larger source still scales down to fit the frame.
   fit?: 'fill' | 'intrinsic';
+  // When true, the image becomes a tap target that opens the shared gallery
+  // Lightbox overlay (accent frame + zoom-in cursor on hover/focus). Set only by
+  // the richtext upload converter — the detail-hero usage leaves it false so the
+  // hero stays non-interactive.
+  zoomable?: boolean;
 };
 
 // Cover-variant backdrop source: a tiny, heavily-blurred copy of the same image,
@@ -35,13 +41,20 @@ const backdropStyle = (src: string): CSSProperties => ({ '--figure-backdrop': `u
 // Intrinsic fit caps the frame at the source's real width via this CSS var; fill leaves it unset.
 const figureWidthStyle = (fit: Props['fit'], width: number): CSSProperties | undefined => (fit === 'intrinsic' ? ({ '--figure-width': `${width}px` } as CSSProperties) : undefined);
 
-export const Figure = ({ src, alt, width, height, caption, placeholder, blurDataURL, variant = 'plain', fit = 'fill' }: Props) => {
+export const Figure = ({ src, alt, width, height, caption, placeholder, blurDataURL, variant = 'plain', fit = 'fill', zoomable = false }: Props) => {
   const captionClassName = variant === 'cover' ? styles.tag : styles.caption;
+  const image = <Image src={src} alt={alt} width={width} height={height} placeholder={placeholder} blurDataURL={blurDataURL} className={styles.image} />;
 
   return (
     <figure className={styles.root} data-variant={variant} data-fit={fit} style={figureWidthStyle(fit, width)}>
       {variant === 'cover' ? <span className={styles.backdrop} aria-hidden="true" style={backdropStyle(src)} /> : null}
-      <Image src={src} alt={alt} width={width} height={height} placeholder={placeholder} blurDataURL={blurDataURL} className={styles.image} />
+      {zoomable ? (
+        <Lightbox src={src} alt={alt} width={width} height={height} triggerClassName={styles.trigger}>
+          {image}
+        </Lightbox>
+      ) : (
+        image
+      )}
       {caption === undefined ? null : <figcaption className={captionClassName}>{caption}</figcaption>}
     </figure>
   );

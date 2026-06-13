@@ -65,6 +65,51 @@ export const backdrop = css({
   pointerEvents: 'none',
 });
 
+// Zoomable trigger: wraps the image in a tap target that opens the shared gallery
+// Lightbox. Mirrors the gallery cell trigger — a transparent button with a
+// zoom-in cursor and an `::after` accent frame that fades in on hover/focus
+// (plus an ink focus ring). The button paints above the cover backdrop (zIndex 1,
+// same layer as the image) and the accent frame paints above the image (zIndex 2).
+export const trigger = css({
+  display: 'block',
+  width: 'full',
+  position: 'relative',
+  zIndex: '[1]',
+  m: '0',
+  p: '0',
+  border: 'none',
+  bg: 'transparent',
+  cursor: '[zoom-in]',
+  // Intrinsic fit lets the image be width:full;height:full, so the trigger must
+  // fill the frame's height for the image to size correctly. For fill, the image's
+  // own 16:9 aspect-ratio drives the height, so leave it auto here.
+  'figure[data-variant="cover"][data-fit="intrinsic"] &': { height: 'full' },
+  _after: {
+    content: '""',
+    position: 'absolute',
+    inset: '0',
+    borderWidth: 'strong',
+    borderStyle: 'solid',
+    borderColor: 'accent.solid',
+    opacity: '[0]',
+    pointerEvents: 'none',
+    zIndex: '[2]',
+  },
+  _hover: {
+    _after: { opacity: '[1]' },
+  },
+  _focusVisible: {
+    _after: {
+      opacity: '[1]',
+      inset: '[3px]',
+      outlineWidth: 'strong',
+      outlineStyle: 'solid',
+      outlineColor: 'fg.default',
+      outlineOffset: '0',
+    },
+  },
+});
+
 export const caption = css({
   display: 'block',
   fontFamily: 'mono',
