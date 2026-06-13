@@ -6,6 +6,10 @@ compatibility_flags = ["nodejs_compat"]
 workers_dev = false
 preview_urls = false
 
+[observability]
+enabled = true
+head_sampling_rate = 1
+
 [vars]
 BASE_URL = "http://localhost:3000"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
@@ -71,6 +75,10 @@ new_sqlite_classes = ["CursorRoom"]
 workers_dev = false
 preview_urls = false
 
+[env.staging.observability]
+enabled = true
+head_sampling_rate = 1
+
 [env.staging.vars]
 BASE_URL = "https://stg.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
@@ -122,6 +130,10 @@ database_id = "0af66616-6458-492f-92b3-0f1d305abd06"
 [env.production]
 workers_dev = false
 preview_urls = false
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
 
 [env.production.vars]
 BASE_URL = "https://napochaan.com"
