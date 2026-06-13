@@ -242,7 +242,7 @@ export const demos: Record<ComponentName, ReactNode> = {
       <ShareBar url="https://www.napochaan.com/works/1" title="サンプル作品タイトル" />
     </NoAction>
   ),
-  quoteShare: (
+  QuoteShare: (
     <NoAction>
       <QuoteShare url="https://www.napochaan.com/blog/sample">
         <p>この段落をドラッグで選択すると、選択範囲の上に共有バーが出ます（PC のみ）。</p>

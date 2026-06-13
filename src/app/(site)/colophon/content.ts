@@ -96,7 +96,7 @@ export const colophon = {
       { name: 'Breadcrumbs', why: 'パンくず。いまどの階層にいるかを辿れるように。' },
       { name: 'FeedLink', why: 'RSS フィードへのリンク。一覧ページの PageHeader 直下に置いて、購読を促す。' },
       { name: 'ShareBar', why: '記事末尾の共有バー。X(Twitter)の web intent と、リンクをクリップボードへコピーする2アクション。Instagram は URL 共有導線が無いので置いてない。' },
-      { name: 'quoteShare', why: '本文を選択すると、その一節への text-fragment 深リンクのコピーと X 引用を選択範囲の上の Popover で出す（PC のみ）。' },
+      { name: 'QuoteShare', why: '本文を選択すると、その一節への text-fragment 深リンクのコピーと X 引用を選択範囲の上の Popover で出す（PC のみ）。' },
       {
         name: 'DecodingSkeleton',
         why: '一覧ページの読み込み中に出すやつ。スピナーの代わりに、文字が復号されていく様子を mono グリフと青いキャレットで見せてる。',
