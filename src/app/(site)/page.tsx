@@ -23,20 +23,28 @@ export const revalidate = 3600;
 
 const homeDescription = 'DJ・VJ・グラフィック・デジタル制作。napochaan の個人サイト。';
 
-export const generateMetadata = (): Metadata => {
-  return {
-    get description() {
-      return homeDescription;
-    },
-    alternates: { canonical: '/' },
-    get openGraph() {
-      return { title: 'napochaan', description: homeDescription };
-    },
-    get twitter() {
-      return { title: 'napochaan', description: homeDescription };
-    },
-  };
-};
+// The OG/Twitter cards are spelled out in full (not just title/description) so the
+// child metadata doesn't replace the root layout's card with a partial object: a
+// `twitter` without `card` falls back to the small `summary` card, and an
+// `openGraph` without `type`/`siteName`/`locale` drops those. The image itself comes
+// from the file-convention opengraph-image.png / twitter-image.png under (site).
+export const generateMetadata = (): Metadata => ({
+  description: homeDescription,
+  alternates: { canonical: '/' },
+  openGraph: {
+    type: 'website',
+    siteName: 'napochaan',
+    locale: 'ja_JP',
+    url: '/',
+    title: 'napochaan',
+    description: homeDescription,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'napochaan',
+    description: homeDescription,
+  },
+});
 
 type NewsFeedItem = {
   id: string;

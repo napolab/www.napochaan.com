@@ -8,6 +8,7 @@ import { profile } from '../about/profile';
 import { ContactList } from '@components/contact-list';
 import { PageHeader } from '@components/page-header';
 import { SectionHeading } from '@components/section-heading';
+import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
@@ -17,23 +18,10 @@ const crumbs = [{ href: '/', label: 'home' }, { label: 'contact' }];
 
 const contactDescription = 'お問い合わせ — フォーム、または各種 SNS から直接どうぞ。';
 
-export const generateMetadata = (): Metadata => {
-  return {
-    get title() {
-      return 'contact';
-    },
-    get description() {
-      return contactDescription;
-    },
-    alternates: { canonical: '/contact' },
-    get openGraph() {
-      return { title: 'contact — napochaan', description: contactDescription };
-    },
-    get twitter() {
-      return { title: 'contact — napochaan', description: contactDescription };
-    },
-  };
-};
+// Use the shared section helper (like about/works/news/blog/log) so contact gets a
+// complete card — including the og:image (og-default.png) its hand-rolled metadata
+// was missing.
+export const generateMetadata = (): Metadata => resolveSectionMetadata({ docTitle: 'contact', description: contactDescription, path: '/contact' });
 
 const ContactPage = async () => {
   const { env } = await getCloudflareContext({ async: true });
