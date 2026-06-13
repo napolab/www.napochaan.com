@@ -4,9 +4,9 @@ import vrchatSquare from '@assets/vrchat-square.jpg';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 
 // A lexical document exercising every node the RichText renderer supports —
-// headings, inline formats, links, lists, blockquote, a horizontal rule, a single
-// image upload, and the custom image-row block. Used only by the colophon RichText
-// demo.
+// headings, inline formats, links, lists, blockquote, a fenced code block, a
+// horizontal rule, a single image upload, and the custom image-row block. Used
+// only by the colophon RichText demo.
 const makeText = (text: string, format = 0) => ({
   type: 'text',
   text,
@@ -16,6 +16,34 @@ const makeText = (text: string, format = 0) => ({
   detail: 0,
   version: 1,
 });
+
+// A @lexical/code `code` block node. Each source line becomes a `code-highlight`
+// child, separated by `linebreak` nodes — the shape RichText's code converter
+// folds back into the raw string Shiki re-highlights server-side.
+const makeCode = (language: string, source: string) => ({
+  type: 'code',
+  language,
+  format: '',
+  indent: 0,
+  version: 1,
+  direction: 'ltr',
+  children: source.split('\n').flatMap((line, index) => {
+    const highlight = { type: 'code-highlight', text: line, version: 1 } as const;
+    const lineBreak = { type: 'linebreak', version: 1 } as const;
+
+    return index === 0 ? [highlight] : [lineBreak, highlight];
+  }),
+});
+
+const skylineSnippet = `// pick the leftmost column whose covered shelf is lowest
+const bestStart = (heights, span) => {
+  const candidates = Array.from({ length: heights.length - span + 1 }, (_, start) => ({
+    start,
+    y: Math.max(...heights.slice(start, start + span)),
+  }));
+
+  return candidates.reduce((best, c) => (c.y < best.y ? c : best));
+};`;
 
 // A populated-media image-row cell shaped like Payload returns it (url/width/
 // height/alt), built from a static demo asset.
@@ -148,6 +176,7 @@ const raw: unknown = {
         direction: 'ltr',
         children: [makeText('TERMINAL-style blockquote. Monospaced, muted, prefixed with "> ".')],
       },
+      makeCode('typescript', skylineSnippet),
       makeUpload(vrchatGlitch, 'VRChat アバター glitch', 'single / 2024'),
       {
         type: 'block',
