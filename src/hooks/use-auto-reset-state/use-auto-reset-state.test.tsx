@@ -18,12 +18,16 @@ const Probe = ({ resetMs }: { resetMs: number }) => {
 
 describe('useAutoResetState', () => {
   it('updates to the new value and auto-resets to the initial after the delay', async () => {
-    await render(<Probe resetMs={100} />);
+    // A wide reset window so the transient "busy" state can't elapse before the
+    // assertion observes it under heavy parallel load (a 100ms window flaked when
+    // the full browser suite ran concurrently).
+    await render(<Probe resetMs={1000} />);
     await page.getByRole('button', { name: 'idle' }).click();
 
     // Holds the new value immediately…
     await expect.element(page.getByRole('button', { name: 'busy' })).toBeInTheDocument();
-    // …then returns to the initial value once the delay elapses (assertion retries).
-    await expect.element(page.getByRole('button', { name: 'idle' })).toBeInTheDocument();
+    // …then returns to the initial value once the delay elapses (assertion retries
+    // up to a timeout comfortably past the reset window).
+    await expect.element(page.getByRole('button', { name: 'idle' }), { timeout: 3000 }).toBeInTheDocument();
   });
 });
