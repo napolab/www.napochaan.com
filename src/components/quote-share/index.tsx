@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Popover, Toolbar } from 'react-aria-components';
+import { Popover, Toolbar, Tooltip, TooltipTrigger } from 'react-aria-components';
 
 import { Button } from '@components/button';
 import { useAutoResetState } from '@hooks/use-auto-reset-state';
@@ -9,6 +9,7 @@ import { usePointerFine } from '@hooks/use-pointer-fine';
 import { buildTweetUrl } from '@utils/tweet-intent';
 
 import { buildTextFragmentUrl } from './build-text-fragment-url';
+import { CheckIcon, LinkIcon, XIcon } from './icons';
 import { truncateQuote } from './truncate-quote';
 import * as styles from './styles.css';
 
@@ -110,14 +111,22 @@ const QuoteToolbar = ({ url, text }: ToolbarProps) => {
     }
   }, [fragmentUrl, setCopied]);
 
+  const copyLabel = copied ? 'コピーしました' : '引用リンク';
+
   return (
     <Toolbar aria-label="選択したテキストを共有" className={styles.toolbar}>
-      <Button variant="outline" onPress={handleCopy}>
-        {copied ? 'コピーしました' : '引用リンク'}
-      </Button>
-      <Button variant="outline" href={buildTweetUrl(truncateQuote(text), fragmentUrl)} target="_blank" rel="noopener noreferrer">
-        X で引用 ↗
-      </Button>
+      <TooltipTrigger>
+        <Button variant="outline" onPress={handleCopy} aria-label={copyLabel}>
+          {copied ? <CheckIcon /> : <LinkIcon />}
+        </Button>
+        <Tooltip className={styles.tooltip}>{copyLabel}</Tooltip>
+      </TooltipTrigger>
+      <TooltipTrigger>
+        <Button variant="outline" href={buildTweetUrl(truncateQuote(text), fragmentUrl)} target="_blank" rel="noopener noreferrer" aria-label="X で引用">
+          <XIcon />
+        </Button>
+        <Tooltip className={styles.tooltip}>X で引用</Tooltip>
+      </TooltipTrigger>
     </Toolbar>
   );
 };
