@@ -1,10 +1,10 @@
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { AdjacentNav } from '../../[id]/_components/adjacent-nav';
-import { RelatedWorks } from '../../[id]/_components/related-works';
-import { WorkDetail } from '../../[id]/_components/work-detail';
-import * as s from '../../[id]/styles.css';
+import { AdjacentNav } from '../../[slug]/_components/adjacent-nav';
+import { RelatedWorks } from '../../[slug]/_components/related-works';
+import { WorkDetail } from '../../[slug]/_components/work-detail';
+import * as s from '../../[slug]/styles.css';
 import { adjacentWorks } from '../../_lib/adjacent-works';
 import { relatedWorks } from '../../_lib/related-works';
 
@@ -40,7 +40,7 @@ const WorkPreviewPage = async ({ params }: Props) => {
   if (work === undefined) return notFound();
 
   const works = await findWorksList();
-  const { prev, next } = adjacentWorks(works, id);
+  const { prev, next } = adjacentWorks(works, work.slug);
   const related = relatedWorks(works, work);
   const crumbs = buildCrumbs(work.title);
 

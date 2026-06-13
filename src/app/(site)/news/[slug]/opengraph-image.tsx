@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { isExternalNews } from '../_lib/is-external-news';
 
-import { findNewsById } from '@lib/payload/news';
+import { findNewsBySlug } from '@lib/payload/news';
 
 import { dayjs } from '@utils/dayjs';
 import { loadOgAssets } from '@utils/og/load-og-assets';
@@ -16,14 +16,14 @@ export const revalidate = 3600;
 export const size = SIZE;
 export const contentType = CONTENT_TYPE;
 
-type Params = { params: Promise<{ id: string }> };
+type Params = { params: Promise<{ slug: string }> };
 
 const FIELD_COLS = Math.ceil(SIZE.width / 56);
 const FIELD_ROWS = Math.ceil(SIZE.height / 56);
 
 const Image = async ({ params }: Params) => {
-  const { id } = await params;
-  const item = await findNewsById(id);
+  const { slug } = await params;
+  const item = await findNewsBySlug(slug);
   // Mirror the detail page: external-link items have no public surface, so their
   // OG card 404s too.
   if (item !== undefined && isExternalNews(item)) notFound();

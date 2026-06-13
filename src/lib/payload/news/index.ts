@@ -45,30 +45,6 @@ export const findNewsList = async (): Promise<readonly NewsItem[]> => {
   return fetchNewsList();
 };
 
-const fetchNewsById = unstable_cache(
-  async (id: string): Promise<NewsItem | undefined> => {
-    const payload = await getPayloadClient();
-    const result = await payload.find({
-      collection: 'news',
-      where: { and: [{ id: { equals: id } }, publishedWhere] },
-      limit: 1,
-    });
-
-    const [doc] = result.docs;
-    if (doc === undefined) return undefined;
-
-    return toNewsItem(doc);
-  },
-  ['news-by-id'],
-  { tags: [CACHE_TAGS.news] },
-);
-
-export const findNewsById = async (id: string): Promise<NewsItem | undefined> => {
-  if (isBuildPhase()) return undefined;
-
-  return fetchNewsById(id);
-};
-
 const fetchNewsBySlug = unstable_cache(
   async (slug: string): Promise<NewsItem | undefined> => {
     const payload = await getPayloadClient();

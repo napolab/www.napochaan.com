@@ -29,7 +29,7 @@ const NewsPreviewPage = async ({ params }: Props) => {
   if (item === undefined) return notFound();
 
   const list = await findNewsList();
-  const { prev, next } = adjacentNews(list, id);
+  const { prev, next } = adjacentNews(list, item.slug);
 
   return (
     <>

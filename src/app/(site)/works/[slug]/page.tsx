@@ -7,7 +7,7 @@ import { adjacentWorks } from '../_lib/adjacent-works';
 import { relatedWorks } from '../_lib/related-works';
 import * as s from './styles.css';
 
-import { findWorkById, findWorksList } from '@lib/payload/works';
+import { findWorkBySlug, findWorksList } from '@lib/payload/works';
 
 import { PageHeader } from '@components/page-header';
 import { ShareBar } from '@components/share-bar';
@@ -17,15 +17,15 @@ import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 import type { Metadata } from 'next';
 
 // Revalidate hourly — ISR. Detail pages are static (no searchParams), so this
-// drives the static cache for the pre-rendered sample ids.
+// drives the static cache for the pre-rendered sample slugs.
 export const revalidate = 3600;
 
 export const generateStaticParams = async () => {
   const works = await findWorksList();
-  return works.map((work) => ({ id: work.id }));
+  return works.map((work) => ({ slug: work.slug }));
 };
 
-type Params = Promise<{ id: string }>;
+type Params = Promise<{ slug: string }>;
 
 type Props = {
   params: Params;
@@ -36,13 +36,13 @@ type Props = {
 const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/works', label: 'works' }, { label: title }];
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
-  const { id } = await params;
-  const work = await findWorkById(id);
+  const { slug } = await params;
+  const work = await findWorkBySlug(slug);
   if (work === undefined) return { title: 'works' };
 
   return resolveDetailMetadata({
     docTitle: work.title,
-    path: `/works/${id}`,
+    path: `/works/${slug}`,
     seo: work.seo,
     body: work.body,
     descriptionCandidates: [work.description],
@@ -53,12 +53,12 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 };
 
 const WorkDetailPage = async ({ params }: Props) => {
-  const { id } = await params;
-  const work = await findWorkById(id);
+  const { slug } = await params;
+  const work = await findWorkBySlug(slug);
   if (work === undefined) return notFound();
 
   const works = await findWorksList();
-  const { prev, next } = adjacentWorks(works, id);
+  const { prev, next } = adjacentWorks(works, slug);
   const related = relatedWorks(works, work);
   const crumbs = buildCrumbs(work.title);
 
@@ -66,14 +66,14 @@ const WorkDetailPage = async ({ params }: Props) => {
   return (
     <>
       <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
-      <WorkDetail work={work} url={absoluteUrl(`/works/${id}`)} />
+      <WorkDetail work={work} url={absoluteUrl(`/works/${slug}`)} />
       {related.length > 0 ? (
         <>
           <hr className={s.divider} />
           <RelatedWorks works={related} />
         </>
       ) : null}
-      <ShareBar url={absoluteUrl(`/works/${id}`)} title={work.title} />
+      <ShareBar url={absoluteUrl(`/works/${slug}`)} title={work.title} />
       <AdjacentNav prev={prev} next={next} />
     </>
   );

@@ -43,30 +43,6 @@ export const findBlogList = async (): Promise<readonly Post[]> => {
   return fetchBlogList();
 };
 
-const fetchBlogById = unstable_cache(
-  async (id: string): Promise<Post | undefined> => {
-    const payload = await getPayloadClient();
-    const result = await payload.find({
-      collection: 'blog',
-      where: { and: [{ id: { equals: id } }, publishedWhere] },
-      limit: 1,
-    });
-
-    const [doc] = result.docs;
-    if (doc === undefined) return undefined;
-
-    return toBlogPost(doc, '01');
-  },
-  ['blog-by-id'],
-  { tags: [CACHE_TAGS.blog] },
-);
-
-export const findBlogById = async (id: string): Promise<Post | undefined> => {
-  if (isBuildPhase()) return undefined;
-
-  return fetchBlogById(id);
-};
-
 const fetchBlogBySlug = unstable_cache(
   async (slug: string): Promise<Post | undefined> => {
     const payload = await getPayloadClient();

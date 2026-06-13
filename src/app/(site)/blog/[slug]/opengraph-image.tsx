@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og';
 
-import { findWorkById } from '@lib/payload/works';
+import { findBlogBySlug } from '@lib/payload/blog';
 
+import { dayjs } from '@utils/dayjs';
 import { loadOgAssets } from '@utils/og/load-og-assets';
 import { loadOgImage } from '@utils/og/load-og-image';
 import { CONTENT_TYPE, OgCard, SIZE } from '@utils/og/og-card';
@@ -9,26 +10,27 @@ import { requestOrigin } from '@utils/og/og-image-url';
 import { ogLifeBoard } from '@utils/og/og-life-board';
 import { resolveOgCardData } from '@utils/og/resolve-og-card-data';
 
-// Revalidate hourly — mirrors the works detail page's ISR window.
+// Revalidate hourly — mirrors the blog detail page's ISR window.
 export const revalidate = 3600;
 export const size = SIZE;
 export const contentType = CONTENT_TYPE;
 
-type Params = { params: Promise<{ id: string }> };
+type Params = { params: Promise<{ slug: string }> };
 
 const FIELD_COLS = Math.ceil(SIZE.width / 56);
 const FIELD_ROWS = Math.ceil(SIZE.height / 56);
 
 const Image = async ({ params }: Params) => {
-  const { id } = await params;
-  const work = await findWorkById(id);
+  const { slug } = await params;
+  const post = await findBlogBySlug(slug);
   const origin = await requestOrigin();
 
-  const imageUrl = await loadOgImage(work?.thumbnail?.src, origin); // present → image field; absent → GoL.
+  const formattedDate = post === undefined ? '' : dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD');
+  const imageUrl = await loadOgImage(post?.thumbnail?.src, origin); // the post's thumbnail → image field; else GoL.
   const data = resolveOgCardData({
-    section: 'works',
-    title: work?.title ?? 'works',
-    meta: `no.${id} · ${work?.type ?? 'works'}`,
+    section: 'blog',
+    title: post?.title ?? 'blog',
+    meta: `${formattedDate} · blog`,
     imageUrl,
   });
 

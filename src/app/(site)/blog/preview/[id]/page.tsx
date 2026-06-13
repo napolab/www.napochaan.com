@@ -1,9 +1,9 @@
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
-import { BlogNav } from '../../[id]/_components/blog-nav';
-import { Toc } from '../../[id]/_components/toc';
-import * as s from '../../[id]/styles.css';
+import { BlogNav } from '../../[slug]/_components/blog-nav';
+import { Toc } from '../../[slug]/_components/toc';
+import * as s from '../../[slug]/styles.css';
 import { adjacentPosts } from '../../_lib/adjacent-posts';
 
 import { LivePreviewListener } from '@components/live-preview';
@@ -38,7 +38,7 @@ const BlogPreviewPage = async ({ params }: Props) => {
   if (post === undefined) return notFound();
 
   const posts = await findBlogList();
-  const { prev, next } = adjacentPosts(posts, id);
+  const { prev, next } = adjacentPosts(posts, post.slug);
   const headings = extractHeadings(post.body ?? null);
   const crumbs = buildCrumbs(post.title);
 

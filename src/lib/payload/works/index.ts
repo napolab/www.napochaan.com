@@ -44,31 +44,6 @@ export const findWorksList = async (): Promise<readonly WorkRow[]> => {
   return fetchWorksList();
 };
 
-const fetchWorkById = unstable_cache(
-  async (id: string): Promise<WorkRow | undefined> => {
-    const payload = await getPayloadClient();
-    const result = await payload.find({
-      collection: 'works',
-      where: { and: [{ id: { equals: id } }, publishedWhere] },
-      depth: 1,
-      limit: 1,
-    });
-
-    const [doc] = result.docs;
-    if (doc === undefined) return undefined;
-
-    return toWorkItem(doc, '01');
-  },
-  ['works-by-id'],
-  { tags: [CACHE_TAGS.works] },
-);
-
-export const findWorkById = async (id: string): Promise<WorkRow | undefined> => {
-  if (isBuildPhase()) return undefined;
-
-  return fetchWorkById(id);
-};
-
 const fetchWorkBySlug = unstable_cache(
   async (slug: string): Promise<WorkRow | undefined> => {
     const payload = await getPayloadClient();

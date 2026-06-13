@@ -6,7 +6,7 @@ import { Toc } from './_components/toc';
 import { adjacentPosts } from '../_lib/adjacent-posts';
 import * as s from './styles.css';
 
-import { findBlogById, findBlogList } from '@lib/payload/blog';
+import { findBlogBySlug, findBlogList } from '@lib/payload/blog';
 
 import { PageHeader } from '@components/page-header';
 import { QuoteShare } from '@components/quote-share';
@@ -20,15 +20,15 @@ import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 import type { Metadata } from 'next';
 
 // Revalidate hourly — ISR. Detail pages are static (no searchParams), so this
-// drives the static cache for the pre-rendered sample ids.
+// drives the static cache for the pre-rendered sample slugs.
 export const revalidate = 3600;
 
 export const generateStaticParams = async () => {
   const posts = await findBlogList();
-  return posts.map((post) => ({ id: post.id }));
+  return posts.map((post) => ({ slug: post.slug }));
 };
 
-type Params = Promise<{ id: string }>;
+type Params = Promise<{ slug: string }>;
 
 type Props = {
   params: Params;
@@ -39,13 +39,13 @@ type Props = {
 const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { href: '/blog', label: 'blog' }, { label: title }];
 
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
-  const { id } = await params;
-  const post = await findBlogById(id);
+  const { slug } = await params;
+  const post = await findBlogBySlug(slug);
   if (post === undefined) return { title: 'blog', description: '記事' };
 
   return resolveDetailMetadata({
     docTitle: post.title,
-    path: `/blog/${id}`,
+    path: `/blog/${slug}`,
     seo: post.seo,
     body: post.body,
     descriptionCandidates: [post.excerpt],
@@ -55,12 +55,12 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 };
 
 const BlogDetailPage = async ({ params }: Props) => {
-  const { id } = await params;
-  const post = await findBlogById(id);
+  const { slug } = await params;
+  const post = await findBlogBySlug(slug);
   if (post === undefined) notFound();
 
   const posts = await findBlogList();
-  const { prev, next } = adjacentPosts(posts, id);
+  const { prev, next } = adjacentPosts(posts, slug);
   const headings = extractHeadings(post.body ?? null);
   const crumbs = buildCrumbs(post.title);
   const formattedDate = dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD');
@@ -76,13 +76,13 @@ const BlogDetailPage = async ({ params }: Props) => {
         </div>
         <div className={s.bodyCol} data-toc-body>
           {post.body === undefined ? null : (
-            <QuoteShare url={absoluteUrl(`/blog/${id}`)} title={post.title}>
+            <QuoteShare url={absoluteUrl(`/blog/${slug}`)} title={post.title}>
               <RichText data={post.body} />
             </QuoteShare>
           )}
         </div>
       </div>
-      <ShareBar url={absoluteUrl(`/blog/${id}`)} title={post.title} />
+      <ShareBar url={absoluteUrl(`/blog/${slug}`)} title={post.title} />
       <BlogNav prev={prev} next={next} />
     </>
   );
