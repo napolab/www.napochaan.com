@@ -22,7 +22,12 @@ export const News = {
   defaultSort: '-publishedAt',
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['pinned', 'title', 'category', 'publishedAt', '_status'],
+    // `title` must lead so the list row links to the edit view — Payload only
+    // wraps the FIRST column in the doc link, and a leading checkbox column
+    // (`pinned`) renders an interactive control with no link instead. Pin state
+    // is already obvious from the `beforeListTable` pinned strip, so it's not a
+    // column here.
+    defaultColumns: ['title', 'category', 'publishedAt', '_status'],
     components: {
       // A strip above the list table that always shows every pinned item,
       // independent of the table's pagination/filtering. See the component.
