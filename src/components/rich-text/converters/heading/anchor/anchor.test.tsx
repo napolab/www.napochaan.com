@@ -2,12 +2,14 @@ import { render } from 'vitest-browser-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
+import { MotionContext } from '@hooks/use-prefers-reduced-motion';
+
 import { HeadingAnchor } from './index';
+
+const motion = (reduced: boolean) => ({ reduced, toggle: () => {} });
 
 describe('HeadingAnchor', () => {
   beforeEach(() => {
-    // history/scroll are global side effects; stub them so presses don't mutate
-    // the shared test page URL or scroll position.
     vi.spyOn(history, 'replaceState').mockImplementation(() => {});
     vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(() => {});
   });
@@ -67,13 +69,27 @@ describe('HeadingAnchor', () => {
     vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
 
     await render(
-      <>
+      <MotionContext.Provider value={motion(false)}>
         <h2 id="intro">見出し</h2>
         <HeadingAnchor slug="intro" />
-      </>,
+      </MotionContext.Provider>,
     );
     await page.getByRole('button', { name: 'この見出しへのリンクをコピー' }).click();
 
     expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: 'smooth' });
+  });
+
+  it('jumps without smooth scroll when reduced motion is preferred', async () => {
+    vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+
+    await render(
+      <MotionContext.Provider value={motion(true)}>
+        <h2 id="intro">見出し</h2>
+        <HeadingAnchor slug="intro" />
+      </MotionContext.Provider>,
+    );
+    await page.getByRole('button', { name: 'この見出しへのリンクをコピー' }).click();
+
+    expect(HTMLElement.prototype.scrollIntoView).toHaveBeenCalledWith({ behavior: 'auto' });
   });
 });

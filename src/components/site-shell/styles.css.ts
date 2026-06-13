@@ -29,6 +29,10 @@ export const stage = css({
   // widening the wordmark) so it never reaches the viewport and judders the
   // fixed TypographyBand. `clip` is paint-only and leaves vertical flow intact.
   overflowX: 'clip',
+  // A small clip margin keeps focus rings that sit just outside the content edge
+  // visible (e.g. the richtext heading gutter copy-anchor) while still clipping
+  // the wider transient overflow. Mirrors the colophon demo-stage pattern.
+  overflowClipMargin: '[8px]',
   maxWidth: '[1180px]',
   marginInline: 'auto',
   // Clear the fixed TypographyBand on each side (safe-area-aware --band-*, see
