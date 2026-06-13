@@ -9,7 +9,12 @@ export const layout = css({
   // once the post overflows the viewport, so long posts are unaffected.
   flexGrow: 1,
   gap: 'block',
-  gridTemplateColumns: { base: '[1fr]', desktop: '[1fr 14rem]' },
+  // `1fr` resolves to `minmax(auto, 1fr)`, whose `auto` floor is the column's
+  // min-content. The TOC's long, keep-all Japanese entries push that floor past
+  // the viewport on narrow screens, so the body column overflows (clipped, not
+  // scrolled, by the shell's `overflow-x: clip`). `minmax(0, 1fr)` lowers the
+  // floor to 0 so the column collapses to its container and the prose wraps.
+  gridTemplateColumns: { base: '[minmax(0, 1fr)]', desktop: '[minmax(0, 1fr) 14rem]' },
   columnGap: { desktop: 'block' },
 });
 
