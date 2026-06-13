@@ -6,11 +6,10 @@ import { Popover, Toolbar } from 'react-aria-components';
 import { Button } from '@components/button';
 import { useAutoResetState } from '@hooks/use-auto-reset-state';
 import { usePointerFine } from '@hooks/use-pointer-fine';
-import { buildTweetUrl } from '@utils/tweet-intent';
 
-import { buildTextFragmentUrl } from './build-text-fragment-url';
-import { CheckIcon, LinkIcon, XIcon } from './icons';
-import { truncateQuote } from './truncate-quote';
+import { buildQuoteBlock } from './build-quote-block';
+import { buildQuoteTweetUrl } from './build-quote-tweet-url';
+import { CheckIcon, CopyIcon, XIcon } from './icons';
 import * as styles from './styles.css';
 
 import type { CSSProperties, ReactNode } from 'react';
@@ -20,19 +19,24 @@ type Snapshot = { text: string; rect: Rect };
 
 type Props = {
   url: string;
+  title: string;
   children: ReactNode;
 };
 
 // Gate: only mount the interactive layer on a fine pointer. On touch we return the
 // body untouched so the OS selection menu (copy / share) stays the affordance.
-export const QuoteShare = ({ url, children }: Props) => {
+export const QuoteShare = ({ url, title, children }: Props) => {
   const fine = usePointerFine();
   if (!fine) return <>{children}</>;
 
-  return <QuoteShareActive url={url}>{children}</QuoteShareActive>;
+  return (
+    <QuoteShareActive url={url} title={title}>
+      {children}
+    </QuoteShareActive>
+  );
 };
 
-const QuoteShareActive = ({ url, children }: Props) => {
+const QuoteShareActive = ({ url, title, children }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLSpanElement>(null);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
@@ -83,7 +87,7 @@ const QuoteShareActive = ({ url, children }: Props) => {
       <span ref={triggerRef} className={styles.anchor} style={anchorStyle} aria-hidden="true" />
       {snapshot !== null && (
         <Popover triggerRef={triggerRef} isOpen onOpenChange={handleOpenChange} placement="top" isNonModal className={styles.popover}>
-          <QuoteToolbar url={url} text={snapshot.text} />
+          <QuoteToolbar url={url} title={title} text={snapshot.text} />
         </Popover>
       )}
     </div>
@@ -92,32 +96,33 @@ const QuoteShareActive = ({ url, children }: Props) => {
 
 type ToolbarProps = {
   url: string;
+  title: string;
   text: string;
 };
 
 // Snapshot is guaranteed non-null here (only rendered while a selection is captured),
-// so both action URLs are built from a settled string — pressing a button can't
-// break them even though the click collapses the live selection.
-const QuoteToolbar = ({ url, text }: ToolbarProps) => {
+// so both actions use a settled quote block — pressing a button can't break them even
+// though the click collapses the live selection.
+const QuoteToolbar = ({ url, title, text }: ToolbarProps) => {
   const [copied, setCopied] = useAutoResetState(false);
-  const fragmentUrl = buildTextFragmentUrl(url, text);
+  const block = buildQuoteBlock(text, title, url);
 
   const handleCopy = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(fragmentUrl);
+      await navigator.clipboard.writeText(block);
       setCopied(true);
     } catch (error) {
       console.error(error);
     }
-  }, [fragmentUrl, setCopied]);
+  }, [block, setCopied]);
 
   return (
     <Toolbar aria-label="選択したテキストを共有" className={styles.toolbar}>
       <Button variant="outline" size="sm" onPress={handleCopy}>
-        {copied ? <CheckIcon width={16} height={16} /> : <LinkIcon width={16} height={16} />}
-        {copied ? 'コピーしました' : '引用リンク'}
+        {copied ? <CheckIcon width={16} height={16} /> : <CopyIcon width={16} height={16} />}
+        {copied ? 'コピーしました' : '引用をコピー'}
       </Button>
-      <Button type="link" variant="outline" size="sm" href={buildTweetUrl(truncateQuote(text), fragmentUrl)} target="_blank" rel="noopener noreferrer">
+      <Button type="link" variant="outline" size="sm" href={buildQuoteTweetUrl(text, title, url)} target="_blank" rel="noopener noreferrer">
         <XIcon width={16} height={16} />X で引用
       </Button>
     </Toolbar>

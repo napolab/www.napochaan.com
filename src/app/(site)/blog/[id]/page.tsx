@@ -76,7 +76,7 @@ const BlogDetailPage = async ({ params }: Props) => {
         </div>
         <div className={s.bodyCol} data-toc-body>
           {post.body === undefined ? null : (
-            <QuoteShare url={absoluteUrl(`/blog/${id}`)}>
+            <QuoteShare url={absoluteUrl(`/blog/${id}`)} title={post.title}>
               <RichText data={post.body} />
             </QuoteShare>
           )}

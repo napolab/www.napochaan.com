@@ -244,7 +244,7 @@ export const demos: Record<ComponentName, ReactNode> = {
   ),
   QuoteShare: (
     <NoAction>
-      <QuoteShare url="https://www.napochaan.com/blog/sample">
+      <QuoteShare url="https://www.napochaan.com/blog/sample" title="サンプルブログ記事">
         <p>この段落をドラッグで選択すると、選択範囲の上に共有バーが出ます（PC のみ）。</p>
       </QuoteShare>
     </NoAction>

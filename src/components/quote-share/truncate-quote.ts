@@ -1,9 +1,7 @@
-// Format a selected passage as a quote for the tweet body: trim, clip to keep the
-// tweet within limits (the URL eats characters too), wrap in Japanese corner brackets.
+// Clip a selected passage for sharing: trim, cap at 100 chars with an ellipsis.
 const MAX_QUOTE_LEN = 100;
 
 export const truncateQuote = (text: string): string => {
   const trimmed = text.trim();
-  const body = trimmed.length > MAX_QUOTE_LEN ? `${trimmed.slice(0, MAX_QUOTE_LEN)}…` : trimmed;
-  return `「${body}」`;
+  return trimmed.length > MAX_QUOTE_LEN ? `${trimmed.slice(0, MAX_QUOTE_LEN)}…` : trimmed;
 };

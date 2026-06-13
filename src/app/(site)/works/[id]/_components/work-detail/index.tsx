@@ -56,7 +56,7 @@ export const WorkDetail = ({ work, url }: Props) => {
       </p>
 
       {body === undefined ? null : (
-        <QuoteShare url={url}>
+        <QuoteShare url={url} title={work.title}>
           <RichText data={body} className={s.body} />
         </QuoteShare>
       )}

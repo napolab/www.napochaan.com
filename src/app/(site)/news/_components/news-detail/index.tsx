@@ -37,7 +37,7 @@ export const NewsDetail = ({ item, prev, next }: Props) => {
       <PageHeader title={item.title} breadcrumbs={crumbs} kicker={`// ${dayjs(item.date).tz('Asia/Tokyo').format('YYYY.MM.DD')} · ${item.category}`} titleTracking="tight" />
       <div className={s.body}>
         {item.body === undefined ? null : (
-          <QuoteShare url={absoluteUrl(`/news/${item.id}`)}>
+          <QuoteShare url={absoluteUrl(`/news/${item.id}`)} title={item.title}>
             <RichText data={item.body} />
           </QuoteShare>
         )}
