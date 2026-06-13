@@ -63,14 +63,3 @@ export const label = css({
 export const empty = css({
   display: { base: 'none', desktop: 'block' },
 });
-
-export const back = css({
-  // Hug the text so the link isn't a full-width block (its hover never stretches
-  // across the row).
-  alignSelf: 'start',
-  fontFamily: 'mono',
-  fontVariationSettings: '"wght" 600',
-  fontSize: 'xs',
-  letterSpacing: 'wide',
-  textUnderlineOffset: '[2px]',
-});
