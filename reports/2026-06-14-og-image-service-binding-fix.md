@@ -319,3 +319,80 @@ export const loadOgImage = async (src: string | undefined, origin: string): Prom
 
 No pure re-export barrels (`combined-runner.ts` composes the registry array = real
 logic; `index.ts` holds `loadOgImage` = real logic). No `runners/index.ts`.
+
+---
+
+## Hardening — sniff magic bytes, fall back to GoL on unsupported (works/43)
+
+### Why
+
+A works thumbnail (`ristill-birthday-2025.jpg`) had a Payload media doc `mimeType`
+of `image/webp` (legacy: it was originally a WebP). Re-encoding the bytes to real
+JPEG did NOT fix it because `ensureMedia` never updates an existing doc's fields,
+so the media route kept serving `Content-Type: image/webp`. `service-binding-runner`
+trusted that header → `data:image/webp;base64,<JPEG bytes>` → Satori took its WebP
+path on JPEG bytes and **hung** (Workers runtime cancelled the request → 500). The
+`/_next/image` transformer was unaffected because Cloudflare's IMAGES binding sniffs
+the actual bytes and ignores the declared type.
+
+Two failure modes to kill: (a) wrong declared MIME for a supported format, and
+(b) a genuinely Satori-unsupported format (real WebP/AVIF/GIF), which hangs rather
+than erroring — one bad image must not take down the whole OG route.
+
+### Fix — `service-binding-runner` decides the data: URL MIME from magic bytes, not the header
+
+Drop the `response.headers.get('content-type')` read entirely. Sniff the fetched
+buffer: JPEG/PNG → inline with the correct MIME; anything else → return `undefined`
+(→ `resolveOgImage` yields `undefined` → the card renders its GoL no-image field).
+
+#### `helpers.ts` — add `detectImageType`
+
+```ts
+// Magic-byte sniff for the formats next/og's Satori can decode. Returns undefined
+// for anything else (WebP/AVIF/GIF/…), so callers fall back to the no-image card
+// instead of handing Satori bytes it will hang on. The media route's declared
+// Content-Type is unreliable (stale Payload doc mimeType), so never trust it.
+export const detectImageType = (buffer: ArrayBuffer): 'jpeg' | 'png' | undefined => {
+  const bytes = new Uint8Array(buffer);
+  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'jpeg';
+  if (bytes.length >= 8 && bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) return 'png';
+
+  return undefined;
+};
+```
+
+#### `runners/service-binding-runner.ts` — sniff in `toDataUrl`
+
+```ts
+import { detectImageType, isPayloadMedia, toBase64 } from '../helpers';
+
+const toDataUrl = async (response: Response): Promise<string | undefined> => {
+  if (!response.ok) return undefined;
+
+  const buffer = await response.arrayBuffer();
+  const type = detectImageType(buffer);
+  if (type === undefined) return undefined; // Satori-unsupported → no-image (GoL) fallback
+
+  return `data:image/${type};base64,${toBase64(buffer)}`;
+};
+```
+
+(The `contentType`/header read is removed.)
+
+### Tests (TDD — adjust existing, add new)
+
+- `helpers.test.ts`: `detectImageType` → JPEG magic (`ff d8 ff`)→'jpeg'; PNG magic
+  (`89 50 4e 47`)→'png'; WebP (`52 49 46 46 .. 57 45 42 50` RIFF/WEBP)→undefined;
+  too-short buffer→undefined.
+- `runners/combined-runner.test.ts` (case "media + prod + binding ok"): the binding
+  response body must now carry **real magic bytes** (e.g. a Uint8Array starting
+  `ff d8 ff` for JPEG) and assert the result is `data:image/jpeg;base64,…`. Add a
+  case: binding returns WebP-magic bytes → result is `undefined` (GoL).
+- `load-og-image.test.ts` (the data-URL case): same — feed JPEG/PNG magic bytes so
+  it returns `data:image/<type>;base64,…`; the assertion must not depend on the
+  response `content-type` header anymore.
+
+### After merge
+
+Redeploy staging; works/43 OG should now render the (real-JPEG) ristill image; any
+genuinely-unsupported image anywhere falls back to the GoL card instead of 500.

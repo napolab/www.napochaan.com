@@ -12,11 +12,11 @@ import { loadOgImage } from './index';
 
 const ORIGIN = 'https://stg.napochaan.com';
 
-const okResponse = (): Response =>
+// Real JPEG magic bytes (ff d8 ff …): the runner sniffs the body, not the header.
+const jpegResponse = (): Response =>
   ({
     ok: true,
-    headers: { get: () => 'image/png' },
-    arrayBuffer: async () => new Uint8Array([1, 2, 3, 4]).buffer,
+    arrayBuffer: async () => new Uint8Array([0xff, 0xd8, 0xff, 0x00]).buffer,
   }) as unknown as Response;
 const notFound = (): Response => ({ ok: false, status: 404 }) as unknown as Response;
 
@@ -45,12 +45,12 @@ describe('loadOgImage', () => {
 
   it('inlines same-origin payload media via the binding as a data URL in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
-    refFetch.mockResolvedValue(okResponse());
+    refFetch.mockResolvedValue(jpegResponse());
 
     const result = await loadOgImage('/api/media/file/x.png', ORIGIN);
 
     expect(refFetch).toHaveBeenCalledWith(`${ORIGIN}/api/media/file/x.png`);
-    expect(result).toBe('data:image/png;base64,AQIDBA==');
+    expect(result).toBe('data:image/jpeg;base64,/9j/AA==');
   });
 
   it('returns undefined when the binding fetch is not ok in production', async () => {

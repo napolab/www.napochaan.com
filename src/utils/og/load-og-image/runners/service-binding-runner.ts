@@ -1,6 +1,6 @@
 import { errAsync, okAsync, ResultAsync } from 'neverthrow';
 
-import { isPayloadMedia, toBase64 } from '../helpers';
+import { detectImageType, isPayloadMedia, toBase64 } from '../helpers';
 
 import type { OgImageRunner } from '../types';
 
@@ -12,9 +12,10 @@ const toDataUrl = async (response: Response): Promise<string | undefined> => {
   if (!response.ok) return undefined;
 
   const buffer = await response.arrayBuffer();
-  const contentType = response.headers.get('content-type') ?? 'image/png';
+  const type = detectImageType(buffer);
+  if (type === undefined) return undefined; // Satori-unsupported → no-image (GoL) fallback
 
-  return `data:${contentType};base64,${toBase64(buffer)}`;
+  return `data:image/${type};base64,${toBase64(buffer)}`;
 };
 
 export const serviceBindingRunner: OgImageRunner = {
