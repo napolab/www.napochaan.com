@@ -96,6 +96,10 @@ export const colophon = {
       { name: 'Breadcrumbs', why: 'パンくず。いまどの階層にいるかを辿れるように。' },
       { name: 'FeedLink', why: 'RSS フィードへのリンク。一覧ページの PageHeader 直下に置いて、購読を促す。' },
       { name: 'ShareBar', why: '記事末尾の共有バー。X(Twitter)の web intent と、リンクをクリップボードへコピーする2アクション。Instagram は URL 共有導線が無いので置いてない。' },
+      {
+        name: 'BackToIndex',
+        why: 'blog / works を読み終えた足元に置く「一覧へもどる」。矢印は方向のしるしで色を抜き、ラベルだけ青く灯す。SysBar がスクロールで流れて消えても、ここから必ず一覧へ戻れる。',
+      },
       { name: 'QuoteShare', why: '本文を選択すると、引用ブロック（> 引用文 / タイトル | URL）のコピーと X 引用を選択範囲の上の Popover で出す（PC のみ）。' },
       {
         name: 'DecodingSkeleton',
