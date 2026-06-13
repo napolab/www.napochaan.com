@@ -16,6 +16,7 @@ import { DescriptionList, List } from '@components/list';
 import { Marquee } from '@components/marquee';
 import { Pagination } from '@components/pagination';
 import { PhrasedText } from '@components/phrased-text';
+import { QuoteShare } from '@components/quote-share';
 import { RichText } from '@components/rich-text';
 import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
@@ -239,6 +240,13 @@ export const demos: Record<ComponentName, ReactNode> = {
   ShareBar: (
     <NoAction>
       <ShareBar url="https://www.napochaan.com/works/1" title="サンプル作品タイトル" />
+    </NoAction>
+  ),
+  quoteShare: (
+    <NoAction>
+      <QuoteShare url="https://www.napochaan.com/blog/sample">
+        <p>この段落をドラッグで選択すると、選択範囲の上に共有バーが出ます（PC のみ）。</p>
+      </QuoteShare>
     </NoAction>
   ),
   DecodingSkeleton: <DecodingSkeleton rows={4} />,
