@@ -31,7 +31,7 @@ export const ShareBar = ({ url, title }: Props) => {
         share
       </span>
       <div className={styles.actions}>
-        <Button variant="outline" href={buildTweetUrl(title, url)} target="_blank" rel="noopener noreferrer">
+        <Button type="link" variant="outline" href={buildTweetUrl(title, url)} target="_blank" rel="noopener noreferrer">
           Twitter(X) ↗
         </Button>
         <Button variant="outline" onPress={handleCopy}>

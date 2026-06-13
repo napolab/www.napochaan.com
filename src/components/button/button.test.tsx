@@ -41,8 +41,12 @@ describe('Button', () => {
     await expect.element(page.getByRole('button', { name: 'label' })).toBeInTheDocument();
   });
 
-  it('renders an anchor with href when href is given', async () => {
-    render(<Button href="/about">enter</Button>);
+  it('renders an anchor with href when type="link" is given', async () => {
+    render(
+      <Button type="link" href="/about">
+        enter
+      </Button>,
+    );
     const link = page.getByRole('link', { name: 'enter' });
     await expect.element(link).toBeInTheDocument();
     await expect.element(link).toHaveAttribute('href', '/about');
@@ -50,7 +54,7 @@ describe('Button', () => {
 
   it('exposes the variant via data attribute on the link form', async () => {
     render(
-      <Button href="/x" variant="danger">
+      <Button type="link" href="/x" variant="danger">
         削除
       </Button>,
     );

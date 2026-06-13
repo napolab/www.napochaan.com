@@ -117,7 +117,7 @@ const QuoteToolbar = ({ url, text }: ToolbarProps) => {
         {copied ? <CheckIcon width={16} height={16} /> : <LinkIcon width={16} height={16} />}
         {copied ? 'コピーしました' : '引用リンク'}
       </Button>
-      <Button variant="outline" size="sm" href={buildTweetUrl(truncateQuote(text), fragmentUrl)} target="_blank" rel="noopener noreferrer">
+      <Button type="link" variant="outline" size="sm" href={buildTweetUrl(truncateQuote(text), fragmentUrl)} target="_blank" rel="noopener noreferrer">
         <XIcon width={16} height={16} />X で引用
       </Button>
     </Toolbar>

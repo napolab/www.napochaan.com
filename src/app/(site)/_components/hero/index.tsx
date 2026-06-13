@@ -25,13 +25,13 @@ export const Hero = ({ name = DEFAULT_NAME, lead = DEFAULT_LEAD }: Props) => {
       <LeadQuote text={lead} />
       <p className={styles.sub}>{SUB}</p>
       <div className={styles.buttons}>
-        <Button variant="solid" href="/about">
+        <Button type="link" variant="solid" href="/about">
           enter →
         </Button>
-        <Button variant="outline" href="/works">
+        <Button type="link" variant="outline" href="/works">
           works
         </Button>
-        <Button variant="danger" href="/contact">
+        <Button type="link" variant="danger" href="/contact">
           contact →
         </Button>
       </div>
