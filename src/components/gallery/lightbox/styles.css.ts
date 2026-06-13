@@ -29,13 +29,15 @@ export const dialog = css({
   maxH: '[90vh]',
 });
 
-// Cap the lightbox image height so a tall portrait never pushes the close
-// button off-screen; width follows the aspect ratio (contain, no crop).
+// Reserve the lightbox image box BEFORE the bitmap loads to avoid layout shift:
+// drive the height by the known aspect ratio (--ar = width/height, set inline by
+// the component) and cap it to 80vh AND to the height that 88vw width allows, so a
+// tall portrait never pushes the close button off-screen and a wide image never
+// overflows. width follows the ratio (contain, no crop, no distortion).
 export const modalImage = css({
+  aspectRatio: '[var(--ar, 1)]',
   width: 'auto',
-  height: 'auto',
-  maxW: '[88vw]',
-  maxH: '[80vh]',
+  height: '[min(80vh, calc(88vw / (var(--ar, 1))))]',
   objectFit: 'contain',
 });
 

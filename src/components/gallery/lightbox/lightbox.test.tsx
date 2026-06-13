@@ -41,4 +41,18 @@ describe('Lightbox', () => {
 
     await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('reserves the dialog image box via an --ar aspect-ratio variable (prevents CLS)', async () => {
+    await render(
+      <Lightbox src="/a.jpg" alt="flyer a" width={400} height={600} triggerClassName="t">
+        <img src="/a.jpg" alt="flyer a" />
+      </Lightbox>,
+    );
+    await page.getByRole('button', { name: /flyer a/ }).click();
+    await expect.element(page.getByRole('dialog')).toBeInTheDocument();
+    const overlay = page.getByTestId('gallery-overlay').element();
+    const img = overlay.querySelector('img');
+    expect(img).not.toBeNull();
+    expect((img as HTMLImageElement).style.getPropertyValue('--ar').replace(/\s+/g, '')).toBe('400/600');
+  });
 });
