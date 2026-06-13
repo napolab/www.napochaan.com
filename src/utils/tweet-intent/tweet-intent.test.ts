@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { buildTweetUrl } from './build-tweet-url';
+import { buildTweetUrl } from './index';
 
 describe('buildTweetUrl', () => {
   it('builds an X intent URL with encoded title and url', () => {

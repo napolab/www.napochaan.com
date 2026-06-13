@@ -5,7 +5,7 @@ import { useCallback } from 'react';
 import { Button } from '@components/button';
 import { useAutoResetState } from '@hooks/use-auto-reset-state';
 
-import { buildTweetUrl } from './build-tweet-url';
+import { buildTweetUrl } from '@utils/tweet-intent';
 import * as styles from './styles.css';
 
 type Props = {
