@@ -1,22 +1,57 @@
 import { css } from '@styled/css';
 
+// Two stacked blocks: the section nav, then the copyright/meta row. The top
+// border separates the footer from the last page section on the section rhythm.
 export const root = css({
-  // The footer is a sibling of the page <main> in the shell's normal flow with
-  // no gap between them, so without this its top border would hug the last
-  // section on every page. Separate it on the section rhythm.
   marginBlockStart: { base: '8', desktop: 'section' },
   borderTopWidth: 'default',
   borderTopStyle: 'solid',
   borderTopColor: 'fg.default',
   paddingBlock: 'element',
   display: 'flex',
-  justifyContent: 'space-between',
-  flexWrap: 'wrap',
-  gap: 'inline',
+  flexDirection: 'column',
+  gap: 'element',
   fontFamily: 'mono',
   fontVariationSettings: '"wght" 600',
   fontSize: 'xs',
   color: 'fg.muted',
+});
+
+// Section links. Wraps to multiple lines on narrow widths so every section stays
+// reachable at the foot of the page (the SysBar scrolls away above).
+export const nav = css({
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  gap: 'inline',
+});
+
+// Each link draws its own leading "·" via ::before so the separator is CSS, never
+// JSX. The first item suppresses it.
+export const navLink = css({
+  _before: {
+    content: '"·"',
+    marginInlineEnd: 'inline',
+    color: 'fg.subtle',
+  },
+  '&:first-child': {
+    _before: { content: '""', marginInlineEnd: '0' },
+  },
+});
+
+// copyright + meta: the original single space-between row, dropping to a column
+// only when the width can't hold both ends (mirrors blog-nav's pager row→column).
+// Separated from the nav above by a hairline.
+export const meta = css({
+  display: 'flex',
+  flexDirection: { base: 'column', desktop: 'row' },
+  justifyContent: 'space-between',
+  flexWrap: 'wrap',
+  gap: 'inline',
+  borderTopWidth: 'hairline',
+  borderTopStyle: 'solid',
+  borderTopColor: 'border.default',
+  paddingTop: 'element',
 });
 
 export const status = css({
