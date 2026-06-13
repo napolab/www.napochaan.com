@@ -36,7 +36,9 @@ const captionOf = (caption: unknown, fallbackAlt: string): string | undefined =>
 
 // One row cell: a cover Figure (16:9 + blurred backdrop). The caption prefers the
 // cell's explicit `caption`, falling back to the media `alt` so a cover image is
-// never label-less (same policy as the single-upload converter).
+// never label-less (same policy as the single-upload converter). `zoomable` makes
+// the cell a tap target that opens the shared gallery Lightbox, matching the
+// standalone in-body image.
 const cellFigure = (image: PopulatedImage, caption: unknown, key: number): React.ReactNode => (
   <div key={key} className={styles.cellRoot}>
     <Figure
@@ -46,6 +48,7 @@ const cellFigure = (image: PopulatedImage, caption: unknown, key: number): React
       height={image.height}
       caption={captionOf(caption, image.alt)}
       variant="cover"
+      zoomable
       placeholder="blur"
       blurDataURL={formatBlurURL(image.url, { blur: 20 })}
     />

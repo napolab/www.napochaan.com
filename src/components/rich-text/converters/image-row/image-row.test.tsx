@@ -44,6 +44,13 @@ describe('imageRowBlockConverters image-row', () => {
     expect(container.querySelectorAll('img')).toHaveLength(2);
   });
 
+  it('makes each cell a zoomable lightbox trigger labelled by its alt', async () => {
+    const { container } = await render(<>{renderImageRow([cell('a.png', 'alt a'), cell('b.png', 'alt b')])}</>);
+
+    const triggers = container.querySelectorAll('button[aria-label="alt a"], button[aria-label="alt b"]');
+    expect(triggers).toHaveLength(2);
+  });
+
   it('renders the explicit caption when provided', async () => {
     const { container } = await render(<>{renderImageRow([cell('a.png', 'alt a', 'left tag'), cell('b.png', 'alt b', 'right tag')])}</>);
 
