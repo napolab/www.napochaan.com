@@ -1,7 +1,7 @@
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
-import { siteNavItems } from '@utils/nav-items';
 
+import { FooterNav } from './footer-nav';
 import * as styles from './styles.css';
 
 type Props = {
@@ -11,13 +11,7 @@ type Props = {
 export const SiteFooter = ({ buildId }: Props) => {
   return (
     <footer className={styles.root}>
-      <nav className={styles.nav} aria-label="フッターナビゲーション">
-        {siteNavItems.map(({ label, href }) => (
-          <Link key={href} href={href} className={styles.navLink} tone="muted">
-            <ScrambleText>{label}</ScrambleText>
-          </Link>
-        ))}
-      </nav>
+      <FooterNav />
       <div className={styles.meta}>
         <span>© 2026 napochaan — graphic / digital</span>
         <span className={styles.status}>

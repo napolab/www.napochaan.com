@@ -11,7 +11,7 @@ import { ScrambleText } from '@components/scramble-text';
 import { useMotion } from '@hooks/use-prefers-reduced-motion';
 import { siteNavItems } from '@utils/nav-items';
 
-import { isNavActive } from './is-nav-active';
+import { isNavActive } from '@utils/is-nav-active';
 import * as styles from './styles.css';
 import { useClock } from './use-clock';
 

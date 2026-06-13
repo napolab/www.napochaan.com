@@ -17,27 +17,24 @@ export const root = css({
   color: 'fg.muted',
 });
 
-// Section links. Wraps to multiple lines on narrow widths so every section stays
-// reachable at the foot of the page (the SysBar scrolls away above).
+// Section links, separated by space (the gap) like the SysBar — no glyph divider.
+// Matches the header's nav rhythm. Wraps to multiple lines on narrow widths so
+// every section stays reachable at the foot of the page (the SysBar scrolls away).
 export const nav = css({
   display: 'flex',
   flexWrap: 'wrap',
   alignItems: 'center',
-  gap: 'inline',
+  gap: { base: '3', desktop: '[18px]' },
 });
 
-// Each link draws its own leading "·" via ::before so the separator is CSS, never
-// JSX. The first item suppresses it. Note: :first-child only suppresses the
-// DOM-first item — on narrow widths the nav wraps and a wrapped line's first item
-// keeps a leading "·". Accepted: the separator is decorative, not structural.
+// A section link. No resting underline — like the SysBar nav, the hover affordance
+// is the scramble and the current page is marked with the inverted box below.
 export const navLink = css({
-  _before: {
-    content: '"·"',
-    marginInlineEnd: 'inline',
-    color: 'fg.subtle',
-  },
-  '&:first-child': {
-    _before: { content: '""', marginInlineEnd: '0' },
+  paddingInline: '[6px]',
+  // Current page — the same inverted slot the header's active nav item uses.
+  '&[data-active]': {
+    color: 'fg.onSolid',
+    bg: 'fg.default',
   },
 });
 
