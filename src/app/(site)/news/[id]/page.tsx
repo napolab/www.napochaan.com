@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 
 import { NewsDetail } from '../_components/news-detail';
 import { adjacentNews } from '../_lib/adjacent-news';
+import { isExternalNews } from '../_lib/is-external-news';
 
 import { findNewsById, findNewsList } from '@lib/payload/news';
 
@@ -29,7 +30,9 @@ type Props = {
 export const generateMetadata = async ({ params }: Props): Promise<Metadata> => {
   const { id } = await params;
   const item = await findNewsById(id);
-  if (item === undefined) return { title: 'news', description: 'お知らせ' };
+  // Match the page render: missing or external-link items have no detail page, so
+  // 404 straight from metadata — no real metadata is generated for them.
+  if (item === undefined || isExternalNews(item)) notFound();
 
   return resolveDetailMetadata({
     docTitle: item.title,
@@ -44,7 +47,9 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
 const NewsDetailPage = async ({ params }: Props) => {
   const { id } = await params;
   const item = await findNewsById(id);
-  if (item === undefined) notFound();
+  // An external-link news item exists in the CMS but is not meant to be read
+  // on-site — its links point off to `item.url`, so the internal detail page 404s.
+  if (item === undefined || isExternalNews(item)) notFound();
 
   const list = await findNewsList();
   const { prev, next } = adjacentNews(list, id);

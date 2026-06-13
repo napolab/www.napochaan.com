@@ -1,4 +1,7 @@
 import { ImageResponse } from 'next/og';
+import { notFound } from 'next/navigation';
+
+import { isExternalNews } from '../_lib/is-external-news';
 
 import { findNewsById } from '@lib/payload/news';
 
@@ -21,6 +24,9 @@ const FIELD_ROWS = Math.ceil(SIZE.height / 56);
 const Image = async ({ params }: Params) => {
   const { id } = await params;
   const item = await findNewsById(id);
+  // Mirror the detail page: external-link items have no public surface, so their
+  // OG card 404s too.
+  if (item !== undefined && isExternalNews(item)) notFound();
 
   const formattedDate = item === undefined ? '' : dayjs(item.date).tz('Asia/Tokyo').format('YYYY.MM.DD');
   const data = resolveOgCardData({
