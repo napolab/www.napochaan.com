@@ -9,23 +9,11 @@ import { useLifeState } from '@components/game-of-life/provider';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 import { useMotion } from '@hooks/use-prefers-reduced-motion';
+import { siteNavItems } from '@utils/nav-items';
 
 import { isNavActive } from './is-nav-active';
 import * as styles from './styles.css';
 import { useClock } from './use-clock';
-
-// Every nav target is now a real page. The inline row holds all seven at the
-// widest sizes; as the viewport shrinks each slot collapses into the menu one at
-// a time from the right (blog first, index last) — see `data-order` in styles.
-const navItems = [
-  { label: 'index', href: '/' },
-  { label: 'about', href: '/about' },
-  { label: 'works', href: '/works' },
-  { label: 'news', href: '/news' },
-  { label: 'log', href: '/log' },
-  { label: 'gallery', href: '/gallery' },
-  { label: 'blog', href: '/blog' },
-];
 
 // One nav item. Holds its own ref so the ScrambleText (trigger="group") has an
 // explicit hover host — the whole padded slot, not just the label text. `order`
@@ -59,7 +47,7 @@ export const SysBar = ({ initialTime }: { initialTime: string }) => {
               (right-to-left, blog → index); whatever is hidden is reached through
               the menu, which holds the full set at every width. */}
           <nav className={styles.nav} aria-label="グローバルナビゲーション">
-            {navItems.map(({ label, href }, order) => (
+            {siteNavItems.map(({ label, href }, order) => (
               <NavLink key={label} label={label} href={href} active={isNavActive(pathname, href)} order={order} />
             ))}
           </nav>
@@ -75,7 +63,7 @@ export const SysBar = ({ initialTime }: { initialTime: string }) => {
               </Button>
               <Popover className={styles.popover}>
                 <Menu className={styles.menu} aria-label="グローバルナビゲーション">
-                  {navItems.map(({ label, href }) => (
+                  {siteNavItems.map(({ label, href }) => (
                     <MenuItem key={label} href={href} className={styles.menuItem} data-active={isNavActive(pathname, href) ? 'true' : undefined}>
                       {label}
                     </MenuItem>
