@@ -185,6 +185,10 @@ export interface Media {
  */
 export interface News {
   id: number;
+  /**
+   * URL に使う英数字の識別子。小文字英数字とハイフンのみ（例: napochaan-v3-0-0）。
+   */
+  slug: string;
   title: string;
   /**
    * オンにすると、このお知らせを news の先頭に固定表示する。
@@ -232,6 +236,10 @@ export interface News {
  */
 export interface Work {
   id: number;
+  /**
+   * URL に使う英数字の識別子。小文字英数字とハイフンのみ（例: napochaan-v3-0-0）。
+   */
+  slug: string;
   title: string;
   thumbnail?: (number | null) | Media;
   type: 'production' | 'talk' | 'support';
@@ -274,6 +282,10 @@ export interface Work {
  */
 export interface Blog {
   id: number;
+  /**
+   * URL に使う英数字の識別子。小文字英数字とハイフンのみ（例: napochaan-v3-0-0）。
+   */
+  slug: string;
   title: string;
   /**
    * 一覧・記事ヘッダーの hero と OG 画像（og:image / twitter:image）に使われる代表画像。
@@ -499,6 +511,7 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "news_select".
  */
 export interface NewsSelect<T extends boolean = true> {
+  slug?: T;
   title?: T;
   pinned?: T;
   publishedAt?: T;
@@ -521,6 +534,7 @@ export interface NewsSelect<T extends boolean = true> {
  * via the `definition` "works_select".
  */
 export interface WorksSelect<T extends boolean = true> {
+  slug?: T;
   title?: T;
   thumbnail?: T;
   type?: T;
@@ -544,6 +558,7 @@ export interface WorksSelect<T extends boolean = true> {
  * via the `definition` "blog_select".
  */
 export interface BlogSelect<T extends boolean = true> {
+  slug?: T;
   title?: T;
   thumbnail?: T;
   publishedAt?: T;
