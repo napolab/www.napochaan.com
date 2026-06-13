@@ -18,6 +18,7 @@ export const heading = css({
   // rule, so the heading publishes the value and the anchor consumes it. Coarse
   // pointers have no hover, so the baseline is raised to keep it discoverable.
   position: 'relative',
+  scrollMarginBlockStart: 'section',
   '--anchor-opacity': '0',
   '&:hover': { '--anchor-opacity': '1' },
   '&:focus-within': { '--anchor-opacity': '1' },

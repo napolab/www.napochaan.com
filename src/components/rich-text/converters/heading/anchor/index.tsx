@@ -11,23 +11,27 @@ type Props = {
   slug: string;
 };
 
-// Hover-revealed gutter affordance for a richtext body heading. Copies the
-// heading's deep-link URL (current page + #slug) to the clipboard and flips a
-// transient `data-copied` flag (auto-resets via useAutoResetState, same idiom as
-// ShareBar). The `#` / `✓` glyph lives in CSS, and reveal is driven by the parent
-// heading's inheriting `--anchor-opacity`, so this island owns no hover state.
+// Hover-revealed gutter affordance for a richtext body heading. On press it copies
+// the heading's deep-link URL, smooth-scrolls the heading into view, and reflects
+// `#slug` in the address bar via history.replaceState (replaceState keeps the
+// smooth scroll — location.hash would jump). A successful copy briefly flips
+// `data-copied`, which the stylesheet renders as an accent flash on the `#` glyph
+// (auto-resets fast via useAutoResetState). The `#` glyph lives in CSS, and the
+// reveal is driven by the parent heading's inheriting `--anchor-opacity`.
 export const HeadingAnchor = ({ slug }: Props) => {
-  const [copied, setCopied] = useAutoResetState(false);
+  const [copied, setCopied] = useAutoResetState(false, 800);
 
-  const handleCopy = useCallback(async () => {
-    const href = new URL(`#${slug}`, window.location.href).href;
+  const handlePress = useCallback(async () => {
+    const url = new URL(`#${slug}`, window.location.href);
     try {
-      await navigator.clipboard.writeText(href);
+      await navigator.clipboard.writeText(url.href);
       setCopied(true);
     } catch (error) {
       console.error(error);
     }
+    document.getElementById(slug)?.scrollIntoView({ behavior: 'smooth' });
+    history.replaceState(null, '', url.href);
   }, [slug, setCopied]);
 
-  return <Button type="button" aria-label="この見出しへのリンクをコピー" onPress={handleCopy} data-copied={copied || undefined} className={styles.root} />;
+  return <Button type="button" aria-label="この見出しへのリンクをコピー" onPress={handlePress} data-copied={copied || undefined} className={styles.root} />;
 };
