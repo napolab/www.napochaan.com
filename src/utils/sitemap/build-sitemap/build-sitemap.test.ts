@@ -45,6 +45,16 @@ describe('buildSitemap', () => {
     expect(urls).toContain(`${baseUrl}/works/work-two`);
   });
 
+  it('excludes external-link news (items with a url) from detail entries', () => {
+    const newsWithExternal: readonly NewsItem[] = [
+      { id: 'n1', slug: 'news-one', date: '2026-06-01', category: 'release', title: 'News One' },
+      { id: 'n2', slug: 'news-ext', date: '2026-06-02', category: 'release', title: 'News Ext', url: 'https://example.com' },
+    ];
+    const urls = buildSitemap({ baseUrl, news: newsWithExternal, blog, works }).map((entry) => entry.url);
+    expect(urls).toContain(`${baseUrl}/news/news-one`);
+    expect(urls).not.toContain(`${baseUrl}/news/news-ext`);
+  });
+
   it('never emits preview, admin, or api urls', () => {
     const entries = buildSitemap({ baseUrl, news, blog, works });
     const urls = entries.map((entry) => entry.url);

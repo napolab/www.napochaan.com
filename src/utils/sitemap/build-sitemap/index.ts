@@ -43,7 +43,9 @@ const toDetailEntry = (url: string, date?: string): SitemapEntry => {
 
 export const buildSitemap = ({ baseUrl, news, blog, works }: BuildSitemapArgs): MetadataRoute.Sitemap => {
   const staticEntries = STATIC_PATHS.map((path) => toStaticEntry(baseUrl, path));
-  const newsEntries = news.map((item) => toDetailEntry(`${baseUrl}/news/${item.slug}`, item.date));
+  // External-link news (a `url` is set) has no internal detail page — the detail
+  // route 404s for it (see is-external-news) — so it must not appear in the sitemap.
+  const newsEntries = news.filter((item) => item.url === undefined).map((item) => toDetailEntry(`${baseUrl}/news/${item.slug}`, item.date));
   const blogEntries = blog.map((post) => toDetailEntry(`${baseUrl}/blog/${post.slug}`, post.date));
   const worksEntries = works.map((work) => toDetailEntry(`${baseUrl}/works/${work.slug}`, work.date));
 
