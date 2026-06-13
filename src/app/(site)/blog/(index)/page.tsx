@@ -1,4 +1,4 @@
-import { PostList } from './_components/post-list';
+import { PostList } from '../_components/post-list';
 
 import { FeedLink } from '@components/feed-link';
 import { PageHeader } from '@components/page-header';

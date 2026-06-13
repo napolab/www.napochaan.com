@@ -1,5 +1,5 @@
-import { NewsArchive } from './_components/news-archive';
-import { groupNewsByYearMonth } from './_lib/group-by-year-month';
+import { NewsArchive } from '../_components/news-archive';
+import { groupNewsByYearMonth } from '../_lib/group-by-year-month';
 
 import { FeedLink } from '@components/feed-link';
 import { PageHeader } from '@components/page-header';

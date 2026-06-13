@@ -1,4 +1,4 @@
-import { WorksArchive } from './_components/works-archive';
+import { WorksArchive } from '../_components/works-archive';
 
 import { findWorksList } from '@lib/payload/works';
 
