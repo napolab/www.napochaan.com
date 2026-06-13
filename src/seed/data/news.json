@@ -1,5 +1,6 @@
 [
   {
+    "slug": "augmented-music-osaka-2023",
     "title": "企画展『拡張される音楽』椎乃味醂・たなか 「多面体、鏡面」@ 大阪関西国際芸術祭2023のシステム構築を担当",
     "pinned": false,
     "publishedAt": "2023-12-20",
@@ -9,6 +10,7 @@
     "_status": "published"
   },
   {
+    "slug": "hono-conf-2024",
     "title": "Hono Conference 2024 に登壇",
     "pinned": false,
     "publishedAt": "2024-06-22",
@@ -18,6 +20,7 @@
     "_status": "published"
   },
   {
+    "slug": "workers-tech-talks-3",
     "title": "Cloudflare Workers Tech Talks in Tokyo #3 に登壇",
     "pinned": false,
     "publishedAt": "2024-08-01",
@@ -179,6 +182,7 @@
     "_status": "published"
   },
   {
+    "slug": "augmented-music-system",
     "title": "企画展『拡張される音楽』椎乃味醂・たなか 「多面体、鏡面」のシステム構築を担当",
     "pinned": false,
     "publishedAt": "2024-11-29",
@@ -188,6 +192,7 @@
     "_status": "published"
   },
   {
+    "slug": "coexisting-music-demixus",
     "title": "企画展『共に在る音楽』煮ル果実DEMiXUSシステム構築を担当",
     "pinned": false,
     "publishedAt": "2024-12-12",
@@ -197,6 +202,7 @@
     "_status": "published"
   },
   {
+    "slug": "coexisting-music-shiino-momoe",
     "title": "企画展『共に在る音楽』椎乃味醂xももえ W♭Y♭K M♭C K システム構築を担当",
     "pinned": false,
     "publishedAt": "2024-12-12",
@@ -206,6 +212,7 @@
     "_status": "published"
   },
   {
+    "slug": "speculative-music-frame-words",
     "title": "企画展『思弁的な音楽』r-906《額縁の言葉 : I》の背景映像・システム構築を担当",
     "pinned": false,
     "publishedAt": "2025-12-10",
@@ -215,6 +222,7 @@
     "_status": "published"
   },
   {
+    "slug": "booth2booth-launch",
     "title": "VRDJイベント&制作チームBooth²Boothの立ち上げ",
     "pinned": false,
     "publishedAt": "2026-04-12",
@@ -224,6 +232,7 @@
     "_status": "published"
   },
   {
+    "slug": "projectcircles-mocap",
     "title": "#ProjectCircles 椎乃味醂ライブセクションの一部にモーキャプシステムを提供",
     "pinned": false,
     "publishedAt": "2026-05-05",
@@ -253,6 +262,7 @@
     "_status": "published"
   },
   {
+    "slug": "dj-vj-booking",
     "title": "DJ・VJ の出演依頼について",
     "pinned": true,
     "publishedAt": "2026-06-10",

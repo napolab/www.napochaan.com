@@ -1,5 +1,6 @@
 [
   {
+    "slug": "napochaan-v3-0-0-making",
     "title": "www.napochaan.com v3.0.0 の制作について",
     "publishedAt": "2026-06-10",
     "excerpt": "napochaan.com を v3.0.0 に作り直した。AI に好みを暴かせるゲームをして、拾った断片に名前をつけて、いちばん下にライフゲームを敷くまで。近くで見ればただ1マスぶん動いているセルが、引くと生命に見える。あの落差が好きだったから、単純さと複雑さが同じ画面に居座っている。覚えているうちに書いておく。",
@@ -1042,6 +1043,7 @@
     "thumbnailFile": "v3-top.png"
   },
   {
+    "slug": "genovese-vj-software",
     "title": "VJ ソフト(Genovese)を作っている",
     "publishedAt": "2026-06-13",
     "excerpt": "感じたものを人に渡したくて DJ を始めて、それでも「作った」と言い切れない引っかかりから、VJ ソフトを自分で書くことにした。datamosh、GPU ZeroCopy の出力、観客そのものを素材にする web カメラ、53 個の FX。naporitan の相棒、Genovese の話。",

@@ -1,5 +1,6 @@
 [
   {
+    "slug": "natori-sana-task-app",
     "title": "名取さなさんのタスク管理ファンアプリ",
     "type": "production",
     "date": "2019-02-02",
@@ -39,6 +40,7 @@
     "thumbnailFile": "natori-task.jpg"
   },
   {
+    "slug": "natori-sana-ar-app",
     "title": "名取さなさんのファン AR アプリ",
     "type": "production",
     "date": "2019-03-16",
@@ -78,6 +80,7 @@
     "thumbnailFile": "natori-ar.jpg"
   },
   {
+    "slug": "soelu-lessons-page",
     "title": "soelu.com lessons ページ",
     "type": "production",
     "date": "2020-02-13",
@@ -117,6 +120,7 @@
     "thumbnailFile": "soelu-lesson.jpg"
   },
   {
+    "slug": "soelu-instructors-page",
     "title": "soelu.com instructors ページ",
     "type": "production",
     "date": "2020-03-31",
@@ -156,6 +160,7 @@
     "thumbnailFile": "soelu-instructor.png"
   },
   {
+    "slug": "napochaan-v1-0-0",
     "title": "v1.0.0 www.napochaan.com",
     "type": "production",
     "date": "2020-04-10",
@@ -426,6 +431,7 @@
     "thumbnailFile": "napochaan-me-v1.png"
   },
   {
+    "slug": "447records-tana",
     "title": "447Records TANA",
     "type": "production",
     "date": "2021-01-17",
@@ -465,6 +471,7 @@
     "thumbnailFile": "447pro-tana.jpg"
   },
   {
+    "slug": "flat-kobo-kaitori-app",
     "title": "flat-工房 買取アプリ",
     "type": "production",
     "date": "2021-03-24",
@@ -504,6 +511,7 @@
     "thumbnailFile": "flat-kaitori.png"
   },
   {
+    "slug": "project-blue-hp",
     "title": "Project BLUE Official HP",
     "type": "production",
     "date": "2021-08-16",
@@ -543,6 +551,7 @@
     "thumbnailFile": "projectblue-hp.png"
   },
   {
+    "slug": "lgtm-generator",
     "title": "LGTM ジェネレータ",
     "type": "production",
     "date": "2022-03-01",
@@ -582,6 +591,7 @@
     "thumbnailFile": "image.png"
   },
   {
+    "slug": "flatkobo-shop-ui",
     "title": "flatkobo.shop ネットショップ UI",
     "type": "production",
     "date": "2022-08-05",
@@ -621,6 +631,7 @@
     "thumbnailFile": "flat-shop.jpg"
   },
   {
+    "slug": "napochaan-v2-0-0",
     "title": "v2.0.0 www.napochaan.com",
     "type": "production",
     "date": "2023-03-26",
@@ -711,6 +722,7 @@
     "thumbnailFile": "napochaan-ogp.png"
   },
   {
+    "slug": "shannon-netsuijou-remix-support",
     "title": "熱異常 / シャノン REMIX テクニカルサポート",
     "type": "support",
     "date": "2023-08-05",
@@ -750,6 +762,7 @@
     "thumbnailFile": "work-12.jpg"
   },
   {
+    "slug": "vocacolle-2023-summer-archive",
     "title": "2023夏ボカコレランキングアーカイブ",
     "type": "production",
     "date": "2023-08-07",
@@ -808,6 +821,7 @@
     "thumbnailFile": "vocacolle-2023.jpg"
   },
   {
+    "slug": "original-business-card",
     "title": "オリジナル名刺",
     "type": "production",
     "date": "2023-09-14",
@@ -847,6 +861,7 @@
     "thumbnailFile": "meishi-v1.jpg"
   },
   {
+    "slug": "shannon-symbol-system-lp",
     "title": "シャノン 第一象徴体系 LP",
     "type": "production",
     "date": "2023-12-19",
@@ -886,6 +901,7 @@
     "thumbnailFile": "1st-album.hakualab.org.png"
   },
   {
+    "slug": "augmented-music-polyhedron",
     "title": "大阪関西国際芸術祭2023  椎乃味醂xたなか「多面体、鏡面」",
     "type": "production",
     "date": "2023-12-20",
@@ -944,6 +960,7 @@
     "thumbnailFile": "OKIAF.png"
   },
   {
+    "slug": "duree-data-analysis",
     "title": "楽曲「デュレエ」関連データ解析",
     "type": "support",
     "date": "2024-01-24",
@@ -983,6 +1000,7 @@
     "thumbnailFile": "work-14.jpg"
   },
   {
+    "slug": "studio-gnu-hp",
     "title": "StudioGnu HP",
     "type": "production",
     "date": "2024-01-24",
@@ -1022,6 +1040,7 @@
     "thumbnailFile": "www.studiognu.org_ja.png"
   },
   {
+    "slug": "utau-kanata-hp",
     "title": "UTAU 彼方公式 HP",
     "type": "production",
     "date": "2024-02-23",
@@ -1080,6 +1099,7 @@
     "thumbnailFile": "kanata.png"
   },
   {
+    "slug": "flat-kobo-hp-support",
     "title": "flat-工房 HP 制作サポート",
     "type": "support",
     "date": "2024-03-01",
@@ -1119,6 +1139,7 @@
     "thumbnailFile": "work-19.jpg"
   },
   {
+    "slug": "hono-conf-2024",
     "title": "Hono Conf 2024 登壇",
     "type": "talk",
     "date": "2024-06-22",
@@ -1209,6 +1230,7 @@
     "thumbnailFile": "hono-conference-2024.png"
   },
   {
+    "slug": "workers-tech-talk-3",
     "title": "Workers Tech Talk #3 登壇",
     "type": "talk",
     "date": "2024-08-01",
@@ -1248,6 +1270,7 @@
     "thumbnailFile": "work-21.jpg"
   },
   {
+    "slug": "five-blocker-stage-system",
     "title": "工房祭ステージシステム「ファイブブロッカー」",
     "type": "production",
     "date": "2024-09-14",
@@ -1319,6 +1342,7 @@
     "thumbnailFile": "five-blocker.png"
   },
   {
+    "slug": "shoku-mv-coding-advisor",
     "title": "燭 / MusicVideo Coding Advisor",
     "type": "support",
     "date": "2024-10-12",
@@ -1358,6 +1382,7 @@
     "thumbnailFile": "work-23.jpg"
   },
   {
+    "slug": "vocacolle-2024-winter-archive",
     "title": "ボカコレ2024冬 ランキングアーカイブ",
     "type": "production",
     "date": "2024-12-01",
@@ -1429,6 +1454,7 @@
     "thumbnailFile": "vocacolle-2024.png"
   },
   {
+    "slug": "coexisting-music-demixus",
     "title": "企画展「共に在る音楽」煮ル果実 DEMiXUS システム",
     "type": "production",
     "date": "2024-12-12",
@@ -1468,6 +1494,7 @@
     "thumbnailFile": "DEMiXUS.jpeg"
   },
   {
+    "slug": "coexisting-music-shiino-momoe",
     "title": "企画展『共に在る音楽』 椎乃味醂 x ももえ W♭Y♭K M♭C K システム",
     "type": "production",
     "date": "2024-12-12",
@@ -1507,6 +1534,7 @@
     "thumbnailFile": "WYKMCK.jpeg"
   },
   {
+    "slug": "halo-gimmick-booth",
     "title": "ヘイロー化ギミック booth 販売",
     "type": "production",
     "date": "2025-01-01",
@@ -1546,6 +1574,7 @@
     "thumbnailFile": "work-28.jpg"
   },
   {
+    "slug": "ahub-umanity-hp",
     "title": "AHUB UMANITY アルバム HP",
     "type": "production",
     "date": "2025-03-15",
@@ -1585,6 +1614,7 @@
     "thumbnailFile": "umanity.jpg"
   },
   {
+    "slug": "vrchat-akage-homage",
     "title": "VRChat アバターを利用した AKAGE オマージュ動画",
     "type": "production",
     "date": "2025-04-17",
@@ -1624,6 +1654,7 @@
     "thumbnailFile": "akage-homage.png"
   },
   {
+    "slug": "mada-shiranai-kimi-video",
     "title": "まだ知らない君がいる 一部映像提供",
     "type": "support",
     "date": "2025-05-03",
@@ -1663,6 +1694,7 @@
     "thumbnailFile": "mada-shiranai-kimi.png"
   },
   {
+    "slug": "vrchat-event-poster",
     "title": "VRChat イベントポスター",
     "type": "production",
     "date": "2025-06-01",
@@ -1702,6 +1734,7 @@
     "thumbnailFile": "vrchat-event-poster.png"
   },
   {
+    "slug": "ristill-birthday-2025",
     "title": "BirthdayWebSite ristill.club 2025",
     "type": "production",
     "date": "2025-07-07",
@@ -2120,6 +2153,7 @@
     "thumbnailFile": "ristill-birthday-2025.jpg"
   },
   {
+    "slug": "vocacolle-2025-summer-archive",
     "title": "ボカコレ2025夏 アーカイブ",
     "type": "production",
     "date": "2025-08-01",
@@ -2223,6 +2257,7 @@
     "thumbnailFile": "vocacolle-2025-summer.png"
   },
   {
+    "slug": "vrc-pixelart-exhibition-2",
     "title": "VRC PIXELART EXHIBITION 2.0 ドットレカギミック",
     "type": "production",
     "date": "2025-09-13",
@@ -2262,6 +2297,7 @@
     "thumbnailFile": "pixelartexhibision2.0.png"
   },
   {
+    "slug": "shiino-harmony-site",
     "title": "椎乃味醂「解釈系 / ハーモニー」特設サイト",
     "type": "production",
     "date": "2025-11-16",
@@ -2301,6 +2337,7 @@
     "thumbnailFile": "kaishakukei-harmony-1.jpg"
   },
   {
+    "slug": "vket-2025-winter-prizespider",
     "title": "Vket2025Winter「PrizeSpider」クレーンゲームギミック",
     "type": "support",
     "date": "2025-12-06",
@@ -2340,6 +2377,7 @@
     "thumbnailFile": "work-37.jpg"
   },
   {
+    "slug": "speculative-music-frame-words",
     "title": "企画展『思弁的な音楽』 r-906《額縁の言葉 : I》",
     "type": "support",
     "date": "2025-12-10",
@@ -2423,6 +2461,7 @@
     "thumbnailFile": "image-4.png"
   },
   {
+    "slug": "harmony-amidakuji-system",
     "title": "椎乃味醂ライブイベント「ハーモニー」ペア決めあみだくじシステム",
     "type": "production",
     "date": "2026-01-18",
@@ -2506,6 +2545,7 @@
     "thumbnailFile": "work-39.jpg"
   },
   {
+    "slug": "booth2booth-site",
     "title": "VRDJイベント Booth2Booth 公式サイト",
     "type": "production",
     "date": "2026-04-12",
@@ -2577,6 +2617,7 @@
     "thumbnailFile": "booth2booth-ogp.jpg"
   },
   {
+    "slug": "projectcircles-motion",
     "title": "#ProjectCircles 椎乃味醂 ライブセクションの一部モーション制作を担当",
     "type": "support",
     "date": "2026-05-05",
@@ -2641,6 +2682,7 @@
     "thumbnailFile": "work-41.jpg"
   },
   {
+    "slug": "napochaan-v3-0-0",
     "title": "v3.0.0 www.napochaan.com",
     "type": "production",
     "date": "2026-06-09",
