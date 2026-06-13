@@ -125,3 +125,19 @@ describe('semantic tokens WCAG AA (light theme)', () => {
     expect(sem('danger.spot')).toBe('{colors.red.9}');
   });
 });
+
+describe('code syntax palette WCAG (on ink fg.default = gray-12)', () => {
+  const grayScale = tokens.colors.gray as Record<number, { value: string } | undefined>;
+  const gray12 = grayScale[12];
+  if (gray12 === undefined) throw new Error('missing gray-12 token');
+  const ink = gray12.value;
+  const code = semanticTokens.colors.code as Record<string, { value: string } | undefined>;
+
+  for (const role of ['fg', 'comment', 'keyword', 'string', 'number', 'function', 'punctuation']) {
+    it(`code.${role} on ink >= 4.5`, () => {
+      const entry = code[role];
+      if (entry === undefined) throw new Error(`missing code.${role} token`);
+      expect(contrastRatio(entry.value, ink)).toBeGreaterThanOrEqual(4.5);
+    });
+  }
+});

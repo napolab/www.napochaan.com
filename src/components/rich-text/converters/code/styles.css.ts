@@ -1,9 +1,9 @@
 import { css } from '@styled/css';
 
-// DARK TERMINAL code block: ink bg, canvas text. Shiki paints token foregrounds
-// via the --code-* variables below (theme `bg` is transparent, so this surface
-// shows through). Provisional palette using existing tokens — a later task swaps
-// these for dedicated colors.code.* tokens that meet WCAG AA on the ink background.
+// DARK TERMINAL code block: ink bg (fg.default = gray-12), syntax colors from
+// the dedicated code.* semantic tokens (WCAG AA ≥4.5:1 on ink).
+// Shiki paints token foregrounds via the --code-* variables below (theme `bg`
+// is transparent, so this surface shows through).
 export const codeBlock = css({
   fontFamily: 'mono',
   fontVariationSettings: '"wght" 600',
@@ -15,11 +15,11 @@ export const codeBlock = css({
   overflowX: 'auto',
   marginBlockEnd: 'block',
   '&:last-child': { marginBlockEnd: '0' },
-  '--code-fg': 'token(colors.bg.canvas)',
-  '--code-comment': 'token(colors.fg.muted)',
-  '--code-keyword': 'token(colors.accent.text)',
-  '--code-string': 'token(colors.bg.canvas)',
-  '--code-number': 'token(colors.accent.text)',
-  '--code-function': 'token(colors.bg.canvas)',
-  '--code-punctuation': 'token(colors.bg.canvas)',
+  '--code-fg': 'token(colors.code.fg)',
+  '--code-comment': 'token(colors.code.comment)',
+  '--code-keyword': 'token(colors.code.keyword)',
+  '--code-string': 'token(colors.code.string)',
+  '--code-number': 'token(colors.code.number)',
+  '--code-function': 'token(colors.code.function)',
+  '--code-punctuation': 'token(colors.code.punctuation)',
 });

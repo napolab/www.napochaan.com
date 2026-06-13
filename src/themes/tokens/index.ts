@@ -231,6 +231,15 @@ export const semanticTokens = defineSemanticTokens({
       border: { value: '{colors.red.7}' },
       spot: { value: '{colors.red.9}' },
     },
+    code: {
+      fg: { value: 'oklch(0.930 0.008 265)' }, // 15.2:1 on ink
+      comment: { value: 'oklch(0.660 0.020 265)' }, // 6.0:1
+      keyword: { value: 'oklch(0.720 0.170 266)' }, // 7.1:1  electric blue
+      string: { value: 'oklch(0.820 0.130 195)' }, // 11.2:1 teal
+      number: { value: 'oklch(0.840 0.130 90)' }, // 11.4:1 amber
+      function: { value: 'oklch(0.850 0.100 266)' }, // 11.5:1 pale blue
+      punctuation: { value: 'oklch(0.780 0.010 265)' }, // 9.3:1  light grey
+    },
   },
   spacing: {
     inline: { value: '{spacing.2}' }, // 8px
