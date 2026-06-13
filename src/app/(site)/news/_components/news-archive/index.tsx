@@ -8,11 +8,12 @@ import * as s from './styles.css';
 // text body the archive never touches).
 type ArchiveItem = {
   id: string;
+  slug: string;
   date: string;
   category: string;
   title: string;
   // Optional external destination. When set, the row links here instead of the
-  // internal `/news/{id}` detail page. Absolute http(s) URLs open in a new tab.
+  // internal `/news/{slug}` detail page. Absolute http(s) URLs open in a new tab.
   url?: string;
 };
 
@@ -39,7 +40,7 @@ export const NewsArchive = ({ groups }: Props) => {
           </h2>
           <ol className={s.rows}>
             {group.items.map((item) => (
-              <NewsRow key={item.id} date={dayjs(item.date).tz('Asia/Tokyo').format('MM.DD')} category={item.category} title={item.title} href={item.url ?? `/news/${item.id}`} />
+              <NewsRow key={item.id} date={dayjs(item.date).tz('Asia/Tokyo').format('MM.DD')} category={item.category} title={item.title} href={item.url ?? `/news/${item.slug}`} />
             ))}
           </ol>
         </section>

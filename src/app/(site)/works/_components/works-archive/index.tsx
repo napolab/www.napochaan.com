@@ -16,6 +16,7 @@ import type { CSSProperties } from 'react';
 
 type ArchiveItem = {
   id: string;
+  slug: string;
   title: string;
   type: string;
   year: number;
@@ -46,7 +47,7 @@ const WorkItem = ({ work }: { work: ArchiveItem }) => {
 
   return (
     <li>
-      <Link ref={setCard} href={`/works/${work.id}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} hideOutsideFocusRing>
+      <Link ref={setCard} href={`/works/${work.slug}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} hideOutsideFocusRing>
         {thumbnail === undefined ? null : <span className={s.ambient} aria-hidden="true" style={ambientStyle(thumbnail.src)} />}
         {thumbnail === undefined ? (
           <span className={s.thumbPlaceholder} aria-hidden="true" />

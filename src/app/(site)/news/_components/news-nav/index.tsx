@@ -5,7 +5,7 @@ import * as s from './styles.css';
 
 type Side = 'prev' | 'next';
 
-type AdjacentItem = { id: string; title: string };
+type AdjacentItem = { id: string; slug: string; title: string };
 
 type Props = {
   prev?: AdjacentItem;
@@ -26,7 +26,7 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
       return <span className={s.empty} aria-hidden="true" />;
     case 'present':
       return (
-        <Link href={`/news/${slot.item.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false}>
+        <Link href={`/news/${slot.item.slug}`} className={s.link} data-side={slot.side} tone="inherit" underline={false}>
           {slot.side === 'prev' ? (
             <span className={s.arrow} aria-hidden="true">
               ‹

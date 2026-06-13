@@ -39,12 +39,12 @@ describe('buildLogTimeline', () => {
     expect(group?.items[0]?.upcoming).toBe(false);
   });
 
-  it('links a work to its internal /works/{id} page', () => {
+  it('links a work to its internal /works/{slug} page', () => {
     const works = [work({ id: '9', year: 2026, url: 'https://example.com/w' })];
 
     const [group] = buildLogTimeline(works, [], now);
 
-    expect(group?.items[0]?.href).toBe('/works/9');
+    expect(group?.items[0]?.href).toBe('/works/work-9');
   });
 
   it('does not mutate the input arrays', () => {

@@ -4,6 +4,7 @@ import * as s from './styles.css';
 // Narrow row shape — the list never reads a post's body, so it isn't required.
 type Row = {
   id: string;
+  slug: string;
   index: string;
   title: string;
   readMin: number;

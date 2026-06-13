@@ -9,14 +9,14 @@ const groups = [
     key: '2026-06',
     label: '2026 / 06',
     items: [
-      { id: '1', date: '2026-06-05', category: 'site', title: 'サイトを全面リニューアル' },
-      { id: '2', date: '2026-06-01', category: 'live', title: 'Booth²Booth 出演決定' },
+      { id: '1', slug: 'site-renewal', date: '2026-06-05', category: 'site', title: 'サイトを全面リニューアル' },
+      { id: '2', slug: 'booth2booth-live', date: '2026-06-01', category: 'live', title: 'Booth²Booth 出演決定' },
     ],
   },
   {
     key: '2026-05',
     label: '2026 / 05',
-    items: [{ id: '3', date: '2026-05-23', category: 'release', title: 'works ページ公開' }],
+    items: [{ id: '3', slug: 'works-page', date: '2026-05-23', category: 'release', title: 'works ページ公開' }],
   },
 ];
 
@@ -28,12 +28,12 @@ describe('NewsArchive', () => {
     await expect.element(page.getByRole('heading', { level: 2, name: '2026 / 05' })).toBeInTheDocument();
   });
 
-  it('renders each item as a link to /news/{id} containing the title', async () => {
+  it('renders each item as a link to /news/{slug} containing the title', async () => {
     await render(<NewsArchive groups={groups} />);
 
     const link = page.getByRole('link', { name: /Booth²Booth 出演決定/ });
     await expect.element(link).toBeInTheDocument();
-    await expect.element(link).toHaveAttribute('href', '/news/2');
+    await expect.element(link).toHaveAttribute('href', '/news/booth2booth-live');
   });
 
   it('renders the category tag and the MM.DD date', async () => {

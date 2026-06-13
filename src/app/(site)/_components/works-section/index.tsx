@@ -43,7 +43,7 @@ const toRows = (works: readonly WorkRow[]): Record<string, ReactNode>[] =>
       ),
     no: work.no,
     title: (
-      <Link href={`/works/${work.id}`} tone="accent">
+      <Link href={`/works/${work.slug}`} tone="accent">
         <ScrambleText>{work.title}</ScrambleText>
       </Link>
     ),

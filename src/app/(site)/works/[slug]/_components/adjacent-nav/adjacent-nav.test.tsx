@@ -4,24 +4,24 @@ import { page } from 'vitest/browser';
 
 import { AdjacentNav } from './index';
 
-const prev = { id: '1', title: 'prev work' };
-const next = { id: '3', title: 'next work' };
+const prev = { id: '1', slug: 'prev-work', title: 'prev work' };
+const next = { id: '3', slug: 'next-work', title: 'next work' };
 
 describe('AdjacentNav', () => {
-  it('renders a prev link to /works/{id}', async () => {
+  it('renders a prev link to /works/{slug}', async () => {
     await render(<AdjacentNav prev={prev} next={next} />);
 
     const link = page.getByRole('link', { name: /prev work/ });
     await expect.element(link).toBeInTheDocument();
-    await expect.element(link).toHaveAttribute('href', '/works/1');
+    await expect.element(link).toHaveAttribute('href', '/works/prev-work');
   });
 
-  it('renders a next link to /works/{id}', async () => {
+  it('renders a next link to /works/{slug}', async () => {
     await render(<AdjacentNav prev={prev} next={next} />);
 
     const link = page.getByRole('link', { name: /next work/ });
     await expect.element(link).toBeInTheDocument();
-    await expect.element(link).toHaveAttribute('href', '/works/3');
+    await expect.element(link).toHaveAttribute('href', '/works/next-work');
   });
 
   it('renders no prev link at the first item', async () => {

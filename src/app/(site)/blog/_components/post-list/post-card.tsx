@@ -13,6 +13,7 @@ import * as s from './styles.css';
 
 type Post = {
   id: string;
+  slug: string;
   index: string;
   title: string;
   readMin: number;
@@ -28,7 +29,7 @@ export const PostCard = ({ post }: { post: Post }) => {
   const [card, setCard] = useState<HTMLAnchorElement | null>(null);
 
   return (
-    <Link ref={setCard} className={s.card} aria-label={post.title} href={`/blog/${post.id}`} tone="inherit" underline={false}>
+    <Link ref={setCard} className={s.card} aria-label={post.title} href={`/blog/${post.slug}`} tone="inherit" underline={false}>
       <span className={s.index}>{post.index}</span>
       <span className={clsx(link({ tone: 'accent', underline: true, hideOutsideFocusRing: true }), s.title)}>
         <ScrambleText trigger="group" host={card}>

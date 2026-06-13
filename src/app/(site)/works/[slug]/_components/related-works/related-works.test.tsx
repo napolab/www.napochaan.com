@@ -5,8 +5,8 @@ import { page } from 'vitest/browser';
 import { RelatedWorks } from './index';
 
 const works = [
-  { id: '4', no: '04', title: 'neon grid flyer', type: 'flyer', year: 2023 },
-  { id: '8', no: '08', title: 'night graphics', type: 'flyer', year: 2024, thumbnail: { src: '/n.jpg', width: 80, height: 80 } },
+  { id: '4', slug: 'neon-grid-flyer', no: '04', title: 'neon grid flyer', type: 'flyer', year: 2023 },
+  { id: '8', slug: 'night-graphics', no: '08', title: 'night graphics', type: 'flyer', year: 2024, thumbnail: { src: '/n.jpg', width: 80, height: 80 } },
 ];
 
 describe('RelatedWorks', () => {
@@ -16,12 +16,12 @@ describe('RelatedWorks', () => {
     await expect.element(page.getByRole('heading', { name: /related/i })).toBeInTheDocument();
   });
 
-  it('renders each related work as a link to /works/{id}', async () => {
+  it('renders each related work as a link to /works/{slug}', async () => {
     await render(<RelatedWorks works={works} />);
 
     const link = page.getByRole('link', { name: /neon grid flyer/ });
     await expect.element(link).toBeInTheDocument();
-    await expect.element(link).toHaveAttribute('href', '/works/4');
+    await expect.element(link).toHaveAttribute('href', '/works/neon-grid-flyer');
   });
 
   it('labels the thumbnail with the work title', async () => {

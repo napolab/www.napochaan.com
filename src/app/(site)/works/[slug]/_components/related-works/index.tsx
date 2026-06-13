@@ -13,6 +13,7 @@ import * as s from './styles.css';
 
 type RelatedWork = {
   id: string;
+  slug: string;
   title: string;
   type: string;
   thumbnail?: { src: string; width: number; height: number };
@@ -31,7 +32,7 @@ const RelatedItem = ({ work }: { work: RelatedWork }) => {
 
   return (
     <li>
-      <Link ref={setCard} href={`/works/${work.id}`} className={clsx(s.item, 'group')} tone="inherit" underline={false}>
+      <Link ref={setCard} href={`/works/${work.slug}`} className={clsx(s.item, 'group')} tone="inherit" underline={false}>
         {thumbnail === undefined ? (
           <span className={s.thumbPlaceholder} aria-hidden="true" />
         ) : (

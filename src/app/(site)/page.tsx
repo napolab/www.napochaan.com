@@ -53,7 +53,7 @@ const toFeedItem = (item: NewsItem): NewsFeedItem => ({
   date: item.date,
   category: item.category,
   title: item.title,
-  href: item.url ?? `/news/${item.id}`,
+  href: item.url ?? `/news/${item.slug}`,
 });
 
 const toFeedItems = (items: readonly NewsItem[]): readonly NewsFeedItem[] => items.map(toFeedItem);

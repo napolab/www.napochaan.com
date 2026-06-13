@@ -47,7 +47,7 @@ const toPostEntry = (post: ExternalPost): SortableEntry => {
   };
 };
 
-// A work links to its own /works/{id} detail page (not its external source url),
+// A work links to its own /works/{slug} detail page (not its external source url),
 // per "works があるものは works に飛ぶ". The title is shown verbatim — any trailing
 // phrasing (作成 / 提供 / 登壇 …) is authored into the work's title in the CMS, not here.
 const toWorkEntry = (work: WorkRow): SortableEntry => {
@@ -60,7 +60,7 @@ const toWorkEntry = (work: WorkRow): SortableEntry => {
     meta: work.type,
     title: work.title,
     upcoming: false,
-    href: `/works/${work.id}`,
+    href: `/works/${work.slug}`,
     sortDate: work.date ?? '',
   };
 };

@@ -5,9 +5,9 @@ import { page } from 'vitest/browser';
 import { WorksArchive } from './index';
 
 const works = [
-  { id: '1', no: '01', title: 'night graphics vol.13', type: 'flyer', year: 2024 },
-  { id: '2', no: '02', title: 'key visual', type: 'graphic', year: 2026 },
-  { id: '3', no: '03', title: 'stage VJ set', type: 'vj', year: 2025 },
+  { id: '1', slug: 'night-graphics-vol13', no: '01', title: 'night graphics vol.13', type: 'flyer', year: 2024 },
+  { id: '2', slug: 'key-visual', no: '02', title: 'key visual', type: 'graphic', year: 2026 },
+  { id: '3', slug: 'stage-vj-set', no: '03', title: 'stage VJ set', type: 'vj', year: 2025 },
 ];
 
 describe('WorksArchive', () => {
@@ -19,12 +19,12 @@ describe('WorksArchive', () => {
     await expect.element(page.getByRole('heading', { level: 2, name: '2024' })).toBeInTheDocument();
   });
 
-  it('renders each work as a link to /works/{id} containing the title', async () => {
+  it('renders each work as a link to /works/{slug} containing the title', async () => {
     await render(<WorksArchive works={works} />);
 
     const link = page.getByRole('link', { name: /key visual/ });
     await expect.element(link).toBeInTheDocument();
-    await expect.element(link).toHaveAttribute('href', '/works/2');
+    await expect.element(link).toHaveAttribute('href', '/works/key-visual');
   });
 
   it('renders the work type', async () => {
@@ -34,7 +34,7 @@ describe('WorksArchive', () => {
   });
 
   it('labels the thumbnail with the work title', async () => {
-    const withThumb = [{ id: '9', no: '09', title: 'thumbed', type: 'flyer', year: 2026, thumbnail: { src: '/x.jpg', width: 80, height: 80 } }];
+    const withThumb = [{ id: '9', slug: 'thumbed', no: '09', title: 'thumbed', type: 'flyer', year: 2026, thumbnail: { src: '/x.jpg', width: 80, height: 80 } }];
     const { container } = await render(<WorksArchive works={withThumb} />);
 
     const img = container.querySelector('img');

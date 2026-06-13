@@ -8,7 +8,7 @@ import * as s from './styles.css';
 
 type Side = 'prev' | 'next';
 
-type AdjacentWork = { id: string; title: string };
+type AdjacentWork = { id: string; slug: string; title: string };
 
 type Props = {
   prev?: AdjacentWork;
@@ -29,7 +29,7 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
       return <span className={s.empty} aria-hidden="true" />;
     case 'present':
       return (
-        <Link href={`/works/${slot.work.id}`} className={s.link} data-side={slot.side} tone="inherit" underline={false}>
+        <Link href={`/works/${slot.work.slug}`} className={s.link} data-side={slot.side} tone="inherit" underline={false}>
           {slot.side === 'prev' ? (
             <span className={s.arrow} aria-hidden="true">
               ‹

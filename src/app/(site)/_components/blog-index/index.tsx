@@ -22,7 +22,7 @@ export const BlogIndex = ({ id, posts }: Props) => {
         {posts.map((post) => (
           <li key={post.id} className={styles.post}>
             <span className={styles.index}>{post.index}</span>
-            <Link href={`/blog/${post.id}`} tone="accent" className={styles.title}>
+            <Link href={`/blog/${post.slug}`} tone="accent" className={styles.title}>
               <ScrambleText>{post.title}</ScrambleText>
             </Link>
             <p className={styles.meta}>
