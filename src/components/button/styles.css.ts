@@ -35,4 +35,5 @@ export const root = css({
     borderColor: 'danger.solid',
     _hover: { bg: 'danger.solidHover' },
   },
+  '&[data-size="sm"]': { minH: 'targetMin', px: '2', fontSize: 'xs' },
 });

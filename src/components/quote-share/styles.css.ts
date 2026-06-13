@@ -34,12 +34,3 @@ export const toolbar = css({
   gap: '2',
   padding: '2',
 });
-
-export const tooltip = css({
-  bg: 'fg.default',
-  color: 'bg.canvas',
-  fontFamily: 'mono',
-  fontSize: 'xs',
-  paddingInline: '2',
-  paddingBlock: '1',
-});
