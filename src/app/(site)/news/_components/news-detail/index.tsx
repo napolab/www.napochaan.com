@@ -3,6 +3,7 @@ import { NewsNav } from '../news-nav';
 import * as s from './styles.css';
 
 import { PageHeader } from '@components/page-header';
+import { QuoteShare } from '@components/quote-share';
 import { RichText } from '@components/rich-text';
 import { ShareBar } from '@components/share-bar';
 import { dayjs } from '@utils/dayjs';
@@ -34,7 +35,13 @@ export const NewsDetail = ({ item, prev, next }: Props) => {
   return (
     <>
       <PageHeader title={item.title} breadcrumbs={crumbs} kicker={`// ${dayjs(item.date).tz('Asia/Tokyo').format('YYYY.MM.DD')} · ${item.category}`} titleTracking="tight" />
-      <div className={s.body}>{item.body === undefined ? null : <RichText data={item.body} />}</div>
+      <div className={s.body}>
+        {item.body === undefined ? null : (
+          <QuoteShare url={absoluteUrl(`/news/${item.id}`)}>
+            <RichText data={item.body} />
+          </QuoteShare>
+        )}
+      </div>
       <ShareBar url={absoluteUrl(`/news/${item.id}`)} title={item.title} />
       <NewsNav prev={prev} next={next} />
     </>

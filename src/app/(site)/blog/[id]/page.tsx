@@ -9,6 +9,7 @@ import * as s from './styles.css';
 import { findBlogById, findBlogList } from '@lib/payload/blog';
 
 import { PageHeader } from '@components/page-header';
+import { QuoteShare } from '@components/quote-share';
 import { RichText } from '@components/rich-text';
 import { extractHeadings } from '@components/rich-text/toc';
 import { ShareBar } from '@components/share-bar';
@@ -74,7 +75,11 @@ const BlogDetailPage = async ({ params }: Props) => {
           <Toc headings={headings} />
         </div>
         <div className={s.bodyCol} data-toc-body>
-          {post.body === undefined ? null : <RichText data={post.body} />}
+          {post.body === undefined ? null : (
+            <QuoteShare url={absoluteUrl(`/blog/${id}`)}>
+              <RichText data={post.body} />
+            </QuoteShare>
+          )}
         </div>
       </div>
       <ShareBar url={absoluteUrl(`/blog/${id}`)} title={post.title} />

@@ -66,7 +66,7 @@ const WorkDetailPage = async ({ params }: Props) => {
   return (
     <>
       <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
-      <WorkDetail work={work} />
+      <WorkDetail work={work} url={absoluteUrl(`/works/${id}`)} />
       {related.length > 0 ? (
         <>
           <hr className={s.divider} />

@@ -18,7 +18,7 @@ const work = {
 
 describe('WorkDetail', () => {
   it('renders the image with the title as alt text', async () => {
-    const { container } = await render(<WorkDetail work={work} />);
+    const { container } = await render(<WorkDetail work={work} url="https://napochaan.com/works/7" />);
 
     const img = container.querySelector('img');
     expect(img).not.toBeNull();
@@ -26,28 +26,28 @@ describe('WorkDetail', () => {
   });
 
   it('renders the type and year meta line', async () => {
-    const { container } = await render(<WorkDetail work={work} />);
+    const { container } = await render(<WorkDetail work={work} url="https://napochaan.com/works/7" />);
 
     // WorkDetail renders a single mono meta line "<type> · <year>" (no `no`).
     expect(container.textContent).toContain('graphic · 2024');
   });
 
   it('renders the rich-text body when present', async () => {
-    await render(<WorkDetail work={work} />);
+    await render(<WorkDetail work={work} url="https://napochaan.com/works/7" />);
 
     await expect.element(page.getByText('アバター ALICE のポートレートシリーズ。')).toBeInTheDocument();
   });
 
   it('omits the body when absent', async () => {
     const noBody = { ...work, body: undefined };
-    const { container } = await render(<WorkDetail work={noBody} />);
+    const { container } = await render(<WorkDetail work={noBody} url="https://napochaan.com/works/7" />);
 
     expect(container.textContent).not.toContain('アバター ALICE のポートレートシリーズ。');
   });
 
   it('renders a placeholder block when there is no thumbnail', async () => {
     const noThumb = { ...work, thumbnail: undefined };
-    const { container } = await render(<WorkDetail work={noThumb} />);
+    const { container } = await render(<WorkDetail work={noThumb} url="https://napochaan.com/works/7" />);
 
     expect(container.querySelector('img')).toBeNull();
   });

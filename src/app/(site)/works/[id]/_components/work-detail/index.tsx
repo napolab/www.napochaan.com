@@ -1,6 +1,7 @@
 import { AmbientBackdrop } from '@components/ambient-backdrop';
 import { Figure } from '@components/figure';
 import { formatBlurURL } from '@components/image/helper';
+import { QuoteShare } from '@components/quote-share';
 import { RichText } from '@components/rich-text';
 
 import * as s from './styles.css';
@@ -17,6 +18,7 @@ type WorkDetailData = {
 
 type Props = {
   work: WorkDetailData;
+  url: string;
 };
 
 // The detail body of a single work: a uniform contact-sheet proof image, a mono
@@ -28,7 +30,7 @@ type Props = {
 // thumbnail, a matching placeholder block stands in (Figure requires a src). Pure
 // Server Component — no react-aria, no interactivity — so it stays out of the client
 // bundle. The page <h1> lives in PageHeader, so this renders no heading.
-export const WorkDetail = ({ work }: Props) => {
+export const WorkDetail = ({ work, url }: Props) => {
   const { thumbnail, body } = work;
 
   return (
@@ -53,7 +55,11 @@ export const WorkDetail = ({ work }: Props) => {
         {work.type} · {work.year}
       </p>
 
-      {body === undefined ? null : <RichText data={body} className={s.body} />}
+      {body === undefined ? null : (
+        <QuoteShare url={url}>
+          <RichText data={body} className={s.body} />
+        </QuoteShare>
+      )}
     </section>
   );
 };
