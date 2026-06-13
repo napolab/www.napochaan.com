@@ -232,13 +232,13 @@ export const semanticTokens = defineSemanticTokens({
       spot: { value: '{colors.red.9}' },
     },
     code: {
-      fg: { value: 'oklch(0.930 0.008 265)' }, // 15.2:1 on ink
-      comment: { value: 'oklch(0.660 0.020 265)' }, // 6.0:1
-      keyword: { value: 'oklch(0.720 0.170 266)' }, // 7.1:1  electric blue
-      string: { value: 'oklch(0.820 0.130 195)' }, // 11.2:1 teal
-      number: { value: 'oklch(0.840 0.130 90)' }, // 11.4:1 amber
-      function: { value: 'oklch(0.850 0.100 266)' }, // 11.5:1 pale blue
-      punctuation: { value: 'oklch(0.780 0.010 265)' }, // 9.3:1  light grey
+      fg: { value: 'oklch(0.260 0.020 265)' }, // 12.2:1 on gray.3
+      comment: { value: 'oklch(0.510 0.017 265)' }, // 4.53:1
+      keyword: { value: 'oklch(0.490 0.287 266)' }, // 5.53:1  electric blue (= blue-9)
+      string: { value: 'oklch(0.470 0.110 195)' }, // 4.83:1  teal
+      number: { value: 'oklch(0.500 0.130 55)' }, // 4.94:1  amber
+      function: { value: 'oklch(0.430 0.230 266)' }, // 6.90:1  deep blue
+      punctuation: { value: 'oklch(0.430 0.018 265)' }, // 6.35:1  grey (= gray-11)
     },
   },
   spacing: {

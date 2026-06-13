@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getHighlighter, INK_THEME_NAME } from './index';
+import { getHighlighter, CODE_THEME_NAME } from './index';
 
 describe('getHighlighter', () => {
   it('returns a memoized singleton (same instance across calls)', async () => {
@@ -21,9 +21,9 @@ describe('getHighlighter', () => {
     expect(loaded).toContain('bash');
   });
 
-  it('highlights typescript into a hast tree under the ink theme', async () => {
+  it('highlights typescript into a hast tree under the code theme', async () => {
     const hl = await getHighlighter();
-    const hast = hl.codeToHast('const x = 1', { lang: 'typescript', theme: INK_THEME_NAME });
+    const hast = hl.codeToHast('const x = 1', { lang: 'typescript', theme: CODE_THEME_NAME });
 
     expect(hast.type).toBe('root');
     expect(JSON.stringify(hast)).toContain('var(--code-');

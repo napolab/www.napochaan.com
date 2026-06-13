@@ -126,18 +126,18 @@ describe('semantic tokens WCAG AA (light theme)', () => {
   });
 });
 
-describe('code syntax palette WCAG (on ink fg.default = gray-12)', () => {
+describe('code syntax palette WCAG (on light panel bg.muted = gray-3)', () => {
   const grayScale = tokens.colors.gray as Record<number, { value: string } | undefined>;
-  const gray12 = grayScale[12];
-  if (gray12 === undefined) throw new Error('missing gray-12 token');
-  const ink = gray12.value;
+  const gray3 = grayScale[3];
+  if (gray3 === undefined) throw new Error('missing gray-3 token');
+  const panel = gray3.value;
   const code = semanticTokens.colors.code as Record<string, { value: string } | undefined>;
 
   for (const role of ['fg', 'comment', 'keyword', 'string', 'number', 'function', 'punctuation']) {
-    it(`code.${role} on ink >= 4.5`, () => {
+    it(`code.${role} on panel >= 4.5`, () => {
       const entry = code[role];
       if (entry === undefined) throw new Error(`missing code.${role} token`);
-      expect(contrastRatio(entry.value, ink)).toBeGreaterThanOrEqual(4.5);
+      expect(contrastRatio(entry.value, panel)).toBeGreaterThanOrEqual(4.5);
     });
   }
 });
