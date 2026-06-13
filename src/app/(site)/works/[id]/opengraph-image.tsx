@@ -3,8 +3,9 @@ import { ImageResponse } from 'next/og';
 import { findWorkById } from '@lib/payload/works';
 
 import { loadOgAssets } from '@utils/og/load-og-assets';
+import { loadOgImage } from '@utils/og/load-og-image';
 import { CONTENT_TYPE, OgCard, SIZE } from '@utils/og/og-card';
-import { absoluteMediaUrl, requestOrigin } from '@utils/og/og-image-url';
+import { requestOrigin } from '@utils/og/og-image-url';
 import { ogLifeBoard } from '@utils/og/og-life-board';
 import { resolveOgCardData } from '@utils/og/resolve-og-card-data';
 
@@ -23,11 +24,12 @@ const Image = async ({ params }: Params) => {
   const work = await findWorkById(id);
   const origin = await requestOrigin();
 
+  const imageUrl = await loadOgImage(work?.thumbnail?.src, origin); // present → image field; absent → GoL.
   const data = resolveOgCardData({
     section: 'works',
     title: work?.title ?? 'works',
     meta: `no.${id} · ${work?.type ?? 'works'}`,
-    imageUrl: absoluteMediaUrl(work?.thumbnail?.src, origin), // present → image field; absent → GoL.
+    imageUrl,
   });
 
   const board = ogLifeBoard(FIELD_COLS, FIELD_ROWS); // fixed seed → consistent GoL texture across all cards

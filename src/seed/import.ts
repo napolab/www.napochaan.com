@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -68,21 +69,30 @@ const findAssetPath = async (filename: string): Promise<string | undefined> => {
   return path.resolve(match.parentPath, match.name);
 };
 
-// Re-upload the binary for an EXISTING media doc when its R2 object is missing.
-// A media row in D1 does not guarantee bytes in R2: e.g. a seed run before the
-// R2 binding was `remote = true` wrote the doc to remote D1 but the upload to
-// local miniflare, so the deployed worker 404s the file. Heading the bucket first
-// keeps re-runs cheap (skip when present). `r2Bucket` is imported lazily, inside
-// this found-branch only, so the unit test (find() returns no docs) never loads
-// payload.config — and at runtime it is the already-evaluated config singleton,
-// resolved to the remote bucket under `CLOUDFLARE_ENV=staging|production`.
-const ensureMediaBytes = async (instance: Payload, filename: string, filePath: string, contentType: string | undefined): Promise<void> => {
+// (Re-)upload the binary for an EXISTING media doc when its R2 object is missing
+// OR its stored content differs from the local asset. A media row in D1 does not
+// guarantee correct bytes in R2: e.g. a seed run before the R2 binding was
+// `remote = true` wrote the doc to remote D1 but the upload to local miniflare, so
+// the deployed worker 404s the file; and editing an asset while keeping the same
+// filename (e.g. swapping a thumbnail) leaves stale bytes in R2 unless we compare
+// content. We head the bucket first and compare hashes: single-part R2 puts (how
+// both the storage-r2 plugin and this code write objects) store the content MD5
+// hex in `head.etag` (defensively unquoted), so we compute the local bytes' MD5
+// and skip the upload only when an object exists AND the hashes match — otherwise
+// we put. `r2Bucket` is imported lazily, inside this found-branch only, so the unit
+// test (find() returns no docs) never loads payload.config — and at runtime it is
+// the already-evaluated config singleton, resolved to the remote bucket under
+// `CLOUDFLARE_ENV=staging|production`.
+// Exported so the content-aware re-upload behavior can be tested directly.
+export const ensureMediaBytes = async (instance: Payload, filename: string, filePath: string, contentType: string | undefined): Promise<void> => {
   const { r2Bucket } = await import('../payload.config');
   const head = await r2Bucket.head(filename);
-  if (head !== null) return;
   const bytes = await readFile(filePath);
+  const localHash = createHash('md5').update(bytes).digest('hex');
+  const storedHash = head === null ? undefined : head.etag.replace(/^"|"$/g, '');
+  if (head !== null && storedHash === localHash) return;
   await r2Bucket.put(filename, bytes, contentType === undefined ? undefined : { httpMetadata: { contentType } });
-  instance.logger.info(`[seed:import] re-uploaded missing R2 object: ${filename}`);
+  instance.logger.info(`[seed:import] uploaded R2 object (new or changed): ${filename}`);
 };
 
 const ensureMedia = async (instance: Payload, filename: string, alt: string): Promise<number | undefined> => {

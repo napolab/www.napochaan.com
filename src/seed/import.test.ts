@@ -1,8 +1,10 @@
+import { createHash } from 'node:crypto';
 import { readdir, readFile } from 'node:fs/promises';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ensureAdminUser, importBlog, importContent, importSeedData, importWorks } from './import';
+import { ensureAdminUser, ensureMediaBytes, importBlog, importContent, importSeedData, importWorks } from './import';
+import { r2Bucket } from '../payload.config';
 
 import { richTextFromBlocks } from '@utils/sample-rich-text';
 
@@ -17,6 +19,12 @@ vi.mock('node:fs/promises', () => ({
   readFile: vi.fn(async (target: string) => (target.endsWith('profile.json') ? '{}' : '[]')),
   readdir: vi.fn(async () => []),
 }));
+
+// ensureMediaBytes lazily `import('../payload.config')` inside its found-branch.
+// The existing tests never enter that branch, so the real config is otherwise
+// never loaded; mock it to a fake bucket with head/put spies (factory must not
+// import the real module).
+vi.mock('../payload.config', () => ({ r2Bucket: { head: vi.fn(), put: vi.fn() } }));
 
 type CreateCall = { collection: string };
 
@@ -203,5 +211,47 @@ describe('importWorks — body image media resolution', () => {
     await importWorks(payload);
 
     expect(writes.some((call) => call.collection === 'works')).toBe(true);
+  });
+});
+
+// ensureMediaBytes re-uploads when R2 has no object OR its stored content differs
+// from the local asset (single-part R2 puts store the content MD5 hex in `etag`).
+describe('ensureMediaBytes — content-aware re-upload', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  const makeInstance = (): Payload => ({ logger: { info: vi.fn(), warn: vi.fn() } }) as unknown as Payload;
+  const md5Hex = (bytes: Buffer): string => createHash('md5').update(bytes).digest('hex');
+
+  it('uploads when the R2 object is missing (head -> null)', async () => {
+    const bytes = Buffer.from('imagebytes');
+    vi.mocked(readFile).mockResolvedValueOnce(bytes);
+    vi.mocked(r2Bucket.head).mockResolvedValueOnce(null);
+
+    await ensureMediaBytes(makeInstance(), 'thumb.png', '/assets/thumb.png', 'image/png');
+
+    expect(r2Bucket.put).toHaveBeenCalledTimes(1);
+    expect(r2Bucket.put).toHaveBeenCalledWith('thumb.png', bytes, { httpMetadata: { contentType: 'image/png' } });
+  });
+
+  it('uploads when the stored content hash differs from the local bytes', async () => {
+    const bytes = Buffer.from('imagebytes');
+    vi.mocked(readFile).mockResolvedValueOnce(bytes);
+    vi.mocked(r2Bucket.head).mockResolvedValueOnce({ etag: 'deadbeefdeadbeefdeadbeefdeadbeef' } as unknown as Awaited<ReturnType<typeof r2Bucket.head>>);
+
+    await ensureMediaBytes(makeInstance(), 'thumb.png', '/assets/thumb.png', 'image/png');
+
+    expect(r2Bucket.put).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips the upload when the stored content hash matches the local bytes', async () => {
+    const bytes = Buffer.from('imagebytes');
+    vi.mocked(readFile).mockResolvedValueOnce(bytes);
+    vi.mocked(r2Bucket.head).mockResolvedValueOnce({ etag: md5Hex(bytes) } as unknown as Awaited<ReturnType<typeof r2Bucket.head>>);
+
+    await ensureMediaBytes(makeInstance(), 'thumb.png', '/assets/thumb.png', 'image/png');
+
+    expect(r2Bucket.put).not.toHaveBeenCalled();
   });
 });
