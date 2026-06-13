@@ -8,6 +8,7 @@ preview_urls = false
 
 [vars]
 BASE_URL = "http://localhost:3000"
+TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 CURSOR_SALT = "dev-cursor-salt-change-me"
 
 [[rules]]
@@ -65,41 +66,14 @@ new_sqlite_classes = ["DOQueueHandler"]
 tag = "v2"
 new_sqlite_classes = ["CursorRoom"]
 
-# ===== Test Environment =====
-# Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
-# `compatibility_date`, and `compatibility_flags` from the top level. Bindings
-# (D1/R2/DO/services) are NOT inherited, keeping the worker test runtime minimal.
-# `assets` IS inherited, so override it to a directory that exists at test time
-# (`.open-next/assets` is a build artifact that is absent during tests).
-[env.test]
-# Override `main` so the workers test pool does not import the OpenNext build
-# artifact (`.open-next/worker.js`), which is absent during tests. This entry
-# only re-exports the `CursorRoom` Durable Object.
-main = "./worker/worker.test-entry.ts"
-
-[env.test.vars]
-CURSOR_SALT = "test-cursor-salt"
-
-[env.test.assets]
-directory = "public"
-binding = "ASSETS"
-
-[[env.test.durable_objects.bindings]]
-name = "CURSOR_ROOM"
-class_name = "CursorRoom"
-
-[[env.test.migrations]]
-tag = "v1"
-new_sqlite_classes = ["CursorRoom"]
-
 # ===== Staging Environment =====
-
 [env.staging]
 workers_dev = false
 preview_urls = false
 
 [env.staging.vars]
 BASE_URL = "https://stg.napochaan.com"
+TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
 
 [[env.staging.routes]]
@@ -145,14 +119,13 @@ database_name = "napochaan-cache-staging"
 database_id = "0af66616-6458-492f-92b3-0f1d305abd06"
 
 # ===== Production Environment =====
-
 [env.production]
 workers_dev = false
 preview_urls = false
 
 [env.production.vars]
 BASE_URL = "https://napochaan.com"
-CURSOR_SALT = "prod-cursor-salt-change-me"
+TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 
 [env.production.images]
 binding = "IMAGES"
@@ -189,3 +162,31 @@ class_name = "CursorRoom"
 binding = "NEXT_TAG_CACHE_D1"
 database_name = "napochaan-cache-production"
 database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cache-production
+
+# ===== Test Environment =====
+# Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
+# `compatibility_date`, and `compatibility_flags` from the top level. Bindings
+# (D1/R2/DO/services) are NOT inherited, keeping the worker test runtime minimal.
+# `assets` IS inherited, so override it to a directory that exists at test time
+# (`.open-next/assets` is a build artifact that is absent during tests).
+[env.test]
+# Override `main` so the workers test pool does not import the OpenNext build
+# artifact (`.open-next/worker.js`), which is absent during tests. This entry
+# only re-exports the `CursorRoom` Durable Object.
+main = "./worker/worker.test-entry.ts"
+
+[env.test.vars]
+CURSOR_SALT = "test-cursor-salt"
+TURNSTILE_SITE_KEY = "test-turnstile-site-key"
+
+[env.test.assets]
+directory = "public"
+binding = "ASSETS"
+
+[[env.test.durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
+
+[[env.test.migrations]]
+tag = "v1"
+new_sqlite_classes = ["CursorRoom"]
