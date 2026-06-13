@@ -129,7 +129,7 @@ describe('importBlog — body image media resolution', () => {
       { type: 'p', text: 'intro' },
       { type: 'img', file: 'v3-hero.png', alt: 'hero' },
     ]);
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'post', body }]));
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'post', slug: 'post', body }]));
     direntsOnce([asDirent('v3-hero.png')]);
 
     const { payload, writes } = makeMediaFakePayload();
@@ -145,7 +145,7 @@ describe('importBlog — body image media resolution', () => {
       { type: 'p', text: 'intro' },
       { type: 'img', file: 'missing.png', alt: 'gone' },
     ]);
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'post', body }]));
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'post', slug: 'post', body }]));
     direntsOnce([]);
 
     const { payload, writes } = makeMediaFakePayload();
@@ -156,7 +156,7 @@ describe('importBlog — body image media resolution', () => {
   });
 
   it('resolves a top-level thumbnailFile to a media id and strips the raw key', async () => {
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'post', thumbnailFile: 'v3-top.png' }]));
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'post', slug: 'post', thumbnailFile: 'v3-top.png' }]));
     direntsOnce([asDirent('v3-top.png')]);
 
     const { payload, writes } = makeMediaFakePayload();
@@ -178,7 +178,7 @@ describe('importWorks — body image media resolution', () => {
       { type: 'p', text: 'intro' },
       { type: 'img', file: 'work-shot.png', alt: 'shot' },
     ]);
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'work', body }]));
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'work', slug: 'work', body }]));
     direntsOnce([asDirent('work-shot.png')]);
 
     const { payload, writes } = makeMediaFakePayload();
@@ -194,7 +194,7 @@ describe('importWorks — body image media resolution', () => {
       { type: 'p', text: 'intro' },
       { type: 'img', file: 'missing.png', alt: 'gone' },
     ]);
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'work', body }]));
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'work', slug: 'work', body }]));
     direntsOnce([]);
 
     const { payload, writes } = makeMediaFakePayload();
@@ -205,7 +205,7 @@ describe('importWorks — body image media resolution', () => {
   });
 
   it('passes a work with no body through without throwing', async () => {
-    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'w' }]));
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: 'w', slug: 'w' }]));
 
     const { payload, writes } = makeMediaFakePayload();
     await importWorks(payload);

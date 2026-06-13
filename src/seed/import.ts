@@ -11,7 +11,7 @@ import type { Blog, Log, News, Work } from '@payload-types';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { Payload, SanitizedConfig } from 'payload';
 
-type TitleSlug = 'news' | 'works' | 'blog' | 'logs';
+type UpsertCollection = 'news' | 'works' | 'blog';
 
 // Reads src/seed/data/*.json (produced by `seed:export`, or hand-edited) and
 // upserts every collection + the profile global. Idempotent: re-running must not
@@ -114,23 +114,25 @@ const ensureMedia = async (instance: Payload, filename: string, alt: string): Pr
 };
 
 // ---------------------------------------------------------------------------
-// Title-keyed upsert (news / works / blog / logs).
+// Slug-keyed upsert (news / works / blog).
 // ---------------------------------------------------------------------------
-// The data is assembled from hand-editable JSON, so the slug↔shape correlation
-// Payload's typed create/update overloads demand cannot be statically proven for a
-// dynamic slug. Coerce the whole options object once at this write boundary (same
-// rationale as the richText `as unknown as`).
+// The data is assembled from hand-editable JSON, so the collection↔shape
+// correlation Payload's typed create/update overloads demand cannot be statically
+// proven for a dynamic collection name. Coerce the whole options object once at
+// this write boundary (same rationale as the richText `as unknown as`).
+// `slug` is the stable natural key in each record: editing a title no longer
+// orphans the existing row — the upsert finds and updates by slug instead.
 type CreateOptions = Parameters<Payload['create']>[0];
 type UpdateOptions = Parameters<Payload['update']>[0];
 
-const upsertByTitle = async (instance: Payload, slug: TitleSlug, title: string, data: Record<string, unknown>): Promise<void> => {
-  const existing = await instance.find({ collection: slug, where: { title: { equals: title } }, limit: 1, depth: 0, overrideAccess: true });
+const upsertBySlug = async (instance: Payload, collection: UpsertCollection, recordSlug: string, data: Record<string, unknown>): Promise<void> => {
+  const existing = await instance.find({ collection, where: { slug: { equals: recordSlug } }, limit: 1, depth: 0, overrideAccess: true });
   const [found] = existing.docs;
   if (found === undefined) {
-    await instance.create({ collection: slug, data, context: writeContext, overrideAccess: true } as unknown as CreateOptions);
+    await instance.create({ collection, data, context: writeContext, overrideAccess: true } as unknown as CreateOptions);
     return;
   }
-  await instance.update({ collection: slug, id: found.id, data, context: writeContext, overrideAccess: true } as unknown as UpdateOptions);
+  await instance.update({ collection, id: found.id, data, context: writeContext, overrideAccess: true } as unknown as UpdateOptions);
 };
 
 type NewsRecord = Omit<News, 'id' | 'createdAt' | 'updatedAt' | 'meta'>;
@@ -138,7 +140,7 @@ const importNews = async (instance: Payload): Promise<void> => {
   const records = await readData<NewsRecord>('news');
   for (const record of records) {
     const data = { ...record, body: asRichText(record.body) };
-    await upsertByTitle(instance, 'news', record.title, data);
+    await upsertBySlug(instance, 'news', record.slug, data);
   }
   instance.logger.info(`[seed:import] upserted ${records.length} news`);
 };
@@ -176,7 +178,7 @@ export const importWorks = async (instance: Payload): Promise<void> => {
     const thumbnail = thumbnailFile === undefined ? undefined : await ensureMedia(instance, thumbnailFile, rest.title);
     const body = await resolveBodyMedia(instance, rest.body);
     const data = { ...rest, body, ...(thumbnail === undefined ? {} : { thumbnail }) };
-    await upsertByTitle(instance, 'works', rest.title, data);
+    await upsertBySlug(instance, 'works', rest.slug, data);
   }
   instance.logger.info(`[seed:import] upserted ${records.length} works`);
 };
@@ -193,7 +195,7 @@ export const importBlog = async (instance: Payload): Promise<void> => {
     const thumbnail = thumbnailFile === undefined ? undefined : await ensureMedia(instance, thumbnailFile, rest.title);
     const body = await resolveBodyMedia(instance, rest.body);
     const data = { ...rest, body, ...(thumbnail === undefined ? {} : { thumbnail }) };
-    await upsertByTitle(instance, 'blog', rest.title, data);
+    await upsertBySlug(instance, 'blog', rest.slug, data);
   }
   instance.logger.info(`[seed:import] upserted ${records.length} blog`);
 };
