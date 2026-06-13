@@ -11,6 +11,17 @@ export const heading = css({
   // collapses with the prior paragraph's `element` (12px) bottom margin, so the
   // gap above resolves to 24px (not additive). `:first-child` drops the leading
   // gap at the top of the article; `:last-child` mirrors the other converters.
+  // The gutter copy-anchor (HeadingAnchor) is absolutely positioned against the
+  // heading and reveals itself by reading the inheriting `--anchor-opacity`
+  // custom property — 0 at rest, raised on hover / keyboard focus. A descendant
+  // selector (`.heading:hover .anchor`) is disallowed by the no-child-selectors
+  // rule, so the heading publishes the value and the anchor consumes it. Coarse
+  // pointers have no hover, so the baseline is raised to keep it discoverable.
+  position: 'relative',
+  '--anchor-opacity': '0',
+  '&:hover': { '--anchor-opacity': '1' },
+  '&:focus-within': { '--anchor-opacity': '1' },
+  '@media (pointer: coarse)': { '--anchor-opacity': '0.4' },
   marginBlockStart: 'block',
   marginBlockEnd: 'block',
   '&:first-child': { marginBlockStart: '0' },

@@ -108,6 +108,11 @@ describe('RichText', () => {
     await expect.element(page.getByRole('heading', { level: 2, name: 'Hello h2' })).toBeInTheDocument();
   });
 
+  it('renders a copy-link button in a slugged heading', async () => {
+    render(<RichText data={state([heading('h2', [text('はじめに')])])} />);
+    await expect.element(page.getByRole('button', { name: 'この見出しへのリンクをコピー' })).toBeInTheDocument();
+  });
+
   it('renders bold text with a <strong> element', async () => {
     render(
       <RichText
