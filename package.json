@@ -21,6 +21,8 @@
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "deploy:staging": "CLOUDFLARE_ENV=staging opennextjs-cloudflare build --env staging && CLOUDFLARE_ENV=staging opennextjs-cloudflare deploy --env staging && CLOUDFLARE_ENV=staging node scripts/bust-isr-cache.mjs",
     "deploy:database:staging": "CLOUDFLARE_ENV=staging payload migrate",
+    "deploy:production": "CLOUDFLARE_ENV=production opennextjs-cloudflare build --env production && CLOUDFLARE_ENV=production opennextjs-cloudflare deploy --env production && CLOUDFLARE_ENV=production node scripts/bust-isr-cache.mjs",
+    "deploy:database:production": "CLOUDFLARE_ENV=production payload migrate",
     "revalidate:isr": "node scripts/bust-isr-cache.mjs",
     "payload": "payload",
     "payload:migrate": "payload migrate",

@@ -138,19 +138,24 @@ head_sampling_rate = 1
 [env.production.vars]
 BASE_URL = "https://napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
+# CURSOR_SALT is a wrangler secret in production (set via `wrangler secret put CURSOR_SALT --env production`).
+
+[[env.production.routes]]
+pattern = "napochaan.com"
+custom_domain = true
 
 [env.production.images]
 binding = "IMAGES"
 
 [[env.production.d1_databases]]
 binding = "D1"
-database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cms-production
+database_id = "047f9f80-9805-468e-96d7-77cbcf86cf0d"
 database_name = "napochaan-cms-production"
 remote = true
 
 [[env.production.r2_buckets]]
 binding = "R2"
-bucket_name = "napochaan-cms-production" # TODO: wrangler r2 bucket create napochaan-cms-production
+bucket_name = "napochaan-cms-production"
 # See staging note: seed/export must hit the real bucket, not local miniflare.
 remote = true
 
@@ -160,7 +165,7 @@ service = "napochaan-website-production"
 
 [[env.production.r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
-bucket_name = "napochaan-cache-production" # TODO: wrangler r2 bucket create napochaan-cache-production
+bucket_name = "napochaan-cache-production"
 
 [[env.production.durable_objects.bindings]]
 name = "NEXT_CACHE_DO_QUEUE"
@@ -173,7 +178,7 @@ class_name = "CursorRoom"
 [[env.production.d1_databases]]
 binding = "NEXT_TAG_CACHE_D1"
 database_name = "napochaan-cache-production"
-database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cache-production
+database_id = "f3f67f2e-3e9d-45e6-b522-de8a90256d36"
 
 # ===== Test Environment =====
 # Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
