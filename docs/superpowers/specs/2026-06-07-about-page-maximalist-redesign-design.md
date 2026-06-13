@@ -38,7 +38,7 @@ This redesign keeps the real content but rebuilds the page on the Hero vocabular
 ───────────────────────────────────────────────────────────
  04 skill  $ ls skill/                          ← category matrix
   lang     [TypeScript][Python][Ruby][Swift][C#][Rust][Haskell]
-  frontend [React][CSS][vanilla-extract][Next.js][Remix]
+  frontend [React][CSS][Panda CSS][Next.js][Remix]
   backend  [Hono][NestJS][GraphQL][Flask][FastAPI][Rails]
   mobile   [ReactNative][Expo]
   xr       [UdonSharp][Unity][WebAssembly]
@@ -62,7 +62,7 @@ This redesign keeps the real content but rebuilds the page on the Hero vocabular
 - Keep `name`, `aka`, `now`, `team`, `tagline`, `bio` (rich-text), `love` (flat), `contacts`.
 - Replace flat `skill` with `skillGroups: readonly { category: string; items: readonly string[] }[]`. Grouping (interpretation, adjustable — all 32 covered):
   - `lang`: TypeScript, Python, Ruby, Swift, C#, Rust, Haskell
-  - `frontend`: React, CSS, vanilla-extract, Next.js, Remix
+  - `frontend`: React, CSS, Panda CSS, Next.js, Remix
   - `backend`: Hono, NestJS, GraphQL, Flask, FastAPI, Rails
   - `mobile`: ReactNative, Expo
   - `xr`: UdonSharp, Unity, WebAssembly

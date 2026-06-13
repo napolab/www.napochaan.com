@@ -40,5 +40,15 @@
     "builtin": true
   },
   "globals": {},
+  "overrides": [
+    {
+      "files": ["src/utils/og/**/*.tsx"],
+      "rules": {
+        "react-perf/jsx-no-new-function-as-prop": "off",
+        "react-perf/jsx-no-new-object-as-prop": "off",
+        "react-perf/jsx-no-new-array-as-prop": "off"
+      }
+    }
+  ],
   "ignorePatterns": ["migrations", "src/app/(payload)/admin/importMap.js", "src/payload-types.ts", "**/*.test.{ts,tsx}"]
 }

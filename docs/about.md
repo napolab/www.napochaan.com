@@ -90,7 +90,7 @@ napochaan VRDJ vol.01〜07 / flick vol.01（2025-12-13）/ flick vol.02（2026-0
 ## Skills / 技術スタック
 
 **言語**: TypeScript, Rust, Python, Ruby, Swift, C#, Haskell, WebAssembly
-**フロントエンド**: React, Next.js, Remix, CSS, vanilla-extract, React Native, Expo
+**フロントエンド**: React, Next.js, Remix, CSS, Panda CSS, React Native, Expo
 **バックエンド / API**: Hono, NestJS, GraphQL, Flask, FastAPI, Rails
 **エッジ / インフラ**: Cloudflare（Workers / Durable Objects / D1 / R2）, Firebase, Vercel
 **データ / 同期**: Yjs, Drizzle, Prisma, pandas, NumPy, scikit-learn

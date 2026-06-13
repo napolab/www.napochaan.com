@@ -49,7 +49,7 @@ export const profile = {
   love: ['dubstep', 'brostep', 'riddim', 'color bass', 'hi-tech', 'jersey club', 'hyperpop', 'jesus club', 'hyperflip', 'bairefunk'],
   skillGroups: [
     { category: 'lang', items: ['TypeScript', 'Rust', 'Python', 'Ruby', 'Swift', 'C#', 'Haskell', 'WebAssembly'] },
-    { category: 'frontend', items: ['React', 'Next.js', 'Remix', 'CSS', 'vanilla-extract', 'React Native', 'Expo'] },
+    { category: 'frontend', items: ['React', 'Next.js', 'Remix', 'CSS', 'Panda CSS', 'React Native', 'Expo'] },
     { category: 'backend', items: ['Hono', 'NestJS', 'GraphQL', 'Flask', 'FastAPI', 'Rails'] },
     { category: 'infra', items: ['Cloudflare', 'Durable Objects', 'D1', 'R2', 'Firebase', 'Vercel'] },
     { category: 'data', items: ['Yjs', 'Drizzle', 'Prisma', 'pandas', 'NumPy', 'scikit-learn'] },
