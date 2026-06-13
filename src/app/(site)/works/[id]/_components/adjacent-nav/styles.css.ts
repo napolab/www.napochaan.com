@@ -1,15 +1,25 @@
 import { css } from '@styled/css';
 
+// Foot-of-page nav: a column wrapper holding the prev/next pager row and the
+// back-to-index link below it — mirrors blog-nav so works' bottom nav reads the
+// same. The hairline + paddingTop separate it from the article above.
 export const root = css({
   display: 'flex',
-  flexDirection: { base: 'column', desktop: 'row' },
-  alignItems: 'stretch',
-  justifyContent: 'space-between',
+  flexDirection: 'column',
   gap: 'element',
   borderTopWidth: 'hairline',
   borderTopStyle: 'solid',
   borderTopColor: 'border.default',
   paddingTop: 'block',
+});
+
+// prev / next row. Was the old `root`: stretch + space-between, stacking on mobile.
+export const pager = css({
+  display: 'flex',
+  flexDirection: { base: 'column', desktop: 'row' },
+  alignItems: 'stretch',
+  justifyContent: 'space-between',
+  gap: 'element',
 });
 
 // Directional link. The arrow + label flips ends via data-side: prev sits left

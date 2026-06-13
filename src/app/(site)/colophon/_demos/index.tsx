@@ -20,6 +20,7 @@ import { QuoteShare } from '@components/quote-share';
 import { RichText } from '@components/rich-text';
 import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
+import { BackToIndex } from '@components/back-to-index';
 import { ShareBar } from '@components/share-bar';
 import { SystemAnnotation } from '@components/system-annotation';
 import { Table } from '@components/table';
@@ -240,6 +241,11 @@ export const demos: Record<ComponentName, ReactNode> = {
   ShareBar: (
     <NoAction>
       <ShareBar url="https://www.napochaan.com/works/1" title="サンプル作品タイトル" />
+    </NoAction>
+  ),
+  BackToIndex: (
+    <NoAction>
+      <BackToIndex href="/blog" label="blog 一覧へもどる" />
     </NoAction>
   ),
   QuoteShare: (

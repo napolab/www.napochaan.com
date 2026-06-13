@@ -1,5 +1,6 @@
 'use client';
 
+import { BackToIndex } from '@components/back-to-index';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 
@@ -52,8 +53,11 @@ const NavSlot = ({ slot }: { slot: Slot }) => {
 export const AdjacentNav = ({ prev, next }: Props) => {
   return (
     <nav className={s.root} aria-label="works pagination">
-      <NavSlot slot={toSlot('prev', prev)} />
-      <NavSlot slot={toSlot('next', next)} />
+      <div className={s.pager}>
+        <NavSlot slot={toSlot('prev', prev)} />
+        <NavSlot slot={toSlot('next', next)} />
+      </div>
+      <BackToIndex href="/works" label="works 一覧へもどる" />
     </nav>
   );
 };

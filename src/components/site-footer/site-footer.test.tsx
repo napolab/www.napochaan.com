@@ -22,4 +22,16 @@ describe('SiteFooter', () => {
     // client-routable page, so it must not go through react-aria's RouterProvider.
     await expect.element(page.getByRole('link', { name: 'sitemap' })).toHaveAttribute('href', '/sitemap.xml');
   });
+
+  it('renders a footer navigation listing every site section', async () => {
+    await render(<SiteFooter />);
+    await expect.element(page.getByRole('navigation', { name: 'フッターナビゲーション' })).toBeInTheDocument();
+    await expect.element(page.getByRole('link', { name: 'index' })).toHaveAttribute('href', '/');
+    await expect.element(page.getByRole('link', { name: 'blog' })).toHaveAttribute('href', '/blog');
+  });
+
+  it('still shows the build status line', async () => {
+    await render(<SiteFooter buildId="abc123" />);
+    await expect.element(page.getByText(/build abc123/)).toBeInTheDocument();
+  });
 });

@@ -1,3 +1,4 @@
+import { BackToIndex } from '@components/back-to-index';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';
 
@@ -54,9 +55,7 @@ export const BlogNav = ({ prev, next }: Props) => {
         <NavSlot slot={toSlot('prev', prev)} />
         <NavSlot slot={toSlot('next', next)} />
       </div>
-      <Link href="/blog" className={s.back} tone="subtle">
-        ← <ScrambleText>blog 一覧</ScrambleText>
-      </Link>
+      <BackToIndex href="/blog" label="blog 一覧へもどる" />
     </nav>
   );
 };
