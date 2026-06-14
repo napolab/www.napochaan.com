@@ -28,13 +28,43 @@ const selectParagraph = (el: Element): void => {
 
 const EXPECTED_BLOCK = '> 引用したい本文のテキスト\nサンプルタイトル | https://www.napochaan.com/blog/1';
 
+// Own `share` property shadows any native `navigator.share` (present on macOS
+// Chrome). `undefined` simulates an unsupported environment.
+const setShare = (impl: ((data: ShareData) => Promise<void>) | undefined): void => {
+  Object.defineProperty(navigator, 'share', { value: impl, configurable: true, writable: true });
+};
+
 afterEach(() => {
   vi.unstubAllGlobals();
+  setShare(undefined);
 });
 
 describe('QuoteShare', () => {
-  it('copies the quote block on the copy action', async () => {
+  it('shares the quote block through the Web Share API on the share action', async () => {
     stubFinePointer();
+    const share = vi.fn().mockResolvedValue(undefined);
+    setShare(share);
+    const writeText = vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+
+    await render(
+      <QuoteShare url="https://www.napochaan.com/blog/1" title="サンプルタイトル">
+        <p>引用したい本文のテキスト</p>
+      </QuoteShare>,
+    );
+
+    selectParagraph(page.getByText('引用したい本文のテキスト').element());
+
+    const shareButton = page.getByRole('button', { name: 'シェア' });
+    await expect.element(shareButton).toBeInTheDocument();
+    await shareButton.click();
+
+    await vi.waitFor(() => expect(share).toHaveBeenCalledWith({ text: EXPECTED_BLOCK }));
+    expect(writeText).not.toHaveBeenCalled();
+  });
+
+  it('falls back to copying the quote block when the Web Share API is unavailable', async () => {
+    stubFinePointer();
+    setShare(undefined);
     const writeText = vi.fn().mockResolvedValue(undefined);
     vi.spyOn(navigator.clipboard, 'writeText').mockImplementation(writeText);
 
@@ -46,15 +76,15 @@ describe('QuoteShare', () => {
 
     selectParagraph(page.getByText('引用したい本文のテキスト').element());
 
-    const copy = page.getByRole('button', { name: '引用をコピー' });
-    await expect.element(copy).toBeInTheDocument();
-    await copy.click();
+    const shareButton = page.getByRole('button', { name: 'シェア' });
+    await expect.element(shareButton).toBeInTheDocument();
+    await shareButton.click();
 
     expect(writeText).toHaveBeenCalledWith(EXPECTED_BLOCK);
     await expect.element(page.getByRole('button', { name: 'コピーしました' })).toBeInTheDocument();
   });
 
-  it('exposes an X quote link carrying the quote block as the tweet text', async () => {
+  it('exposes a Twitter(X) quote link carrying the quote block as the tweet text', async () => {
     stubFinePointer();
     await render(
       <QuoteShare url="https://www.napochaan.com/blog/1" title="サンプルタイトル">
@@ -64,7 +94,7 @@ describe('QuoteShare', () => {
 
     selectParagraph(page.getByText('引用したい本文のテキスト').element());
 
-    const link = page.getByRole('link', { name: /x/i });
+    const link = page.getByRole('link', { name: /Twitter\(X\) で引用/ });
     await expect.element(link).toBeInTheDocument();
     const href = link.element().getAttribute('href') ?? '';
     expect(href.startsWith('https://twitter.com/intent/tweet?text=')).toBe(true);

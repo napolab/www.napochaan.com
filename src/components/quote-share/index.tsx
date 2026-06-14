@@ -4,12 +4,12 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { Popover, Toolbar } from 'react-aria-components';
 
 import { Button } from '@components/button';
-import { useAutoResetState } from '@hooks/use-auto-reset-state';
 import { usePointerFine } from '@hooks/use-pointer-fine';
+import { useShare } from '@hooks/use-share';
 
 import { buildQuoteBlock } from './build-quote-block';
 import { buildQuoteTweetUrl } from './build-quote-tweet-url';
-import { CheckIcon, CopyIcon, XIcon } from './icons';
+import { CheckIcon, ShareIcon, TwitterIcon } from './icons';
 import * as styles from './styles.css';
 
 import type { CSSProperties, ReactNode } from 'react';
@@ -104,26 +104,19 @@ type ToolbarProps = {
 // so both actions use a settled quote block — pressing a button can't break them even
 // though the click collapses the live selection.
 const QuoteToolbar = ({ url, title, text }: ToolbarProps) => {
-  const [copied, setCopied] = useAutoResetState(false);
   const block = buildQuoteBlock(text, title, url);
-
-  const handleCopy = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText(block);
-      setCopied(true);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [block, setCopied]);
+  const shareData = useMemo(() => ({ text: block }) satisfies ShareData, [block]);
+  const { copied, share } = useShare(shareData, block);
 
   return (
     <Toolbar aria-label="選択したテキストを共有" className={styles.toolbar}>
-      <Button variant="outline" size="sm" onPress={handleCopy}>
-        {copied ? <CheckIcon width={16} height={16} /> : <CopyIcon width={16} height={16} />}
-        {copied ? 'コピーしました' : '引用をコピー'}
-      </Button>
       <Button type="link" variant="outline" size="sm" href={buildQuoteTweetUrl(text, title, url)} target="_blank" rel="noopener noreferrer">
-        <XIcon width={16} height={16} />X で引用
+        <TwitterIcon width={16} height={16} />
+        Twitter(X) で引用
+      </Button>
+      <Button variant="outline" size="sm" onPress={share}>
+        {copied ? <CheckIcon width={16} height={16} /> : <ShareIcon width={16} height={16} />}
+        {copied ? 'コピーしました' : 'シェア'}
       </Button>
     </Toolbar>
   );
