@@ -1,3 +1,4 @@
+import { isProductionHost } from '@utils/is-production-host';
 import { buildRobots } from '@utils/robots/build-robots';
 
 import type { MetadataRoute } from 'next';
@@ -9,7 +10,7 @@ export const dynamic = 'force-dynamic';
 const robots = (): MetadataRoute.Robots => {
   const baseUrl = process.env.BASE_URL ?? 'http://localhost:3000';
 
-  return buildRobots({ baseUrl, isProduction: baseUrl === 'https://www.napochaan.com' });
+  return buildRobots({ baseUrl, isProduction: isProductionHost(baseUrl) });
 };
 
 export default robots;

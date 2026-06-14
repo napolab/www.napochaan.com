@@ -1,3 +1,4 @@
+import { isProductionHost } from '@utils/is-production-host';
 import { motionBootScriptHtml } from '@utils/motion-cookie';
 import { getRequestOrigin } from '@utils/request-url';
 import { fontVariables } from '@themes/fonts';
@@ -22,7 +23,7 @@ export const viewport: Viewport = {
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const origin = await getRequestOrigin();
-  const isProduction = origin === 'https://www.napochaan.com';
+  const isProduction = isProductionHost(origin);
 
   return {
     title: {
