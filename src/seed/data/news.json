@@ -329,7 +329,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": " までご連絡ください。DJ・VJ いずれも ¥5,000 で承っています。",
+                "text": " までご連絡ください。DJ は ¥3,000、VJ は ¥5,000 で承っています。",
                 "type": "text",
                 "version": 1
               }
@@ -349,7 +349,79 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "関東圏内であれば交通費はいただきません。関東圏から出る場合は、交通費に加えて +¥5,000 を頂戴します。",
+                "text": "VJ で独自実装が必要な演出を含む場合は、料金を別途ご相談させてください。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "VR での出演はギャラをいただいていません。楽しいパーティにいっぱい出たいので、お話だけでも DM をいただければ柔軟に対応します。もしよければ、BOOTH で ",
+                "type": "text",
+                "version": 1
+              },
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "ミルフィ Milfy / オリジナル3Dモデル",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "direction": null,
+                "format": "",
+                "indent": 0,
+                "type": "link",
+                "version": 3,
+                "fields": {
+                  "url": "https://booth.pm/ja/items/6571299",
+                  "linkType": "custom",
+                  "newTab": true
+                }
+              },
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": " 対応の衣装をプレゼントしていただけると喜びます。",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "paragraph",
+            "version": 1,
+            "textFormat": 0,
+            "textStyle": ""
+          },
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "関東圏内であれば交通費はいただきません。関東圏から出る場合は、交通費に加えて DJ は +¥3,000、VJ は +¥5,000 を頂戴します。",
                 "type": "text",
                 "version": 1
               }
@@ -686,7 +758,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "箱側にお願いしたいこと",
+                "text": "ブッキングの際に教えていただきたいこと",
                 "type": "text",
                 "version": 1
               }
@@ -705,7 +777,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "用意していただきたいのは、V1-HD に入力する HDMI 1本だけです。あわせて、VJ スペースの広さと出力解像度、映像の出し先（プロジェクター / LED ディスプレイなど）を事前に教えていただけると助かります。",
+                "text": "VJ スペースの広さ・出力解像度・映像の出し先（プロジェクター / LED ディスプレイなど）を事前に教えていただけると助かります。当日ご用意いただくのは、V1-HD に入力する HDMI 1本だけです。",
                 "type": "text",
                 "version": 1
               }
