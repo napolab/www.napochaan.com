@@ -664,7 +664,7 @@
                     "format": 0,
                     "mode": "normal",
                     "style": "",
-                    "text": "AKAI ",
+                    "text": "MIDIコン ",
                     "type": "text",
                     "version": 1
                   },
@@ -675,7 +675,7 @@
                         "format": 0,
                         "mode": "normal",
                         "style": "",
-                        "text": "APC Mini MK2",
+                        "text": "AKAI APC Mini MK2",
                         "type": "text",
                         "version": 1
                       }
