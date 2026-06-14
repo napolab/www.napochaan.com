@@ -33,15 +33,12 @@
 // shared by every document root that loads the kit (site layout + global-error
 // fallback) so the two cannot drift.
 //
-// To tune the floor, change the BOOT_MIN_MS literal (3000) below. The floor is the
-// minimum the boot sequence stays on screen. It has to be this long because the
-// BootQuestion typewriter is a client island: it can only start typing after the
-// JS bundle hydrates, so the overlay must outlast hydration + a readable slice of
-// the typewriter. Once the admin-only fonts were removed and the kit resolves fast,
-// fonts no longer hold the overlay up — the floor became the only thing that does,
-// so a short floor (700ms/1.2s) dropped the overlay before any text appeared. Since
-// bots skip the overlay (below), a longer floor only shapes the human boot and never
-// the audit/crawler first paint.
+// To tune the floor, change the BOOT_MIN_MS literal (1000) below — the minimum the
+// boot sequence lingers on screen. It is purely aesthetic pacing: the SSR boot class
+// already prevents any bare-content flash, so the floor only decides how long the
+// human boot shows. The BootQuestion typewriter only starts after hydration, so at a
+// short floor the prompt reads as a quick glitch-flash rather than a full sentence —
+// a deliberate trade. Bots skip the overlay, so this never affects audit first paint.
 //
 // Bots (crawlers, Lighthouse, PageSpeed, headless) get boot REMOVED synchronously
 // here, before first paint. boot is SSR'd for everyone (UA-independent, to keep the
@@ -52,7 +49,7 @@
 const script = `(function(d) {
   var config = { kitId: 'vmz7pfu', scriptTimeout: 3000, async: true },
       h = d.documentElement,
-      BOOT_MIN_MS = 3000,
+      BOOT_MIN_MS = 1000,
       BOT = /bot|crawl|spider|lighthouse|headlesschrome|pagespeed|gtmetrix|slurp/i.test(navigator.userAgent),
       t0 = Date.now(),
       t = setTimeout(function () { h.className = h.className.replace(/\\bwf-loading\\b/g, "") + " wf-inactive"; }, config.scriptTimeout),
