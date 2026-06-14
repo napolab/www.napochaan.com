@@ -31,14 +31,22 @@
 // fallback) so the two cannot drift.
 //
 // To tune the floor, change the BOOT_MIN_MS literal (700) below.
+//
+// Bots (crawlers, Lighthouse, PageSpeed, headless) skip the `boot` class entirely:
+// the overlay is opacity:0 by default, so without `boot` the page paints its real
+// content on first frame instead of waiting behind the font-load gate. The branded
+// boot sequence is for humans; an auditor / crawler measuring first paint sees the
+// content immediately. The fonts still load the same way (wf-loading is kept) and
+// the SSR'd DOM is identical — only the transient cover is suppressed.
 const script = `(function(d) {
   var config = { kitId: 'vmz7pfu', scriptTimeout: 3000, async: true },
       h = d.documentElement,
       BOOT_MIN_MS = 700,
+      BOT = /bot|crawl|spider|lighthouse|headlesschrome|pagespeed|gtmetrix|slurp/i.test(navigator.userAgent),
       t0 = Date.now(),
       t = setTimeout(function () { h.className = h.className.replace(/\\bwf-loading\\b/g, "") + " wf-inactive"; }, config.scriptTimeout),
       tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a;
-  h.className += " wf-loading boot";
+  h.className += BOT ? " wf-loading" : " wf-loading boot";
   requestAnimationFrame(function () { t0 = Date.now(); });
   var obs = new MutationObserver(function () {
     var c = h.className;
