@@ -1,5 +1,5 @@
 import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts';
-import { adminFontVariables } from '@themes/fonts';
+import { adminFontVariables } from '@themes/fonts-admin';
 
 import config from '@payload-config';
 
