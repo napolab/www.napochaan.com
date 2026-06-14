@@ -623,7 +623,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "以下の機材を所有しています。MacBook Pro と APC Mini MK2 は持参します。V1-HD も必要であれば持っていけます。",
+                "text": "以下の機材を所有しています。MacBook Pro と APC Mini MK2 は持参します。V-1HD も必要であれば持っていけます。",
                 "type": "text",
                 "version": 1
               }
@@ -717,7 +717,7 @@
                         "format": 0,
                         "mode": "normal",
                         "style": "",
-                        "text": "V1-HD",
+                        "text": "V-1HD",
                         "type": "text",
                         "version": 1
                       }
@@ -777,7 +777,7 @@
                 "format": 0,
                 "mode": "normal",
                 "style": "",
-                "text": "VJ スペースの広さ・出力解像度・映像の出し先（プロジェクター / LED ディスプレイなど）を事前に教えていただけると助かります。当日ご用意いただくのは、V1-HD に入力する HDMI 1本だけです。",
+                "text": "VJ スペースの広さ・出力解像度・映像の出し先（プロジェクター / LED ディスプレイなど）を事前に教えていただけると助かります。当日ご用意いただくのは、V-1HD に入力する HDMI 1本だけです。",
                 "type": "text",
                 "version": 1
               }
