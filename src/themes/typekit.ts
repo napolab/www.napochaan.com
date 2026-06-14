@@ -3,11 +3,14 @@
 // wf-loading → wf-active / wf-inactive classes on <html>), with one addition: a
 // `boot` class that drives the LoadingOverlay.
 //
-// `boot` is added synchronously alongside wf-loading (before the body paints) and
-// removed only once fonts have RESOLVED *and* a minimum on-screen time has
-// elapsed — i.e. max(font-load-time, BOOT_MIN_MS). This guarantees the overlay is
-// perceivable even when fonts are cached and resolve in a few ms (without it the
-// overlay would flash for one frame and read as a glitch).
+// `boot` is rendered into the SSR <html> class (see layout.tsx), NOT added by this
+// script — so the overlay covers from the very first paint with no JS-timing gap. A
+// cached load that paints before this script runs would otherwise flash the bare,
+// unfonted content (the original bug). This script only REMOVES boot: for humans once
+// fonts have RESOLVED *and* a minimum on-screen time has elapsed — i.e.
+// max(font-load-time, BOOT_MIN_MS) — and for bots immediately (before paint). A
+// pageshow(persisted) handler also lifts it on bfcache restore, where the page is
+// frozen with fonts already applied so re-running the boot would be wrong.
 //
 // The minimum-display clock (`t0`) is anchored to FIRST PAINT, not to script
 // execution: a requestAnimationFrame callback re-assigns t0 at the first
@@ -40,12 +43,12 @@
 // bots skip the overlay (below), a longer floor only shapes the human boot and never
 // the audit/crawler first paint.
 //
-// Bots (crawlers, Lighthouse, PageSpeed, headless) skip the `boot` class entirely:
-// the overlay is opacity:0 by default, so without `boot` the page paints its real
-// content on first frame instead of waiting behind the font-load gate. The branded
-// boot sequence is for humans; an auditor / crawler measuring first paint sees the
-// content immediately. The fonts still load the same way (wf-loading is kept) and
-// the SSR'd DOM is identical — only the transient cover is suppressed.
+// Bots (crawlers, Lighthouse, PageSpeed, headless) get boot REMOVED synchronously
+// here, before first paint. boot is SSR'd for everyone (UA-independent, to keep the
+// markup ISR/statically cacheable — a per-UA server branch would force dynamic
+// rendering), so the bot exemption has to happen client-side, but synchronously in
+// <head> it still lands before paint: an auditor/crawler never sees the overlay and
+// measures the real content's first paint. The branded boot is for humans only.
 const script = `(function(d) {
   var config = { kitId: 'vmz7pfu', scriptTimeout: 3000, async: true },
       h = d.documentElement,
@@ -54,7 +57,7 @@ const script = `(function(d) {
       t0 = Date.now(),
       t = setTimeout(function () { h.className = h.className.replace(/\\bwf-loading\\b/g, "") + " wf-inactive"; }, config.scriptTimeout),
       tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a;
-  h.className += BOT ? " wf-loading" : " wf-loading boot";
+  if (BOT) h.className = h.className.replace(/\\bboot\\b/g, "");
   requestAnimationFrame(function () { t0 = Date.now(); });
   var obs = new MutationObserver(function () {
     var c = h.className;
@@ -69,6 +72,7 @@ const script = `(function(d) {
     }
   });
   obs.observe(h, { attributes: true, attributeFilter: ["class"] });
+  addEventListener("pageshow", function (e) { if (e.persisted) h.className = h.className.replace(/\\bboot\\b/g, ""); });
   tk.src = 'https://use.typekit.net/' + config.kitId + '.js';
   tk.async = true;
   tk.onload = tk.onreadystatechange = function () {

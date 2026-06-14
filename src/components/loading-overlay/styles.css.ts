@@ -25,7 +25,11 @@ export const root = css({
   pointerEvents: 'none',
   transitionProperty: '[opacity]',
   transitionDuration: 'slow',
-  'html.boot &': { opacity: '[1]', pointerEvents: 'auto' },
+  // `bootAutoDismiss` (see global.css) is a no-JS fail-safe: if the Typekit loader
+  // never removes `boot`, this fades the overlay out after ~7s so content is always
+  // reachable. When the loader DOES remove `boot`, this rule stops applying and the
+  // overlay fades via the opacity transition above instead.
+  'html.boot &': { opacity: '[1]', pointerEvents: 'auto', animation: '[bootAutoDismiss 7s linear forwards]' },
 });
 
 // Left-aligned mono console block, centered as a unit. Fixed-ish width gives the

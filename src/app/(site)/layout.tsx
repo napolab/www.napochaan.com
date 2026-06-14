@@ -54,14 +54,19 @@ export const generateMetadata = async (): Promise<Metadata> => {
 
 const SiteLayout = async ({ children }: { children: ReactNode }) => {
   return (
-    // suppressHydrationWarning: the inline Typekit loader in <head> mutates
-    // documentElement.className (adds wf-loading) before React hydrates, so the
-    // live <html> class legitimately differs from this render. Scoped to <html>'s
-    // own attributes only — child mismatches are still reported.
-    <html lang="ja" className={fontVariables} suppressHydrationWarning>
+    // `wf-loading boot` is rendered into the SSR class (not added by JS) so the
+    // boot overlay covers the page from the very first paint — even on a cached
+    // load where the browser paints before the inline script runs. The script
+    // only REMOVES boot (after fonts + floor for humans, immediately for bots).
+    // This is UA-independent so the markup stays ISR/statically cacheable; the
+    // bot exemption is done client-side in the script before first paint.
+    // suppressHydrationWarning: the inline loader mutates documentElement.className
+    // before React hydrates, so the live <html> class legitimately differs from
+    // this render. Scoped to <html>'s own attributes only.
+    <html lang="ja" className={`${fontVariables} wf-loading boot`} suppressHydrationWarning>
       <head>
-        {/* Adobe Fonts (Typekit) async loader — non-blocking; adds wf-loading
-            class hook on <html>. Static vendor snippet, no dynamic content. */}
+        {/* Adobe Fonts (Typekit) async loader — non-blocking. Removes the SSR boot
+            class once fonts resolve (or immediately for bots). No dynamic content. */}
         <script dangerouslySetInnerHTML={typekitLoaderHtml} />
         {/* Pre-hydration: set --motion-play from the motion cookie before paint to
             avoid a flash of motion for motion:off visitors. See @utils/motion-cookie. */}

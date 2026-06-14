@@ -23,3 +23,25 @@
   descent-override: 23.0037%;
   size-adjust: 99.9837%;
 }
+
+/*
+ * No-JS / fail-safe backstop for the boot overlay. `boot` is SSR'd onto <html>
+ * (so the overlay covers from the first paint) and normally REMOVED by the Typekit
+ * loader once fonts resolve. If that script never runs (JS disabled, blocked, or a
+ * load error), the overlay would otherwise cover the page forever. This animation
+ * auto-fades it after ~7s so the content is always reachable. When the script DOES
+ * run it removes `boot`, the `html.boot &` rule (and this animation) stops applying,
+ * and the overlay fades via its normal opacity transition instead — this only ever
+ * "wins" in the no-JS case.
+ */
+@keyframes bootAutoDismiss {
+  0%,
+  70% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
