@@ -30,7 +30,15 @@
 // shared by every document root that loads the kit (site layout + global-error
 // fallback) so the two cannot drift.
 //
-// To tune the floor, change the BOOT_MIN_MS literal (700) below.
+// To tune the floor, change the BOOT_MIN_MS literal (3000) below. The floor is the
+// minimum the boot sequence stays on screen. It has to be this long because the
+// BootQuestion typewriter is a client island: it can only start typing after the
+// JS bundle hydrates, so the overlay must outlast hydration + a readable slice of
+// the typewriter. Once the admin-only fonts were removed and the kit resolves fast,
+// fonts no longer hold the overlay up — the floor became the only thing that does,
+// so a short floor (700ms/1.2s) dropped the overlay before any text appeared. Since
+// bots skip the overlay (below), a longer floor only shapes the human boot and never
+// the audit/crawler first paint.
 //
 // Bots (crawlers, Lighthouse, PageSpeed, headless) skip the `boot` class entirely:
 // the overlay is opacity:0 by default, so without `boot` the page paints its real
@@ -41,7 +49,7 @@
 const script = `(function(d) {
   var config = { kitId: 'vmz7pfu', scriptTimeout: 3000, async: true },
       h = d.documentElement,
-      BOOT_MIN_MS = 700,
+      BOOT_MIN_MS = 3000,
       BOT = /bot|crawl|spider|lighthouse|headlesschrome|pagespeed|gtmetrix|slurp/i.test(navigator.userAgent),
       t0 = Date.now(),
       t = setTimeout(function () { h.className = h.className.replace(/\\bwf-loading\\b/g, "") + " wf-inactive"; }, config.scriptTimeout),
