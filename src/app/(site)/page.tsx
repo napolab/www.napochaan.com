@@ -96,7 +96,7 @@ const HomePage = async () => {
   const logEntries = selectHomeLogTeaser(
     logGroups.flatMap((group) => group.items),
     HOME_LOG_LIMIT,
-  );
+  ).toReversed();
   const homePosts = [...blogPosts].slice(0, 3);
   const homeWorks = [...works].slice(0, 3);
 
