@@ -5,6 +5,7 @@ import { LogSection } from './_components/log-section';
 import { Hero } from './_components/hero';
 import { NewsSection } from './_components/news-section';
 import { WorksSection } from './_components/works-section';
+import { selectHomeLogTeaser } from './_lib/select-home-log-teaser';
 import { buildLogTimeline } from './log/_lib/build-log-timeline';
 import { fetchExternalPosts } from './log/_lib/fetch-external-posts';
 import { findBlogList } from '@lib/payload/blog';
@@ -74,7 +75,7 @@ const about = {
   wants: '後悔を、残さない。ぼくも、周りも。',
 };
 
-// Number of latest log entries shown in the home teaser.
+// Number of log entries shown in the home teaser (upcoming-first, then recent).
 const HOME_LOG_LIMIT = 5;
 
 const HomePage = async () => {
@@ -89,9 +90,13 @@ const HomePage = async () => {
 
   const newsItems = toFeedItems(latest);
   const now = dayjs().tz('Asia/Tokyo').toISOString();
-  // Build the full timeline from works/posts/logs; take the N newest entries for the home teaser.
+  // Build the full timeline from works/posts/logs; the home teaser leads with the
+  // soonest upcoming gigs and backfills with the most recent finished entries.
   const logGroups = buildLogTimeline(works, externalPosts, now, logs);
-  const logEntries = logGroups.flatMap((group) => group.items).slice(0, HOME_LOG_LIMIT);
+  const logEntries = selectHomeLogTeaser(
+    logGroups.flatMap((group) => group.items),
+    HOME_LOG_LIMIT,
+  );
   const homePosts = [...blogPosts].slice(0, 3);
   const homeWorks = [...works].slice(0, 3);
 
