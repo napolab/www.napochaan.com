@@ -1,1 +1,25 @@
 @layer reset, base, tokens, recipes, utilities;
+
+/*
+ * Metric-matched fallback for the Typekit mono face (config-mono-vf).
+ *
+ * config-mono-vf loads async via the Typekit kit (no next/font metric override),
+ * so before it resolves the stack falls back to ui-monospace — whose line box is
+ * a different height. When the web font swaps in, every mono block (notably the
+ * top-of-page SysBar, which is in normal flow) changes height and shifts the whole
+ * page below it: the dominant CLS culprit (~0.47) measured on prod.
+ *
+ * This @font-face wraps the locally-available Courier New in ascent/descent/
+ * size-adjust overrides computed (via @capsizecss) from config-mono-vf's real
+ * metrics (unitsPerEm 1000, ascent 896, descent -230, xWidthAvg 600), so the
+ * fallback occupies the exact same box as the web font. Placed before
+ * ui-monospace in the `fonts.mono` token stack, it removes the swap reflow.
+ * Both faces are 0.6em monospace, so size-adjust is ~100%.
+ */
+@font-face {
+  font-family: 'config-mono-vf Fallback';
+  src: local('Courier New'), local('CourierNewPSMT');
+  ascent-override: 89.6146%;
+  descent-override: 23.0037%;
+  size-adjust: 99.9837%;
+}
