@@ -33,8 +33,10 @@ type Props = {
 const spineStyle = (index: number): CSSProperties => ({ '--spine-index': index }) as CSSProperties;
 
 // The blurred ambient background url for a row, set as a CSS variable so the
-// fixed s.ambient layer can paint this row's thumb on hover.
-const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${src})` }) as CSSProperties;
+// fixed s.ambient layer can paint this row's thumb on hover. Routed through
+// formatBlurURL so the hover wash (blurred 40px, ≤25% opacity) is served as a tiny
+// downscaled copy via /_next/image instead of the full-resolution original.
+const ambientStyle = (src: string): CSSProperties => ({ '--thumb': `url(${formatBlurURL(src, { blur: 40, width: 96, quality: 40 })})` }) as CSSProperties;
 
 // A single work row rendered as a block link to its detail page via the shared
 // `Link` (a plain styled anchor). `hideOutsideFocusRing` defers to s.item's own inset

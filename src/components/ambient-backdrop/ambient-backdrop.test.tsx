@@ -11,10 +11,16 @@ describe('AmbientBackdrop', () => {
     expect(el).not.toBeNull();
   });
 
-  it('carries the thumbnail url as the --thumb custom property', async () => {
+  it('carries an optimized /_next/image thumbnail url as the --thumb custom property', async () => {
     const { container } = await render(<AmbientBackdrop src="/v3-top.png" />);
 
     const el = container.querySelector('[aria-hidden="true"]');
-    expect(el?.getAttribute('style')).toContain('--thumb: url(/v3-top.png)');
+    const style = el?.getAttribute('style') ?? '';
+    // The decorative wash must not download the full-resolution original — it goes
+    // through the worker's /_next/image transformer, downscaled and blurred.
+    expect(style).toContain('--thumb: url(/_next/image?');
+    expect(style).toContain('url=%2Fv3-top.png');
+    expect(style).toContain('w=96');
+    expect(style).toContain('blur=40');
   });
 });
