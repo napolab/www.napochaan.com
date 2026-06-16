@@ -1,8 +1,32 @@
+import { revalidatePath, revalidateTag } from 'next/cache';
+
+import { findBlogSlugsEmbeddingSoftware } from '@lib/payload/software/find-embedding-blog-slugs';
 import { CACHE_TAGS } from '@utils/cache-tags';
 
-import { createTagRevalidateHooks } from './hooks/revalidate';
+import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, CollectionConfig } from 'payload';
 
-import type { CollectionConfig } from 'payload';
+// Bust the software data tag, then the ISR HTML of every blog post embedding this
+// release's software (the block renders the latest version, so a new release changes
+// already-published articles). Swallow throws outside a request context (CLI seed).
+const revalidateReleaseAndEmbedders = async (softwareRef: unknown): Promise<void> => {
+  const softwareId = typeof softwareRef === 'object' && softwareRef !== null && 'id' in softwareRef ? `${(softwareRef as { id: unknown }).id}` : `${softwareRef}`;
+  try {
+    revalidateTag(CACHE_TAGS.software);
+    const slugs = await findBlogSlugsEmbeddingSoftware(softwareId);
+    for (const slug of slugs) revalidatePath(`/blog/${slug}`);
+  } catch {
+    // Outside a Next request context (CLI migrate/seed). Surfaces on next build.
+  }
+};
+
+const afterChange: CollectionAfterChangeHook = async ({ doc }) => {
+  await revalidateReleaseAndEmbedders(doc.software);
+  return doc;
+};
+const afterDelete: CollectionAfterDeleteHook = async ({ doc }) => {
+  await revalidateReleaseAndEmbedders(doc.software);
+  return doc;
+};
 
 // One binary = one version of a `software` product. Upload-backed (bytes in R2 under
 // the `releases/` prefix). `read` is admin-only on purpose: the public never reads a
@@ -10,7 +34,6 @@ import type { CollectionConfig } from 'payload';
 // overrideAccess, and bytes are served only through the signed /api/software/download
 // route. This also makes Payload's built-in file route return 403 for the public, so
 // there is no public direct download link.
-const revalidateRelease = createTagRevalidateHooks([CACHE_TAGS.software]);
 
 export const SoftwareRelease = {
   slug: 'software-release',
@@ -31,8 +54,8 @@ export const SoftwareRelease = {
     delete: ({ req: { user } }) => user !== null,
   },
   hooks: {
-    afterChange: [revalidateRelease.afterChange],
-    afterDelete: [revalidateRelease.afterDelete],
+    afterChange: [afterChange],
+    afterDelete: [afterDelete],
   },
   fields: [
     {
