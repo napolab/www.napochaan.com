@@ -66,18 +66,13 @@ export const versionLabel = css({
   color: 'fg.default',
 });
 
-export const badge = css({
-  display: 'inline-flex',
-  alignItems: 'center',
-  px: '2',
-  py: '1',
-  fontSize: 'xs',
-  fontFamily: 'mono',
-  fontVariationSettings: '"wght" 600',
-  color: 'accent.text',
-  borderWidth: 'hairline',
-  borderStyle: 'solid',
-  borderColor: 'accent.border',
+export const chevron = css({
+  flexShrink: '0',
+  // strictTokens escape: simple icon rotation transition; no token category applies
+  transition: '[transform 0.15s ease]',
+  '&[data-expanded]': {
+    transform: 'rotate(90deg)',
+  },
 });
 
 export const versionDate = css({

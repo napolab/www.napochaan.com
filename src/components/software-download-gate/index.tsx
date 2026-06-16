@@ -6,9 +6,11 @@ import { Button as AriaButton, Checkbox, Dialog, DialogTrigger, Disclosure, Disc
 
 import { Button } from '@components/button';
 import { RichText } from '@components/rich-text';
+import { Tag } from '@components/tag';
 import { dayjs } from '@utils/dayjs';
 
 import { issueDownloadURL } from '../../app/(site)/_actions/issue-download-url';
+import { ChevronIcon } from './icons';
 import * as styles from './styles.css';
 
 import type { SoftwareDownload, SoftwareRelease } from '@lib/payload/software';
@@ -97,7 +99,7 @@ const VersionRow = ({ release, isLatest, terms, siteKey }: VersionRowProps) => (
     <div className={styles.versionRowHeader}>
       <div className={styles.versionMeta}>
         <span className={styles.versionLabel}>v{release.version}</span>
-        {isLatest ? <span className={styles.badge}>最新</span> : null}
+        {isLatest ? <Tag tone="blue">最新</Tag> : null}
         <span className={styles.versionDate}>{dayjs(release.releasedAt).tz('Asia/Tokyo').format('YYYY.MM.DD')}</span>
       </div>
       <div className={styles.downloadCell}>
@@ -106,14 +108,19 @@ const VersionRow = ({ release, isLatest, terms, siteKey }: VersionRowProps) => (
     </div>
     {release.changelog !== undefined ? (
       <Disclosure className={styles.releaseNoteDisclosure} defaultExpanded={isLatest}>
-        <Heading>
-          <AriaButton slot="trigger" className={styles.releaseNoteTrigger}>
-            リリースノート
-          </AriaButton>
-        </Heading>
-        <DisclosurePanel>
-          <p className={styles.changelog}>{release.changelog}</p>
-        </DisclosurePanel>
+        {({ isExpanded }) => (
+          <>
+            <Heading>
+              <AriaButton slot="trigger" className={styles.releaseNoteTrigger}>
+                <ChevronIcon className={styles.chevron} data-expanded={isExpanded || undefined} />
+                リリースノート
+              </AriaButton>
+            </Heading>
+            <DisclosurePanel>
+              <p className={styles.changelog}>{release.changelog}</p>
+            </DisclosurePanel>
+          </>
+        )}
       </Disclosure>
     ) : null}
   </li>
