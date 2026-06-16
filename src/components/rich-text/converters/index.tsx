@@ -6,31 +6,31 @@ import { linkConverter } from './link';
 import { listConverter } from './list';
 import { paragraphConverter } from './paragraph';
 import { quoteConverter } from './quote';
+import { createSoftwareDownloadBlockConverters } from './software-download';
 import { tableConverter } from './table';
 import { textConverter } from './text';
 import { uploadConverter } from './upload';
 
+import type { SoftwareDownload } from '@lib/payload/software';
 import type { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react';
 
 import type { NodeTypes } from './types';
 
-/**
- * Combined JSX converters for rendering Payload Lexical rich text.
- *
- * Spreads Payload's `defaultConverters` first, then overrides with project-specific
- * styled converters. Each converter folder owns one concern (heading/text/list/…).
- */
-export const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConverters }) => ({
-  ...defaultConverters,
-  ...paragraphConverter,
-  ...headingConverter,
-  ...textConverter,
-  ...linkConverter,
-  ...listConverter,
-  ...quoteConverter,
-  ...codeConverter,
-  ...tableConverter,
-  ...uploadConverter,
-  ...hrConverter,
-  blocks: { ...imageRowBlockConverters },
-});
+export type ConverterContext = { softwareDownloads: ReadonlyMap<string, SoftwareDownload>; turnstileSiteKey: string };
+
+export const createJsxConverters =
+  (context: ConverterContext): JSXConvertersFunction<NodeTypes> =>
+  ({ defaultConverters }) => ({
+    ...defaultConverters,
+    ...paragraphConverter,
+    ...headingConverter,
+    ...textConverter,
+    ...linkConverter,
+    ...listConverter,
+    ...quoteConverter,
+    ...codeConverter,
+    ...tableConverter,
+    ...uploadConverter,
+    ...hrConverter,
+    blocks: { ...imageRowBlockConverters, ...createSoftwareDownloadBlockConverters(context) },
+  });

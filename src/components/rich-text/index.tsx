@@ -2,22 +2,22 @@ import { RichText as PayloadRichText } from '@payloadcms/richtext-lexical/react'
 
 import { clsx } from '@utils/clsx';
 
-import { jsxConverters } from './converters';
+import { createJsxConverters } from './converters';
 import * as styles from './styles.css';
 
+import type { SoftwareDownload } from '@lib/payload/software';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 
 type Props = {
   readonly data: SerializedEditorState;
   readonly className?: string;
+  readonly softwareDownloads?: ReadonlyMap<string, SoftwareDownload>;
+  readonly turnstileSiteKey?: string;
 };
 
-/**
- * Renders Payload Lexical rich text using custom JSX converters.
- *
- * Pass a Payload `richText` field's value (`{ root: … }`) as `data`.
- * Converters live in `./converters/` — one file per node type.
- */
-export const RichText = ({ data, className }: Props) => {
-  return <PayloadRichText data={data} converters={jsxConverters} className={clsx(styles.root, className)} />;
+const EMPTY: ReadonlyMap<string, SoftwareDownload> = new Map();
+
+export const RichText = ({ data, className, softwareDownloads = EMPTY, turnstileSiteKey = '' }: Props) => {
+  const converters = createJsxConverters({ softwareDownloads, turnstileSiteKey });
+  return <PayloadRichText data={data} converters={converters} className={clsx(styles.root, className)} />;
 };

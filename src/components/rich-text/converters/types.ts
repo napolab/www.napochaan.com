@@ -19,8 +19,19 @@ export type ImageRowBlock = {
 };
 
 /**
- * Node types handled by the rich-text JSX converters: every Payload default
- * Lexical node plus the project's custom `image-row` block. When a collection
- * adds another custom block, widen this union and add a matching converter.
+ * The serialized fields of the `software-download` lexical block. `software`
+ * is `unknown` because Payload populates it with either a numeric id or a full
+ * Software object at various populate depths; the converter normalizes via
+ * `referenceId`.
  */
-export type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageRowBlock>;
+export type SoftwareDownloadBlock = {
+  readonly blockType: 'software-download';
+  readonly software: unknown;
+};
+
+/**
+ * Node types handled by the rich-text JSX converters: every Payload default
+ * Lexical node plus the project's custom blocks. When a collection adds another
+ * custom block, widen this union and add a matching converter.
+ */
+export type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageRowBlock> | SerializedBlockNode<SoftwareDownloadBlock>;
