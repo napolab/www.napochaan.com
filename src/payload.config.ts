@@ -16,6 +16,7 @@ import { Media } from './collections/media';
 import { News } from './collections/news';
 import { Users } from './collections/users';
 import { Software } from './collections/software';
+import { SoftwareRelease } from './collections/software-release';
 import { Works } from './collections/works';
 import { Profile } from './globals/profile';
 import { createPreviewURLFactory, draftPreviewRoute } from './lib/payload/create-preview-url-factory';
@@ -149,7 +150,7 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, News, Works, Blog, Gallery, Logs, Software],
+  collections: [Users, Media, News, Works, Blog, Gallery, Logs, Software, SoftwareRelease],
   globals: [Profile],
   editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow] })] }),
   secret,
@@ -166,6 +167,7 @@ export default buildConfig({
       bucket: r2,
       collections: {
         media: true,
+        'software-release': { prefix: 'releases' },
       },
     }),
     seoPlugin({
