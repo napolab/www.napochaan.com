@@ -9,6 +9,7 @@ import { r2Storage } from '@payloadcms/storage-r2';
 import { buildConfig } from 'payload';
 
 import { ImageRow } from './blocks/image-row';
+import { SoftwareDownload } from './blocks/software-download';
 import { Blog } from './collections/blog';
 import { Gallery } from './collections/gallery';
 import { Logs } from './collections/logs';
@@ -152,7 +153,7 @@ export default buildConfig({
   csrf: [serverURL],
   collections: [Users, Media, News, Works, Blog, Gallery, Logs, Software, SoftwareRelease],
   globals: [Profile],
-  editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow] })] }),
+  editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow, SoftwareDownload] })] }),
   secret,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
