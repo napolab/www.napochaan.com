@@ -105,8 +105,7 @@ export const releaseNoteTrigger = css({
   borderWidth: 'none',
   padding: '0',
   cursor: 'pointer',
-  textDecoration: 'underline',
-  textUnderlineOffset: '[2px]',
+  // No underline — the chevron marks this as a toggle, not a link.
   _hover: {
     color: 'fg.default',
   },
