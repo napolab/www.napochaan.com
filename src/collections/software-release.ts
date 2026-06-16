@@ -1,6 +1,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 
 import { findBlogSlugsEmbeddingSoftware } from '@lib/payload/software/find-embedding-blog-slugs';
+import { referenceId } from '@lib/software/collect-software-ids';
 import { CACHE_TAGS } from '@utils/cache-tags';
 
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, CollectionConfig } from 'payload';
@@ -9,7 +10,9 @@ import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, CollectionCo
 // release's software (the block renders the latest version, so a new release changes
 // already-published articles). Swallow throws outside a request context (CLI seed).
 const revalidateReleaseAndEmbedders = async (softwareRef: unknown): Promise<void> => {
-  const softwareId = typeof softwareRef === 'object' && softwareRef !== null && 'id' in softwareRef ? `${(softwareRef as { id: unknown }).id}` : `${softwareRef}`;
+  const softwareId = referenceId(softwareRef);
+  if (softwareId === undefined) return;
+
   try {
     revalidateTag(CACHE_TAGS.software);
     const slugs = await findBlogSlugsEmbeddingSoftware(softwareId);
