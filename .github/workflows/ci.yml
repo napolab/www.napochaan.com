@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: lint & typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      # `cloudflare-env.d.ts` is gitignored; regenerate it from wrangler.toml so
+      # tsgo can resolve the `CloudflareEnv` type. `wrangler types` is local-only.
+      - run: pnpm cf:types
+      - run: pnpm lint
+      - run: pnpm typecheck
+
+  test:
+    name: vitest (browser + unit + workers)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      # The `browser` vitest project drives headless chromium via Playwright.
+      - name: Install Playwright chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - run: pnpm test

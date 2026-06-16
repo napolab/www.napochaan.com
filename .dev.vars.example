@@ -1,0 +1,11 @@
+# `wrangler types`（pnpm cf:types）はこのファイルのキーも CloudflareEnv 型に流し込む。
+# 値はプレースホルダ。ローカル開発では .dev.vars にコピーして実値を入れること。
+# CI では setup composite action が .dev.vars 不在時にこれをコピーして型生成に使う。
+PAYLOAD_SECRET=dev-placeholder
+PREVIEW_SECRET=dev-placeholder
+RESEND_API_KEY=dev-placeholder
+DISCORD_WEBHOOK_URL=https://example.com/webhook
+CONTACT_TO_EMAIL=dev@example.com
+CONTACT_FROM_EMAIL=dev@example.com
+TURNSTILE_SECRET_KEY=dev-placeholder
+TURNSTILE_SITE_KEY=dev-placeholder

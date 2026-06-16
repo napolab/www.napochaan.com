@@ -1,0 +1,21 @@
+name: Setup
+description: >-
+  mise.toml から node/pnpm を導入し、node_modules キャッシュを復元して依存をインストールする。
+  `pnpm install` の prepare スクリプトが panda codegen を走らせ、gitignore された
+  styled-system を再生成する。
+
+runs:
+  using: composite
+  steps:
+    # mise installs node + pnpm at the versions pinned in mise.toml ([tools]).
+    - uses: jdx/mise-action@v2
+    # キャッシュ層は独立モジュール（.github/actions/cache-deps）に分離。
+    - uses: ./.github/actions/cache-deps
+    - run: pnpm install --frozen-lockfile
+      shell: bash
+    # `wrangler types`（pnpm cf:types）は .dev.vars のキーも CloudflareEnv 型に
+    # 含める。CI には .dev.vars が無いため secret 型が欠落し typecheck が落ちる。
+    # 雛形（.dev.vars.example）を不在時のみコピーして型生成の入力を揃える。
+    # cp -n でローカルの実 .dev.vars は決して上書きしない。
+    - run: cp -n .dev.vars.example .dev.vars
+      shell: bash

@@ -1,0 +1,13 @@
+name: Cache deps
+description: pnpm の node_modules を lockfile ハッシュ key でキャッシュする。
+
+runs:
+  using: composite
+  steps:
+    - name: Cache node_modules
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: node-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          node-modules-${{ runner.os }}-
