@@ -1,6 +1,6 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 
-import { getPayloadClient } from '@lib/payload/client';
+import { findDownloadableReleaseFile } from '@lib/payload/software/find-downloadable-release';
 
 import { resolveDownloadRequest } from './resolve-download';
 
@@ -20,9 +20,7 @@ export const GET = async (request: NextRequest): Promise<Response> => {
   const resolved = await resolveDownloadRequest(request.nextUrl.searchParams, env.PAYLOAD_SECRET, Date.now());
   if (!resolved.ok) return forbidden();
 
-  const payload = await getPayloadClient();
-  const release = await payload.findByID({ collection: 'software-release', id: resolved.releaseId, overrideAccess: true }).catch(() => undefined);
-  const filename = typeof release?.filename === 'string' ? release.filename : undefined;
+  const filename = await findDownloadableReleaseFile(resolved.releaseId);
   if (filename === undefined) return forbidden();
 
   if (env.R2 === undefined) return forbidden();

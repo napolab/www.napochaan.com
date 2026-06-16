@@ -4,6 +4,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { headers } from 'next/headers';
 
 import { verifyTurnstile } from '@lib/contact/verify-turnstile';
+import { isReleaseDownloadable } from '@lib/payload/software/find-downloadable-release';
 import { signDownloadToken } from '@lib/software/download-token';
 
 import { buildDownloadURL } from './build-download-url';
@@ -25,6 +26,9 @@ export const issueDownloadURL = async (releaseId: string, token: string): Promis
   const { env } = await getCloudflareContext({ async: true });
   const verified = await verifyTurnstile(token, env, await resolveRemoteIp());
   if (!verified) return { error: '認証を確認できませんでした。もう一度お試しください。' };
+
+  const downloadable = await isReleaseDownloadable(releaseId);
+  if (!downloadable) return { error: 'このダウンロードは利用できません。' };
 
   const exp = Date.now() + DOWNLOAD_URL_TTL_MS;
   const sig = await signDownloadToken({ releaseId, exp }, env.PAYLOAD_SECRET);
