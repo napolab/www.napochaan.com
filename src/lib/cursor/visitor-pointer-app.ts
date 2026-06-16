@@ -23,9 +23,10 @@ export interface VisitorPointerApp {
   start(): void;
   // Closes the WebSocket and clears every timer. Idempotent: safe to call when not started.
   end(): void;
-  // Report the visitor's current page. Sends a `nav` on change (so presence transitions fire even
-  // when idle) and re-sends on every socket 'open'; the page also rides on every `move`.
-  setPath(path: string): void;
+  // Report the presence channel the visitor currently occupies (the consumer decides the key — a
+  // URL pathname today, but any string works). Sends a `nav` on change (so presence transitions fire
+  // even when idle) and re-sends on every socket 'open'; the channel also rides on every `move`.
+  setChannel(channel: string): void;
   // Outbound move; THROTTLED internally so a flood of pointermove events does not flood the socket.
   send(position: { x: number; y: number }): void;
   getState(): VisitorPointerState;
@@ -112,29 +113,30 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
     };
   };
 
-  // Socket lifecycle + current page, held individually. `stopPing` tears down durabcast's heartbeat.
+  // Socket lifecycle + current channel, held individually. `stopPing` tears down durabcast's heartbeat.
+  // `channel` is the abstraction boundary: it maps to the wire `path` field the server routes on.
   let ws: WebSocket | null = null;
   let stopPing: (() => void) | null = null;
-  let path: string | undefined = undefined;
+  let channel: string | undefined = undefined;
 
   const isOpen = (socket: WebSocket | null): socket is WebSocket => socket !== null && socket.readyState === socket.OPEN;
 
-  // Page change with no movement; re-sent on every (re)connect so presence re-registers after a drop.
+  // Channel change with no movement; re-sent on every (re)connect so presence re-registers after a drop.
   const sendNav = (): void => {
-    if (path !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'nav', path }));
+    if (channel !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'nav', path: channel }));
   };
   const handleOpen = (): void => sendNav();
-  const setPath = (next: string): void => {
-    if (next === path) return;
-    path = next;
+  const setChannel = (next: string): void => {
+    if (next === channel) return;
+    channel = next;
     sendNav();
   };
 
   // Outbound move throttle: collapses pointermove (~60/s) to one `move` per interval (latest wins).
-  // Every move carries the current page so the server can route it (and re-detect page changes).
+  // Every move carries the current channel so the server can route it (and re-detect channel changes).
   // Declared before handleMessage/send, both of which reference it.
   const moves = createTrailingThrottle<{ x: number; y: number }>(MOVE_SEND_INTERVAL_MS, (position) => {
-    if (path !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'move', path, x: position.x, y: position.y }));
+    if (channel !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'move', path: channel, x: position.x, y: position.y }));
   });
 
   const handleMessage = (event: MessageEvent): void => {
@@ -193,5 +195,5 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
     resetState(); // listener already detached, so clear explicitly for a deliberate stop
   };
 
-  return { start, end, setPath, send, getState, subscribe };
+  return { start, end, setChannel, send, getState, subscribe };
 };

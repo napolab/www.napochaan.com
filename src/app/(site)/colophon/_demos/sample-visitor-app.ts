@@ -83,8 +83,8 @@ export const createSampleVisitorApp = (): VisitorPointerApp => {
       clearInterval(timer.id);
       timer.id = undefined;
     },
-    setPath() {
-      // no-op: the sample app is page-agnostic.
+    setChannel() {
+      // no-op: the sample app is channel-agnostic.
     },
     send() {
       // no-op: the sample app has no local cursor to broadcast.
