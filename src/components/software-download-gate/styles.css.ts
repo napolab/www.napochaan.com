@@ -116,7 +116,8 @@ export const releaseNoteTrigger = css({
 
 export const changelog = css({
   fontSize: 'xs',
-  color: 'fg.subtle',
+  // fg.muted (7.04:1 on bg.canvas) clears WCAG 2.1 AA for normal text; fg.subtle was 4.03:1.
+  color: 'fg.muted',
   lineHeight: 'body',
   margin: '0',
   // Indent + left rule so the note reads as one level below the disclosure trigger.
@@ -125,7 +126,7 @@ export const changelog = css({
   paddingLeft: '3',
   borderLeftWidth: 'hairline',
   borderLeftStyle: 'solid',
-  borderLeftColor: 'border.subtle',
+  borderLeftColor: 'border.default',
 });
 
 export const overlay = css({
