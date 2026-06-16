@@ -1,0 +1,51 @@
+name: Deploy
+
+on:
+  # main へのマージで staging を自動デプロイ
+  push:
+    branches: [main]
+  # production は手動 dispatch（GitHub Environment "production" の承認ゲート経由）
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# 同一環境への多重デプロイは直列化（途中キャンセルしない）
+concurrency:
+  group: deploy-${{ github.event_name == 'workflow_dispatch' && 'production' || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  staging:
+    if: github.event_name == 'push'
+    name: deploy staging
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      # next build / opennext build が CloudflareEnv 型を解決できるよう再生成
+      - run: pnpm cf:types
+      # worker deploy の前に D1 スキーマを反映（remote binding 経由）
+      - run: pnpm deploy:database:staging
+      # opennext build → deploy → ISR cache bust（1スクリプトに同梱）
+      - run: pnpm deploy:staging
+
+  production:
+    if: github.event_name == 'workflow_dispatch'
+    name: deploy production
+    runs-on: ubuntu-latest
+    # Environment 保護ルール（required reviewers）でデプロイ前に承認を要求する
+    environment: production
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: pnpm cf:types
+      - run: pnpm deploy:database:production
+      - run: pnpm deploy:production
