@@ -12,6 +12,10 @@ export default defineConfig({
   },
   test: {
     exclude: [...configDefaults.exclude, '.claude/worktrees/**'],
+    // browser mode は CI 素環境で Vite の依存最適化による mid-run リロードが起き、
+    // 進行中の dynamic import が "Failed to fetch" になることがある（フレーク）。
+    // CI のみ retry してこの一過性の取りこぼしを吸収する（ローカルは 0 で即検知）。
+    retry: process.env.CI ? 2 : 0,
     projects: [
       {
         plugins: [react()],
