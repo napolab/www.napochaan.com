@@ -56,8 +56,8 @@ export const profile = {
     { category: 'graphics', items: ['WebGPU', 'WGSL', 'Unity', 'UdonSharp'] },
   ],
   contacts: [
-    { label: 'x', handle: '@naporin24690', href: 'https://x.com/naporin24690' },
-    { label: 'github', handle: 'naporin0624', href: 'https://github.com/naporin0624' },
-    { label: 'mail', handle: 'contact@napochaan.com', href: 'mailto:contact@napochaan.com' },
+    { label: 'Twitter(X)', handle: '@naporin24690', href: 'https://x.com/naporin24690' },
+    { label: 'GitHub', handle: 'naporin0624', href: 'https://github.com/naporin0624' },
+    { label: 'Email', handle: 'contact@napochaan.com', href: 'mailto:contact@napochaan.com' },
   ],
 } as const;

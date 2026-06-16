@@ -16,7 +16,7 @@ const fixture = {
   philosophy: undefined,
   love: ['dubstep', 'brostep'],
   skillGroups: [{ category: 'lang', items: ['TypeScript', 'Rust'] }],
-  contacts: [{ label: 'x', handle: '@naporin24690', href: 'https://x.com/naporin24690' }],
+  contacts: [{ label: 'Twitter(X)', handle: '@naporin24690', href: 'https://x.com/naporin24690' }],
 } satisfies Profile;
 
 describe('AboutPage', () => {
