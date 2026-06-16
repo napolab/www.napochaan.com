@@ -23,9 +23,10 @@ export interface VisitorPointerApp {
   start(): void;
   // Closes the WebSocket and clears every timer. Idempotent: safe to call when not started.
   end(): void;
-  // Report the visitor's current page. Sends a `nav` on change (so presence transitions fire even
-  // when idle) and re-sends on every socket 'open'; the page also rides on every `move`.
-  setPath(path: string): void;
+  // Report the presence channel the visitor currently occupies (the consumer decides the key — a
+  // URL pathname today, but any string works). Sends a `nav` on change (so presence transitions fire
+  // even when idle) and re-sends on every socket 'open'; the channel also rides on every `move`.
+  setChannel(channel: string): void;
   // Outbound move; THROTTLED internally so a flood of pointermove events does not flood the socket.
   send(position: { x: number; y: number }): void;
   getState(): VisitorPointerState;
@@ -46,6 +47,14 @@ const safeJsonParse = (raw: string): unknown => {
     return undefined;
   }
 };
+
+// True when another visitor is on the page (count includes self, so >= 2 means at least one peer).
+// Single source of truth for the streaming threshold.
+export const hasPeers = (count: number): boolean => count >= 2;
+// Rising edge: `pred` flipped false -> true between prev and next.
+export const rose = (pred: (n: number) => boolean, prev: number, next: number): boolean => !pred(prev) && pred(next);
+// Falling edge: `pred` flipped true -> false between prev and next.
+export const fell = (pred: (n: number) => boolean, prev: number, next: number): boolean => pred(prev) && !pred(next);
 
 // Pure reducer: derives the next state from the current state and a server message. Returns the
 // SAME reference when nothing changed, so useSyncExternalStore can rely on identity stability.
@@ -84,6 +93,8 @@ export const applyMessage = (state: VisitorPointerState, msg: ServerMessage): Vi
 export const createVisitorPointerApp = (): VisitorPointerApp => {
   // Single-element holder so `state` can be reassigned without a top-level `let`.
   const store: { state: VisitorPointerState } = { state: { visitors: new Map(), count: 0 } };
+  // Last known pointer position, recorded on every `send` even while solo, for the catch-up emit.
+  const pointer: { last: { x: number; y: number } | undefined } = { last: undefined };
   const listeners = new Set<Listener>();
 
   const getState = (): VisitorPointerState => store.state;
@@ -102,23 +113,32 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
     };
   };
 
-  // Socket lifecycle + current page, held individually. `stopPing` tears down durabcast's heartbeat.
+  // Socket lifecycle + current channel. `channel` is the abstraction boundary: it maps to the wire
+  // `path` field the server routes on. `disposers` collects every per-session teardown so end()
+  // releases them in one pass — each one is registered next to its acquisition in start().
   let ws: WebSocket | null = null;
-  let stopPing: (() => void) | null = null;
-  let path: string | undefined = undefined;
+  let channel: string | undefined = undefined;
+  const disposers: Array<() => void> = [];
 
   const isOpen = (socket: WebSocket | null): socket is WebSocket => socket !== null && socket.readyState === socket.OPEN;
 
-  // Page change with no movement; re-sent on every (re)connect so presence re-registers after a drop.
+  // Channel change with no movement; re-sent on every (re)connect so presence re-registers after a drop.
   const sendNav = (): void => {
-    if (path !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'nav', path }));
+    if (channel !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'nav', path: channel }));
   };
   const handleOpen = (): void => sendNav();
-  const setPath = (next: string): void => {
-    if (next === path) return;
-    path = next;
+  const setChannel = (next: string): void => {
+    if (next === channel) return;
+    channel = next;
     sendNav();
   };
+
+  // Outbound move throttle: collapses pointermove (~60/s) to one `move` per interval (latest wins).
+  // Every move carries the current channel so the server can route it (and re-detect channel changes).
+  // Declared before handleMessage/send, both of which reference it.
+  const moves = createTrailingThrottle<{ x: number; y: number }>(MOVE_SEND_INTERVAL_MS, (position) => {
+    if (channel !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'move', path: channel, x: position.x, y: position.y }));
+  });
 
   const handleMessage = (event: MessageEvent): void => {
     if (event.data === 'pong') return;
@@ -130,7 +150,14 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
 
       return;
     }
+    // Capture prev BEFORE setState and read next AFTER, so setState stays single-purpose.
+    const prevCount = getState().count;
     setState(applyMessage(getState(), parsed.data));
+    const nextCount = getState().count;
+    // Catch-up: a peer just arrived — show them our cursor at once (idle throttle => immediate emit).
+    if (rose(hasPeers, prevCount, nextCount) && pointer.last !== undefined) moves.push(pointer.last);
+    // Re-muted (dropped back to solo): drop any pending trailing frame.
+    if (fell(hasPeers, prevCount, nextCount)) moves.cancel();
   };
 
   // Drop all known visitors. On a disconnect the prior roster is stale (peers may have left while we
@@ -138,40 +165,42 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
   const resetState = (): void => setState({ visitors: new Map(), count: 0 });
   const handleClose = (): void => resetState();
 
-  // Outbound move throttle: collapses pointermove (~60/s) to one `move` per interval (latest wins).
-  // Every move carries the current page so the server can route it (and re-detect page changes).
-  const moves = createTrailingThrottle<{ x: number; y: number }>(MOVE_SEND_INTERVAL_MS, (position) => {
-    if (path !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'move', path, x: position.x, y: position.y }));
-  });
-
   const send = (position: { x: number; y: number }): void => {
+    pointer.last = position;
+    if (!hasPeers(getState().count)) return; // solo: don't stream
     moves.push(position);
   };
 
   const start = (): void => {
     if (ws !== null) return; // already started
-    ws = client.api.cursors.$ws();
-    ws.addEventListener('open', handleOpen);
-    ws.addEventListener('message', handleMessage);
-    ws.addEventListener('close', handleClose); // reconnecting-websocket fires this on every drop
+    const socket = client.api.cursors.$ws();
+    ws = socket;
+    disposers.push(() => socket.close());
+
+    socket.addEventListener('open', handleOpen);
+    disposers.push(() => socket.removeEventListener('open', handleOpen));
+
+    socket.addEventListener('message', handleMessage);
+    disposers.push(() => socket.removeEventListener('message', handleMessage));
+
+    socket.addEventListener('close', handleClose); // reconnecting-websocket fires this on every drop
+    disposers.push(() => socket.removeEventListener('close', handleClose));
+
     // durabcast auto-answers 'ping' with 'pong' (setWebSocketAutoResponse); keep the socket alive.
-    stopPing = pingWebSocket(ws, { interval: PING_INTERVAL_MS, ping: 'ping' });
+    const stopPing = pingWebSocket(socket, { interval: PING_INTERVAL_MS, ping: 'ping' });
+    disposers.push(stopPing);
+
+    disposers.push(moves.cancel); // a pending trailing move only outlives the socket — drop it on stop
   };
 
   const end = (): void => {
-    if (stopPing !== null) {
-      stopPing();
-      stopPing = null;
-    }
-    moves.cancel();
-    if (ws === null) return;
-    ws.removeEventListener('open', handleOpen);
-    ws.removeEventListener('message', handleMessage);
-    ws.removeEventListener('close', handleClose);
-    ws.close();
+    // Release in reverse acquisition order (LIFO), so each listener is removed before the socket it
+    // was attached to is closed — in particular the 'close' listener, preventing handleClose re-entry.
+    for (const dispose of [...disposers].reverse()) dispose();
+    disposers.length = 0;
     ws = null;
-    resetState(); // listener already detached, so clear explicitly for a deliberate stop
+    resetState(); // deliberate close suppresses handleClose, so clear the roster ourselves
   };
 
-  return { start, end, setPath, send, getState, subscribe };
+  return { start, end, setChannel, send, getState, subscribe };
 };

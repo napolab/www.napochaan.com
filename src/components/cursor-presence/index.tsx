@@ -51,8 +51,8 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
   }, [app, enabled]);
 
   useEffect(() => {
-    // Report the current page so the server routes presence per pathname over the single socket.
-    app.setPath(pathname);
+    // Use the pathname as the presence channel so the server routes per route over the single socket.
+    app.setChannel(pathname);
   }, [app, pathname]);
 
   useEffect(() => {
