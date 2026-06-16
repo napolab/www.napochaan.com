@@ -7,6 +7,7 @@ import * as migration_20260611_024807_drop_news_order from './20260611_024807_dr
 import * as migration_20260612_205858_blog_thumbnail from './20260612_205858_blog_thumbnail';
 import * as migration_20260613_200316_add_slug from './20260613_200316_add_slug';
 import * as migration_20260616_192806_software_release from './20260616_192806_software_release';
+import * as migration_20260616_204437_software_seo_meta from './20260616_204437_software_seo_meta';
 
 export const migrations = [
   {
@@ -52,6 +53,11 @@ export const migrations = [
   {
     up: migration_20260616_192806_software_release.up,
     down: migration_20260616_192806_software_release.down,
-    name: '20260616_192806_software_release'
+    name: '20260616_192806_software_release',
+  },
+  {
+    up: migration_20260616_204437_software_seo_meta.up,
+    down: migration_20260616_204437_software_seo_meta.down,
+    name: '20260616_204437_software_seo_meta'
   },
 ];
