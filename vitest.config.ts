@@ -27,6 +27,47 @@ export default defineConfig({
             'next/navigation': path.resolve(__dirname, 'src/__mocks__/next/navigation.ts'),
           },
         },
+        // Pre-bundle every browser-test dependency up front. Otherwise Vite
+        // discovers some of them late and triggers a mid-run reload
+        // ("optimized dependencies changed. reloading"), which makes an in-flight
+        // test-file import fail with "Failed to fetch dynamically imported module"
+        // — a suite-level failure `retry` cannot recover. Keep in sync with the
+        // deps surfaced by `DEBUG=vite:deps` (node_modules/.vite/.../_metadata.json).
+        optimizeDeps: {
+          include: [
+            'react',
+            'react-dom',
+            'react/jsx-runtime',
+            'react/jsx-dev-runtime',
+            'react-aria-components',
+            'vitest-browser-react',
+            '@gsap/react',
+            'gsap',
+            'gsap/ScrambleTextPlugin',
+            'gsap/ScrollToPlugin',
+            'gsap/ScrollTrigger',
+            '@marsidev/react-turnstile',
+            '@opennextjs/cloudflare',
+            '@payloadcms/richtext-lexical/react',
+            'shiki/core',
+            'shiki/engine/javascript',
+            '@shikijs/langs/bash',
+            '@shikijs/langs/css',
+            '@shikijs/langs/json',
+            '@shikijs/langs/tsx',
+            '@shikijs/langs/typescript',
+            'hast-util-to-jsx-runtime',
+            'budoux',
+            'dayjs',
+            'dayjs/plugin/utc',
+            'dayjs/plugin/timezone',
+            'durabcast/helpers/client',
+            'hono/client',
+            'reconnecting-websocket',
+            'fast-json-stable-stringify',
+            'zod',
+          ],
+        },
         test: {
           name: 'browser',
           include: ['src/**/*.test.tsx'],
