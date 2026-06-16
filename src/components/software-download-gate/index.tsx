@@ -67,16 +67,23 @@ type DownloadButtonProps = {
   siteKey: string;
 };
 
-const DownloadButton = ({ release, terms, siteKey }: DownloadButtonProps) => (
-  <DialogTrigger>
-    <Button>ダウンロード</Button>
-    <ModalOverlay className={styles.overlay} isDismissable>
-      <Modal className={styles.modal}>
-        <GateDialog release={release} terms={terms} siteKey={siteKey} />
-      </Modal>
-    </ModalOverlay>
-  </DialogTrigger>
-);
+const DownloadButton = ({ release, terms, siteKey }: DownloadButtonProps) => {
+  const [attempt, setAttempt] = useState(0);
+  const handleOpenChange = useCallback((isOpen: boolean) => {
+    if (isOpen) setAttempt((n) => n + 1);
+  }, []);
+
+  return (
+    <DialogTrigger onOpenChange={handleOpenChange}>
+      <Button>ダウンロード</Button>
+      <ModalOverlay className={styles.overlay} isDismissable>
+        <Modal className={styles.modal}>
+          <GateDialog key={attempt} release={release} terms={terms} siteKey={siteKey} />
+        </Modal>
+      </ModalOverlay>
+    </DialogTrigger>
+  );
+};
 
 export type SoftwareDownloadGateProps = {
   software: SoftwareDownload;

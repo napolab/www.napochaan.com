@@ -34,6 +34,11 @@ const mockSoftware: SoftwareDownload = {
   history: [],
 };
 
+const mockSoftwareWithHistory: SoftwareDownload = {
+  ...mockSoftware,
+  history: [{ id: '9', version: '1.1.0', releasedAt: '2025-06-01T00:00:00.000Z', filename: 'testapp-1.1.0.zip' }],
+};
+
 describe('SoftwareDownloadGate', () => {
   it('shows product name heading and latest version text', async () => {
     render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
@@ -63,6 +68,34 @@ describe('SoftwareDownloadGate', () => {
 
     const confirmBtn = page.getByRole('dialog').getByRole('button', { name: 'ダウンロード' });
     await expect.element(confirmBtn).not.toBeDisabled();
+  });
+
+  it('history release download calls issueDownloadURL with the history release id', async () => {
+    // Return an error so window.location.href is never assigned and the iframe stays alive.
+    // The goal is to verify per-release id identity, not navigation.
+    issueMock.mockResolvedValue({ error: 'token expired' });
+
+    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" />);
+
+    // Expand history section
+    await page.getByRole('button', { name: '過去のバージョン' }).click();
+
+    // Click the second download button (first is the latest, second is the history entry)
+    await page.getByRole('button', { name: 'ダウンロード' }).nth(1).click();
+
+    await expect.element(page.getByRole('dialog')).toBeInTheDocument();
+
+    await page.getByText('利用規約に同意する').click({ force: true });
+    await page.getByRole('button', { name: 'solve-turnstile' }).click();
+
+    const confirmBtn = page.getByRole('dialog').getByRole('button', { name: 'ダウンロード' });
+    await confirmBtn.click();
+
+    await vi.waitFor(() => {
+      // Verify issueDownloadURL was called with the HISTORY release id ('9'), not the latest ('10')
+      expect(issueMock).toHaveBeenCalledWith('9', 'tok');
+      expect(issueMock).not.toHaveBeenCalledWith('10', 'tok');
+    });
   });
 
   it('clicking confirm calls issueDownloadURL and navigates to the download URL', async () => {

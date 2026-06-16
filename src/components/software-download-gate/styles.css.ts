@@ -52,13 +52,16 @@ export const overlay = css({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  // strictTokens escape: scrim color is a one-off semi-transparent black, no semantic token applies
   bg: '[oklch(0 0 0 / 0.6)]',
   zIndex: 'modal',
 });
 
 export const modal = css({
   display: 'flex',
+  // strictTokens escape: viewport-relative modal sizing, no token applies
   maxW: '[90vw]',
+  // strictTokens escape: viewport-relative modal sizing, no token applies
   w: '[480px]',
 });
 
@@ -69,9 +72,10 @@ export const dialog = css({
   padding: '6',
   bg: 'bg.canvas',
   outline: 'none',
-  w: '[100%]',
+  w: 'full',
+  // strictTokens escape: viewport-relative modal sizing, no token applies
   maxH: '[90vh]',
-  overflow: '[auto]',
+  overflow: 'auto',
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'border.default',
@@ -99,7 +103,7 @@ export const agree = css({
   gap: '2',
   fontSize: 'sm',
   color: 'fg.default',
-  cursor: '[pointer]',
+  cursor: 'pointer',
 });
 
 export const error = css({
@@ -129,7 +133,7 @@ export const historyTrigger = css({
   bg: 'transparent',
   borderWidth: 'none',
   padding: '0',
-  cursor: '[pointer]',
+  cursor: 'pointer',
   letterSpacing: 'wide',
   textTransform: 'uppercase',
   _hover: {
