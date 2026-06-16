@@ -60,7 +60,7 @@ export const findSoftwareDownloadsByIds = async (ids: readonly string[]): Promis
 const fetchBySlug = unstable_cache(
   async (slug: string): Promise<SoftwareDownload | undefined> => {
     const payload = await getPayloadClient();
-    const result = await payload.find({ collection: 'software', where: { and: [{ slug: { equals: slug } }, publishedWhere] }, limit: 1 });
+    const result = await payload.find({ collection: 'software', where: { and: [{ slug: { equals: slug } }, publishedWhere] }, overrideAccess: true, limit: 1 });
     const [doc] = result.docs;
     if (doc === undefined) return undefined;
     return buildDownload(`${doc.id}`);
