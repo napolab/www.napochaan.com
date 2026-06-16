@@ -136,8 +136,13 @@ export default buildConfig({
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
           buildPath: () => '/log/preview',
         }),
+        draftPreviewRoute({
+          slug: 'software',
+          previewSecret: cfEnv.PREVIEW_SECRET ?? '',
+          buildPath: (data) => `/software/preview/${data.id}`,
+        }),
       ]),
-      collections: ['news', 'works', 'blog', 'gallery', 'logs'],
+      collections: ['news', 'works', 'blog', 'gallery', 'logs', 'software'],
     },
     get autoLogin() {
       if (process.env.NODE_ENV !== 'development') return false;
@@ -175,7 +180,7 @@ export default buildConfig({
       // `logs` is intentionally omitted: the plugin injects a `meta` group field
       // that collides with the logs collection's own `meta` field (DuplicateFieldName
       // at boot), and logs entries have no public detail page (they resolve to /log).
-      collections: ['news', 'works', 'blog', 'gallery'],
+      collections: ['news', 'works', 'blog', 'gallery', 'software'],
       uploadsCollection: 'media',
       tabbedUI: true,
       generateTitle: ({ doc }) => `napochaan — ${doc.title as string}`,
