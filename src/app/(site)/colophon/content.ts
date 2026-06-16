@@ -124,6 +124,10 @@ export const colophon = {
         name: 'LoadingOverlay',
         why: 'フォント読込中の起動オーバーレイ。本来は全画面を覆う fixed だけど、ここは枠に収めた版。問いかけを typewriter で次々と。',
       },
+      {
+        name: 'SoftwareDownloadGate',
+        why: 'ソフトウェア配布物のダウンロードゲート。利用規約への同意と Turnstile を経て署名付き URL を発行する。',
+      },
     ],
   },
   stack: [
