@@ -15,6 +15,7 @@ import { Logs } from './collections/logs';
 import { Media } from './collections/media';
 import { News } from './collections/news';
 import { Users } from './collections/users';
+import { Software } from './collections/software';
 import { Works } from './collections/works';
 import { Profile } from './globals/profile';
 import { createPreviewURLFactory, draftPreviewRoute } from './lib/payload/create-preview-url-factory';
@@ -148,7 +149,7 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, News, Works, Blog, Gallery, Logs],
+  collections: [Users, Media, News, Works, Blog, Gallery, Logs, Software],
   globals: [Profile],
   editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow] })] }),
   secret,
