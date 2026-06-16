@@ -47,6 +47,14 @@ const safeJsonParse = (raw: string): unknown => {
   }
 };
 
+// True when another visitor is on the page (count includes self, so >= 2 means at least one peer).
+// Single source of truth for the streaming threshold.
+export const hasPeers = (count: number): boolean => count >= 2;
+// Rising edge: `pred` flipped false -> true between prev and next.
+export const rose = (pred: (n: number) => boolean, prev: number, next: number): boolean => !pred(prev) && pred(next);
+// Falling edge: `pred` flipped true -> false between prev and next.
+export const fell = (pred: (n: number) => boolean, prev: number, next: number): boolean => pred(prev) && !pred(next);
+
 // Pure reducer: derives the next state from the current state and a server message. Returns the
 // SAME reference when nothing changed, so useSyncExternalStore can rely on identity stability.
 export const applyMessage = (state: VisitorPointerState, msg: ServerMessage): VisitorPointerState => {
@@ -84,6 +92,8 @@ export const applyMessage = (state: VisitorPointerState, msg: ServerMessage): Vi
 export const createVisitorPointerApp = (): VisitorPointerApp => {
   // Single-element holder so `state` can be reassigned without a top-level `let`.
   const store: { state: VisitorPointerState } = { state: { visitors: new Map(), count: 0 } };
+  // Last known pointer position, recorded on every `send` even while solo, for the catch-up emit.
+  const pointer: { last: { x: number; y: number } | undefined } = { last: undefined };
   const listeners = new Set<Listener>();
 
   const getState = (): VisitorPointerState => store.state;
@@ -120,6 +130,13 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
     sendNav();
   };
 
+  // Outbound move throttle: collapses pointermove (~60/s) to one `move` per interval (latest wins).
+  // Every move carries the current page so the server can route it (and re-detect page changes).
+  // Declared before handleMessage/send, both of which reference it.
+  const moves = createTrailingThrottle<{ x: number; y: number }>(MOVE_SEND_INTERVAL_MS, (position) => {
+    if (path !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'move', path, x: position.x, y: position.y }));
+  });
+
   const handleMessage = (event: MessageEvent): void => {
     if (event.data === 'pong') return;
     const json = safeJsonParse(`${event.data}`);
@@ -130,7 +147,14 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
 
       return;
     }
+    // Capture prev BEFORE setState and read next AFTER, so setState stays single-purpose.
+    const prevCount = getState().count;
     setState(applyMessage(getState(), parsed.data));
+    const nextCount = getState().count;
+    // Catch-up: a peer just arrived — show them our cursor at once (idle throttle => immediate emit).
+    if (rose(hasPeers, prevCount, nextCount) && pointer.last !== undefined) moves.push(pointer.last);
+    // Re-muted (dropped back to solo): drop any pending trailing frame.
+    if (fell(hasPeers, prevCount, nextCount)) moves.cancel();
   };
 
   // Drop all known visitors. On a disconnect the prior roster is stale (peers may have left while we
@@ -138,13 +162,9 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
   const resetState = (): void => setState({ visitors: new Map(), count: 0 });
   const handleClose = (): void => resetState();
 
-  // Outbound move throttle: collapses pointermove (~60/s) to one `move` per interval (latest wins).
-  // Every move carries the current page so the server can route it (and re-detect page changes).
-  const moves = createTrailingThrottle<{ x: number; y: number }>(MOVE_SEND_INTERVAL_MS, (position) => {
-    if (path !== undefined && isOpen(ws)) ws.send(JSON.stringify({ t: 'move', path, x: position.x, y: position.y }));
-  });
-
   const send = (position: { x: number; y: number }): void => {
+    pointer.last = position;
+    if (!hasPeers(getState().count)) return; // solo: don't stream
     moves.push(position);
   };
 
