@@ -110,6 +110,17 @@ CI は lint+typecheck+test(全3project)。
 - workflow YAML はローカルに yaml パーサ / actionlint が無く手検証。push 後に
   Actions タブで初回実行を確認すること。
 
+### 初回 CI で判明した root cause（解決済み）
+
+- `wrangler types`(`pnpm cf:types`)は wrangler.toml の `[vars]` だけでなく
+  **`.dev.vars` のキーも `CloudflareEnv` 型に流し込む**。CI には `.dev.vars`(gitignore)が
+  無いため `PAYLOAD_SECRET` 等の secret 型が欠落し、それらを参照する
+  `src/payload.config.ts` / contact actions で **typecheck が exit 2**。
+- 対策: キーのみのプレースホルダ `.dev.vars.example` をコミットし、`setup` composite
+  action が `cp -n .dev.vars.example .dev.vars`(不在時のみ)で型生成の入力を揃える。
+  ローカルの実 `.dev.vars` は `-n` で上書きしない。`.dev.vars.example` だけで
+  cf:types + typecheck が通ることをローカル再現で確認済み(exit 0)。
+
 ## 既知の落とし穴(memory 由来)
 
 - `CLOUDFLARE_ACCOUNT_ID` 必須(exit 13)。

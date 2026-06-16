@@ -13,3 +13,9 @@ runs:
     - uses: ./.github/actions/cache-deps
     - run: pnpm install --frozen-lockfile
       shell: bash
+    # `wrangler types`（pnpm cf:types）は .dev.vars のキーも CloudflareEnv 型に
+    # 含める。CI には .dev.vars が無いため secret 型が欠落し typecheck が落ちる。
+    # 雛形（.dev.vars.example）を不在時のみコピーして型生成の入力を揃える。
+    # cp -n でローカルの実 .dev.vars は決して上書きしない。
+    - run: cp -n .dev.vars.example .dev.vars
+      shell: bash
