@@ -120,7 +120,13 @@ export const changelog = css({
   color: 'fg.subtle',
   lineHeight: 'body',
   margin: '0',
+  // Indent + left rule so the note reads as one level below the disclosure trigger.
+  marginLeft: '1',
   paddingTop: '1',
+  paddingLeft: '3',
+  borderLeftWidth: 'hairline',
+  borderLeftStyle: 'solid',
+  borderLeftColor: 'border.subtle',
 });
 
 export const overlay = css({
