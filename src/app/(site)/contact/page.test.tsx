@@ -33,6 +33,6 @@ describe('ContactPage', () => {
 
   it('renders the direct-contact links', async () => {
     render(await ContactPage());
-    await expect.element(page.getByRole('link', { name: /github/ })).toHaveAttribute('href', 'https://github.com/naporin0624');
+    await expect.element(page.getByRole('link', { name: /GitHub/ })).toHaveAttribute('href', 'https://github.com/naporin0624');
   });
 });
