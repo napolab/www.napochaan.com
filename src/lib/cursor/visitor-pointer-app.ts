@@ -113,11 +113,12 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
     };
   };
 
-  // Socket lifecycle + current channel, held individually. `stopPing` tears down durabcast's heartbeat.
-  // `channel` is the abstraction boundary: it maps to the wire `path` field the server routes on.
+  // Socket lifecycle + current channel. `channel` is the abstraction boundary: it maps to the wire
+  // `path` field the server routes on. `disposers` collects every per-session teardown so end()
+  // releases them in one pass — each one is registered next to its acquisition in start().
   let ws: WebSocket | null = null;
-  let stopPing: (() => void) | null = null;
   let channel: string | undefined = undefined;
+  const disposers: Array<() => void> = [];
 
   const isOpen = (socket: WebSocket | null): socket is WebSocket => socket !== null && socket.readyState === socket.OPEN;
 
@@ -172,27 +173,33 @@ export const createVisitorPointerApp = (): VisitorPointerApp => {
 
   const start = (): void => {
     if (ws !== null) return; // already started
-    ws = client.api.cursors.$ws();
-    ws.addEventListener('open', handleOpen);
-    ws.addEventListener('message', handleMessage);
-    ws.addEventListener('close', handleClose); // reconnecting-websocket fires this on every drop
+    const socket = client.api.cursors.$ws();
+    ws = socket;
+    disposers.push(() => socket.close());
+
+    socket.addEventListener('open', handleOpen);
+    disposers.push(() => socket.removeEventListener('open', handleOpen));
+
+    socket.addEventListener('message', handleMessage);
+    disposers.push(() => socket.removeEventListener('message', handleMessage));
+
+    socket.addEventListener('close', handleClose); // reconnecting-websocket fires this on every drop
+    disposers.push(() => socket.removeEventListener('close', handleClose));
+
     // durabcast auto-answers 'ping' with 'pong' (setWebSocketAutoResponse); keep the socket alive.
-    stopPing = pingWebSocket(ws, { interval: PING_INTERVAL_MS, ping: 'ping' });
+    const stopPing = pingWebSocket(socket, { interval: PING_INTERVAL_MS, ping: 'ping' });
+    disposers.push(stopPing);
+
+    disposers.push(moves.cancel); // a pending trailing move only outlives the socket — drop it on stop
   };
 
   const end = (): void => {
-    if (stopPing !== null) {
-      stopPing();
-      stopPing = null;
-    }
-    moves.cancel();
-    if (ws === null) return;
-    ws.removeEventListener('open', handleOpen);
-    ws.removeEventListener('message', handleMessage);
-    ws.removeEventListener('close', handleClose);
-    ws.close();
+    // Release in reverse acquisition order (LIFO), so each listener is removed before the socket it
+    // was attached to is closed — in particular the 'close' listener, preventing handleClose re-entry.
+    for (const dispose of [...disposers].reverse()) dispose();
+    disposers.length = 0;
     ws = null;
-    resetState(); // listener already detached, so clear explicitly for a deliberate stop
+    resetState(); // deliberate close suppresses handleClose, so clear the roster ourselves
   };
 
   return { start, end, setChannel, send, getState, subscribe };
