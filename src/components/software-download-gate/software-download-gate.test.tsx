@@ -30,13 +30,24 @@ const mockSoftware: SoftwareDownload = {
   name: 'TestApp',
   summary: 'A test application',
   terms: mockTerms,
-  latest: { id: '10', version: '1.2.0', releasedAt: '2026-01-01T00:00:00.000Z', filename: 'testapp-1.2.0.zip' },
+  latest: {
+    id: '10',
+    version: '1.2.0',
+    releasedAt: '2026-01-01T00:00:00.000Z',
+    filename: 'testapp-1.2.0.zip',
+    changelog: 'Latest release notes here.',
+  },
   history: [],
 };
 
 const mockSoftwareWithHistory: SoftwareDownload = {
   ...mockSoftware,
-  history: [{ id: '9', version: '1.1.0', releasedAt: '2025-06-01T00:00:00.000Z', filename: 'testapp-1.1.0.zip' }],
+  history: [
+    // id '9' has no changelog — for the identity test + no-disclosure test
+    { id: '9', version: '1.1.0', releasedAt: '2025-06-01T00:00:00.000Z', filename: 'testapp-1.1.0.zip' },
+    // id '8' has a changelog — for the collapsed disclosure test
+    { id: '8', version: '1.0.0', releasedAt: '2025-01-01T00:00:00.000Z', filename: 'testapp-1.0.0.zip', changelog: 'Old release notes.' },
+  ],
 };
 
 describe('SoftwareDownloadGate', () => {
@@ -48,20 +59,20 @@ describe('SoftwareDownloadGate', () => {
 
   it('clicking ダウンロード button opens dialog', async () => {
     render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
-    await page.getByRole('button', { name: 'ダウンロード' }).click();
+    await page.getByRole('button', { name: 'ダウンロード' }).first().click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('confirm button inside dialog is disabled initially', async () => {
     render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
-    await page.getByRole('button', { name: 'ダウンロード' }).click();
+    await page.getByRole('button', { name: 'ダウンロード' }).first().click();
     const confirmBtn = page.getByRole('dialog').getByRole('button', { name: 'ダウンロード' });
     await expect.element(confirmBtn).toBeDisabled();
   });
 
   it('confirm becomes enabled after checking checkbox and solving turnstile', async () => {
     render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
-    await page.getByRole('button', { name: 'ダウンロード' }).click();
+    await page.getByRole('button', { name: 'ダウンロード' }).first().click();
 
     await page.getByText('利用規約に同意する').click({ force: true });
     await page.getByRole('button', { name: 'solve-turnstile' }).click();
@@ -77,10 +88,7 @@ describe('SoftwareDownloadGate', () => {
 
     render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" />);
 
-    // Expand history section
-    await page.getByRole('button', { name: '過去のバージョン' }).click();
-
-    // Click the second download button (first is the latest, second is the history entry)
+    // In the flat list, latest is index 0, first history (id '9') is index 1
     await page.getByRole('button', { name: 'ダウンロード' }).nth(1).click();
 
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
@@ -98,11 +106,43 @@ describe('SoftwareDownloadGate', () => {
     });
   });
 
+  it('latest version changelog is visible on initial render (defaultExpanded)', async () => {
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    // The latest release has a changelog — its disclosure panel should be open (visible) initially
+    await expect.element(page.getByText('Latest release notes here.')).toBeVisible();
+  });
+
+  it('latest version has a release-note disclosure', async () => {
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    await expect.element(page.getByRole('button', { name: 'リリースノート' }).first()).toBeInTheDocument();
+  });
+
+  it('history release WITH changelog has a collapsed disclosure initially', async () => {
+    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" />);
+    // id '8' has 'Old release notes.' — should have a disclosure trigger but panel hidden initially
+    await expect.element(page.getByRole('button', { name: 'リリースノート' }).nth(1)).toBeInTheDocument();
+    // The changelog text is in the DOM (react-aria keeps panel in DOM) but NOT visible (hidden="until-found" / aria-hidden)
+    await expect.element(page.getByText('Old release notes.')).not.toBeVisible();
+  });
+
+  it('history release WITHOUT changelog renders no disclosure', async () => {
+    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" />);
+    // id '9' (index 1 in list) has no changelog — should show only 2 リリースノート buttons (latest + id '8')
+    // latest has changelog, id '9' does not, id '8' does → 2 total
+    const releaseNoteButtons = page.getByRole('button', { name: 'リリースノート' });
+    await expect.element(releaseNoteButtons.nth(0)).toBeInTheDocument();
+    await expect.element(releaseNoteButtons.nth(1)).toBeInTheDocument();
+    // Only 2 リリースノート buttons (latest + id '8'), not 3
+    await expect.element(releaseNoteButtons.nth(2)).not.toBeInTheDocument();
+  });
+
+  // Keep navigation test LAST: window.location.href assignment navigates the iframe,
+  // causing CORS errors that abort subsequent tests in the suite.
   it('clicking confirm calls issueDownloadURL and navigates to the download URL', async () => {
     issueMock.mockResolvedValue({ url: 'https://example.com/download/testapp.zip' });
 
     render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
-    await page.getByRole('button', { name: 'ダウンロード' }).click();
+    await page.getByRole('button', { name: 'ダウンロード' }).first().click();
 
     await page.getByText('利用規約に同意する').click({ force: true });
     await page.getByRole('button', { name: 'solve-turnstile' }).click();

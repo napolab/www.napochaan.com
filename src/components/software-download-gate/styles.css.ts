@@ -25,11 +25,45 @@ export const summary = css({
   margin: '0',
 });
 
-export const latestRow = css({
+export const versionList = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0',
+  listStyle: 'none',
+  margin: '0',
+  padding: '0',
+});
+
+export const versionRow = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '2',
+  padding: '3',
+  borderTopWidth: 'hairline',
+  borderTopStyle: 'solid',
+  borderTopColor: 'border.subtle',
+});
+
+export const versionRowHeader = css({
   display: 'flex',
   alignItems: 'center',
   gap: '3',
   flexWrap: 'wrap',
+});
+
+export const versionMeta = css({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '2',
+  flex: '1',
+  flexWrap: 'wrap',
+});
+
+export const versionLabel = css({
+  fontSize: 'sm',
+  fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
+  color: 'fg.default',
 });
 
 export const badge = css({
@@ -44,6 +78,54 @@ export const badge = css({
   borderWidth: 'hairline',
   borderStyle: 'solid',
   borderColor: 'accent.border',
+});
+
+export const versionDate = css({
+  fontSize: 'xs',
+  color: 'fg.muted',
+  fontFamily: 'mono',
+});
+
+export const downloadCell = css({
+  // strictTokens escape: fixed pixel width so all download buttons align in a consistent right column
+  minW: '[120px]',
+  display: 'flex',
+  justifyContent: 'flex-end',
+  flexShrink: '0',
+});
+
+export const releaseNoteDisclosure = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '1',
+});
+
+export const releaseNoteTrigger = css({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '1',
+  fontSize: 'xs',
+  color: 'fg.muted',
+  bg: 'transparent',
+  borderWidth: 'none',
+  padding: '0',
+  cursor: 'pointer',
+  textDecoration: 'underline',
+  textUnderlineOffset: '[2px]',
+  _hover: {
+    color: 'fg.default',
+  },
+  _focusVisible: {
+    layerStyle: 'focusRing',
+  },
+});
+
+export const changelog = css({
+  fontSize: 'xs',
+  color: 'fg.subtle',
+  lineHeight: 'body',
+  margin: '0',
+  paddingTop: '1',
 });
 
 export const overlay = css({
@@ -109,62 +191,5 @@ export const agree = css({
 export const error = css({
   fontSize: 'sm',
   color: 'danger.text',
-  margin: '0',
-});
-
-export const history = css({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '2',
-  borderTopWidth: 'hairline',
-  borderTopStyle: 'solid',
-  borderTopColor: 'border.subtle',
-  paddingTop: '4',
-});
-
-export const historyTrigger = css({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '2',
-  fontSize: 'xs',
-  fontFamily: 'mono',
-  fontVariationSettings: '"wght" 600',
-  color: 'fg.muted',
-  bg: 'transparent',
-  borderWidth: 'none',
-  padding: '0',
-  cursor: 'pointer',
-  letterSpacing: 'wide',
-  textTransform: 'uppercase',
-  _hover: {
-    color: 'fg.default',
-  },
-  _focusVisible: {
-    layerStyle: 'focusRing',
-  },
-});
-
-export const historyList = css({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '4',
-  listStyle: 'none',
-  margin: '0',
-  padding: '0',
-  paddingTop: '2',
-});
-
-export const historyItem = css({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '2',
-  fontSize: 'sm',
-  color: 'fg.muted',
-});
-
-export const changelog = css({
-  fontSize: 'xs',
-  color: 'fg.subtle',
-  lineHeight: 'body',
   margin: '0',
 });

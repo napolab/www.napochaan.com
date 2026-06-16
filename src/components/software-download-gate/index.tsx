@@ -85,42 +85,59 @@ const DownloadButton = ({ release, terms, siteKey }: DownloadButtonProps) => {
   );
 };
 
+type VersionRowProps = {
+  release: SoftwareRelease;
+  isLatest: boolean;
+  terms: SoftwareDownload['terms'];
+  siteKey: string;
+};
+
+const VersionRow = ({ release, isLatest, terms, siteKey }: VersionRowProps) => (
+  <li className={styles.versionRow}>
+    <div className={styles.versionRowHeader}>
+      <div className={styles.versionMeta}>
+        <span className={styles.versionLabel}>v{release.version}</span>
+        {isLatest ? <span className={styles.badge}>最新</span> : null}
+        <span className={styles.versionDate}>{dayjs(release.releasedAt).tz('Asia/Tokyo').format('YYYY.MM.DD')}</span>
+      </div>
+      <div className={styles.downloadCell}>
+        <DownloadButton release={release} terms={terms} siteKey={siteKey} />
+      </div>
+    </div>
+    {release.changelog !== undefined ? (
+      <Disclosure className={styles.releaseNoteDisclosure} defaultExpanded={isLatest}>
+        <Heading>
+          <AriaButton slot="trigger" className={styles.releaseNoteTrigger}>
+            リリースノート
+          </AriaButton>
+        </Heading>
+        <DisclosurePanel>
+          <p className={styles.changelog}>{release.changelog}</p>
+        </DisclosurePanel>
+      </Disclosure>
+    ) : null}
+  </li>
+);
+
 export type SoftwareDownloadGateProps = {
   software: SoftwareDownload;
   turnstileSiteKey: string;
 };
 
-export const SoftwareDownloadGate = ({ software, turnstileSiteKey }: SoftwareDownloadGateProps) => (
-  <section className={styles.root} aria-label={`${software.name} のダウンロード`}>
-    <Heading level={3} className={styles.name}>
-      {software.name}
-    </Heading>
-    <p className={styles.summary}>{software.summary}</p>
-    <div className={styles.latestRow}>
-      <span className={styles.badge}>最新 v{software.latest.version}</span>
-      <DownloadButton release={software.latest} terms={software.terms} siteKey={turnstileSiteKey} />
-    </div>
-    {software.history.length === 0 ? null : (
-      <Disclosure className={styles.history}>
-        <Heading>
-          <AriaButton slot="trigger" className={styles.historyTrigger}>
-            過去のバージョン
-          </AriaButton>
-        </Heading>
-        <DisclosurePanel>
-          <ul className={styles.historyList}>
-            {software.history.map((release) => (
-              <li key={release.id} className={styles.historyItem}>
-                <span>
-                  v{release.version} · {dayjs(release.releasedAt).tz('Asia/Tokyo').format('YYYY.MM.DD')}
-                </span>
-                {release.changelog !== undefined ? <p className={styles.changelog}>{release.changelog}</p> : null}
-                <DownloadButton release={release} terms={software.terms} siteKey={turnstileSiteKey} />
-              </li>
-            ))}
-          </ul>
-        </DisclosurePanel>
-      </Disclosure>
-    )}
-  </section>
-);
+export const SoftwareDownloadGate = ({ software, turnstileSiteKey }: SoftwareDownloadGateProps) => {
+  const versions = [software.latest, ...software.history];
+
+  return (
+    <section className={styles.root} aria-label={`${software.name} のダウンロード`}>
+      <Heading level={3} className={styles.name}>
+        {software.name}
+      </Heading>
+      <p className={styles.summary}>{software.summary}</p>
+      <ul className={styles.versionList}>
+        {versions.map((release) => (
+          <VersionRow key={release.id} release={release} isLatest={release.id === software.latest.id} terms={software.terms} siteKey={turnstileSiteKey} />
+        ))}
+      </ul>
+    </section>
+  );
+};
