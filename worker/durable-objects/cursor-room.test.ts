@@ -269,6 +269,77 @@ describe('CursorRoom', () => {
     expect(parsed.filter((m) => m.t === 'count').at(-1)).toEqual({ t: 'count', n: 1 });
   });
 
+  it('keeps the visitor present when only one of their tabs is reaped (same uid survives)', async () => {
+    const room = 'reap-multitab';
+    const sharedUid = 'cccc3333cccc3333';
+    const peerUid = 'dddd4444dddd4444';
+
+    const tab1 = await connect(room, sharedUid);
+    const tab2 = await connect(room, sharedUid);
+    const peer = await connect(room, peerUid);
+    nav(tab1, '/x');
+    nav(tab2, '/x');
+    nav(peer, '/x');
+    await settle();
+
+    const peerSeen: string[] = [];
+    peer.addEventListener('message', (e) => peerSeen.push(`${e.data}`));
+
+    // Kill exactly ONE of the shared-uid tabs, then reap.
+    await killByUid(room, sharedUid, 1);
+    await runDurableObjectAlarm(stubFor(room));
+    await settle();
+
+    const parsed = peerSeen.map((s) => JSON.parse(s));
+    expect(parsed.filter((m) => m.t === 'leave')).toHaveLength(0); // visitor still present via the other tab
+    expect(parsed.filter((m) => m.t === 'count').at(-1)).toEqual({ t: 'count', n: 2 });
+  });
+
+  it('emits nothing when the alarm runs with no dead sockets', async () => {
+    const room = 'reap-none';
+    const aUid = 'eeee5555eeee5555';
+    const bUid = 'ffff6666ffff6666';
+
+    const a = await connect(room, aUid);
+    const b = await connect(room, bUid);
+    nav(a, '/x');
+    nav(b, '/x');
+    await settle();
+
+    const bSeen: string[] = [];
+    b.addEventListener('message', (e) => bSeen.push(`${e.data}`));
+
+    // Both sockets are alive (just connected) — the reaper must not touch them.
+    await runDurableObjectAlarm(stubFor(room));
+    await settle();
+
+    const parsed = bSeen.map((s) => JSON.parse(s));
+    expect(parsed.filter((m) => m.t === 'leave')).toHaveLength(0);
+    expect(parsed.filter((m) => m.t === 'count')).toHaveLength(0);
+  });
+
+  it('keeps durabcast heartbeat alive: re-arms the alarm after a reap while peers remain', async () => {
+    const room = 'reap-rearm';
+    const aUid = 'a1a1a1a1a1a1a1a1';
+    const bUid = 'b2b2b2b2b2b2b2b2';
+
+    const a = await connect(room, aUid);
+    const b = await connect(room, bUid);
+    nav(a, '/x');
+    nav(b, '/x');
+    await settle();
+
+    await killByUid(room, aUid);
+    const ran = await runDurableObjectAlarm(stubFor(room));
+    await settle();
+
+    expect(ran).toBe(true); // an alarm was scheduled and our override ran
+    // super.alarm() must have re-scheduled the heartbeat because b is still connected — proving the
+    // override did not break durabcast's alarm (we never call setAlarm ourselves).
+    const nextAlarm = await runInDurableObject(stubFor(room), (_instance, state) => state.storage.getAlarm());
+    expect(nextAlarm).not.toBeNull();
+  });
+
   it('keeps a visitor present when one of their tabs (same uid) closes', async () => {
     const room = 'multi-tab';
     const sharedUid = 'eeee1111ffff1111';
