@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { SoftwareDetail } from './_components/software-detail';
 
+import { issueDownloadURL } from '../../_actions/issue-download-url';
 import { findSoftwareBySlug } from '@lib/payload/software';
 import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
@@ -33,7 +34,7 @@ const SoftwareDetailPage = async ({ params }: Props) => {
   const software = await findSoftwareBySlug(slug);
   if (software === undefined) notFound();
   const { env } = await getCloudflareContext({ async: true });
-  return <SoftwareDetail software={software} turnstileSiteKey={env.TURNSTILE_SITE_KEY} />;
+  return <SoftwareDetail software={software} turnstileSiteKey={env.TURNSTILE_SITE_KEY} issueDownloadURL={issueDownloadURL} />;
 };
 
 export default SoftwareDetailPage;

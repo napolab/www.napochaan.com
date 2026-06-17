@@ -9,10 +9,10 @@ import { RichText } from '@components/rich-text';
 import { Tag } from '@components/tag';
 import { dayjs } from '@utils/dayjs';
 
-import { issueDownloadURL } from '../../app/(site)/_actions/issue-download-url';
 import { ChevronIcon } from './icons';
 import * as styles from './styles.css';
 
+import type { IssueDownloadAction } from '../../app/(site)/_actions/issue-download-url';
 import type { SoftwareDownload, SoftwareRelease } from '@lib/payload/software';
 
 const TURNSTILE_OPTIONS = { theme: 'auto', size: 'flexible' } as const;
@@ -21,9 +21,10 @@ type GateDialogProps = {
   release: SoftwareRelease;
   terms: SoftwareDownload['terms'];
   siteKey: string;
+  issueDownloadURL: IssueDownloadAction;
 };
 
-const GateDialog = ({ release, terms, siteKey }: GateDialogProps) => {
+const GateDialog = ({ release, terms, siteKey, issueDownloadURL }: GateDialogProps) => {
   const [agreed, setAgreed] = useState(false);
   const [token, setToken] = useState<string>();
   const [error, setError] = useState<string>();
@@ -37,7 +38,7 @@ const GateDialog = ({ release, terms, siteKey }: GateDialogProps) => {
       return;
     }
     setError(result.error);
-  }, [release.id, token]);
+  }, [release.id, token, issueDownloadURL]);
 
   return (
     <Dialog className={styles.dialog}>
@@ -67,9 +68,10 @@ type DownloadButtonProps = {
   release: SoftwareRelease;
   terms: SoftwareDownload['terms'];
   siteKey: string;
+  issueDownloadURL: IssueDownloadAction;
 };
 
-const DownloadButton = ({ release, terms, siteKey }: DownloadButtonProps) => {
+const DownloadButton = ({ release, terms, siteKey, issueDownloadURL }: DownloadButtonProps) => {
   const [attempt, setAttempt] = useState(0);
   const handleOpenChange = useCallback((isOpen: boolean) => {
     if (isOpen) setAttempt((n) => n + 1);
@@ -80,7 +82,7 @@ const DownloadButton = ({ release, terms, siteKey }: DownloadButtonProps) => {
       <Button>ダウンロード</Button>
       <ModalOverlay className={styles.overlay} isDismissable>
         <Modal className={styles.modal}>
-          <GateDialog key={attempt} release={release} terms={terms} siteKey={siteKey} />
+          <GateDialog key={attempt} release={release} terms={terms} siteKey={siteKey} issueDownloadURL={issueDownloadURL} />
         </Modal>
       </ModalOverlay>
     </DialogTrigger>
@@ -92,9 +94,10 @@ type VersionRowProps = {
   isLatest: boolean;
   terms: SoftwareDownload['terms'];
   siteKey: string;
+  issueDownloadURL: IssueDownloadAction;
 };
 
-const VersionRow = ({ release, isLatest, terms, siteKey }: VersionRowProps) => (
+const VersionRow = ({ release, isLatest, terms, siteKey, issueDownloadURL }: VersionRowProps) => (
   <li className={styles.versionRow}>
     <div className={styles.versionRowHeader}>
       <div className={styles.versionMeta}>
@@ -103,7 +106,7 @@ const VersionRow = ({ release, isLatest, terms, siteKey }: VersionRowProps) => (
         <span className={styles.versionDate}>{dayjs(release.releasedAt).tz('Asia/Tokyo').format('YYYY.MM.DD')}</span>
       </div>
       <div className={styles.downloadCell}>
-        <DownloadButton release={release} terms={terms} siteKey={siteKey} />
+        <DownloadButton release={release} terms={terms} siteKey={siteKey} issueDownloadURL={issueDownloadURL} />
       </div>
     </div>
     {release.changelog !== undefined ? (
@@ -129,9 +132,10 @@ const VersionRow = ({ release, isLatest, terms, siteKey }: VersionRowProps) => (
 export type SoftwareDownloadGateProps = {
   software: SoftwareDownload;
   turnstileSiteKey: string;
+  issueDownloadURL: IssueDownloadAction;
 };
 
-export const SoftwareDownloadGate = ({ software, turnstileSiteKey }: SoftwareDownloadGateProps) => {
+export const SoftwareDownloadGate = ({ software, turnstileSiteKey, issueDownloadURL }: SoftwareDownloadGateProps) => {
   const versions = [software.latest, ...software.history];
 
   return (
@@ -142,7 +146,7 @@ export const SoftwareDownloadGate = ({ software, turnstileSiteKey }: SoftwareDow
       <p className={styles.summary}>{software.summary}</p>
       <ul className={styles.versionList}>
         {versions.map((release) => (
-          <VersionRow key={release.id} release={release} isLatest={release.id === software.latest.id} terms={software.terms} siteKey={turnstileSiteKey} />
+          <VersionRow key={release.id} release={release} isLatest={release.id === software.latest.id} terms={software.terms} siteKey={turnstileSiteKey} issueDownloadURL={issueDownloadURL} />
         ))}
       </ul>
     </section>

@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 
 import { SoftwareDetail } from '../../[slug]/_components/software-detail';
 
+import { issueDownloadURL } from '../../../_actions/issue-download-url';
 import { LivePreviewListener } from '@components/live-preview';
 import { findSoftwareDraftById } from '@lib/payload/software';
 
@@ -33,7 +34,7 @@ const SoftwarePreviewPage = async ({ params }: Props) => {
   return (
     <>
       <LivePreviewListener />
-      <SoftwareDetail software={software} turnstileSiteKey={env.TURNSTILE_SITE_KEY} />
+      <SoftwareDetail software={software} turnstileSiteKey={env.TURNSTILE_SITE_KEY} issueDownloadURL={issueDownloadURL} />
     </>
   );
 };

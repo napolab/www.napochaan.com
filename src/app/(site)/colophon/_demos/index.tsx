@@ -303,7 +303,7 @@ export const demos: Record<ComponentName, ReactNode> = {
   CursorPresence: <CursorPresenceDemo />,
   LoadingOverlay: <LoadingOverlayDemo />,
   // turnstileSiteKey="" → Turnstile never resolves a token → confirm stays disabled.
-  // The dialog can be opened but never fires the server action, satisfying the
-  // colophon rule that demo interactions must be inert.
-  SoftwareDownloadGate: <SoftwareDownloadGate software={softwareDownloadDemo} turnstileSiteKey="" />,
+  // The no-op action ensures the colophon demo never calls the real server action.
+  // The dialog can be opened but never fires, satisfying the colophon inert-ness rule.
+  SoftwareDownloadGate: <SoftwareDownloadGate software={softwareDownloadDemo} turnstileSiteKey="" issueDownloadURL={async () => ({ error: 'demo' })} />,
 };

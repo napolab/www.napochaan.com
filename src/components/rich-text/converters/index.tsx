@@ -11,12 +11,13 @@ import { tableConverter } from './table';
 import { textConverter } from './text';
 import { uploadConverter } from './upload';
 
+import type { IssueDownloadAction } from '../../../app/(site)/_actions/issue-download-url';
 import type { SoftwareDownload } from '@lib/payload/software';
 import type { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react';
 
 import type { NodeTypes } from './types';
 
-export type ConverterContext = { softwareDownloads: ReadonlyMap<string, SoftwareDownload>; turnstileSiteKey: string };
+export type ConverterContext = { softwareDownloads: ReadonlyMap<string, SoftwareDownload>; turnstileSiteKey: string; issueDownloadURL: IssueDownloadAction };
 
 export const createJsxConverters =
   (context: ConverterContext): JSXConvertersFunction<NodeTypes> =>

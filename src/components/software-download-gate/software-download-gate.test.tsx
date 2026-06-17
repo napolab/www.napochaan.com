@@ -4,6 +4,7 @@ import { page } from 'vitest/browser';
 
 import { SoftwareDownloadGate } from './index';
 
+import type { IssueDownloadAction } from '../../app/(site)/_actions/issue-download-url';
 import type { SoftwareDownload } from '@lib/payload/software';
 
 vi.mock('@marsidev/react-turnstile', () => ({
@@ -12,11 +13,6 @@ vi.mock('@marsidev/react-turnstile', () => ({
       solve-turnstile
     </button>
   ),
-}));
-
-const issueMock = vi.fn();
-vi.mock('../../app/(site)/_actions/issue-download-url', () => ({
-  issueDownloadURL: (...args: unknown[]) => issueMock(...args),
 }));
 
 vi.mock('@components/rich-text', () => ({
@@ -52,26 +48,30 @@ const mockSoftwareWithHistory: SoftwareDownload = {
 
 describe('SoftwareDownloadGate', () => {
   it('shows product name heading and latest version text', async () => {
-    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    const issueMock: IssueDownloadAction = vi.fn();
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     await expect.element(page.getByRole('heading', { name: 'TestApp' })).toBeInTheDocument();
     await expect.element(page.getByText(/1\.2\.0/)).toBeInTheDocument();
   });
 
   it('clicking ダウンロード button opens dialog', async () => {
-    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    const issueMock: IssueDownloadAction = vi.fn();
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     await page.getByRole('button', { name: 'ダウンロード' }).first().click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('confirm button inside dialog is disabled initially', async () => {
-    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    const issueMock: IssueDownloadAction = vi.fn();
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     await page.getByRole('button', { name: 'ダウンロード' }).first().click();
     const confirmBtn = page.getByRole('dialog').getByRole('button', { name: 'ダウンロード' });
     await expect.element(confirmBtn).toBeDisabled();
   });
 
   it('confirm becomes enabled after checking checkbox and solving turnstile', async () => {
-    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    const issueMock: IssueDownloadAction = vi.fn();
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     await page.getByRole('button', { name: 'ダウンロード' }).first().click();
 
     await page.getByText('利用規約に同意する').click({ force: true });
@@ -84,9 +84,9 @@ describe('SoftwareDownloadGate', () => {
   it('history release download calls issueDownloadURL with the history release id', async () => {
     // Return an error so window.location.href is never assigned and the iframe stays alive.
     // The goal is to verify per-release id identity, not navigation.
-    issueMock.mockResolvedValue({ error: 'token expired' });
+    const issueMock: IssueDownloadAction = vi.fn().mockResolvedValue({ error: 'token expired' });
 
-    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" />);
+    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
 
     // In the flat list, latest is index 0, first history (id '9') is index 1
     await page.getByRole('button', { name: 'ダウンロード' }).nth(1).click();
@@ -107,18 +107,21 @@ describe('SoftwareDownloadGate', () => {
   });
 
   it('latest version changelog is visible on initial render (defaultExpanded)', async () => {
-    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    const issueMock: IssueDownloadAction = vi.fn();
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     // The latest release has a changelog — its disclosure panel should be open (visible) initially
     await expect.element(page.getByText('Latest release notes here.')).toBeVisible();
   });
 
   it('latest version has a release-note disclosure', async () => {
-    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    const issueMock: IssueDownloadAction = vi.fn();
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     await expect.element(page.getByRole('button', { name: 'リリースノート' }).first()).toBeInTheDocument();
   });
 
   it('history release WITH changelog has a collapsed disclosure initially', async () => {
-    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" />);
+    const issueMock: IssueDownloadAction = vi.fn();
+    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     // id '8' has 'Old release notes.' — should have a disclosure trigger but panel hidden initially
     await expect.element(page.getByRole('button', { name: 'リリースノート' }).nth(1)).toBeInTheDocument();
     // The changelog text is in the DOM (react-aria keeps panel in DOM) but NOT visible (hidden="until-found" / aria-hidden)
@@ -126,7 +129,8 @@ describe('SoftwareDownloadGate', () => {
   });
 
   it('history release WITHOUT changelog renders no disclosure', async () => {
-    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" />);
+    const issueMock: IssueDownloadAction = vi.fn();
+    render(<SoftwareDownloadGate software={mockSoftwareWithHistory} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     // id '9' (index 1 in list) has no changelog — should show only 2 リリースノート buttons (latest + id '8')
     // latest has changelog, id '9' does not, id '8' does → 2 total
     const releaseNoteButtons = page.getByRole('button', { name: 'リリースノート' });
@@ -139,9 +143,9 @@ describe('SoftwareDownloadGate', () => {
   // Keep navigation test LAST: window.location.href assignment navigates the iframe,
   // causing CORS errors that abort subsequent tests in the suite.
   it('clicking confirm calls issueDownloadURL and navigates to the download URL', async () => {
-    issueMock.mockResolvedValue({ url: 'https://example.com/download/testapp.zip' });
+    const issueMock: IssueDownloadAction = vi.fn().mockResolvedValue({ url: 'https://example.com/download/testapp.zip' });
 
-    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" />);
+    render(<SoftwareDownloadGate software={mockSoftware} turnstileSiteKey="site-key-test" issueDownloadURL={issueMock} />);
     await page.getByRole('button', { name: 'ダウンロード' }).first().click();
 
     await page.getByText('利用規約に同意する').click({ force: true });

@@ -13,8 +13,10 @@ vi.mock('@components/software-download-gate', () => ({
 const terms = { root: { type: 'root', children: [], direction: null, format: '', indent: 0, version: 1 } } as never;
 const download: SoftwareDownload = { id: '5', name: 'tool', summary: 's', terms, latest: { id: '1', version: '1.0.0', releasedAt: '2026-01-01', filename: 'a.zip' }, history: [] };
 
+const noopDownload = async (): Promise<{ error: string }> => ({ error: 'test-noop' });
+
 const renderBlock = (map: ReadonlyMap<string, SoftwareDownload>, software: unknown) => {
-  const converters = createSoftwareDownloadBlockConverters({ softwareDownloads: map, turnstileSiteKey: 'site' });
+  const converters = createSoftwareDownloadBlockConverters({ softwareDownloads: map, turnstileSiteKey: 'site', issueDownloadURL: noopDownload });
   const converter = converters['software-download'];
   if (typeof converter !== 'function') throw new Error('software-download converter must be a function');
   const node = { fields: { blockType: 'software-download', software } } as never;

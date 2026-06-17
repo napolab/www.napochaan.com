@@ -4,11 +4,16 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { headers } from 'next/headers';
 
 import { verifyTurnstile } from '@lib/contact/verify-turnstile';
+import { isReleaseDownloadable } from '@lib/payload/software/find-downloadable-release';
 import { signDownloadToken } from '@lib/software/download-token';
 
 import { buildDownloadURL } from './build-download-url';
 
 export type IssueDownloadResult = { url: string } | { error: string };
+
+// The action type — exported so client components can reference it without a
+// runtime import of this server-only module.
+export type IssueDownloadAction = (releaseId: string, token: string) => Promise<IssueDownloadResult>;
 
 // Short-lived signed URL TTL. Long enough to start a navigation, short enough that a
 // leaked URL is useless within seconds.
@@ -26,12 +31,6 @@ export const issueDownloadURL = async (releaseId: string, token: string): Promis
   const verified = await verifyTurnstile(token, env, await resolveRemoteIp());
   if (!verified) return { error: '認証を確認できませんでした。もう一度お試しください。' };
 
-  // Dynamic import keeps the payload client (and its server-only `payload.config`
-  // top-level await) out of this module's static graph. This action is statically
-  // imported by the client download gate (via the rich-text converter), so a static
-  // import here would pull `payload.config` into the browser bundle and break
-  // vitest browser builds. The GET route remains the authoritative publish-status gate.
-  const { isReleaseDownloadable } = await import('@lib/payload/software/find-downloadable-release');
   const downloadable = await isReleaseDownloadable(releaseId);
   if (!downloadable) return { error: 'このダウンロードは利用できません。' };
 
