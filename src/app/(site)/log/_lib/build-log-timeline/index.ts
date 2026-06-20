@@ -66,8 +66,9 @@ const toWorkEntry = (work: WorkRow): SortableEntry => {
 };
 
 // Manual log entries are dated, so they sort alongside posts by sortDate.
-// A gig dated strictly after `now` (day precision, Asia/Tokyo) is `upcoming`, which
-// the timeline renders with a filled dot.
+// A gig whose day (day precision, Asia/Tokyo) is today or later is `upcoming`, which
+// the timeline renders with a filled dot. It only stops being upcoming once its day
+// has fully passed — an event stays upcoming through the whole of its own day.
 const toManualEntry = (item: LogManualItem, now: string): SortableEntry => {
   const at = dayjs(item.date).tz('Asia/Tokyo');
   const today = dayjs(now).tz('Asia/Tokyo');
@@ -78,7 +79,7 @@ const toManualEntry = (item: LogManualItem, now: string): SortableEntry => {
     date: at.format('MM.DD'),
     meta: item.meta,
     title: item.title,
-    upcoming: at.startOf('day').isAfter(today.startOf('day')),
+    upcoming: !at.startOf('day').isBefore(today.startOf('day')),
     href: item.url,
     sortDate: item.date,
   };

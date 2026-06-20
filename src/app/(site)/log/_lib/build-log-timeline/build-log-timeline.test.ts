@@ -160,4 +160,12 @@ describe('buildLogTimeline manual entries', () => {
     expect(items.find((item) => item.id === 'log-future')?.upcoming).toBe(true);
     expect(items.find((item) => item.id === 'log-past')?.upcoming).toBe(false);
   });
+
+  it('keeps a gig dated today upcoming until the day is over', () => {
+    // now is 2026-06-08T00:00:00Z → 2026-06-08 09:00 Asia/Tokyo, so the event day is today.
+    const logs: LogManualItem[] = [{ id: 'today', title: 'live today', date: '2026-06-08', meta: 'VJ' }];
+    const items = buildLogTimeline([], [], now, logs).find((g) => g.year === 2026)?.items ?? [];
+
+    expect(items.find((item) => item.id === 'log-today')?.upcoming).toBe(true);
+  });
 });
