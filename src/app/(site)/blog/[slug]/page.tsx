@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { notFound } from 'next/navigation';
 
 import { BlogHero } from './_components/blog-hero';
@@ -6,11 +7,15 @@ import { Toc } from './_components/toc';
 import { adjacentPosts } from '../_lib/adjacent-posts';
 import * as s from './styles.css';
 
+import { issueDownloadURL } from '../../_actions/issue-download-url';
 import { findBlogBySlug, findBlogList } from '@lib/payload/blog';
+import { findSoftwareDownloadsByIds } from '@lib/payload/software';
+import { collectSoftwareIds } from '@lib/software/collect-software-ids';
 
 import { PageHeader } from '@components/page-header';
 import { QuoteShare } from '@components/quote-share';
 import { RichText } from '@components/rich-text';
+import { createJsxConverters } from '@components/rich-text/converters';
 import { extractHeadings } from '@components/rich-text/toc';
 import { ShareBar } from '@components/share-bar';
 import { dayjs } from '@utils/dayjs';
@@ -64,6 +69,10 @@ const BlogDetailPage = async ({ params }: Props) => {
   const headings = extractHeadings(post.body ?? null);
   const crumbs = buildCrumbs(post.title);
   const formattedDate = dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD');
+  const softwareIds = collectSoftwareIds(post.body);
+  const softwareDownloads = await findSoftwareDownloadsByIds(softwareIds);
+  const { env } = await getCloudflareContext({ async: true });
+  const converters = createJsxConverters({ softwareDownloads, turnstileSiteKey: env.TURNSTILE_SITE_KEY, issueDownloadURL });
 
   // Renders inside the blog segment's shared `<main>` (see `blog/layout.tsx`).
   return (
@@ -77,7 +86,7 @@ const BlogDetailPage = async ({ params }: Props) => {
         <div className={s.bodyCol} data-toc-body>
           {post.body === undefined ? null : (
             <QuoteShare url={absoluteUrl(`/blog/${slug}`)} title={post.title}>
-              <RichText data={post.body} />
+              <RichText data={post.body} converters={converters} />
             </QuoteShare>
           )}
         </div>

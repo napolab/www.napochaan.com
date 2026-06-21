@@ -9,11 +9,14 @@ import { r2Storage } from '@payloadcms/storage-r2';
 import { buildConfig } from 'payload';
 
 import { ImageRow } from './blocks/image-row';
+import { SoftwareDownload } from './blocks/software-download';
 import { Blog } from './collections/blog';
 import { Gallery } from './collections/gallery';
 import { Logs } from './collections/logs';
 import { Media } from './collections/media';
 import { News } from './collections/news';
+import { Software } from './collections/software';
+import { SoftwareRelease } from './collections/software-release';
 import { Users } from './collections/users';
 import { Works } from './collections/works';
 import { Profile } from './globals/profile';
@@ -133,8 +136,13 @@ export default buildConfig({
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
           buildPath: () => '/log/preview',
         }),
+        draftPreviewRoute({
+          slug: 'software',
+          previewSecret: cfEnv.PREVIEW_SECRET ?? '',
+          buildPath: (data) => `/software/preview/${data.id}`,
+        }),
       ]),
-      collections: ['news', 'works', 'blog', 'gallery', 'logs'],
+      collections: ['news', 'works', 'blog', 'gallery', 'logs', 'software'],
     },
     get autoLogin() {
       if (process.env.NODE_ENV !== 'development') return false;
@@ -148,9 +156,9 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, News, Works, Blog, Gallery, Logs],
+  collections: [Users, Media, News, Works, Blog, Gallery, Logs, Software, SoftwareRelease],
   globals: [Profile],
-  editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow] })] }),
+  editor: lexicalEditor({ features: ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow, SoftwareDownload] })] }),
   secret,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
@@ -165,13 +173,14 @@ export default buildConfig({
       bucket: r2,
       collections: {
         media: true,
+        'software-release': { prefix: 'releases' },
       },
     }),
     seoPlugin({
       // `logs` is intentionally omitted: the plugin injects a `meta` group field
       // that collides with the logs collection's own `meta` field (DuplicateFieldName
       // at boot), and logs entries have no public detail page (they resolve to /log).
-      collections: ['news', 'works', 'blog', 'gallery'],
+      collections: ['news', 'works', 'blog', 'gallery', 'software'],
       uploadsCollection: 'media',
       tabbedUI: true,
       generateTitle: ({ doc }) => `napochaan — ${doc.title as string}`,

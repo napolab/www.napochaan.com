@@ -74,6 +74,8 @@ export interface Config {
     blog: Blog;
     gallery: Gallery;
     logs: Log;
+    software: Software;
+    'software-release': SoftwareRelease;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +90,8 @@ export interface Config {
     blog: BlogSelect<false> | BlogSelect<true>;
     gallery: GallerySelect<false> | GallerySelect<true>;
     logs: LogsSelect<false> | LogsSelect<true>;
+    software: SoftwareSelect<false> | SoftwareSelect<true>;
+    'software-release': SoftwareReleaseSelect<false> | SoftwareReleaseSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -373,6 +377,80 @@ export interface Log {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "software".
+ */
+export interface Software {
+  id: number;
+  /**
+   * URL に使う英数字の識別子。小文字英数字とハイフンのみ（例: napochaan-v3-0-0）。
+   */
+  slug: string;
+  name: string;
+  /**
+   * 一覧やダウンロードブロックの見出し下、詳細ページ、OG に表示される短い説明。
+   */
+  summary: string;
+  /**
+   * ダウンロード時のダイアログ内にスクロール表示される利用規約。
+   */
+  terms: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "software-release".
+ */
+export interface SoftwareRelease {
+  id: number;
+  software: number | Software;
+  /**
+   * 例: 1.1.0
+   */
+  version: string;
+  releasedAt: string;
+  /**
+   * 任意。GitHub Release のように、この版で何が変わったかを書く。
+   */
+  changelog?: string | null;
+  prefix?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -422,6 +500,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'logs';
         value: number | Log;
+      } | null)
+    | ({
+        relationTo: 'software';
+        value: number | Software;
+      } | null)
+    | ({
+        relationTo: 'software-release';
+        value: number | SoftwareRelease;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -607,6 +693,48 @@ export interface LogsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "software_select".
+ */
+export interface SoftwareSelect<T extends boolean = true> {
+  slug?: T;
+  name?: T;
+  summary?: T;
+  terms?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "software-release_select".
+ */
+export interface SoftwareReleaseSelect<T extends boolean = true> {
+  software?: T;
+  version?: T;
+  releasedAt?: T;
+  changelog?: T;
+  prefix?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

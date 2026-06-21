@@ -1,0 +1,40 @@
+'use server';
+
+import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { headers } from 'next/headers';
+
+import { verifyTurnstile } from '@lib/contact/verify-turnstile';
+import { isReleaseDownloadable } from '@lib/payload/software/find-downloadable-release';
+import { signDownloadToken } from '@lib/software/download-token';
+
+import { buildDownloadURL } from './build-download-url';
+
+export type IssueDownloadResult = { url: string } | { error: string };
+
+// The action type — exported so client components can reference it without a
+// runtime import of this server-only module.
+export type IssueDownloadAction = (releaseId: string, token: string) => Promise<IssueDownloadResult>;
+
+// Short-lived signed URL TTL. Long enough to start a navigation, short enough that a
+// leaked URL is useless within seconds.
+const DOWNLOAD_URL_TTL_MS = 60_000;
+
+const resolveRemoteIp = async (): Promise<string | undefined> => {
+  const headerList = await headers();
+  return headerList.get('CF-Connecting-IP') ?? undefined;
+};
+
+// Verify the Turnstile token, then mint a signed, expiring URL pointing at the GET
+// route. Returns an error string (never throws to the client) when verification fails.
+export const issueDownloadURL = async (releaseId: string, token: string): Promise<IssueDownloadResult> => {
+  const { env } = await getCloudflareContext({ async: true });
+  const verified = await verifyTurnstile(token, env, await resolveRemoteIp());
+  if (!verified) return { error: '認証を確認できませんでした。もう一度お試しください。' };
+
+  const downloadable = await isReleaseDownloadable(releaseId);
+  if (!downloadable) return { error: 'このダウンロードは利用できません。' };
+
+  const exp = Date.now() + DOWNLOAD_URL_TTL_MS;
+  const sig = await signDownloadToken({ releaseId, exp }, env.PAYLOAD_SECRET);
+  return { url: buildDownloadURL({ releaseId, exp, sig }) };
+};

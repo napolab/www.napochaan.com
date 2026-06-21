@@ -29,6 +29,7 @@ import { TextArea } from '@components/text-area';
 import { TextField } from '@components/text-field';
 import { Timeline } from '@components/timeline';
 import { TypewriterText } from '@components/typewriter-text';
+import { SoftwareDownloadGate } from '@components/software-download-gate';
 
 import { colophon } from '../content';
 import { CursorPresenceDemo } from './cursor-presence-demo';
@@ -50,6 +51,8 @@ import vrchatWide from '@assets/vrchat-wide.jpg';
 
 import type { GalleryItem } from '@components/gallery';
 import type { TimelineItem } from '@components/timeline';
+import type { SoftwareDownload } from '@lib/payload/software';
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { ReactNode } from 'react';
 
 // The catalog key set is derived from the content so a name without a demo (or a
@@ -121,6 +124,45 @@ const breadcrumbItems = [{ href: '/', label: 'home' }, { href: '/works', label: 
 // Demo-only href builder. (In real use the consumer owns the URL shape;
 // Pagination owns layout / a11y / routing.)
 const paginationHref = (page: number): string => `?page=${page}`;
+
+// Minimal lexical document for the SoftwareDownloadGate terms demo.
+// A single paragraph is enough to exercise the terms rendering path.
+// Assigned to unknown first (same pattern as rich-text-sample.ts) because
+// some node fields (textFormat, format on paragraphs) don't appear in the
+// generated SerializedLexicalNode union but are required by the lexical runtime.
+const softwareTermsRaw: unknown = {
+  root: {
+    type: 'root',
+    format: '',
+    indent: 0,
+    version: 1,
+    direction: 'ltr',
+    children: [
+      {
+        type: 'paragraph',
+        textFormat: 0,
+        format: '',
+        indent: 0,
+        version: 1,
+        direction: 'ltr',
+        children: [{ type: 'text', text: '本ソフトウェアは個人・非商用利用に限り使用できます。再配布・改変は禁止します。', format: 0, style: '', mode: 'normal', detail: 0, version: 1 }],
+      },
+    ],
+  },
+};
+const softwareTermsDemo = softwareTermsRaw as SerializedEditorState;
+
+// Sample SoftwareDownload used only by the colophon demo — not real data.
+// turnstileSiteKey="" means Turnstile never calls onSuccess → token stays undefined
+// → confirm button is naturally disabled. The dialog can open but never submits.
+const softwareDownloadDemo: SoftwareDownload = {
+  id: 'demo-software',
+  name: 'napochaan tool kit',
+  summary: 'DJ / VJ 用のユーティリティツール。MIDI マッピングとシーン管理をいい感じにやる。',
+  terms: softwareTermsDemo,
+  latest: { id: 'demo-release-v1-1-0', version: '1.1.0', releasedAt: '2026-06-01T00:00:00.000Z', changelog: 'MIDI デバイス自動検出に対応。', filename: 'napochaan-tool-kit-v1.1.0.zip' },
+  history: [{ id: 'demo-release-v1-0-0', version: '1.0.0', releasedAt: '2026-05-01T00:00:00.000Z', changelog: '初回リリース。', filename: 'napochaan-tool-kit-v1.0.0.zip' }],
+};
 
 // Live demos keyed by component name, mapped against colophon.components.items in
 // the page. Kept out of content.ts so the data file stays JSX-free.
@@ -260,4 +302,8 @@ export const demos: Record<ComponentName, ReactNode> = {
   GameOfLife: <GameOfLifeDemo />,
   CursorPresence: <CursorPresenceDemo />,
   LoadingOverlay: <LoadingOverlayDemo />,
+  // turnstileSiteKey="" → Turnstile never resolves a token → confirm stays disabled.
+  // The no-op action ensures the colophon demo never calls the real server action.
+  // The dialog can be opened but never fires, satisfying the colophon inert-ness rule.
+  SoftwareDownloadGate: <SoftwareDownloadGate software={softwareDownloadDemo} turnstileSiteKey="" issueDownloadURL={async () => ({ error: 'demo' })} />,
 };
