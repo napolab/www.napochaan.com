@@ -1,17 +1,36 @@
-import { env } from 'cloudflare:test';
+import { env, runDurableObjectAlarm, runInDurableObject } from 'cloudflare:test';
 import { describe, expect, it } from 'vitest';
 
 import { deriveIdentity } from '../../src/lib/cursor/identity';
 
+// Return type left to inference: env.CURSOR_ROOM.get(...) yields DurableObjectStub<CursorRoom>,
+// which runInDurableObject/runDurableObjectAlarm consume directly. Annotating it as the bare
+// `DurableObjectStub` can trip the generic default, so don't.
+const stubFor = (room: string) => env.CURSOR_ROOM.get(env.CURSOR_ROOM.idFromName(room));
+
 const connect = async (room: string, uid: string): Promise<WebSocket> => {
-  const stub = env.CURSOR_ROOM.get(env.CURSOR_ROOM.idFromName(room));
+  const stub = stubFor(room);
   const url = new URL(`/rooms/${room}`, 'https://cursor.do');
   url.searchParams.set('uid', uid);
   const res = await stub.fetch(new Request(url, { headers: { Upgrade: 'websocket' } }));
   const ws = res.webSocket;
   if (!ws) throw new Error('no webSocket on response');
   ws.accept();
+
   return ws;
+};
+
+// Force server-side socket(s) "dead" by backdating connectedAt past the 60s TIMEOUT, so the next
+// alarm reaps them. Test sockets never ping, so isAliveSocket falls back to connectedAt. `limit`
+// caps how many matching sockets are killed — used to kill only ONE of a uid's several tabs.
+const killByUid = async (room: string, uid: string, limit = Infinity): Promise<void> => {
+  await runInDurableObject(stubFor(room), (_instance, state) => {
+    const matches = [...state.getWebSockets()].filter((ws) => ws.deserializeAttachment().uid === uid);
+    for (const ws of matches.slice(0, limit)) {
+      const att = ws.deserializeAttachment();
+      ws.serializeAttachment({ ...att, connectedAt: new Date(Date.now() - 120_000) });
+    }
+  });
 };
 
 const nav = (ws: WebSocket, path: string): void => ws.send(JSON.stringify({ t: 'nav', path }));
@@ -224,6 +243,101 @@ describe('CursorRoom', () => {
 
     const counts = seen.map((s) => JSON.parse(s)).filter((m) => m.t === 'count');
     expect(counts.at(-1)).toEqual({ t: 'count', n: 2 });
+  });
+
+  it('emits leave + recounted count when the heartbeat reaps an abruptly-disconnected socket', async () => {
+    const room = 'reap-leave';
+    const aUid = 'aaaa1111aaaa1111';
+    const bUid = 'bbbb2222bbbb2222';
+
+    const a = await connect(room, aUid);
+    const b = await connect(room, bUid);
+    nav(a, '/x');
+    nav(b, '/x');
+    await settle();
+
+    const bSeen: string[] = [];
+    b.addEventListener('message', (e) => bSeen.push(`${e.data}`));
+
+    // a never sent a close frame; mark it dead and run the heartbeat reaper.
+    await killByUid(room, aUid);
+    await runDurableObjectAlarm(stubFor(room));
+    await settle();
+
+    const parsed = bSeen.map((s) => JSON.parse(s));
+    expect(parsed.filter((m) => m.t === 'leave')).toContainEqual({ t: 'leave', id: aUid });
+    expect(parsed.filter((m) => m.t === 'count').at(-1)).toEqual({ t: 'count', n: 1 });
+  });
+
+  it('keeps the visitor present when only one of their tabs is reaped (same uid survives)', async () => {
+    const room = 'reap-multitab';
+    const sharedUid = 'cccc3333cccc3333';
+    const peerUid = 'dddd4444dddd4444';
+
+    const tab1 = await connect(room, sharedUid);
+    const tab2 = await connect(room, sharedUid);
+    const peer = await connect(room, peerUid);
+    nav(tab1, '/x');
+    nav(tab2, '/x');
+    nav(peer, '/x');
+    await settle();
+
+    const peerSeen: string[] = [];
+    peer.addEventListener('message', (e) => peerSeen.push(`${e.data}`));
+
+    // Kill exactly ONE of the shared-uid tabs, then reap.
+    await killByUid(room, sharedUid, 1);
+    await runDurableObjectAlarm(stubFor(room));
+    await settle();
+
+    const parsed = peerSeen.map((s) => JSON.parse(s));
+    expect(parsed.filter((m) => m.t === 'leave')).toHaveLength(0); // visitor still present via the other tab
+    expect(parsed.filter((m) => m.t === 'count').at(-1)).toEqual({ t: 'count', n: 2 });
+  });
+
+  it('emits nothing when the alarm runs with no dead sockets', async () => {
+    const room = 'reap-none';
+    const aUid = 'eeee5555eeee5555';
+    const bUid = 'ffff6666ffff6666';
+
+    const a = await connect(room, aUid);
+    const b = await connect(room, bUid);
+    nav(a, '/x');
+    nav(b, '/x');
+    await settle();
+
+    const bSeen: string[] = [];
+    b.addEventListener('message', (e) => bSeen.push(`${e.data}`));
+
+    // Both sockets are alive (just connected) — the reaper must not touch them.
+    await runDurableObjectAlarm(stubFor(room));
+    await settle();
+
+    const parsed = bSeen.map((s) => JSON.parse(s));
+    expect(parsed.filter((m) => m.t === 'leave')).toHaveLength(0);
+    expect(parsed.filter((m) => m.t === 'count')).toHaveLength(0);
+  });
+
+  it('keeps durabcast heartbeat alive: re-arms the alarm after a reap while peers remain', async () => {
+    const room = 'reap-rearm';
+    const aUid = 'a1a1a1a1a1a1a1a1';
+    const bUid = 'b2b2b2b2b2b2b2b2';
+
+    const a = await connect(room, aUid);
+    const b = await connect(room, bUid);
+    nav(a, '/x');
+    nav(b, '/x');
+    await settle();
+
+    await killByUid(room, aUid);
+    const ran = await runDurableObjectAlarm(stubFor(room));
+    await settle();
+
+    expect(ran).toBe(true); // an alarm was scheduled and our override ran
+    // super.alarm() must have re-scheduled the heartbeat because b is still connected — proving the
+    // override did not break durabcast's alarm (we never call setAlarm ourselves).
+    const nextAlarm = await runInDurableObject(stubFor(room), (_instance, state) => state.storage.getAlarm());
+    expect(nextAlarm).not.toBeNull();
   });
 
   it('keeps a visitor present when one of their tabs (same uid) closes', async () => {
