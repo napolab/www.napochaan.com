@@ -1,20 +1,18 @@
-import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { Suspense } from 'react';
 
 import * as s from './styles.css';
 
-import { ContactForm } from './_components/contact-form';
+import { ContactFormLoader } from './_components/contact-form-loader';
 import { profile } from '../about/profile';
 
 import { ContactList } from '@components/contact-list';
-import { PageHeader } from '@components/page-header';
+import { DecodingSkeleton } from '@components/decoding-skeleton';
 import { SectionHeading } from '@components/section-heading';
 import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
 export const revalidate = 3600;
-
-const crumbs = [{ href: '/', label: 'home' }, { label: 'contact' }];
 
 const contactDescription = 'お問い合わせ — フォーム、または各種 SNS から直接どうぞ。';
 
@@ -23,25 +21,22 @@ const contactDescription = 'お問い合わせ — フォーム、または各�
 // was missing.
 export const generateMetadata = (): Metadata => resolveSectionMetadata({ docTitle: 'contact', description: contactDescription, path: '/contact' });
 
-const ContactPage = async () => {
-  const { env } = await getCloudflareContext({ async: true });
-
+const ContactPage = () => {
   return (
-    <main id="main-content" className={s.main}>
-      <PageHeader title="contact" breadcrumbs={crumbs} kicker="// お問い合わせ" lead="お仕事のご依頼・ご相談はこちらから。" />
-      <div className={s.grid}>
-        <section className={s.formCell}>
-          <SectionHeading no="01" more="// メッセージ">
-            message
-          </SectionHeading>
-          <ContactForm turnstileSiteKey={env.TURNSTILE_SITE_KEY} />
-        </section>
-        <aside className={s.directCell}>
-          <SectionHeading no="02">direct</SectionHeading>
-          <ContactList items={profile.contacts} />
-        </aside>
-      </div>
-    </main>
+    <div className={s.grid}>
+      <section className={s.formCell}>
+        <SectionHeading no="01" more="// メッセージ">
+          message
+        </SectionHeading>
+        <Suspense fallback={<DecodingSkeleton rows={5} />}>
+          <ContactFormLoader />
+        </Suspense>
+      </section>
+      <aside className={s.directCell}>
+        <SectionHeading no="02">direct</SectionHeading>
+        <ContactList items={profile.contacts} />
+      </aside>
+    </div>
   );
 };
 
