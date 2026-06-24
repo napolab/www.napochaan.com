@@ -5,7 +5,6 @@ import { colophon } from './content';
 import { demos } from './_demos';
 import * as s from './styles.css';
 
-import { PageHeader } from '@components/page-header';
 import { ScrambleText } from '@components/scramble-text';
 import { SectionHeading } from '@components/section-heading';
 
@@ -14,8 +13,6 @@ import type { Metadata } from 'next';
 // Revalidate hourly — ISR. Static page; its content is sourced from the repo's
 // own rules, not the CMS.
 export const revalidate = 3600;
-
-const crumbs = [{ href: '/', label: 'home' }, { label: 'colophon' }];
 
 export const generateMetadata = (): Metadata => {
   return {
@@ -31,9 +28,7 @@ export const generateMetadata = (): Metadata => {
 
 const ColophonPage = () => {
   return (
-    <main id="main-content" className={s.main}>
-      <PageHeader title={colophon.title} breadcrumbs={crumbs} kicker={colophon.kicker} lead={colophon.lead} leadReveal="scramble" annotation="この世界だけに閉じている" />
-
+    <>
       <section className={s.cell}>
         <SectionHeading no="01" more="$ cat concept.md">
           concept
@@ -87,7 +82,7 @@ const ColophonPage = () => {
           <span aria-hidden="true">↗</span>
         </a>
       </section>
-    </main>
+    </>
   );
 };
 

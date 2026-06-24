@@ -1,7 +1,8 @@
-import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
-import { AboutView } from './_components/about-view';
+import { AboutContent } from './_components/about-content';
 
+import { DecodingSkeleton } from '@components/decoding-skeleton';
 import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 import { findProfile } from '@lib/payload/profile';
 
@@ -20,11 +21,12 @@ export const generateMetadata = async (): Promise<Metadata> => {
   });
 };
 
-const AboutPage = async () => {
-  const profile = await findProfile();
-  if (profile === undefined) notFound();
-
-  return <AboutView profile={profile} />;
+const AboutPage = () => {
+  return (
+    <Suspense fallback={<DecodingSkeleton rows={8} fill />}>
+      <AboutContent />
+    </Suspense>
+  );
 };
 
 export default AboutPage;

@@ -1,10 +1,8 @@
-import { LogTimeline } from './_components/log-timeline';
-import { buildLogTimeline } from './_lib/build-log-timeline';
-import { fetchExternalPosts } from './_lib/fetch-external-posts';
+import { Suspense } from 'react';
 
-import { findLogList } from '@lib/payload/logs';
-import { findWorksList } from '@lib/payload/works';
-import { dayjs } from '@utils/dayjs';
+import { LogTimelineSection } from './_components/log-timeline-section';
+
+import { DecodingSkeleton } from '@components/decoding-skeleton';
 import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
@@ -23,14 +21,10 @@ export const generateMetadata = (): Metadata =>
     feed: { url: '/log/rss.xml', title: 'napochaan — log' },
   });
 
-const LogPage = async () => {
-  const works = await findWorksList();
-  const posts = await fetchExternalPosts();
-  const logs = await findLogList();
-  const now = dayjs().tz('Asia/Tokyo').toISOString();
-  const groups = buildLogTimeline(works, posts, now, logs);
-
-  return <LogTimeline groups={groups} />;
-};
+const LogPage = () => (
+  <Suspense fallback={<DecodingSkeleton fill />}>
+    <LogTimelineSection />
+  </Suspense>
+);
 
 export default LogPage;
