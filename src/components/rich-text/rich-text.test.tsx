@@ -166,6 +166,23 @@ describe('RichText', () => {
     await expect.element(page.getByText('Item two')).toBeInTheDocument();
   });
 
+  it('flags every wrapper item at any nesting depth so markers stay on leaves only', async () => {
+    // L1 → wraps L2 → wraps L3: two wrapper items, one leaf, three levels deep.
+    render(<RichText data={state([list('ul', [[text('L1')], [list('ul', [[text('L2')], [list('ul', [[text('L3')]])]])]])])} />);
+    await expect.element(page.getByText('L3')).toBeInTheDocument();
+
+    // The detection is per-node, so it recurses: both wrapper items carry the flag.
+    const wrappers = document.querySelectorAll('li[data-has-sublist]');
+    expect(wrappers.length).toBe(2);
+    for (const wrapper of wrappers) {
+      expect(wrapper.getAttribute('data-has-sublist')).toBe('true');
+    }
+
+    // The deepest leaf carries real content, so it is never flagged — it keeps its marker.
+    const leaf = page.getByText('L3').element().closest('li');
+    expect(leaf?.getAttribute('data-has-sublist')).toBeNull();
+  });
+
   it('renders a blockquote', async () => {
     render(<RichText data={state([quote([text('A wise quote.')])])} />);
     await expect.element(page.getByText('A wise quote.')).toBeInTheDocument();

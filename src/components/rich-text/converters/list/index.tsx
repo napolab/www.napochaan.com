@@ -10,6 +10,11 @@ import type { NodeTypes } from '../types';
  * Payload's default converter relies on global `list-*` class names that Panda's
  * preflight resets. These converters apply the project's own styled classes instead.
  * A list whose parent is a `listitem` is marked `data-nested` so it indents properly.
+ *
+ * Lexical models a nested list as a `listitem` whose only child is another `list`
+ * (the preceding sibling holds the parent text). Such a wrapper item carries no
+ * text of its own, so it is flagged `data-has-sublist` to drop its bullet —
+ * otherwise it paints a stray marker on the nested list's first line.
  */
 export const listConverter: Partial<JSXConverters<NodeTypes>> = {
   list: ({ node, nodesToJSX, parent }) => {
@@ -23,8 +28,9 @@ export const listConverter: Partial<JSXConverters<NodeTypes>> = {
     );
   },
   listitem: ({ node, nodesToJSX }) => {
+    const hasSubList = node.children.some((child) => child.type === 'list') ? true : undefined;
     return (
-      <li className={styles.listItem} value={node.value}>
+      <li className={styles.listItem} value={node.value} data-has-sublist={hasSubList}>
         {nodesToJSX({ nodes: node.children })}
       </li>
     );
