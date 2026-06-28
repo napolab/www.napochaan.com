@@ -166,6 +166,20 @@ describe('RichText', () => {
     await expect.element(page.getByText('Item two')).toBeInTheDocument();
   });
 
+  it('marks a list item that only wraps a nested list so its marker is suppressed', async () => {
+    render(<RichText data={state([list('ul', [[text('Parent item')], [list('ul', [[text('Nested item')]])]])])} />);
+    await expect.element(page.getByText('Nested item')).toBeInTheDocument();
+
+    // The wrapper li holds only the nested list — it is flagged so CSS drops its bullet.
+    const wrapper = document.querySelector('ul[data-nested]')?.parentElement;
+    expect(wrapper?.tagName).toBe('LI');
+    expect(wrapper?.getAttribute('data-has-sublist')).toBe('true');
+
+    // A leaf item carrying real content is not flagged, so it keeps its bullet.
+    const leaf = page.getByText('Nested item').element().closest('li');
+    expect(leaf?.getAttribute('data-has-sublist')).toBeNull();
+  });
+
   it('renders a blockquote', async () => {
     render(<RichText data={state([quote([text('A wise quote.')])])} />);
     await expect.element(page.getByText('A wise quote.')).toBeInTheDocument();

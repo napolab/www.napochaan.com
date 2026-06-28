@@ -19,6 +19,9 @@ export const orderedList = css({
     fontFamily: 'mono',
     fontVariationSettings: '"wght" 600',
   },
+  // A wrapper item only holds a nested list: skip its number and its marker.
+  '& > li[data-has-sublist]': { counterIncrement: 'none' },
+  '& > li[data-has-sublist]::before': { content: 'none' },
 });
 
 export const unorderedList = css({
@@ -35,6 +38,8 @@ export const unorderedList = css({
     fontWeight: 'medium',
   },
   '&[data-nested] > li::before': { content: '"·"', insetInlineStart: '-4' },
+  // A wrapper item only holds a nested list: skip its marker (placed last to win specificity ties).
+  '& > li[data-has-sublist]::before': { content: 'none' },
 });
 
 export const listItem = css({
@@ -42,4 +47,6 @@ export const listItem = css({
   lineHeight: 'jp',
   marginBlockEnd: '2',
   '&:last-child': { marginBlockEnd: '0' },
+  // The nested list owns its own spacing — the wrapper adds none of its own.
+  '&[data-has-sublist]': { marginBlockEnd: '0' },
 });
