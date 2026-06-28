@@ -1,9 +1,8 @@
-import { FeedLink } from '@components/feed-link';
-import { GalleryArchive } from '@components/gallery-archive';
-import { PageHeader } from '@components/page-header';
-import { findGalleryList } from '@lib/payload/gallery';
+import { Suspense } from 'react';
 
-import * as s from './styles.css';
+import { GalleryArchiveLoader } from './_components/gallery-archive-loader';
+
+import { DecodingSkeleton } from '@components/decoding-skeleton';
 
 import type { Metadata } from 'next';
 
@@ -18,19 +17,13 @@ export const metadata: Metadata = {
   },
 };
 
-const galleryCrumbs = [{ href: '/', label: 'home' }, { label: 'gallery' }] as const;
-
-const GalleryPage = async () => {
-  const galleryPhotos = await findGalleryList();
-
+const GalleryPage = () => {
   return (
-    <main id="main-content" className={s.main}>
-      <PageHeader title="gallery" breadcrumbs={galleryCrumbs} kicker="// flyer · VRChat · photo — 2024-2026" lead="まだ知らない君がいる！" />
-      <FeedLink href="/gallery/rss.xml" label="gallery の RSS フィード" />
-      <section aria-label="作品ギャラリー一覧">
-        <GalleryArchive photos={galleryPhotos} />
-      </section>
-    </main>
+    <section aria-label="作品ギャラリー一覧">
+      <Suspense fallback={<DecodingSkeleton rows={6} fill />}>
+        <GalleryArchiveLoader />
+      </Suspense>
+    </section>
   );
 };
 
