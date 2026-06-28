@@ -17,6 +17,7 @@ export const Gallery = {
   // manual `order` number field is gone — drag the rows to reorder.
   orderable: true,
   admin: {
+    group: 'コンテンツ',
     useAsTitle: 'caption',
     defaultColumns: ['caption', 'homeTop', '_status'],
   },

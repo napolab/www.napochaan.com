@@ -4,6 +4,7 @@ export const Users: CollectionConfig = {
   slug: 'users',
   labels: { singular: 'user', plural: 'users' },
   admin: {
+    group: 'システム',
     useAsTitle: 'email',
   },
   auth: {

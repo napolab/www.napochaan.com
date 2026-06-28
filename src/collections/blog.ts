@@ -15,6 +15,7 @@ export const Blog = {
   labels: { singular: 'blog', plural: 'blogs' },
   defaultSort: '-publishedAt',
   admin: {
+    group: 'コンテンツ',
     useAsTitle: 'title',
     defaultColumns: ['title', 'thumbnail', 'publishedAt', '_status'],
   },

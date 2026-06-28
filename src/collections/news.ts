@@ -21,6 +21,7 @@ export const News = {
   // `['-pinned', '-publishedAt']` sort in lib/payload/news).
   defaultSort: '-publishedAt',
   admin: {
+    group: 'コンテンツ',
     useAsTitle: 'title',
     // `title` must lead so the list row links to the edit view — Payload only
     // wraps the FIRST column in the doc link, and a leading checkbox column
