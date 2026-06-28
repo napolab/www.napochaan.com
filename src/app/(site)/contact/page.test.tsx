@@ -16,9 +16,10 @@ vi.mock('@opennextjs/cloudflare', () => ({
 }));
 
 describe('ContactPage', () => {
-  it('renders the page heading', async () => {
+  it('does not render the page heading or main landmark (owned by the layout)', async () => {
     render(await ContactPage());
-    await expect.element(page.getByRole('heading', { level: 1, name: 'contact' })).toBeVisible();
+    expect(page.getByRole('heading', { level: 1 }).elements()).toHaveLength(0);
+    expect(page.getByRole('main').elements()).toHaveLength(0);
   });
 
   it('renders the message section heading', async () => {
