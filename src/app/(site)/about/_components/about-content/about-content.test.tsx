@@ -26,9 +26,10 @@ vi.mock('@lib/payload/profile', () => ({
 describe('AboutContent', () => {
   it('renders the masthead name as the only h1', async () => {
     render(await AboutContent());
-    const headings = page.getByRole('heading', { level: 1 }).elements();
-    expect(headings).toHaveLength(1);
+    // Await the heading first — the masthead h1 wraps the client-side EchoText, so
+    // the tree settles a tick after render(); a synchronous count would race it.
     await expect.element(page.getByRole('heading', { level: 1, name: /naporitan/ })).toBeVisible();
+    expect(page.getByRole('heading', { level: 1 }).elements()).toHaveLength(1);
   });
 
   it('renders the whoami section heading', async () => {

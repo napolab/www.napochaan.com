@@ -1,6 +1,7 @@
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
+import { BlogHero } from '../../[slug]/_components/blog-hero';
 import { BlogNav } from '../../[slug]/_components/blog-nav';
 import { Toc } from '../../[slug]/_components/toc';
 import * as s from '../../[slug]/styles.css';
@@ -41,12 +42,14 @@ const BlogPreviewPage = async ({ params }: Props) => {
   const { prev, next } = adjacentPosts(posts, post.slug);
   const headings = extractHeadings(post.body ?? null);
   const crumbs = buildCrumbs(post.title);
+  const formattedDate = dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD');
 
   // Renders inside the blog segment's shared `<main>` (see `blog/layout.tsx`).
   return (
     <>
       <LivePreviewListener />
-      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${dayjs(post.date).tz('Asia/Tokyo').format('YYYY.MM.DD')}`} titleTracking="tight" />
+      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} titleTracking="tight" />
+      {post.thumbnail === undefined ? null : <BlogHero thumbnail={post.thumbnail} title={post.title} caption={`blog / ${formattedDate}`} />}
       <div className={s.layout}>
         <div className={s.tocCol}>
           <Toc headings={headings} />

@@ -2,7 +2,7 @@ import { unstable_cache } from 'next/cache';
 
 import { CACHE_TAGS } from '@utils/cache-tags';
 
-import { getPayloadClient } from '../client';
+import { getPayloadClient } from '@lib/payload/client';
 
 import { toLogManualItem } from './to-log-manual-item';
 
