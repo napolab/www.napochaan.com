@@ -8,8 +8,10 @@ export const orderedList = css({
   marginBlockEnd: 'block',
   '&:last-child': { marginBlockEnd: '0' },
   '&[data-nested]': { marginBlockStart: '2', marginBlockEnd: '0', paddingInlineStart: '6' },
-  '& > li': { counterIncrement: 'rt-list' },
-  '& > li::before': {
+  // Markers belong to leaf items only. A wrapper item (one that only holds a nested
+  // list) is excluded via :not — so it neither numbers nor increments the counter.
+  '& > li:not([data-has-sublist])': { counterIncrement: 'rt-list' },
+  '& > li:not([data-has-sublist])::before': {
     content: 'counter(rt-list) "."',
     position: 'absolute',
     insetInlineStart: '-8',
@@ -19,9 +21,6 @@ export const orderedList = css({
     fontFamily: 'mono',
     fontVariationSettings: '"wght" 600',
   },
-  // A wrapper item only holds a nested list: skip its number and its marker.
-  '& > li[data-has-sublist]': { counterIncrement: 'none' },
-  '& > li[data-has-sublist]::before': { content: 'none' },
 });
 
 export const unorderedList = css({
@@ -30,16 +29,16 @@ export const unorderedList = css({
   marginBlockEnd: 'block',
   '&:last-child': { marginBlockEnd: '0' },
   '&[data-nested]': { marginBlockStart: '2', marginBlockEnd: '0', paddingInlineStart: '5' },
-  '& > li::before': {
+  // Markers belong to leaf items only — wrapper items (holding just a nested list)
+  // are excluded via :not. The same ▸ is used at every depth (like the ol numbers);
+  // nesting is conveyed by indentation alone, not by switching the glyph.
+  '& > li:not([data-has-sublist])::before': {
     content: '"▸"',
     position: 'absolute',
     insetInlineStart: '-5',
     color: 'accent.text',
     fontWeight: 'medium',
   },
-  '&[data-nested] > li::before': { content: '"·"', insetInlineStart: '-4' },
-  // A wrapper item only holds a nested list: skip its marker (placed last to win specificity ties).
-  '& > li[data-has-sublist]::before': { content: 'none' },
 });
 
 export const listItem = css({

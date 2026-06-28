@@ -166,17 +166,20 @@ describe('RichText', () => {
     await expect.element(page.getByText('Item two')).toBeInTheDocument();
   });
 
-  it('marks a list item that only wraps a nested list so its marker is suppressed', async () => {
-    render(<RichText data={state([list('ul', [[text('Parent item')], [list('ul', [[text('Nested item')]])]])])} />);
-    await expect.element(page.getByText('Nested item')).toBeInTheDocument();
+  it('flags every wrapper item at any nesting depth so markers stay on leaves only', async () => {
+    // L1 → wraps L2 → wraps L3: two wrapper items, one leaf, three levels deep.
+    render(<RichText data={state([list('ul', [[text('L1')], [list('ul', [[text('L2')], [list('ul', [[text('L3')]])]])]])])} />);
+    await expect.element(page.getByText('L3')).toBeInTheDocument();
 
-    // The wrapper li holds only the nested list — it is flagged so CSS drops its bullet.
-    const wrapper = document.querySelector('ul[data-nested]')?.parentElement;
-    expect(wrapper?.tagName).toBe('LI');
-    expect(wrapper?.getAttribute('data-has-sublist')).toBe('true');
+    // The detection is per-node, so it recurses: both wrapper items carry the flag.
+    const wrappers = document.querySelectorAll('li[data-has-sublist]');
+    expect(wrappers.length).toBe(2);
+    for (const wrapper of wrappers) {
+      expect(wrapper.getAttribute('data-has-sublist')).toBe('true');
+    }
 
-    // A leaf item carrying real content is not flagged, so it keeps its bullet.
-    const leaf = page.getByText('Nested item').element().closest('li');
+    // The deepest leaf carries real content, so it is never flagged — it keeps its marker.
+    const leaf = page.getByText('L3').element().closest('li');
     expect(leaf?.getAttribute('data-has-sublist')).toBeNull();
   });
 
