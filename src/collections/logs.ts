@@ -14,6 +14,7 @@ export const Logs = {
   labels: { singular: 'log', plural: 'logs' },
   defaultSort: '-date',
   admin: {
+    group: 'コンテンツ',
     useAsTitle: 'title',
     defaultColumns: ['title', 'date', 'meta', '_status'],
   },

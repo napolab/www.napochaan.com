@@ -18,6 +18,7 @@ export const Works = {
   // explicit date sort (see lib/payload/works).
   defaultSort: '-date',
   admin: {
+    group: 'コンテンツ',
     useAsTitle: 'title',
     defaultColumns: ['date', 'thumbnail', 'title', 'type', 'body', '_status'],
   },

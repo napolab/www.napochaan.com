@@ -8,6 +8,9 @@ import type { GlobalConfig } from 'payload';
 export const Profile = {
   slug: 'profile',
   label: 'profile',
+  admin: {
+    group: 'サイト設定',
+  },
   access: {
     read: () => true,
     update: ({ req: { user } }) => user !== null,
