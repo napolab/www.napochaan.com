@@ -1,12 +1,18 @@
 import { dayjs } from '@utils/dayjs';
 
-import type { ActivityCalendarMark } from '@components/activity-calendar';
 import type { ExternalPost } from '../external-feeds';
 import type { LogManualItem } from '../log-manual-item';
 import type { WorkRow } from '../../../works/_lib/work-row';
 
+// 集計結果の 1 日ぶん。upcoming は log ドメインの意味論（当日いっぱいまで）で、
+// 表示トーンへの変換は描画側（log-calendar-section）の責務。
+export type LogDateMark = {
+  date: string;
+  upcoming: boolean;
+};
+
 export type CollectLogDatesResult = {
-  marks: ActivityCalendarMark[];
+  marks: LogDateMark[];
   minDate?: string;
   maxDate?: string;
 };
