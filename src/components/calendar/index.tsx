@@ -39,7 +39,7 @@ export const Calendar = ({ marks, minDate, maxDate, label }: Props) => {
 
   return (
     <I18nProvider locale="ja-JP">
-      <AriaCalendar aria-label={label} isReadOnly minValue={toCalendarDate(minDate)} maxValue={toCalendarDate(maxDate)}>
+      <AriaCalendar className={styles.root} aria-label={label} isReadOnly minValue={toCalendarDate(minDate)} maxValue={toCalendarDate(maxDate)}>
         <header className={styles.headerRoot}>
           <Button slot="previous" className={styles.navButton} aria-label="前の月">
             ‹

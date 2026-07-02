@@ -1,5 +1,11 @@
 import { css } from '@styled/css';
 
+// グリッドは内容依存の固定幅なので、root もそれに合わせて縮める。広いコンテナに
+// 置かれたとき（colophon のデモ等）に header だけ全幅へ伸びるのを防ぐ。
+export const root = css({
+  width: 'fit',
+});
+
 export const headerRoot = css({
   display: 'flex',
   alignItems: 'center',
