@@ -53,6 +53,7 @@ export default defineConfig({
             'react/jsx-dev-runtime',
             'react-aria-components',
             'vitest-browser-react',
+            '@internationalized/date',
             '@gsap/react',
             'gsap',
             'gsap/ScrambleTextPlugin',

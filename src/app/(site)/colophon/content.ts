@@ -96,6 +96,10 @@ export const colophon = {
       { name: 'Breadcrumbs', why: 'パンくず。いまどの階層にいるかを辿れるように。' },
       { name: 'FeedLink', why: 'RSS フィードへのリンク。一覧ページの PageHeader 直下に置いて、購読を促す。' },
       {
+        name: 'Calendar',
+        why: '読み取り専用の月めくりカレンダー。印のある日は下端にドットが灯って、accent はこれからの日。log では feed リンクの隣の popover の中身をやってる。',
+      },
+      {
         name: 'ShareBar',
         why: '記事末尾の共有バー。Twitter(X) の web intent と、OS の共有シート（Web Share API、非対応環境ではクリップボードへコピー）を呼ぶ2アクション。Instagram は URL 共有導線が無いので置いてない。',
       },
