@@ -78,12 +78,12 @@ describe('buildLogTimeline', () => {
     expect(group?.items[0]?.href).toBe('https://sizu.me/x/posts/9');
   });
 
-  it('formats a post date as MM.DD and never marks it upcoming', () => {
+  it('formats a post date as MM.DD (ddd) in JST and never marks it upcoming', () => {
     const posts = [post({ id: '1', date: '2026-04-09T00:00:00.000Z', source: 'zenn' })];
 
     const [group] = buildLogTimeline([], posts, now);
 
-    expect(group?.items[0]?.date).toBe('04.09');
+    expect(group?.items[0]?.date).toBe('04.09 (Thu)');
     expect(group?.items[0]?.upcoming).toBe(false);
   });
 
@@ -100,12 +100,12 @@ describe('buildLogTimeline', () => {
 });
 
 describe('buildLogTimeline work date precision', () => {
-  it('shows MM.DD for a work that has a date', () => {
+  it('shows MM.DD (ddd) for a work that has a date', () => {
     const works = [work({ id: 'dated', year: 2025, date: '2025-03-15' })];
 
     const [group] = buildLogTimeline(works, [], now);
 
-    expect(group?.items[0]?.date).toBe('03.15');
+    expect(group?.items[0]?.date).toBe('03.15 (Sat)');
   });
 
   it('shows em dash for a work without a date', () => {
@@ -143,7 +143,7 @@ describe('buildLogTimeline manual entries', () => {
     const y2026 = groups.find((g) => g.year === 2026);
     expect(y2026).toBeDefined();
     const entry = y2026?.items.find((i) => i.id === 'log-1');
-    expect(entry).toMatchObject({ title: 'サイト公開', date: '06.01', meta: 'milestone', upcoming: false, href: 'https://napochaan.com' });
+    expect(entry).toMatchObject({ title: 'サイト公開', date: '06.01 (Mon)', meta: 'milestone', upcoming: false, href: 'https://napochaan.com' });
   });
 
   it('keeps working when no manual entries are passed (default param)', () => {

@@ -38,7 +38,7 @@ const toPostEntry = (post: ExternalPost): SortableEntry => {
   return {
     id: `post-${post.id}`,
     year: at.year(),
-    date: at.format('MM.DD'),
+    date: at.format('MM.DD (ddd)'),
     meta: post.source,
     title: post.title,
     upcoming: false,
@@ -56,7 +56,7 @@ const toWorkEntry = (work: WorkRow): SortableEntry => {
   return {
     id: `work-${work.id}`,
     year: work.year,
-    date: at !== undefined ? at.format('MM.DD') : '—',
+    date: at !== undefined ? at.format('MM.DD (ddd)') : '—',
     meta: work.type,
     title: work.title,
     upcoming: false,
@@ -76,7 +76,7 @@ const toManualEntry = (item: LogManualItem, now: string): SortableEntry => {
   return {
     id: `log-${item.id}`,
     year: at.year(),
-    date: at.format('MM.DD'),
+    date: at.format('MM.DD (ddd)'),
     meta: item.meta,
     title: item.title,
     upcoming: !at.startOf('day').isBefore(today.startOf('day')),
