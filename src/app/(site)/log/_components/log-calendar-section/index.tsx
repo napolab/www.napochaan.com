@@ -21,11 +21,18 @@ const toCalendarMarks = (marks: readonly LogDateMark[]): CalendarMark[] => marks
 // タイムラインと同じ 3 ソース（unstable_cache 済みなので page 側と実体は共有）を
 // 集計してカレンダーに渡す。ISR(3600s) にそのまま乗る。
 export const LogCalendarSection = async () => {
-  const works = await findWorksList();
-  const posts = await fetchExternalPosts();
-  const logs = await findLogList();
-  const now = dayjs().tz('Asia/Tokyo').toISOString();
-  const { marks, minDate, maxDate } = collectLogDates(works, posts, logs, now);
+  try {
+    const works = await findWorksList();
+    const posts = await fetchExternalPosts();
+    const logs = await findLogList();
+    const now = dayjs().tz('Asia/Tokyo').toISOString();
+    const { marks, minDate, maxDate } = collectLogDates(works, posts, logs, now);
 
-  return <LogCalendar marks={toCalendarMarks(marks)} minDate={minDate} maxDate={maxDate} label="活動カレンダー" />;
+    return <LogCalendar marks={toCalendarMarks(marks)} minDate={minDate} maxDate={maxDate} label="活動カレンダー" />;
+  } catch {
+    // カレンダーは装飾的な enhancement。layout 配下なのでここで投げると
+    // log/error.tsx ではなく親の error boundary に抜けて全ページが落ちる —
+    // データ取得に失敗したら黙って消えるのが正しい。
+    return null;
+  }
 };

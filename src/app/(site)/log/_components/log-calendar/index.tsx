@@ -26,7 +26,7 @@ const CalendarIcon = () => (
 // log 専用の組み立て: トリガー + Popover + Dialog で汎用 Calendar プリミティブを包む。
 export const LogCalendar = ({ marks, minDate, maxDate, label }: Props) => (
   <DialogTrigger>
-    <Button className={styles.trigger} aria-label={label}>
+    <Button className={styles.trigger} aria-label={`${label}を表示`}>
       <CalendarIcon />
     </Button>
     <Popover className={styles.popover} placement="bottom end">

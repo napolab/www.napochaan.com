@@ -17,13 +17,13 @@ const singleMonth = { minDate: '2026-01-01', maxDate: '2026-01-31' };
 describe('LogCalendar', () => {
   it('トリガーをクリックするとカレンダーの dialog が開く', async () => {
     render(<LogCalendar marks={marks} {...singleMonth} label="活動カレンダー" />);
-    await page.getByRole('button', { name: '活動カレンダー' }).click();
+    await page.getByRole('button', { name: '活動カレンダーを表示' }).click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
   });
 
   it('marks の日付セルに data-tone が付く（default / accent の描き分け）', async () => {
     render(<LogCalendar marks={marks} {...singleMonth} label="活動カレンダー" />);
-    await page.getByRole('button', { name: '活動カレンダー' }).click();
+    await page.getByRole('button', { name: '活動カレンダーを表示' }).click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
     await expect.poll(() => document.querySelectorAll('[data-tone="default"]').length).toBe(1);
     await expect.poll(() => document.querySelectorAll('[data-tone="accent"]').length).toBe(1);
