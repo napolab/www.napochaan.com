@@ -150,3 +150,11 @@ log/layout.tsx (RSC)
 2. chrome-devtools で localhost:3000/log を目視確認（トリガー位置・popover 表示・ドット・月送り）
 3. colophon ページに ActivityCalendar が表示されている
 4. difit を起動してレビュー依頼
+
+## 変更履歴
+
+- 2026-07-02（実装中のステークホルダー決定）: 共通コンポーネントは log 特化の `ActivityCalendar` ではなく、
+  **汎用プリミティブ `src/components/calendar/`（`Calendar` / `CalendarMark = { date, tone?: 'default' | 'accent' }`）**
+  として抽象化する。トリガー + Popover の組み立ては log 専用の `log/_components/log-calendar/` に移動。
+  `upcoming`（log ドメイン）→ `tone`（表示）の変換は RSC `log-calendar-section` の境界で行い、
+  `collect-log-dates` は自前の `LogDateMark` 型を持つ。colophon には `Calendar` をインラインデモで登録する。
