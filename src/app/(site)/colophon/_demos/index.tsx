@@ -4,6 +4,7 @@ import { Badge } from '@components/badge';
 import { Breadcrumbs } from '@components/breadcrumbs';
 import { FeedLink } from '@components/feed-link';
 import { Button } from '@components/button';
+import { Calendar } from '@components/calendar';
 import { Card } from '@components/card';
 import { DecodingSkeleton } from '@components/decoding-skeleton';
 import { Divider } from '@components/divider';
@@ -48,6 +49,7 @@ import vrchatGlitch from '@assets/vrchat-glitch.jpg';
 import vrchatSquare from '@assets/vrchat-square.jpg';
 import vrchatWide from '@assets/vrchat-wide.jpg';
 
+import type { CalendarMark } from '@components/calendar';
 import type { GalleryItem } from '@components/gallery';
 import type { TimelineItem } from '@components/timeline';
 import type { ReactNode } from 'react';
@@ -121,6 +123,10 @@ const breadcrumbItems = [{ href: '/', label: 'home' }, { href: '/works', label: 
 // Demo-only href builder. (In real use the consumer owns the URL shape;
 // Pagination owns layout / a11y / routing.)
 const paginationHref = (page: number): string => `?page=${page}`;
+
+// default ドットと accent ドットが両方見えるサンプル。実行日に依らず表示が
+// 固定されるよう min/max で 2026-06〜07 に範囲を絞ってある。
+const calendarMarks = [{ date: '2026-06-06' }, { date: '2026-06-20' }, { date: '2026-07-11', tone: 'accent' }, { date: '2026-07-25', tone: 'accent' }] satisfies CalendarMark[];
 
 // Live demos keyed by component name, mapped against colophon.components.items in
 // the page. Kept out of content.ts so the data file stays JSX-free.
@@ -238,6 +244,7 @@ export const demos: Record<ComponentName, ReactNode> = {
       <FeedLink href="/news/rss.xml" label="サンプル RSS フィード" />
     </NoAction>
   ),
+  Calendar: <Calendar marks={calendarMarks} minDate="2026-06-01" maxDate="2026-07-31" label="活動カレンダー（サンプル）" />,
   ShareBar: (
     <NoAction>
       <ShareBar url="https://www.napochaan.com/works/1" title="サンプル作品タイトル" />
