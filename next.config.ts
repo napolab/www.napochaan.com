@@ -15,6 +15,16 @@ const nextConfig: NextConfig = {
     staleTimes: { static: 0, dynamic: 0 },
   },
   serverExternalPackages: ['drizzle-kit', 'esbuild', 'esbuild-register'],
+  redirects: async () => [
+    // The public route is /log (the CMS collection slug is `logs`, so /logs is a
+    // natural guess). `:path*` matches zero or more segments, so this covers
+    // both /logs and nested paths like /logs/rss.xml with a 308.
+    {
+      source: '/logs/:path*',
+      destination: '/log/:path*',
+      permanent: true,
+    },
+  ],
   typescript: {
     ignoreBuildErrors: true,
   },
