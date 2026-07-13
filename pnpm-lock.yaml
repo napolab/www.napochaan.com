@@ -48,6 +48,9 @@ importers:
       '@payloadcms/storage-r2':
         specifier: 3.84.1
         version: 3.84.1(@types/react@19.2.16)(monaco-editor@0.55.1)(next@15.3.9(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.77.4))(payload@3.84.1(graphql@16.14.1)(typescript@5.9.3))(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@5.9.3)
+      '@payloadcms/translations':
+        specifier: 3.84.1
+        version: 3.84.1
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.2.16)(react@19.2.7)

@@ -6,6 +6,7 @@ import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite';
 import { seoPlugin } from '@payloadcms/plugin-seo';
 import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 import { r2Storage } from '@payloadcms/storage-r2';
+import { ja } from '@payloadcms/translations/languages/ja';
 import { buildConfig } from 'payload';
 
 import { ImageRow } from './blocks/image-row';
@@ -99,6 +100,10 @@ const serverURL = process.env.BASE_URL ?? 'http://localhost:3000';
 
 export default buildConfig({
   i18n: {
+    // Restricting supportedLanguages to ja pins the admin UI language regardless
+    // of browser detection, which is what makes the date picker load the
+    // date-fns ja locale (month/weekday names in the calendar).
+    supportedLanguages: { ja },
     fallbackLanguage: 'ja',
   },
   admin: {
