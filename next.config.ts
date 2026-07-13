@@ -17,18 +17,14 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ['drizzle-kit', 'esbuild', 'esbuild-register'],
   redirects: async () => [
     // The public route is /log (the CMS collection slug is `logs`, so /logs is a
-    // natural guess). Kept as two rules instead of one `/logs/:path*`: OpenNext's
-    // routing layer only compiles the destination when the source match produced
-    // params, so a zero-segment `:path*` match leaves the literal ":path*" in the
-    // Location header. Exact + `:path+` (one or more segments) avoids that case.
+    // natural guess). Exact match only — /log has no detail pages, so there is
+    // nothing meaningful to map sub-paths onto. Placeholder rules (`:path*`) are
+    // also risky here: OpenNext's routing layer skips destination compilation
+    // when the source match yields no params, leaving a literal ":path*" in the
+    // Location header (bit us on staging).
     {
       source: '/logs',
       destination: '/log',
-      permanent: true,
-    },
-    {
-      source: '/logs/:path+',
-      destination: '/log/:path+',
       permanent: true,
     },
   ],
