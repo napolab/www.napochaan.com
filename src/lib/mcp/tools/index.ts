@@ -333,10 +333,26 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
 
     publishPost: async (input: { id: number }): Promise<ToolResult> => {
       try {
+        // draft-promotion: versions.drafts が有効なため update_post の変更は
+        // versions テーブルに積まれる。ここで bare `_status` だけを update すると
+        // published 済みの main テーブル行の上に浅くマージされ、未公開の draft
+        // 編集内容が黙って失われる。最新 draft を読み直し、全フィールドを
+        // publishedステータス付きで再送することで最新内容を確実に公開する。
+        const current = await payload.findByID({ collection: 'blog', id: input.id, draft: true, disableErrors: true, overrideAccess: false, user });
+        if (current === null) return fail('記事が見つかりません。list_posts で id を確認してください。');
+        const thumbnailID = typeof current.thumbnail === 'number' ? current.thumbnail : current.thumbnail.id;
         const updated = await payload.update({
           collection: 'blog',
           id: input.id,
-          data: { _status: 'published' },
+          data: {
+            title: current.title,
+            slug: current.slug,
+            excerpt: current.excerpt,
+            thumbnail: thumbnailID,
+            publishedAt: current.publishedAt,
+            body: current.body,
+            _status: 'published',
+          },
           overrideAccess: false,
           user,
         });

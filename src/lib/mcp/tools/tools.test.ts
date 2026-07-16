@@ -130,14 +130,51 @@ describe('updatePost', () => {
 });
 
 describe('publishPost', () => {
-  it('sets _status published and returns the public URL', async () => {
+  it('resends all draft fields with _status published and returns the public URL', async () => {
     const { payload, deps } = createDeps();
-    payload.update.mockResolvedValue({ id: 3, slug: 'hello', _status: 'published' });
+    const draft = {
+      id: 3,
+      slug: 'hello',
+      title: 't',
+      excerpt: 'e',
+      thumbnail: 5,
+      publishedAt: '2026-07-16',
+      body: paragraphBody(),
+    };
+    payload.findByID.mockResolvedValue(draft);
+    payload.update.mockResolvedValue({ id: 3, slug: 'hello', title: 't', _status: 'published' });
     const handlers = createBlogToolHandlers(deps);
     const result = await handlers.publishPost({ id: 3 });
 
-    expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, overrideAccess: false, user, data: { _status: 'published' } }));
+    expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user }));
+    expect(payload.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'blog',
+        id: 3,
+        overrideAccess: false,
+        user,
+        data: {
+          title: 't',
+          slug: 'hello',
+          excerpt: 'e',
+          thumbnail: 5,
+          publishedAt: '2026-07-16',
+          body: draft.body,
+          _status: 'published',
+        },
+      }),
+    );
     expect(result.content[0]?.text).toContain('/blog/hello');
+  });
+
+  it('returns an error and does not update when the post does not exist', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue(null);
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.publishPost({ id: 999 });
+
+    expect(result.isError).toBe(true);
+    expect(payload.update).not.toHaveBeenCalled();
   });
 });
 
