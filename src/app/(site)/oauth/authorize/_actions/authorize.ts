@@ -7,6 +7,7 @@ import { getOAuthHelpers } from '@lib/mcp/oauth';
 import { absoluteUrl } from '@utils/site-url';
 
 import type { OAuthHelpers } from '@cloudflare/workers-oauth-provider';
+import type { User } from '@payload-types';
 
 export type AuthorizeState = {
   status: 'idle' | 'error';
@@ -21,22 +22,37 @@ const readField = (fd: FormData, key: string): string => {
   return typeof value === 'string' ? value : '';
 };
 
+const credentialErrorMessage = 'メールアドレスまたはパスワードが正しくありません。';
+const authRequestErrorMessage = '認可リクエストの処理に失敗しました。MCP クライアントから接続をやり直してください。';
+
 type LoginOutcome = { redirectTo: string } | AuthorizeState;
 
-// redirect() は throw で制御するため try の外で呼ぶ必要がある。
-// ここでは redirectTo を返すところまでを担い、throw しない。
-//
 // getPayloadClient は動的 import する: 'use server' ファイルがこれを静的 import
 // すると payload.config の top-level await が browser-mode vitest のビルドに
 // 巻き込まれ、この action を import する client component (AuthorizeForm) の
 // テストが "Failed to fetch dynamically imported module" で壊れる。
-const completeLogin = async (helpers: OAuthHelpers, email: string, password: string, query: string): Promise<LoginOutcome> => {
+//
+// Payload の認証失敗(AuthenticationError)だけをここで吸収する。ここでの throw は
+// 「資格情報が誤り」を意味するので、専用のメッセージを返す。
+const loginUser = async (email: string, password: string): Promise<User | undefined> => {
   try {
     const { getPayloadClient } = await import('@lib/payload/client');
     const payload = await getPayloadClient();
     const { user } = await payload.login({ collection: 'users', data: { email, password } });
-    if (user === undefined) return { status: 'error', message: 'ログインに失敗しました。' };
 
+    return user;
+  } catch (error) {
+    console.error('[oauth] payload login failed', error);
+
+    return undefined;
+  }
+};
+
+// parseAuthRequest / completeAuthorization の失敗は資格情報とは無関係(不正な
+// client_id、redirect_uri 不一致など)。ここでの throw をログイン失敗と混同しない
+// ように、別メッセージで返す。
+const completeAuthRequest = async (helpers: OAuthHelpers, user: User, query: string): Promise<{ redirectTo: string } | undefined> => {
+  try {
     const authRequest = await helpers.parseAuthRequest(new Request(absoluteUrl(`/oauth/authorize?${query}`)));
     const { redirectTo } = await helpers.completeAuthorization({
       request: authRequest,
@@ -48,10 +64,22 @@ const completeLogin = async (helpers: OAuthHelpers, email: string, password: str
 
     return { redirectTo };
   } catch (error) {
-    console.error('[oauth] authorize failed', error);
+    console.error('[oauth] authorize request failed', error);
 
-    return { status: 'error', message: 'メールアドレスまたはパスワードが正しくありません。' };
+    return undefined;
   }
+};
+
+// redirect() は throw で制御するため try の外で呼ぶ必要がある。
+// ここでは redirectTo を返すところまでを担い、throw しない。
+const completeLogin = async (helpers: OAuthHelpers, email: string, password: string, query: string): Promise<LoginOutcome> => {
+  const user = await loginUser(email, password);
+  if (user === undefined) return { status: 'error', message: credentialErrorMessage };
+
+  const authorized = await completeAuthRequest(helpers, user, query);
+  if (authorized === undefined) return { status: 'error', message: authRequestErrorMessage };
+
+  return authorized;
 };
 
 export const authorize = async (prev: AuthorizeState, formData: FormData): Promise<AuthorizeState> => {
