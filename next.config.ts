@@ -28,6 +28,15 @@ const nextConfig: NextConfig = {
       permanent: true,
     },
   ],
+  // `.md` twins of the content pages. Next.js cannot express a partial dynamic
+  // segment (`[slug].md`), so the three dynamic URLs rewrite onto nested `md`
+  // route handlers. Each rule uses a plain `:slug` (always exactly one segment),
+  // which sidesteps the OpenNext `:path*` zero-segment pitfall described above.
+  rewrites: async () => [
+    { source: '/blog/:slug.md', destination: '/blog/:slug/md' },
+    { source: '/news/:slug.md', destination: '/news/:slug/md' },
+    { source: '/works/:slug.md', destination: '/works/:slug/md' },
+  ],
   typescript: {
     ignoreBuildErrors: true,
   },
