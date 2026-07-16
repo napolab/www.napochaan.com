@@ -12,7 +12,7 @@ export type MarkdownCodec = {
 // 渡すこと(呼び出し側の責務。route.ts で `payload.config.editor.editorConfig` から解決する)。
 // `editorConfigFactory.default` は Payload のグローバルキャッシュされた汎用 default editor を
 // 返すだけで payload.config.editor から導出されないため、プロジェクトの block 登録
-// (image-row 等)を含まない。ここでは絶対に使わないこと。
+// (BlocksFeature([ImageRow]) 等)を含まない。ここでは絶対に使わないこと。
 export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): MarkdownCodec => ({
   toLexical: (markdown) => convertMarkdownToLexical({ editorConfig, markdown }),
   toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),

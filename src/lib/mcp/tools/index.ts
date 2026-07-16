@@ -204,7 +204,7 @@ const resolveNextBody = async (bodyMarkdown: string | undefined, current: Blog, 
     return {
       kind: 'error',
       message:
-        'この記事の本文には MCP 非対応の block(image-row 等)が含まれるため、bodyMarkdown での上書きはできません(既存 block が破壊されます)。title/excerpt 等の他フィールドのみ更新するか、本文は admin UI で編集してください。',
+        'この記事の本文には MCP 非対応の block が含まれるため、bodyMarkdown での上書きはできません(既存 block が破壊されます)。title/excerpt 等の他フィールドのみ更新するか、本文は admin UI で編集してください。',
     };
   }
   const bodyError = await validateBodyMarkdown(bodyMarkdown, verifyMediaExists);
@@ -265,9 +265,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         return ok({
           ...toSummary(doc),
           bodyEditable,
-          ...(bodyEditable
-            ? { bodyMarkdown: codec.toMarkdown(doc.body) }
-            : { warning: '本文に MCP 非対応の block(image-row 等)が含まれます。bodyMarkdown での更新は不可。本文編集は admin UI で行ってください。' }),
+          ...(bodyEditable ? { bodyMarkdown: codec.toMarkdown(doc.body) } : { warning: '本文に MCP 非対応の block が含まれます。bodyMarkdown での更新は不可。本文編集は admin UI で行ってください。' }),
         });
       } catch (error) {
         return toErrorResult(error);
