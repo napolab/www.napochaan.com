@@ -57,8 +57,55 @@ const toSummary = (doc: Blog) => ({
 
 type UploadSource = { data: Buffer; mimetype?: string };
 
+const parseURL = (url: string): URL | undefined => {
+  try {
+    return new URL(url);
+  } catch {
+    return undefined;
+  }
+};
+
+const isPrivateIPv4 = (hostname: string): boolean => {
+  const octets = hostname.split('.');
+  if (octets.length !== 4) return false;
+  const parsed = octets.map((octet) => parseInt(octet, 10));
+  const hasInvalidOctet = parsed.some((octet) => Number.isNaN(octet));
+  if (hasInvalidOctet) return false;
+  const [a, b] = parsed;
+  if (a === undefined || b === undefined) return false;
+  if (a === 127) return true; // loopback
+  if (a === 10) return true; // private
+  if (a === 172 && b >= 16 && b <= 31) return true; // private
+  if (a === 192 && b === 168) return true; // private
+  if (a === 169 && b === 254) return true; // link-local
+  return false;
+};
+
+const isPrivateHostname = (hostname: string): boolean => {
+  const lower = hostname.toLowerCase();
+  if (lower === 'localhost') return true;
+  if (lower.endsWith('.local')) return true;
+  if (lower === '[::1]' || lower === '::1') return true;
+  return isPrivateIPv4(lower);
+};
+
+// SSRF ガード: caller 供給 URL を fetch する前に、公開画像 URL として妥当かを検証する。
+const validateImageURL = (url: string): string | undefined => {
+  const parsed = parseURL(url);
+  if (parsed === undefined) return 'URL の形式が不正です。http(s) の画像 URL を指定してください。';
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    return 'http(s) 以外の URL は使用できません。公開されている画像の URL を指定してください。';
+  }
+  if (isPrivateHostname(parsed.hostname)) {
+    return '内部ネットワークの URL は使用できません。公開されている画像の URL を指定してください。';
+  }
+  return undefined;
+};
+
 const resolveUploadSource = async (input: { url?: string; base64?: string }): Promise<UploadSource | string> => {
   if (input.url !== undefined) {
+    const validationError = validateImageURL(input.url);
+    if (validationError !== undefined) return validationError;
     const response = await fetch(input.url);
     if (!response.ok) return `画像の取得に失敗しました (HTTP ${response.status})。URL を確認して再実行してください。`;
     const contentType = response.headers.get('content-type');

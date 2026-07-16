@@ -178,6 +178,33 @@ describe('uploadMedia', () => {
     const result = await handlers.uploadMedia({ alt: 'x', filename: 'x.png' });
     expect(result.isError).toBe(true);
   });
+
+  it('rejects a non-http(s) URL scheme (SSRF guard)', async () => {
+    const { payload, deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.uploadMedia({ url: 'file:///etc/passwd', alt: 'x', filename: 'x.png' });
+
+    expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a localhost URL (SSRF guard)', async () => {
+    const { payload, deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.uploadMedia({ url: 'http://localhost:3000/x.png', alt: 'x', filename: 'x.png' });
+
+    expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a private IPv4 URL (SSRF guard)', async () => {
+    const { payload, deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.uploadMedia({ url: 'http://192.168.1.5/x.png', alt: 'x', filename: 'x.png' });
+
+    expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
 });
 
 describe('listPosts', () => {
