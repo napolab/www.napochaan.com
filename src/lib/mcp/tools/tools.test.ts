@@ -179,31 +179,60 @@ describe('uploadMedia', () => {
     expect(result.isError).toBe(true);
   });
 
-  it('rejects a non-http(s) URL scheme (SSRF guard)', async () => {
-    const { payload, deps } = createDeps();
-    const handlers = createBlogToolHandlers(deps);
-    const result = await handlers.uploadMedia({ url: 'file:///etc/passwd', alt: 'x', filename: 'x.png' });
+  describe('SSRF guard', () => {
+    let fetchSpy: ReturnType<typeof vi.spyOn>;
 
-    expect(result.isError).toBe(true);
-    expect(payload.create).not.toHaveBeenCalled();
-  });
+    beforeEach(() => {
+      fetchSpy = vi.spyOn(globalThis, 'fetch');
+    });
 
-  it('rejects a localhost URL (SSRF guard)', async () => {
-    const { payload, deps } = createDeps();
-    const handlers = createBlogToolHandlers(deps);
-    const result = await handlers.uploadMedia({ url: 'http://localhost:3000/x.png', alt: 'x', filename: 'x.png' });
+    afterEach(() => {
+      fetchSpy.mockRestore();
+    });
 
-    expect(result.isError).toBe(true);
-    expect(payload.create).not.toHaveBeenCalled();
-  });
+    it('rejects a non-http(s) URL scheme without calling fetch', async () => {
+      const { payload, deps } = createDeps();
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'file:///etc/passwd', alt: 'x', filename: 'x.png' });
 
-  it('rejects a private IPv4 URL (SSRF guard)', async () => {
-    const { payload, deps } = createDeps();
-    const handlers = createBlogToolHandlers(deps);
-    const result = await handlers.uploadMedia({ url: 'http://192.168.1.5/x.png', alt: 'x', filename: 'x.png' });
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('http(s) 以外の URL');
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
 
-    expect(result.isError).toBe(true);
-    expect(payload.create).not.toHaveBeenCalled();
+    it('rejects a localhost URL without calling fetch', async () => {
+      const { payload, deps } = createDeps();
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'http://localhost:3000/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('内部ネットワークの URL');
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a private IPv4 URL without calling fetch', async () => {
+      const { payload, deps } = createDeps();
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'http://192.168.1.5/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('内部ネットワークの URL');
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects an IPv6 literal hostname without calling fetch', async () => {
+      const { payload, deps } = createDeps();
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'http://[::ffff:127.0.0.1]/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('内部ネットワークの URL');
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
   });
 });
 

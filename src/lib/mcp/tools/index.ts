@@ -85,7 +85,11 @@ const isPrivateHostname = (hostname: string): boolean => {
   const lower = hostname.toLowerCase();
   if (lower === 'localhost') return true;
   if (lower.endsWith('.local')) return true;
-  if (lower === '[::1]' || lower === '::1') return true;
+  // IPv6 literal (URL#hostname keeps brackets, e.g. "[::1]"; bare form also
+  // contains ":"). IPv4-mapped/link-local/unique-local IPv6 can alias private
+  // hosts (e.g. [::ffff:127.0.0.1]), so fail closed and reject all IPv6
+  // literals — public image URLs don't use them.
+  if (lower.includes(':')) return true;
   return isPrivateIPv4(lower);
 };
 
@@ -102,11 +106,21 @@ const validateImageURL = (url: string): string | undefined => {
   return undefined;
 };
 
+// リダイレクト経由の SSRF を防ぐため、302 等は追従せず失敗として扱う。
+const fetchWithoutRedirect = async (url: string): Promise<Response | string> => {
+  try {
+    return await fetch(url, { redirect: 'error' });
+  } catch {
+    return '画像 URL の取得に失敗しました(リダイレクトまたはネットワークエラー)。リダイレクトしない最終 URL を直接指定してください。';
+  }
+};
+
 const resolveUploadSource = async (input: { url?: string; base64?: string }): Promise<UploadSource | string> => {
   if (input.url !== undefined) {
     const validationError = validateImageURL(input.url);
     if (validationError !== undefined) return validationError;
-    const response = await fetch(input.url);
+    const response = await fetchWithoutRedirect(input.url);
+    if (typeof response === 'string') return response;
     if (!response.ok) return `画像の取得に失敗しました (HTTP ${response.status})。URL を確認して再実行してください。`;
     const contentType = response.headers.get('content-type');
     return {
