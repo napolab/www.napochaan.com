@@ -8,8 +8,11 @@ export type MarkdownCodec = {
   toMarkdown: (data: Blog['body']) => string;
 };
 
-// editorConfig はグローバル editor 設定(BlocksFeature 込み)から
-// `await editorConfigFactory.default({ config: payload.config })` で作る(呼び出し側の責務)。
+// editorConfig はプロジェクトの root lexical editor 設定(BlocksFeature([ImageRow]) 込み)を
+// 渡すこと(呼び出し側の責務。route.ts で `payload.config.editor.editorConfig` から解決する)。
+// `editorConfigFactory.default` は Payload のグローバルキャッシュされた汎用 default editor を
+// 返すだけで payload.config.editor から導出されないため、プロジェクトの block 登録
+// (image-row 等)を含まない。ここでは絶対に使わないこと。
 export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): MarkdownCodec => ({
   toLexical: (markdown) => convertMarkdownToLexical({ editorConfig, markdown }),
   toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),
