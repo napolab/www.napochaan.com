@@ -9,16 +9,21 @@ import { getPayloadClient } from '@lib/payload/client';
 // Pair: worker/worker.ts の mcpAPIHandler が OAuth 検証後にこのヘッダーを付けて
 // in-process forward する。外部からの /api/mcp は Hono 層(mcp-guard)で 404 に
 // なるため、ここに届いた時点でヘッダーは信頼できる。
+// 万一 worker 層の遮断が壊れた場合でも、このヘッダーだけでは Payload の実在ユーザー
+// ID との一致が必要(存在しない ID は 401)。
 const MCP_USER_HEADER = 'x-mcp-user-id';
 
 const handleMCPRequest = async (request: Request): Promise<Response> => {
   const userHeader = request.headers.get(MCP_USER_HEADER);
   if (userHeader === null) return new Response('Not Found', { status: 404 });
 
+  const userID = parseInt(userHeader, 10);
+  if (Number.isNaN(userID)) return new Response('Unauthorized', { status: 401 });
+
   const payload = await getPayloadClient();
   const user = await payload.findByID({
     collection: 'users',
-    id: parseInt(userHeader, 10),
+    id: userID,
     disableErrors: true,
     overrideAccess: true,
   });
