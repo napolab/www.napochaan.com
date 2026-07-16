@@ -1,0 +1,345 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { createBlogToolHandlers } from '.';
+
+import type { BlogToolDeps } from '.';
+import type { Blog, User } from '@payload-types';
+
+// Vite reserves `BASE_URL` (default '/') and injects it into `process.env` in
+// the vitest node environment, which breaks `absoluteUrl`'s `new URL(path, base)`
+// call. Stub a real origin for the duration of this suite (see src/utils/site-url
+// for the same pattern).
+beforeEach(() => {
+  vi.stubEnv('BASE_URL', 'https://www.napochaan.com');
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
+
+const user = { id: 1, email: 'dev@napochaan.com' } as User;
+
+const paragraphBody = (): Blog['body'] => ({ root: { type: 'root', children: [{ type: 'paragraph', version: 1 }], direction: null, format: '', indent: 0, version: 1 } }) as Blog['body'];
+
+const blockBody = (): Blog['body'] => ({ root: { type: 'root', children: [{ type: 'block', version: 2 }], direction: null, format: '', indent: 0, version: 1 } }) as Blog['body'];
+
+const createDeps = () => {
+  const payload = {
+    find: vi.fn(),
+    findByID: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+  };
+  const codec = {
+    toLexical: vi.fn((_markdown: string) => paragraphBody()),
+    toMarkdown: vi.fn(() => '# md'),
+  };
+  const deps = { payload, user, codec } as unknown as BlogToolDeps;
+  return { payload, codec, deps };
+};
+
+describe('createPost', () => {
+  it('creates a draft with overrideAccess: false', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    payload.create.mockResolvedValue({ id: 10, slug: 'hello' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 'hello',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: '# hi',
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'blog',
+        draft: true,
+        overrideAccess: false,
+        user,
+        data: expect.objectContaining({ _status: 'draft', slug: 'hello', thumbnail: 5 }),
+      }),
+    );
+  });
+
+  it('rejects raw image URLs with a recovery hint', async () => {
+    const { payload, deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: '![x](https://example.com/x.png)',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('upload_media');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a missing thumbnail', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue(null);
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 's', excerpt: 'e', thumbnailMediaID: 99, bodyMarkdown: '# hi' });
+
+    expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('defaults publishedAt to today (Asia/Tokyo)', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 });
+    payload.create.mockResolvedValue({ id: 10, slug: 'hello' });
+    const handlers = createBlogToolHandlers(deps);
+    await handlers.createPost({ title: 't', slug: 'hello', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: '# hi' });
+
+    const arg = payload.create.mock.calls[0]?.[0] as { data: { publishedAt: string } };
+    expect(arg.data.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('updatePost', () => {
+  it('rejects bodyMarkdown when the current body contains block nodes', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: blockBody() });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.updatePost({ id: 3, bodyMarkdown: '# rewrite' });
+
+    expect(result.isError).toBe(true);
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  it('updates non-body fields of a block-containing post', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: blockBody() });
+    payload.update.mockResolvedValue({ id: 3, slug: 's' });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.updatePost({ id: 3, title: 'new title' });
+
+    expect(result.isError).toBeUndefined();
+    const arg = payload.update.mock.calls[0]?.[0] as { draft: boolean; data: Record<string, unknown> };
+    expect(arg.draft).toBe(true);
+    expect(arg.data).not.toHaveProperty('body');
+    expect(arg.data).toHaveProperty('title', 'new title');
+  });
+});
+
+describe('publishPost', () => {
+  it('resends all draft fields with _status published and returns the public URL', async () => {
+    const { payload, deps } = createDeps();
+    const draft = {
+      id: 3,
+      slug: 'hello',
+      title: 't',
+      excerpt: 'e',
+      thumbnail: 5,
+      publishedAt: '2026-07-16',
+      body: paragraphBody(),
+    };
+    payload.findByID.mockResolvedValue(draft);
+    payload.update.mockResolvedValue({ id: 3, slug: 'hello', title: 't', _status: 'published' });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.publishPost({ id: 3 });
+
+    expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user }));
+    expect(payload.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'blog',
+        id: 3,
+        overrideAccess: false,
+        user,
+        data: {
+          title: 't',
+          slug: 'hello',
+          excerpt: 'e',
+          thumbnail: 5,
+          publishedAt: '2026-07-16',
+          body: draft.body,
+          _status: 'published',
+        },
+      }),
+    );
+    expect(result.content[0]?.text).toContain('/blog/hello');
+  });
+
+  it('returns an error and does not update when the post does not exist', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue(null);
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.publishPost({ id: 999 });
+
+    expect(result.isError).toBe(true);
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('getPost', () => {
+  it('flags block-containing posts as not body-editable', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, slug: 's', title: 't', publishedAt: '2026-07-16', excerpt: 'e', body: blockBody() });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.content[0]?.text).toContain('"bodyEditable": false');
+    expect(codec.toMarkdown).not.toHaveBeenCalled();
+  });
+});
+
+describe('uploadMedia', () => {
+  it('creates media from base64 and returns the placeholder', async () => {
+    const { payload, deps } = createDeps();
+    payload.create.mockResolvedValue({ id: 42, url: '/api/media/file/x.png' });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.uploadMedia({ base64: Buffer.from('png-bytes').toString('base64'), alt: 'x', filename: 'x.png' });
+
+    expect(payload.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'media',
+        overrideAccess: false,
+        user,
+        data: { alt: 'x' },
+        file: expect.objectContaining({ mimetype: 'image/png', name: 'x.png' }),
+      }),
+    );
+    expect(result.content[0]?.text).toContain('![media:42]()');
+  });
+
+  it('fails without url or base64', async () => {
+    const { deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.uploadMedia({ alt: 'x', filename: 'x.png' });
+    expect(result.isError).toBe(true);
+  });
+
+  describe('SSRF guard', () => {
+    beforeEach(() => {
+      vi.spyOn(globalThis, 'fetch');
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('rejects a non-http(s) URL scheme without calling fetch', async () => {
+      const { payload, deps } = createDeps();
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'file:///etc/passwd', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('http(s) 以外の URL');
+      expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a localhost URL without calling fetch', async () => {
+      const { payload, deps } = createDeps();
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'http://localhost:3000/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('内部ネットワークの URL');
+      expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a private IPv4 URL without calling fetch', async () => {
+      const { payload, deps } = createDeps();
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'http://192.168.1.5/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('内部ネットワークの URL');
+      expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects an IPv6 literal hostname without calling fetch', async () => {
+      const { payload, deps } = createDeps();
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'http://[::ffff:127.0.0.1]/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('内部ネットワークの URL');
+      expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a URL whose fetch is redirected, without calling payload.create', async () => {
+      const { payload, deps } = createDeps();
+      vi.mocked(globalThis.fetch).mockRejectedValue(new TypeError('unexpected redirect'));
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'https://example.com/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('リダイレクト');
+      expect(vi.mocked(globalThis.fetch)).toHaveBeenCalledWith('https://example.com/x.png', expect.objectContaining({ redirect: 'error' }));
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('size limit', () => {
+    beforeEach(() => {
+      vi.spyOn(globalThis, 'fetch');
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('rejects a response whose content-length exceeds 10MB without reading the body', async () => {
+      const { payload, deps } = createDeps();
+      vi.mocked(globalThis.fetch).mockResolvedValue(new Response('x', { headers: { 'content-type': 'image/png', 'content-length': `${11 * 1024 * 1024}` } }));
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'https://example.com/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('上限 10MB');
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a streamed response exceeding 10MB when content-length is absent', async () => {
+      const { payload, deps } = createDeps();
+      const chunk = new Uint8Array(2 * 1024 * 1024);
+      const stream = new ReadableStream<Uint8Array>({
+        start: (controller) => {
+          for (const _index of [0, 1, 2, 3, 4, 5]) controller.enqueue(chunk);
+          controller.close();
+        },
+      });
+      vi.mocked(globalThis.fetch).mockResolvedValue(new Response(stream, { headers: { 'content-type': 'image/png' } }));
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'https://example.com/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('上限 10MB');
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects base64 input exceeding 10MB after decoding', async () => {
+      const { payload, deps } = createDeps();
+      const oversized = Buffer.alloc(11 * 1024 * 1024).toString('base64');
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ base64: oversized, alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('上限 10MB');
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+  });
+});
+
+describe('listPosts', () => {
+  it('queries drafts with access control', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [] });
+    const handlers = createBlogToolHandlers(deps);
+    await handlers.listPosts({});
+
+    expect(payload.find).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', draft: true, overrideAccess: false, user, sort: '-publishedAt' }));
+  });
+});
