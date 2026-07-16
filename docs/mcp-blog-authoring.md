@@ -1,17 +1,8 @@
 # MCP blog 入稿 — 接続・運用 runbook
 
-## 初回セットアップ(未完了)
+## 初回セットアップ
 
-以下は staging E2E 検証を始める前に必要な作業。`wrangler.toml` の `OAUTH_KV` binding は現在 3 箇所とも placeholder id(`00000000000000000000000000000000`)のままで、今回使用したトークンには KV write 権限がないため実施できていない。
-
-1. KV write 権限のあるトークンで namespace を作成し、`wrangler.toml` の placeholder id 3 箇所(main / `env.staging` / `env.production`)を実 ID に置換する。
-
-   ```bash
-   CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72 pnpm wrangler kv namespace create OAUTH_KV
-   CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72 pnpm wrangler kv namespace create OAUTH_KV --env staging
-   CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72 pnpm wrangler kv namespace create OAUTH_KV --env production
-   ```
-
+1. ~~KV namespace 作成~~ **完了(2026-07-16)**: `env.staging` = `385b19e3196d42408ea8466591d1ce8a` / `env.production` = `d19a648ce9224e16be0927ba5d594460` を `wrangler.toml` に反映済み。main(local dev)は miniflare シミュレーションで動くため実 namespace 不要 — placeholder のまま(default env は deploy しない)。
 2. staging へ deploy する(`staging-deploy-seed` skill の手順)。
 3. staging E2E(下記フローに準じる 10 項目: 401 + WWW-Authenticate 確認 → ヘッダー偽造遮断確認 → oauth-authorization-server メタデータ確認 → Claude Code 接続 → list_posts → upload_media/create_post の round-trip 確認 → publish_post の最新 draft 反映確認 → claude.ai Connectors 接続 → image-row block を含む記事の bodyEditable=false 確認 → cursor WebSocket(/api/cursors)の upgrade(101)が OAuthProvider ラップ後も生きていることを確認)を実施する。
 

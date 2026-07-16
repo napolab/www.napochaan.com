@@ -43,7 +43,7 @@ bucket_name = "napochaan-cms-dev" # TODO: wrangler r2 bucket create napochaan-cm
 
 [[kv_namespaces]]
 binding = "OAUTH_KV"
-id = "00000000000000000000000000000000" # TODO: wrangler kv namespace create OAUTH_KV
+id = "00000000000000000000000000000000" # local は miniflare シミュレーションのため実 namespace 不要(default env は deploy しない)
 
 # ===== Cache (OpenNext) =====
 
@@ -135,7 +135,7 @@ database_id = "0af66616-6458-492f-92b3-0f1d305abd06"
 
 [[env.staging.kv_namespaces]]
 binding = "OAUTH_KV"
-id = "00000000000000000000000000000000" # TODO: wrangler kv namespace create OAUTH_KV --env staging
+id = "385b19e3196d42408ea8466591d1ce8a"
 
 # ===== Production Environment =====
 [env.production]
@@ -193,7 +193,7 @@ database_id = "f3f67f2e-3e9d-45e6-b522-de8a90256d36"
 
 [[env.production.kv_namespaces]]
 binding = "OAUTH_KV"
-id = "00000000000000000000000000000000" # TODO: wrangler kv namespace create OAUTH_KV --env production
+id = "d19a648ce9224e16be0927ba5d594460"
 
 # ===== Test Environment =====
 # Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
