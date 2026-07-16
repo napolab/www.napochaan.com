@@ -50,6 +50,7 @@
     "@payloadcms/storage-r2": "3.84.1",
     "@payloadcms/translations": "3.84.1",
     "@radix-ui/react-slot": "^1.2.4",
+    "bson-objectid": "^2.0.4",
     "budoux": "^0.8.4",
     "dayjs": "^1.11.21",
     "durabcast": "^0.2.4",
