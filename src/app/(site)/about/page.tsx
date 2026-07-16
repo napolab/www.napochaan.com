@@ -18,6 +18,7 @@ export const generateMetadata = async (): Promise<Metadata> => {
     docTitle: 'about',
     description: profile?.tagline ?? undefined,
     path: '/about',
+    markdown: '/about.md',
   });
 };
 

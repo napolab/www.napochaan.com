@@ -49,6 +49,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     imageCandidates: [work.thumbnail?.src],
     genericDescription: 'works',
     defaultImage: '/og-default.png',
+    markdown: `/works/${slug}.md`,
   });
 };
 

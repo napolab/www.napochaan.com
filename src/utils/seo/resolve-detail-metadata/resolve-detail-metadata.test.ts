@@ -130,4 +130,14 @@ describe('resolveDetailMetadata', () => {
     expect(meta.openGraph !== null && meta.openGraph !== undefined && 'images' in meta.openGraph ? meta.openGraph.images : undefined).toBeUndefined();
     expect(meta.twitter !== null && meta.twitter !== undefined && 'images' in meta.twitter ? meta.twitter.images : undefined).toBeUndefined();
   });
+
+  it('adds a text/markdown alternate when markdown is given', () => {
+    const result = resolveDetailMetadata({ docTitle: 't', path: '/blog/x', genericDescription: 'g', defaultImage: '/og.png', markdown: '/blog/x.md' });
+    expect(result.alternates).toMatchObject({ canonical: '/blog/x', types: { 'text/markdown': [{ url: '/blog/x.md', title: 't' }] } });
+  });
+
+  it('emits canonical-only alternates when markdown is absent', () => {
+    const result = resolveDetailMetadata({ docTitle: 't', path: '/blog/x', genericDescription: 'g', defaultImage: '/og.png' });
+    expect(result.alternates).toEqual({ canonical: '/blog/x' });
+  });
 });

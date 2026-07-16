@@ -28,6 +28,8 @@ export type ResolveDetailMetadataArgs = {
   genericDescription: string;
   // Accepted but ignored — see `imageCandidates`.
   defaultImage: string;
+  // Optional path of the page's `.md` twin, surfaced as a text/markdown alternate.
+  markdown?: string;
 };
 
 const SUFFIX = ' — napochaan';
@@ -90,7 +92,7 @@ export const resolveDetailMetadata = (args: ResolveDetailMetadataArgs): Metadata
   return {
     title: hasMetaTitle ? { absolute: metaTitle } : args.docTitle,
     description,
-    alternates: { canonical: args.path },
+    alternates: args.markdown === undefined ? { canonical: args.path } : { canonical: args.path, types: { 'text/markdown': [{ url: args.markdown, title: args.docTitle }] } },
     openGraph: {
       type: 'website',
       siteName: SITE_NAME,

@@ -26,6 +26,7 @@ export const generateMetadata = (): Metadata =>
     description: blogDescription,
     path: '/blog',
     feed: { url: '/blog/rss.xml', title: 'napochaan — blog' },
+    markdown: '/blog.md',
   });
 
 const BlogPage = async ({ searchParams }: Props) => {

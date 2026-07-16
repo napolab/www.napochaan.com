@@ -41,6 +41,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     body: item.body,
     genericDescription: 'お知らせ',
     defaultImage: '/og-default.png',
+    markdown: `/news/${slug}.md`,
   });
 };
 

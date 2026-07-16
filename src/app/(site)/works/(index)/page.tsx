@@ -21,6 +21,7 @@ export const generateMetadata = (): Metadata =>
     description: worksDescription,
     path: '/works',
     feed: { url: '/works/rss.xml', title: 'napochaan — works' },
+    markdown: '/works.md',
   });
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;

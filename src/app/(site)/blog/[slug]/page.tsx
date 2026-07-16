@@ -51,6 +51,7 @@ export const generateMetadata = async ({ params }: Props): Promise<Metadata> => 
     descriptionCandidates: [post.excerpt],
     genericDescription: '記事',
     defaultImage: '/og-default.png',
+    markdown: `/blog/${slug}.md`,
   });
 };
 

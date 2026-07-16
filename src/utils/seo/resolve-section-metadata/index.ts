@@ -16,19 +16,24 @@ export type ResolveSectionMetadataArgs = {
   // Site default og:image (defaults to the shared OG card). Same bytes as the
   // file-convention opengraph-image.png.
   image?: string;
+  // Optional path of the page's `.md` twin, surfaced as a text/markdown alternate.
+  markdown?: string;
 };
 
 const SUFFIX = ' — napochaan';
 const SITE_NAME = 'napochaan';
 const DEFAULT_IMAGE = '/og-default.png';
 
-const buildAlternates = (path: string, feed?: Feed): Metadata['alternates'] => {
-  if (feed === undefined) return { canonical: path };
+type AlternateTypes = Record<string, { url: string; title: string }[]>;
 
-  return {
-    canonical: path,
-    types: { 'application/rss+xml': [{ url: feed.url, title: feed.title }] },
-  };
+const buildAlternates = (args: ResolveSectionMetadataArgs): Metadata['alternates'] => {
+  const rss: AlternateTypes = args.feed === undefined ? {} : { 'application/rss+xml': [{ url: args.feed.url, title: args.feed.title }] };
+  const md: AlternateTypes = args.markdown === undefined ? {} : { 'text/markdown': [{ url: args.markdown, title: args.docTitle }] };
+  const types = { ...rss, ...md };
+
+  if (Object.keys(types).length === 0) return { canonical: args.path };
+
+  return { canonical: args.path, types };
 };
 
 // Builds the full `Metadata` for a section/index page (about, works, news, blog,
@@ -42,7 +47,7 @@ export const resolveSectionMetadata = (args: ResolveSectionMetadataArgs): Metada
   return {
     title: args.docTitle,
     description: args.description,
-    alternates: buildAlternates(args.path, args.feed),
+    alternates: buildAlternates(args),
     openGraph: {
       type: 'website',
       siteName: SITE_NAME,
