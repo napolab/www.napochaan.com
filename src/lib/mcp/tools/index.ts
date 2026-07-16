@@ -46,6 +46,11 @@ const MIME_BY_EXT: Record<string, string> = {
   webp: 'image/webp',
 };
 
+// Workers の isolate メモリ保護。media は画像/PDF 想定。
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+
+const UPLOAD_TOO_LARGE_MESSAGE = '画像が大きすぎます(上限 10MB)。縮小・圧縮してから再実行してください。';
+
 const toSummary = (doc: Blog) => ({
   id: doc.id,
   slug: doc.slug,
@@ -130,6 +135,20 @@ const fetchWithoutRedirect = async (url: string): Promise<Response | string> => 
   }
 };
 
+// content-length ヘッダを信頼できない(未送信/嘘)場合に備え、実際の受信バイト数も
+// readCapped 側で上限チェックする。再帰ヘルパーは `let` 禁止ルールに沿うための
+// 累積アキュムレータ(chunks, total)を const 引数として引き回す。
+const readCapped = async (reader: ReadableStreamDefaultReader<Uint8Array<ArrayBuffer>>, chunks: Uint8Array<ArrayBuffer>[], total: number): Promise<Buffer | undefined> => {
+  const { done, value } = await reader.read();
+  if (done) return Buffer.concat(chunks);
+  const nextTotal = total + value.byteLength;
+  if (nextTotal > MAX_UPLOAD_BYTES) {
+    await reader.cancel();
+    return undefined;
+  }
+  return readCapped(reader, [...chunks, value], nextTotal);
+};
+
 const resolveUploadSource = async (input: { url?: string; base64?: string }): Promise<UploadSource | string> => {
   if (input.url !== undefined) {
     const validationError = validateImageURL(input.url);
@@ -137,13 +156,23 @@ const resolveUploadSource = async (input: { url?: string; base64?: string }): Pr
     const response = await fetchWithoutRedirect(input.url);
     if (typeof response === 'string') return response;
     if (!response.ok) return `画像の取得に失敗しました (HTTP ${response.status})。URL を確認して再実行してください。`;
+    const contentLength = response.headers.get('content-length');
+    if (contentLength !== null && parseInt(contentLength, 10) > MAX_UPLOAD_BYTES) {
+      await response.body?.cancel();
+      return UPLOAD_TOO_LARGE_MESSAGE;
+    }
     const contentType = response.headers.get('content-type');
-    return {
-      data: Buffer.from(await response.arrayBuffer()),
-      mimetype: contentType !== null ? contentType.split(';')[0] : undefined,
-    };
+    const mimetype = contentType !== null ? contentType.split(';')[0] : undefined;
+    if (response.body === null) return { data: Buffer.alloc(0), mimetype };
+    const data = await readCapped(response.body.getReader(), [], 0);
+    if (data === undefined) return UPLOAD_TOO_LARGE_MESSAGE;
+    return { data, mimetype };
   }
-  if (input.base64 !== undefined) return { data: Buffer.from(input.base64, 'base64') };
+  if (input.base64 !== undefined) {
+    const data = Buffer.from(input.base64, 'base64');
+    if (data.byteLength > MAX_UPLOAD_BYTES) return UPLOAD_TOO_LARGE_MESSAGE;
+    return { data };
+  }
   return 'url か base64 のどちらかを指定してください。';
 };
 
@@ -405,10 +434,11 @@ export const registerBlogTools = (server: McpServer, deps: BlogToolDeps): void =
     'upload_media',
     {
       title: '画像アップロード',
-      description: '画像を media コレクションに登録し、本文用プレースホルダ ![media:<id>]() と thumbnail 用の id を返す。本文への画像埋め込み・thumbnail 指定の前に必ずこれを使う。',
+      description:
+        '画像を media コレクションに登録し、本文用プレースホルダ ![media:<id>]() と thumbnail 用の id を返す。本文への画像埋め込み・thumbnail 指定の前に必ずこれを使う。サイズ上限は 10MB(超過時はエラーになるため事前に縮小・圧縮すること)。',
       inputSchema: {
-        url: z.string().url().optional().describe('取得元 URL(url か base64 のどちらか必須)'),
-        base64: z.string().optional().describe('画像バイナリの base64'),
+        url: z.string().url().optional().describe('取得元 URL(url か base64 のどちらか必須。ダウンロードサイズ上限 10MB)'),
+        base64: z.string().optional().describe('画像バイナリの base64(デコード後サイズ上限 10MB)'),
         alt: z.string().min(1).describe('代替テキスト(必須)'),
         filename: z.string().min(1).describe('拡張子付きファイル名(例: cover.png)'),
       },

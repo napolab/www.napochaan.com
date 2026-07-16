@@ -281,6 +281,56 @@ describe('uploadMedia', () => {
       expect(payload.create).not.toHaveBeenCalled();
     });
   });
+
+  describe('size limit', () => {
+    beforeEach(() => {
+      vi.spyOn(globalThis, 'fetch');
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('rejects a response whose content-length exceeds 10MB without reading the body', async () => {
+      const { payload, deps } = createDeps();
+      vi.mocked(globalThis.fetch).mockResolvedValue(new Response('x', { headers: { 'content-type': 'image/png', 'content-length': `${11 * 1024 * 1024}` } }));
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'https://example.com/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('上限 10MB');
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a streamed response exceeding 10MB when content-length is absent', async () => {
+      const { payload, deps } = createDeps();
+      const chunk = new Uint8Array(2 * 1024 * 1024);
+      const stream = new ReadableStream<Uint8Array>({
+        start: (controller) => {
+          for (const _index of [0, 1, 2, 3, 4, 5]) controller.enqueue(chunk);
+          controller.close();
+        },
+      });
+      vi.mocked(globalThis.fetch).mockResolvedValue(new Response(stream, { headers: { 'content-type': 'image/png' } }));
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'https://example.com/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('上限 10MB');
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects base64 input exceeding 10MB after decoding', async () => {
+      const { payload, deps } = createDeps();
+      const oversized = Buffer.alloc(11 * 1024 * 1024).toString('base64');
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ base64: oversized, alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('上限 10MB');
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+  });
 });
 
 describe('listPosts', () => {
