@@ -107,6 +107,11 @@ describe('lexicalToMarkdown: quote/code/table/hr', () => {
     expect(lexicalToMarkdown(body, opts)).toBe('```\nplain\n```');
   });
 
+  it('preserves tab nodes as \\t inside fenced code', () => {
+    const body = state({ type: 'code', language: 'ts', children: [text('if (a) {'), { type: 'linebreak' }, { type: 'tab' }, text('run();'), { type: 'linebreak' }, text('}')] });
+    expect(lexicalToMarkdown(body, opts)).toBe('```ts\nif (a) {\n\trun();\n}\n```');
+  });
+
   it('renders tables with a separator after the first row', () => {
     const cell = (value: string, headerState = 0) => ({ type: 'tablecell', headerState, children: [paragraph(text(value))] });
     const row = (...cells: readonly unknown[]) => ({ type: 'tablerow', children: cells });

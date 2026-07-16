@@ -21,28 +21,40 @@ const profile: Profile = {
   contacts: [],
 };
 
+const HEADER_LINES = [
+  '---',
+  'title: "naporitan"',
+  'url: "https://example.com/about"',
+  '---',
+  '',
+  '# naporitan',
+  '',
+  '**naporitan** (napochaan)',
+  '',
+  '> おそろしき、なんでも屋。',
+  '',
+  'Now: エンジニア · DJ · VJ / Team: StudioGnu',
+  '',
+  '自己紹介',
+  '',
+  '哲学',
+];
+
 describe('buildAboutMarkdown', () => {
-  it('renders frontmatter, profile header lines, bio, and philosophy', () => {
-    expect(buildAboutMarkdown(profile, BASE)).toBe(
-      [
-        '---',
-        'title: "naporitan"',
-        'url: "https://example.com/about"',
-        '---',
-        '',
-        '# naporitan',
-        '',
-        '**naporitan** (napochaan)',
-        '',
-        '> おそろしき、なんでも屋。',
-        '',
-        'Now: エンジニア · DJ · VJ / Team: StudioGnu',
-        '',
-        '自己紹介',
-        '',
-        '哲学',
-        '',
-      ].join('\n'),
+  it('renders frontmatter, profile header lines, bio, and philosophy when love/skillGroups/contacts are empty', () => {
+    expect(buildAboutMarkdown(profile, BASE)).toBe([...HEADER_LINES, ''].join('\n'));
+  });
+
+  it('renders love/skill/contact sections when present', () => {
+    const withSections: Profile = {
+      ...profile,
+      love: ['DJ', 'VJ'],
+      skillGroups: [{ category: 'frontend', items: ['react', 'panda css'] }],
+      contacts: [{ label: 'X', handle: '@naporin24690', href: 'https://x.com/naporin24690' }],
+    };
+
+    expect(buildAboutMarkdown(withSections, BASE)).toBe(
+      [...HEADER_LINES, '', '## love', '', '- DJ', '- VJ', '', '## skill', '', '- frontend: react, panda css', '', '## contact', '', '- X: [@naporin24690](https://x.com/naporin24690)', ''].join('\n'),
     );
   });
 

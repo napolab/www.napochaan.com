@@ -147,10 +147,24 @@ const headingLevel = (tag: string | undefined): number => {
   return parsed;
 };
 
-// Raw text of a code block: text nodes joined verbatim, linebreak → '\n'
-// (no inline formatting inside a fence).
+// One code-block child → its raw text. linebreak/tab carry no text field of
+// their own, so they must be special-cased before falling back to `text`
+// (mirrors converters/code/extract-code's childText).
+const codeChildText = (node: unknown): string => {
+  switch (typeOf(node)) {
+    case 'linebreak':
+      return '\n';
+    case 'tab':
+      return '\t';
+    default:
+      return stringOf(node, 'text') ?? '';
+  }
+};
+
+// Raw text of a code block: text nodes joined verbatim, linebreak → '\n',
+// tab → '\t' (no inline formatting inside a fence).
 const renderCodeText = (nodes: readonly unknown[]): string => {
-  return nodes.map((node) => (typeOf(node) === 'linebreak' ? '\n' : (stringOf(node, 'text') ?? ''))).join('');
+  return nodes.map((node) => codeChildText(node)).join('');
 };
 
 const absolutize = (url: string, opts: LexicalToMarkdownOptions): string => (url.startsWith('/') ? new URL(url, opts.baseUrl).toString() : url);
