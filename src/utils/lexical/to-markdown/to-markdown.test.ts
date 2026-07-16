@@ -90,3 +90,32 @@ describe('lexicalToMarkdown: lists', () => {
     expect(lexicalToMarkdown(body, opts)).toBe('1. one\n    - nested\n2. two');
   });
 });
+
+describe('lexicalToMarkdown: quote/code/table/hr', () => {
+  it('prefixes quote lines with >', () => {
+    const body = state({ type: 'quote', children: [text('一行目'), { type: 'linebreak' }, text('二行目')] });
+    expect(lexicalToMarkdown(body, opts)).toBe('> 一行目\n> 二行目');
+  });
+
+  it('renders fenced code blocks with language', () => {
+    const body = state({ type: 'code', language: 'ts', children: [text('const a = 1;'), { type: 'linebreak' }, text('const b = 2;')] });
+    expect(lexicalToMarkdown(body, opts)).toBe('```ts\nconst a = 1;\nconst b = 2;\n```');
+  });
+
+  it('renders a fence without language when language is absent', () => {
+    const body = state({ type: 'code', children: [text('plain')] });
+    expect(lexicalToMarkdown(body, opts)).toBe('```\nplain\n```');
+  });
+
+  it('renders tables with a separator after the first row', () => {
+    const cell = (value: string, headerState = 0) => ({ type: 'tablecell', headerState, children: [paragraph(text(value))] });
+    const row = (...cells: readonly unknown[]) => ({ type: 'tablerow', children: cells });
+    const body = state({ type: 'table', children: [row(cell('名前', 2), cell('値', 2)), row(cell('a'), cell('b'))] });
+    expect(lexicalToMarkdown(body, opts)).toBe('| 名前 | 値 |\n| --- | --- |\n| a | b |');
+  });
+
+  it('renders horizontalrule as ---', () => {
+    const body = state(paragraph(text('上')), { type: 'horizontalrule' }, paragraph(text('下')));
+    expect(lexicalToMarkdown(body, opts)).toBe('上\n\n---\n\n下');
+  });
+});

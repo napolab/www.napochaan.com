@@ -147,6 +147,12 @@ const headingLevel = (tag: string | undefined): number => {
   return parsed;
 };
 
+// Raw text of a code block: text nodes joined verbatim, linebreak → '\n'
+// (no inline formatting inside a fence).
+const renderCodeText = (nodes: readonly unknown[]): string => {
+  return nodes.map((node) => (typeOf(node) === 'linebreak' ? '\n' : (stringOf(node, 'text') ?? ''))).join('');
+};
+
 // Block renderer: returns the markdown for one top-level block, or undefined
 // for unknown/empty blocks (skipped by the caller).
 const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | undefined => {
@@ -163,9 +169,49 @@ const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | un
     }
     case 'list':
       return renderList(node, 0, opts);
+    case 'quote': {
+      const inline = renderInline(childrenOf(node), opts);
+
+      return inline === ''
+        ? undefined
+        : inline
+            .split('\n')
+            .map((line) => `> ${line}`)
+            .join('\n');
+    }
+    case 'code': {
+      const lang = stringOf(node, 'language') ?? '';
+
+      return `\`\`\`${lang}\n${renderCodeText(childrenOf(node))}\n\`\`\``;
+    }
+    case 'table':
+      return renderTable(node, opts);
+    case 'horizontalrule':
+      return '---';
     default:
       return undefined;
   }
+};
+
+// Table cell content collapses to one line (pipes escaped so they don't break
+// the row).
+const renderTableCell = (cell: unknown, opts: LexicalToMarkdownOptions): string => {
+  const blocks = childrenOf(cell)
+    .map((child) => renderBlock(child, opts) ?? renderInline(childrenOf(child), opts))
+    .filter((value) => value !== '');
+
+  return blocks.join(' ').replace(/\n/g, ' ').replace(/\|/g, '\\|');
+};
+
+const renderTable = (node: unknown, opts: LexicalToMarkdownOptions): string => {
+  const rows = childrenOf(node).map((row) => childrenOf(row).map((cell) => renderTableCell(cell, opts)));
+  const [head, ...rest] = rows;
+  if (head === undefined) return '';
+
+  const line = (cells: readonly string[]): string => `| ${cells.join(' | ')} |`;
+  const separator = line(head.map(() => '---'));
+
+  return [line(head), separator, ...rest.map(line)].join('\n');
 };
 
 /**
