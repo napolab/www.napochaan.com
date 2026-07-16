@@ -119,3 +119,38 @@ describe('lexicalToMarkdown: quote/code/table/hr', () => {
     expect(lexicalToMarkdown(body, opts)).toBe('上\n\n---\n\n下');
   });
 });
+
+describe('lexicalToMarkdown: upload & image-row', () => {
+  const media = { url: '/api/media/file/cat.jpg', alt: '猫', mimeType: 'image/jpeg', width: 800, height: 450 };
+
+  it('renders a populated image upload as absolute-URL image with caption line', () => {
+    const body = state({ type: 'upload', value: media, fields: { caption: '飼い猫' } });
+    expect(lexicalToMarkdown(body, opts)).toBe('![猫](https://example.com/api/media/file/cat.jpg)\n*飼い猫*');
+  });
+
+  it('falls back to alt as caption and skips unpopulated uploads', () => {
+    const body = state({ type: 'upload', value: media }, { type: 'upload', value: 42 });
+    expect(lexicalToMarkdown(body, opts)).toBe('![猫](https://example.com/api/media/file/cat.jpg)\n*猫*');
+  });
+
+  it('renders non-image uploads as file links', () => {
+    const body = state({ type: 'upload', value: { url: '/api/media/file/tool.zip', mimeType: 'application/zip', filename: 'tool.zip' } });
+    expect(lexicalToMarkdown(body, opts)).toBe('[tool.zip](https://example.com/api/media/file/tool.zip)');
+  });
+
+  it('renders image-row block cells as stacked images', () => {
+    const body = state({
+      type: 'block',
+      fields: {
+        blockType: 'image-row',
+        cells: [{ image: media, caption: '左' }, { image: { ...media, url: '/api/media/file/dog.jpg', alt: '犬' } }],
+      },
+    });
+    expect(lexicalToMarkdown(body, opts)).toBe('![猫](https://example.com/api/media/file/cat.jpg)\n*左*\n![犬](https://example.com/api/media/file/dog.jpg)\n*犬*');
+  });
+
+  it('skips unknown block types', () => {
+    const body = state({ type: 'block', fields: { blockType: 'future-block' } }, paragraph(text('生存')));
+    expect(lexicalToMarkdown(body, opts)).toBe('生存');
+  });
+});

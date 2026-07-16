@@ -153,6 +153,51 @@ const renderCodeText = (nodes: readonly unknown[]): string => {
   return nodes.map((node) => (typeOf(node) === 'linebreak' ? '\n' : (stringOf(node, 'text') ?? ''))).join('');
 };
 
+const absolutize = (url: string, opts: LexicalToMarkdownOptions): string => (url.startsWith('/') ? new URL(url, opts.baseUrl).toString() : url);
+
+// A populated media value carries url (+ alt/mimeType); an unpopulated one is a
+// numeric id — mirrors converters/image-row's guard.
+type PopulatedMedia = { url: string; alt: string; mimeType: string; filename?: string };
+
+const populatedMediaOf = (value: unknown): PopulatedMedia | undefined => {
+  if (!isObject(value)) return undefined;
+  const url = stringOf(value, 'url');
+  if (url === undefined) return undefined;
+
+  return { url, alt: stringOf(value, 'alt') ?? '', mimeType: stringOf(value, 'mimeType') ?? '', filename: stringOf(value, 'filename') };
+};
+
+// `![alt](url)` + caption line. Caption prefers the explicit caption, falling
+// back to alt so an image is never label-less (same policy as converters/upload).
+const imageMarkdown = (media: PopulatedMedia, caption: string | undefined, opts: LexicalToMarkdownOptions): string => {
+  const line = `![${media.alt}](${absolutize(media.url, opts)})`;
+  const label = caption !== undefined && caption !== '' ? caption : media.alt;
+
+  return label === '' ? line : `${line}\n*${label}*`;
+};
+
+const renderUpload = (node: unknown, opts: LexicalToMarkdownOptions): string | undefined => {
+  const media = populatedMediaOf(isObject(node) ? node.value : undefined);
+  if (media === undefined) return undefined;
+  if (!media.mimeType.startsWith('image')) return `[${media.filename ?? media.url}](${absolutize(media.url, opts)})`;
+
+  return imageMarkdown(media, stringOf(isObject(node) ? node.fields : undefined, 'caption'), opts);
+};
+
+const renderImageRow = (fields: Record<string, unknown>, opts: LexicalToMarkdownOptions): string | undefined => {
+  const cells = Array.isArray(fields.cells) ? fields.cells : [];
+  const rendered = cells
+    .map((cell: unknown) => {
+      const media = populatedMediaOf(isObject(cell) ? cell.image : undefined);
+      if (media === undefined) return undefined;
+
+      return imageMarkdown(media, stringOf(cell, 'caption'), opts);
+    })
+    .filter((value): value is string => value !== undefined);
+
+  return rendered.length === 0 ? undefined : rendered.join('\n');
+};
+
 // Block renderer: returns the markdown for one top-level block, or undefined
 // for unknown/empty blocks (skipped by the caller).
 const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | undefined => {
@@ -188,6 +233,15 @@ const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | un
       return renderTable(node, opts);
     case 'horizontalrule':
       return '---';
+    case 'upload':
+      return renderUpload(node, opts);
+    case 'block': {
+      const fields = isObject(node) && isObject(node.fields) ? node.fields : undefined;
+      if (fields === undefined) return undefined;
+      if (fields.blockType === 'image-row') return renderImageRow(fields, opts);
+
+      return undefined;
+    }
     default:
       return undefined;
   }
