@@ -186,8 +186,7 @@ const validateBodyMarkdown = async (bodyMarkdown: string, verifyMediaExists: (id
   const fenceErrors = validateImageRowFences(bodyMarkdown);
   if (fenceErrors.length > 0) return fenceErrors[0];
 
-  const mediaIDs = extractImageRowMediaIDs(bodyMarkdown);
-  for (const id of mediaIDs) {
+  for (const id of [...new Set(extractImageRowMediaIDs(bodyMarkdown))]) {
     const exists = await verifyMediaExists(id);
     if (!exists) return `image-row の media id=${id} が存在しません。upload_media で作成した id を使ってください。`;
   }
@@ -215,9 +214,12 @@ const resolveNextBody = async (bodyMarkdown: string | undefined, current: Blog, 
 export const createBlogToolHandlers = (deps: BlogToolDeps) => {
   const { payload, user, codec } = deps;
 
+  // depth: 0 で読む — 既定 depth だと body 内の upload node が media doc に populate
+  // され、convertLexicalToMarkdown が生 URL(![alt](url))として書き出してしまう。
+  // これだと再送/検証で raw ref 扱いされ、往復編集が壊れる(![media:<id>]() が欲しい)。
   const findPost = async (query: { id?: number; slug?: string }): Promise<Blog | null> => {
     if (query.id !== undefined) {
-      return payload.findByID({ collection: 'blog', id: query.id, draft: true, disableErrors: true, overrideAccess: false, user });
+      return payload.findByID({ collection: 'blog', id: query.id, draft: true, disableErrors: true, overrideAccess: false, user, depth: 0 });
     }
     if (query.slug !== undefined) {
       const { docs } = await payload.find({
@@ -227,6 +229,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         limit: 1,
         overrideAccess: false,
         user,
+        depth: 0,
       });
       return docs[0] ?? null;
     }
@@ -379,7 +382,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         // published 済みの main テーブル行の上に浅くマージされ、未公開の draft
         // 編集内容が黙って失われる。最新 draft を読み直し、全フィールドを
         // publishedステータス付きで再送することで最新内容を確実に公開する。
-        const current = await payload.findByID({ collection: 'blog', id: input.id, draft: true, disableErrors: true, overrideAccess: false, user });
+        const current = await payload.findByID({ collection: 'blog', id: input.id, draft: true, disableErrors: true, overrideAccess: false, user, depth: 0 });
         if (current === null) return fail('記事が見つかりません。list_posts で id を確認してください。');
         const thumbnailID = typeof current.thumbnail === 'number' ? current.thumbnail : current.thumbnail.id;
         const updated = await payload.update({

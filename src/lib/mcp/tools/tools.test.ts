@@ -184,7 +184,7 @@ describe('publishPost', () => {
     const handlers = createBlogToolHandlers(deps);
     const result = await handlers.publishPost({ id: 3 });
 
-    expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user }));
+    expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user, depth: 0 }));
     expect(payload.update).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: 'blog',
@@ -225,6 +225,15 @@ describe('getPost', () => {
 
     expect(result.content[0]?.text).toContain('"bodyEditable": false');
     expect(codec.toMarkdown).not.toHaveBeenCalled();
+  });
+
+  it('reads the post at depth 0 so body upload nodes keep raw ids instead of populating', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, slug: 's', title: 't', publishedAt: '2026-07-16', excerpt: 'e', body: paragraphBody() });
+    const handlers = createBlogToolHandlers(deps);
+    await handlers.getPost({ id: 3 });
+
+    expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user, depth: 0 }));
   });
 });
 

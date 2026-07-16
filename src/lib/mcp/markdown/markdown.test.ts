@@ -12,12 +12,16 @@ const bodyWith = (children: unknown[]): Blog['body'] =>
 const FENCE = ['```image-row', '![media:79](left)', '![media:78]()', '```'].join('\n');
 
 describe('findRawImageRefs (image-row aware)', () => {
-  it('excludes image-row cell lines with captions', () => {
-    expect(findRawImageRefs('![media:79](left cap)')).toEqual([]);
+  it('excludes image-row cell lines with captions inside a fence', () => {
+    expect(findRawImageRefs(FENCE)).toEqual([]);
   });
 
   it('excludes empty-paren media refs', () => {
     expect(findRawImageRefs('![media:78]()')).toEqual([]);
+  });
+
+  it('detects a caption-bearing media ref outside any fence', () => {
+    expect(findRawImageRefs('![media:79](left cap)')).toEqual(['![media:79](left cap)']);
   });
 
   it('still detects raw URL images', () => {

@@ -18,12 +18,28 @@ export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): 
   toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),
 });
 
-// 画像参照。alt が media:<数字> のもの(単一 media プレースホルダ / image-row セル)は
-// 生 URL ではないので除外する。それ以外の ![alt](非空) を生 URL として返す。
-const IMAGE_REF = /!\[([^\]]*)\]\(([^)]+)\)/g;
-const MEDIA_ALT = /^media:\d+$/;
+// ```image-row フェンスとセル行。
+const IMAGE_ROW_FENCE = /^```image-row\s*\n([\s\S]*?)^```\s*$/gm;
+const CELL_LINE = /^\s*!\[media:(\d+)\]\((.*)\)\s*$/;
 
-export const findRawImageRefs = (markdown: string): string[] => [...markdown.matchAll(IMAGE_REF)].filter((match) => MEDIA_ALT.test(match[1] ?? '') === false).map((match) => match[0]);
+const fenceCellLines = (inner: string): string[] =>
+  inner
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+
+// image-row フェンスを丸ごと除去した Markdown を返す。caption 付き media 参照
+// (![media:<id>](caption))は image-row フェンス内でのみ有効な構文なので、
+// フェンスを除去した残りを生URL画像参照スキャンにかければフェンス外の誤用
+// (caption 付き media 参照 / 本物の生 URL)だけが対象になる。
+const stripImageRowFences = (markdown: string): string => markdown.replace(IMAGE_ROW_FENCE, '');
+
+// 画像参照。フェンス除去後に ![alt](非空) が残っていたら、生 URL 画像か
+// image-row 専用構文(caption 付き media 参照)のフェンス外での誤用。
+// 単一 media プレースホルダ ![media:<id>]() は空 parens のためマッチしない。
+const RAW_IMAGE_REF = /!\[[^\]]*\]\([^)]+\)/g;
+
+export const findRawImageRefs = (markdown: string): string[] => [...stripImageRowFences(markdown).matchAll(RAW_IMAGE_REF)].map((match) => match[0]);
 
 // MCP が Markdown 往復できる block。増えたらここに足す。
 const SUPPORTED_BLOCK_TYPES = ['image-row'];
@@ -40,16 +56,6 @@ const containsUnsupportedBlock = (nodes: LexicalNode[]): boolean =>
 // 対応済み block(image-row)は Markdown 往復できるので拒否しない。
 // 未対応 block(将来の block 等)を含む本文だけ true。
 export const hasUnsupportedBlocks = (body: Blog['body']): boolean => containsUnsupportedBlock(body.root.children as LexicalNode[]);
-
-// ```image-row フェンスとセル行。
-const IMAGE_ROW_FENCE = /^```image-row\s*\n([\s\S]*?)^```\s*$/gm;
-const CELL_LINE = /^\s*!\[media:(\d+)\]\((.*)\)\s*$/;
-
-const fenceCellLines = (inner: string): string[] =>
-  inner
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
 
 // 各 image-row フェンスが「ちょうど2行の ![media:<id>](...)」であることを検証。
 // 違反ごとに LLM 向け回復指示を返す。
