@@ -103,23 +103,41 @@ const listMarker = (tag: string | undefined, index: number, node: unknown): stri
 };
 
 // One listitem → one or more lines. A wrapper item (its only children are
-// nested lists — Lexical's nesting shape) emits no marker line of its own.
-const renderListItem = (node: unknown, tag: string | undefined, index: number, depth: number, opts: LexicalToMarkdownOptions): string => {
+// nested lists — Lexical's nesting shape) emits no marker line of its own,
+// so it must not consume an ordinal — the caller passes only the count of
+// marker-emitting items that preceded it.
+const renderListItem = (node: unknown, tag: string | undefined, ordinal: number, depth: number, opts: LexicalToMarkdownOptions): string => {
   const nested = childrenOf(node).filter((child) => typeOf(child) === 'list');
   const own = childrenOf(node).filter((child) => typeOf(child) !== 'list');
   const inline = renderInline(own, opts).replace(/\n/g, ' ');
-  const ownLine = inline === '' ? [] : [`${INDENT.repeat(depth)}${listMarker(tag, index, node)} ${inline}`];
+  const ownLine = inline === '' ? [] : [`${INDENT.repeat(depth)}${listMarker(tag, ordinal, node)} ${inline}`];
   const nestedLines = nested.map((child) => renderList(child, depth + 1, opts));
 
   return [...ownLine, ...nestedLines].join('\n');
+};
+
+// A listitem emits its own marker line iff it has non-list children whose
+// inline rendering is non-empty (mirrors the ownLine check in renderListItem).
+const emitsMarkerLine = (node: unknown, opts: LexicalToMarkdownOptions): boolean => {
+  const own = childrenOf(node).filter((child) => typeOf(child) !== 'list');
+
+  return renderInline(own, opts) !== '';
 };
 
 const renderList = (node: unknown, depth: number, opts: LexicalToMarkdownOptions): string => {
   const tag = stringOf(node, 'tag');
 
   return childrenOf(node)
-    .map((child, index) => renderListItem(child, tag, index, depth, opts))
-    .filter((line) => line !== '')
+    .reduce<{ lines: readonly string[]; ordinal: number }>(
+      (acc, child) => {
+        const line = renderListItem(child, tag, acc.ordinal, depth, opts);
+        const ordinal = emitsMarkerLine(child, opts) ? acc.ordinal + 1 : acc.ordinal;
+
+        return { lines: [...acc.lines, line], ordinal };
+      },
+      { lines: [], ordinal: 0 },
+    )
+    .lines.filter((line) => line !== '')
     .join('\n');
 };
 

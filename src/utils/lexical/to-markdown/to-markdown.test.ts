@@ -84,4 +84,9 @@ describe('lexicalToMarkdown: lists', () => {
     const body = state(list('ul', { type: 'listitem', checked: true, children: [text('done')] }, { type: 'listitem', checked: false, children: [text('todo')] }));
     expect(lexicalToMarkdown(body, opts)).toBe('- [x] done\n- [ ] todo');
   });
+
+  it('does not let a nested-list wrapper item consume an ordered number', () => {
+    const body = state(list('ol', listitem(text('one')), listitem(list('ul', listitem(text('nested')))), listitem(text('two'))));
+    expect(lexicalToMarkdown(body, opts)).toBe('1. one\n    - nested\n2. two');
+  });
 });
