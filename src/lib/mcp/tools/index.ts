@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { dayjs } from '@utils/dayjs';
 import { absoluteUrl } from '@utils/site-url';
 
-import { findRawImageRefs, hasUnsupportedBlocks } from '../markdown';
+import { extractImageRowMediaIDs, findRawImageRefs, hasUnsupportedBlocks, validateImageRowFences } from '../markdown';
 
 import type { MarkdownCodec } from '../markdown';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -176,10 +176,30 @@ const resolveUploadSource = async (input: { url?: string; base64?: string }): Pr
   return 'url か base64 のどちらかを指定してください。';
 };
 
-type BodyPatch = { kind: 'none' } | { kind: 'patch'; body: Blog['body'] } | { kind: 'error'; message: string };
+// 本文 Markdown の生URL画像参照 + image-row フェンス構造 + cell media 実在性を検証し、
+// 問題があれば LLM 向け回復指示メッセージ(最初の1件)を返す。問題なければ undefined。
+const validateBodyMarkdown = async (bodyMarkdown: string, verifyMediaExists: (id: number) => Promise<boolean>): Promise<string | undefined> => {
+  const rawRefs = findRawImageRefs(bodyMarkdown);
+  if (rawRefs.length > 0) {
+    return `本文に生 URL の画像参照があります: ${rawRefs.join(', ')}\n先に upload_media で画像を登録し、返された ![media:<id>]() を使ってください。`;
+  }
+  const fenceErrors = validateImageRowFences(bodyMarkdown);
+  if (fenceErrors.length > 0) return fenceErrors[0];
 
-const resolveBodyPatch = (current: Blog, bodyMarkdown: string | undefined, codec: MarkdownCodec): BodyPatch => {
-  if (bodyMarkdown === undefined) return { kind: 'none' };
+  const mediaIDs = extractImageRowMediaIDs(bodyMarkdown);
+  for (const id of mediaIDs) {
+    const exists = await verifyMediaExists(id);
+    if (!exists) return `image-row の media id=${id} が存在しません。upload_media で作成した id を使ってください。`;
+  }
+  return undefined;
+};
+
+type NextBody = { kind: 'skip' } | { kind: 'body'; body: Blog['body'] } | { kind: 'error'; message: string };
+
+// update_post の bodyMarkdown 差し替え可否を判定する。IIFE 禁止ルールのため
+// updatePost 本体から切り出した名前付きヘルパ(discriminated union を返す)。
+const resolveNextBody = async (bodyMarkdown: string | undefined, current: Blog, codec: MarkdownCodec, verifyMediaExists: (id: number) => Promise<boolean>): Promise<NextBody> => {
+  if (bodyMarkdown === undefined) return { kind: 'skip' };
   if (hasUnsupportedBlocks(current.body)) {
     return {
       kind: 'error',
@@ -187,14 +207,9 @@ const resolveBodyPatch = (current: Blog, bodyMarkdown: string | undefined, codec
         'この記事の本文には MCP 非対応の block(image-row 等)が含まれるため、bodyMarkdown での上書きはできません(既存 block が破壊されます)。title/excerpt 等の他フィールドのみ更新するか、本文は admin UI で編集してください。',
     };
   }
-  const rawRefs = findRawImageRefs(bodyMarkdown);
-  if (rawRefs.length > 0) {
-    return {
-      kind: 'error',
-      message: `本文に生 URL の画像参照があります: ${rawRefs.join(', ')}\n先に upload_media で画像を登録し、返された ![media:<id>]() を本文に使ってください。`,
-    };
-  }
-  return { kind: 'patch', body: codec.toLexical(bodyMarkdown) };
+  const bodyError = await validateBodyMarkdown(bodyMarkdown, verifyMediaExists);
+  if (bodyError !== undefined) return { kind: 'error', message: bodyError };
+  return { kind: 'body', body: codec.toLexical(bodyMarkdown) };
 };
 
 export const createBlogToolHandlers = (deps: BlogToolDeps) => {
@@ -288,10 +303,9 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
 
     createPost: async (input: { title: string; slug: string; excerpt: string; thumbnailMediaID: number; bodyMarkdown: string; publishedAt?: string }): Promise<ToolResult> => {
       try {
-        const rawRefs = findRawImageRefs(input.bodyMarkdown);
-        if (rawRefs.length > 0) {
-          return fail(`本文に生 URL の画像参照があります: ${rawRefs.join(', ')}\n先に upload_media で画像を登録し、返された ![media:<id>]() を使ってください。`);
-        }
+        const bodyError = await validateBodyMarkdown(input.bodyMarkdown, verifyMediaExists);
+        if (bodyError !== undefined) return fail(bodyError);
+
         const thumbnailExists = await verifyMediaExists(input.thumbnailMediaID);
         if (!thumbnailExists) {
           return fail(`thumbnailMediaID=${input.thumbnailMediaID} の media が存在しません。upload_media で作成した id を指定してください。`);
@@ -331,8 +345,8 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
           const thumbnailExists = await verifyMediaExists(input.thumbnailMediaID);
           if (!thumbnailExists) return fail(`thumbnailMediaID=${input.thumbnailMediaID} の media が存在しません。`);
         }
-        const patch = resolveBodyPatch(current, input.bodyMarkdown, codec);
-        if (patch.kind === 'error') return fail(patch.message);
+        const nextBody = await resolveNextBody(input.bodyMarkdown, current, codec, verifyMediaExists);
+        if (nextBody.kind === 'error') return fail(nextBody.message);
         const updated = await payload.update({
           collection: 'blog',
           id: input.id,
@@ -343,7 +357,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
             ...(input.excerpt !== undefined ? { excerpt: input.excerpt } : {}),
             ...(input.thumbnailMediaID !== undefined ? { thumbnail: input.thumbnailMediaID } : {}),
             ...(input.publishedAt !== undefined ? { publishedAt: input.publishedAt } : {}),
-            ...(patch.kind === 'patch' ? { body: patch.body } : {}),
+            ...(nextBody.kind === 'body' ? { body: nextBody.body } : {}),
           },
           overrideAccess: false,
           user,

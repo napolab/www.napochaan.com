@@ -103,6 +103,44 @@ describe('createPost', () => {
   });
 });
 
+const FENCE = ['```image-row', '![media:5](left)', '![media:6]()', '```'].join('\n');
+
+describe('createPost with image-row', () => {
+  it('accepts a valid image-row fence and checks each cell media', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail + cells all exist
+    payload.create.mockResolvedValue({ id: 20, slug: 'ir' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'ir', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: `intro\n\n${FENCE}` });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.create).toHaveBeenCalled();
+  });
+
+  it('rejects a malformed image-row fence', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 });
+    const handlers = createBlogToolHandlers(deps);
+    const bad = ['```image-row', '![media:5](only one)', '```'].join('\n');
+    const result = await handlers.createPost({ title: 't', slug: 'ir', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: bad });
+
+    expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects when a cell media does not exist', async () => {
+    const { payload, deps } = createDeps();
+    // thumbnail (5) exists, cell media (6) missing
+    payload.findByID.mockImplementation(async ({ id }: { id: number }) => (id === 6 ? null : { id }));
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'ir', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: FENCE });
+
+    expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+});
+
 describe('updatePost', () => {
   it('rejects bodyMarkdown when the current body contains block nodes', async () => {
     const { payload, deps } = createDeps();
