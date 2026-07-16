@@ -180,14 +180,12 @@ describe('uploadMedia', () => {
   });
 
   describe('SSRF guard', () => {
-    let fetchSpy: ReturnType<typeof vi.spyOn>;
-
     beforeEach(() => {
-      fetchSpy = vi.spyOn(globalThis, 'fetch');
+      vi.spyOn(globalThis, 'fetch');
     });
 
     afterEach(() => {
-      fetchSpy.mockRestore();
+      vi.restoreAllMocks();
     });
 
     it('rejects a non-http(s) URL scheme without calling fetch', async () => {
@@ -197,7 +195,7 @@ describe('uploadMedia', () => {
 
       expect(result.isError).toBe(true);
       expect(result.content[0]?.text).toContain('http(s) 以外の URL');
-      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
       expect(payload.create).not.toHaveBeenCalled();
     });
 
@@ -208,7 +206,7 @@ describe('uploadMedia', () => {
 
       expect(result.isError).toBe(true);
       expect(result.content[0]?.text).toContain('内部ネットワークの URL');
-      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
       expect(payload.create).not.toHaveBeenCalled();
     });
 
@@ -219,7 +217,7 @@ describe('uploadMedia', () => {
 
       expect(result.isError).toBe(true);
       expect(result.content[0]?.text).toContain('内部ネットワークの URL');
-      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
       expect(payload.create).not.toHaveBeenCalled();
     });
 
@@ -230,7 +228,19 @@ describe('uploadMedia', () => {
 
       expect(result.isError).toBe(true);
       expect(result.content[0]?.text).toContain('内部ネットワークの URL');
-      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(vi.mocked(globalThis.fetch)).not.toHaveBeenCalled();
+      expect(payload.create).not.toHaveBeenCalled();
+    });
+
+    it('rejects a URL whose fetch is redirected, without calling payload.create', async () => {
+      const { payload, deps } = createDeps();
+      vi.mocked(globalThis.fetch).mockRejectedValue(new TypeError('unexpected redirect'));
+      const handlers = createBlogToolHandlers(deps);
+      const result = await handlers.uploadMedia({ url: 'https://example.com/x.png', alt: 'x', filename: 'x.png' });
+
+      expect(result.isError).toBe(true);
+      expect(result.content[0]?.text).toContain('リダイレクト');
+      expect(vi.mocked(globalThis.fetch)).toHaveBeenCalledWith('https://example.com/x.png', expect.objectContaining({ redirect: 'error' }));
       expect(payload.create).not.toHaveBeenCalled();
     });
   });
