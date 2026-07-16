@@ -6,9 +6,10 @@ import { AuthorizeForm } from './index';
 
 const errorMessage = 'メールアドレスまたはパスワードが正しくありません。';
 
+// initialAuthorizeState now lives in ../../_actions/state (a plain object, no side
+// effects) so the form imports it directly — only the server action is mocked here.
 vi.mock('../../_actions/authorize', () => ({
   authorize: vi.fn(async () => ({ status: 'error', message: errorMessage })),
-  initialAuthorizeState: { status: 'idle' },
 }));
 
 describe('AuthorizeForm', () => {

@@ -6,15 +6,9 @@ import { redirect } from 'next/navigation';
 import { getOAuthHelpers } from '@lib/mcp/oauth';
 import { absoluteUrl } from '@utils/site-url';
 
+import type { AuthorizeState } from './state';
 import type { OAuthHelpers } from '@cloudflare/workers-oauth-provider';
 import type { User } from '@payload-types';
-
-export type AuthorizeState = {
-  status: 'idle' | 'error';
-  message?: string;
-};
-
-export const initialAuthorizeState: AuthorizeState = { status: 'idle' };
 
 const readField = (fd: FormData, key: string): string => {
   const value = fd.get(key);

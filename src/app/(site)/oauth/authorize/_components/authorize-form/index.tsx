@@ -6,7 +6,8 @@ import { Form } from 'react-aria-components';
 import { Button } from '@components/button';
 import { TextField } from '@components/text-field';
 
-import { authorize, initialAuthorizeState } from '../../_actions/authorize';
+import { authorize } from '../../_actions/authorize';
+import { initialAuthorizeState } from '../../_actions/state';
 import * as styles from './styles.css';
 
 type Props = {
