@@ -26,6 +26,7 @@ export const generateMetadata = (): Metadata =>
     description: newsDescription,
     path: '/news',
     feed: { url: '/news/rss.xml', title: 'napochaan — news' },
+    markdown: '/news.md',
   });
 
 const NewsPage = async ({ searchParams }: Props) => {

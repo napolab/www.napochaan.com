@@ -75,4 +75,19 @@ describe('resolveSectionMetadata', () => {
     expect(meta.alternates?.types).toBeUndefined();
     expect(meta.alternates && 'types' in meta.alternates).toBe(false);
   });
+
+  it('adds a text/markdown alternate when markdown is given', () => {
+    const result = resolveSectionMetadata({ docTitle: 'blog', path: '/blog', markdown: '/blog.md' });
+    expect(result.alternates?.types).toMatchObject({ 'text/markdown': [{ url: '/blog.md', title: 'blog' }] });
+    // canonical is preserved
+    expect(result.alternates?.canonical).toBe('/blog');
+  });
+
+  it('keeps the rss alternate alongside the markdown one', () => {
+    const result = resolveSectionMetadata({ docTitle: 'blog', path: '/blog', feed: { url: '/blog/rss.xml', title: 'blog feed' }, markdown: '/blog.md' });
+    expect(result.alternates?.types).toMatchObject({
+      'application/rss+xml': [{ url: '/blog/rss.xml', title: 'blog feed' }],
+      'text/markdown': [{ url: '/blog.md', title: 'blog' }],
+    });
+  });
 });

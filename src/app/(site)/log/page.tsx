@@ -19,6 +19,7 @@ export const generateMetadata = (): Metadata =>
     description: logDescription,
     path: '/log',
     feed: { url: '/log/rss.xml', title: 'napochaan — log' },
+    markdown: '/log.md',
   });
 
 const LogPage = () => (
