@@ -57,13 +57,19 @@ Settings → Connectors → Add custom connector → URL に `https://napochaan.
 
 ## トークン失効(漏洩時)
 
-grant は KV(`OAUTH_KV`)に保存されている。
+grant と access token は KV(`OAUTH_KV`)に別キーで保存されている。`@cloudflare/workers-oauth-provider` の request-time 検証は `token:<userId>:<grantId>:<tokenId>` のみを読む(`grant:` キーは再照会しない)ため、**grant キーを消すだけでは既発行の access token は無効化されない** — TTL(1 時間)が切れるまで使え続ける。grant キーと対応する token キーの両方を削除すること。
 
     export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
-    # 一覧(userId は Payload users の id)
+    # 1. grant を一覧して対象の grantId を特定(userId は Payload users の id)
     pnpm wrangler kv key list --binding OAUTH_KV --env production --prefix "grant:"
-    # 失効(grant を消せば紐づく token も無効になる)
-    pnpm wrangler kv key delete --binding OAUTH_KV --env production "<key>"
+    # 2. その grant にぶら下がる token キーを一覧
+    pnpm wrangler kv key list --binding OAUTH_KV --env production --prefix "token:<userId>:<grantId>:"
+    # 3. 2 で返った token キーをすべて削除
+    pnpm wrangler kv key delete --binding OAUTH_KV --env production "token:<userId>:<grantId>:<tokenId>"
+    # 4. grant キーを削除(refresh はこれで無効化される。以後の再発行を止める)
+    pnpm wrangler kv key delete --binding OAUTH_KV --env production "grant:<userId>:<grantId>"
+
+access token の TTL は 1 時間。token キーの削除漏れがあっても、その 1 時間が最悪の露出窓になる(refresh は grant 削除で止まるので、無限に使われ続けることはない)。
 
 全失効したい場合は `token:` / `grant:` prefix のキーを全削除。
 
