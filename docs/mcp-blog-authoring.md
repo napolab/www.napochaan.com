@@ -13,7 +13,7 @@
    ```
 
 2. staging へ deploy する(`staging-deploy-seed` skill の手順)。
-3. staging E2E(下記フローに準じる 9 項目: 401 + WWW-Authenticate 確認 → ヘッダー偽造遮断確認 → oauth-authorization-server メタデータ確認 → Claude Code 接続 → list_posts → upload_media/create_post の round-trip 確認 → publish_post の最新 draft 反映確認 → claude.ai Connectors 接続 → image-row block を含む記事の bodyEditable=false 確認)を実施する。
+3. staging E2E(下記フローに準じる 10 項目: 401 + WWW-Authenticate 確認 → ヘッダー偽造遮断確認 → oauth-authorization-server メタデータ確認 → Claude Code 接続 → list_posts → upload_media/create_post の round-trip 確認 → publish_post の最新 draft 反映確認 → claude.ai Connectors 接続 → image-row block を含む記事の bodyEditable=false 確認 → cursor WebSocket(/api/cursors)の upgrade(101)が OAuthProvider ラップ後も生きていることを確認)を実施する。
 
 これらが完了するまで、以下の runbook は本番相当の動作確認が取れていない。
 

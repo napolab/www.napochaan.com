@@ -7,10 +7,14 @@ import { registerBlogTools } from '@lib/mcp/tools';
 import { getPayloadClient } from '@lib/payload/client';
 
 // Pair: worker/worker.ts の mcpAPIHandler が OAuth 検証後にこのヘッダーを付けて
-// in-process forward する。外部からの /api/mcp は Hono 層(mcp-guard)で 404 に
-// なるため、ここに届いた時点でヘッダーは信頼できる。
-// 万一 worker 層の遮断が壊れた場合でも、このヘッダーだけでは Payload の実在ユーザー
-// ID との一致が必要(存在しない ID は 401)。
+// in-process forward する。外部からの /api/mcp は Hono 層(mcp-guard, worker/app.ts。
+// 登録順序は worker/app.test.ts で回帰テスト済み)で 404 になるため、ここに届いた
+// 時点でヘッダーは信頼できる、という前提に立っている。
+// 本サイトは実質シングルユーザーで id=1 は推測可能なため、下の findByID 一致は
+// 「本物のユーザー ID との一致」自体を防御層として機能させるものではない。ここで
+// 行っているのは principal の正規化(存在しない/壊れた ID を弾く)のみ。実質的な
+// 認可境界は worker 層の Hono ガードであり、このヘッダーチェックを認可レイヤーとして
+// 当てにしてはいけない。
 const MCP_USER_HEADER = 'x-mcp-user-id';
 
 const handleMCPRequest = async (request: Request): Promise<Response> => {
