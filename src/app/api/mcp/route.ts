@@ -46,7 +46,7 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   // config (globally cached) — it is NOT derived from `payload.config.editor`
   // at all, so it never includes this project's BlocksFeature([ImageRow])
   // registration. `payload.config.editor.editorConfig` IS the project's real
-  // root editor config (see scripts/verify-image-row-roundtrip.ts).
+  // root editor config.
   if (!isLexicalRichTextAdapter(payload.config.editor)) return new Response('Editor config unavailable', { status: 500 });
   const editorConfig = payload.config.editor.editorConfig;
 
