@@ -81,29 +81,44 @@ const isPrivateIPv4 = (hostname: string): boolean => {
   return false;
 };
 
-const isPrivateHostname = (hostname: string): boolean => {
-  const lower = hostname.toLowerCase();
-  if (lower === 'localhost') return true;
-  if (lower.endsWith('.local')) return true;
-  // IPv6 literal (URL#hostname keeps brackets, e.g. "[::1]"; bare form also
-  // contains ":"). IPv4-mapped/link-local/unique-local IPv6 can alias private
-  // hosts (e.g. [::ffff:127.0.0.1]), so fail closed and reject all IPv6
-  // literals — public image URLs don't use them.
-  if (lower.includes(':')) return true;
-  return isPrivateIPv4(lower);
-};
+type URLValidator = (url: URL) => string | undefined; // エラーメッセージ or undefined
 
-// SSRF ガード: caller 供給 URL を fetch する前に、公開画像 URL として妥当かを検証する。
-const validateImageURL = (url: string): string | undefined => {
-  const parsed = parseURL(url);
-  if (parsed === undefined) return 'URL の形式が不正です。http(s) の画像 URL を指定してください。';
-  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+const PRIVATE_HOST_MESSAGE = '内部ネットワークの URL は使用できません。公開されている画像の URL を指定してください。';
+
+const rejectNonHTTPScheme: URLValidator = (url) => {
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
     return 'http(s) 以外の URL は使用できません。公開されている画像の URL を指定してください。';
   }
-  if (isPrivateHostname(parsed.hostname)) {
-    return '内部ネットワークの URL は使用できません。公開されている画像の URL を指定してください。';
-  }
   return undefined;
+};
+
+// IPv6 literal (URL#hostname keeps brackets, e.g. "[::1]"; bare form also
+// contains ":"). IPv4-mapped/link-local/unique-local IPv6 can alias private
+// hosts (e.g. [::ffff:127.0.0.1]), so fail closed and reject all IPv6
+// literals — public image URLs don't use them.
+const rejectIPv6Literal: URLValidator = (url) => {
+  if (url.hostname.includes(':')) return PRIVATE_HOST_MESSAGE;
+  return undefined;
+};
+
+const rejectPrivateHost: URLValidator = (url) => {
+  const lower = url.hostname.toLowerCase();
+  if (lower === 'localhost') return PRIVATE_HOST_MESSAGE;
+  if (lower.endsWith('.local')) return PRIVATE_HOST_MESSAGE;
+  if (isPrivateIPv4(lower)) return PRIVATE_HOST_MESSAGE;
+  return undefined;
+};
+
+const composeValidators =
+  (...validators: URLValidator[]): URLValidator =>
+  (url) =>
+    validators.reduce<string | undefined>((error, validate) => error ?? validate(url), undefined);
+
+// SSRF ガード: caller 供給 URL を fetch する前に、公開画像 URL として妥当かを検証する。
+const validateImageURL = (raw: string): string | undefined => {
+  const url = parseURL(raw);
+  if (url === undefined) return 'URL の形式が不正です。http(s) の画像 URL を指定してください。';
+  return composeValidators(rejectNonHTTPScheme, rejectIPv6Literal, rejectPrivateHost)(url);
 };
 
 // リダイレクト経由の SSRF を防ぐため、302 等は追従せず失敗として扱う。
