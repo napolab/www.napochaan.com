@@ -59,7 +59,20 @@ const applyFormat = (format: number, value: string): string => {
 
 const renderTextNode = (node: unknown): string => applyFormat(numberOf(node, 'format') ?? 0, stringOf(node, 'text') ?? '');
 
-// Inline renderer: text / linebreak / (Task 3: link, autolink). Unknown inline
+// Allow only safe URL schemes — mirrors converters/link. Author-controlled URLs
+// may carry javascript:/data: payloads; those collapse to '#'.
+const SAFE_HREF = /^(?:https?:|mailto:|tel:|\/|#)/i;
+
+const resolveHref = (node: unknown, opts: LexicalToMarkdownOptions): string => {
+  const fields = isObject(node) ? node.fields : undefined;
+  const raw = stringOf(fields, 'url') ?? '';
+  if (!SAFE_HREF.test(raw)) return '#';
+  if (raw.startsWith('/')) return new URL(raw, opts.baseUrl).toString();
+
+  return raw;
+};
+
+// Inline renderer: text / linebreak / link / autolink. Unknown inline
 // nodes flatten to their children's text so content is never silently dropped.
 const renderInline = (nodes: readonly unknown[], opts: LexicalToMarkdownOptions): string => {
   return nodes
@@ -69,11 +82,45 @@ const renderInline = (nodes: readonly unknown[], opts: LexicalToMarkdownOptions)
           return renderTextNode(node);
         case 'linebreak':
           return '\n';
+        case 'link':
+        case 'autolink':
+          return `[${renderInline(childrenOf(node), opts)}](${resolveHref(node, opts)})`;
         default:
           return renderInline(childrenOf(node), opts);
       }
     })
     .join('');
+};
+
+const INDENT = '    ';
+
+const listMarker = (tag: string | undefined, index: number, node: unknown): string => {
+  const checked = isObject(node) && typeof node.checked === 'boolean' ? node.checked : undefined;
+  if (checked !== undefined) return checked ? '- [x]' : '- [ ]';
+  if (tag === 'ol') return `${index + 1}.`;
+
+  return '-';
+};
+
+// One listitem → one or more lines. A wrapper item (its only children are
+// nested lists — Lexical's nesting shape) emits no marker line of its own.
+const renderListItem = (node: unknown, tag: string | undefined, index: number, depth: number, opts: LexicalToMarkdownOptions): string => {
+  const nested = childrenOf(node).filter((child) => typeOf(child) === 'list');
+  const own = childrenOf(node).filter((child) => typeOf(child) !== 'list');
+  const inline = renderInline(own, opts).replace(/\n/g, ' ');
+  const ownLine = inline === '' ? [] : [`${INDENT.repeat(depth)}${listMarker(tag, index, node)} ${inline}`];
+  const nestedLines = nested.map((child) => renderList(child, depth + 1, opts));
+
+  return [...ownLine, ...nestedLines].join('\n');
+};
+
+const renderList = (node: unknown, depth: number, opts: LexicalToMarkdownOptions): string => {
+  const tag = stringOf(node, 'tag');
+
+  return childrenOf(node)
+    .map((child, index) => renderListItem(child, tag, index, depth, opts))
+    .filter((line) => line !== '')
+    .join('\n');
 };
 
 const headingLevel = (tag: string | undefined): number => {
@@ -96,6 +143,8 @@ const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | un
 
       return `${'#'.repeat(headingLevel(stringOf(node, 'tag')))} ${inline}`;
     }
+    case 'list':
+      return renderList(node, 0, opts);
     default:
       return undefined;
   }
