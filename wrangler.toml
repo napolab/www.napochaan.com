@@ -38,6 +38,13 @@ database_name = "napochaan-cms-dev"
 binding = "R2"
 bucket_name = "napochaan-cms-dev" # TODO: wrangler r2 bucket create napochaan-cms-dev
 
+# ===== MCP OAuth =====
+# @cloudflare/workers-oauth-provider は binding 名 "OAUTH_KV" 固定。
+
+[[kv_namespaces]]
+binding = "OAUTH_KV"
+id = "00000000000000000000000000000000" # TODO: wrangler kv namespace create OAUTH_KV
+
 # ===== Cache (OpenNext) =====
 
 [[services]]
@@ -126,6 +133,10 @@ binding = "NEXT_TAG_CACHE_D1"
 database_name = "napochaan-cache-staging"
 database_id = "0af66616-6458-492f-92b3-0f1d305abd06"
 
+[[env.staging.kv_namespaces]]
+binding = "OAUTH_KV"
+id = "00000000000000000000000000000000" # TODO: wrangler kv namespace create OAUTH_KV --env staging
+
 # ===== Production Environment =====
 [env.production]
 workers_dev = false
@@ -179,6 +190,10 @@ class_name = "CursorRoom"
 binding = "NEXT_TAG_CACHE_D1"
 database_name = "napochaan-cache-production"
 database_id = "f3f67f2e-3e9d-45e6-b522-de8a90256d36"
+
+[[env.production.kv_namespaces]]
+binding = "OAUTH_KV"
+id = "00000000000000000000000000000000" # TODO: wrangler kv namespace create OAUTH_KV --env production
 
 # ===== Test Environment =====
 # Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,

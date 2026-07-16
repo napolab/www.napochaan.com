@@ -35,10 +35,12 @@
     "cf:types": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@cloudflare/workers-oauth-provider": "^0.8.1",
     "@gsap/react": "^2.1.2",
     "@hono/zod-validator": "^0.7.6",
     "@internationalized/date": "^3.12.2",
     "@marsidev/react-turnstile": "^1.5.3",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@opennextjs/cloudflare": "1.18.0",
     "@payloadcms/db-d1-sqlite": "3.84.1",
     "@payloadcms/live-preview-react": "3.84.1",
