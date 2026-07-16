@@ -1,10 +1,19 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
-import { editorConfigFactory } from '@payloadcms/richtext-lexical';
 
 import { createMarkdownCodec } from '@lib/mcp/markdown';
 import { registerBlogTools } from '@lib/mcp/tools';
 import { getPayloadClient } from '@lib/payload/client';
+
+import type { LexicalRichTextAdapter } from '@payloadcms/richtext-lexical';
+import type { RichTextAdapter } from 'payload';
+
+// `SanitizedConfig['editor']` is typed as the generic core `RichTextAdapter`
+// (payload doesn't know about lexical specifics), but this project's root
+// editor is always `lexicalEditor(...)`, which resolves to a
+// `LexicalRichTextAdapter` — the same shape carrying `.editorConfig` that
+// `editorConfigFactory.fromField` reads off field-level editors.
+const isLexicalRichTextAdapter = (adapter: RichTextAdapter | undefined): adapter is LexicalRichTextAdapter => adapter !== undefined && 'editorConfig' in adapter;
 
 // Pair: worker/worker.ts の mcpAPIHandler が OAuth 検証後にこのヘッダーを付けて
 // in-process forward する。外部からの /api/mcp は Hono 層(mcp-guard, worker/app.ts。
@@ -33,9 +42,16 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   });
   if (user === null) return new Response('Unauthorized', { status: 401 });
 
+  // `editorConfigFactory.default` resolves Payload's generic default editor
+  // config (globally cached) — it is NOT derived from `payload.config.editor`
+  // at all, so it never includes this project's BlocksFeature([ImageRow])
+  // registration. `payload.config.editor.editorConfig` IS the project's real
+  // root editor config (see scripts/verify-image-row-roundtrip.ts).
+  if (!isLexicalRichTextAdapter(payload.config.editor)) return new Response('Editor config unavailable', { status: 500 });
+  const editorConfig = payload.config.editor.editorConfig;
+
   // MCP SDK 1.26+ はリクエストごとに server / transport を新規生成する必要がある
   // (共有すると "already connected" で throw する)。生成は安価。
-  const editorConfig = await editorConfigFactory.default({ config: payload.config });
   const server = new McpServer({ name: 'napochaan-blog', version: '1.0.0' });
   registerBlogTools(server, { payload, user, codec: createMarkdownCodec(editorConfig) });
 

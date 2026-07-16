@@ -73,10 +73,13 @@ export const ImageRow = {
       return `\`\`\`image-row\n${lines}\n\`\`\``;
     },
     import: ({ children }: { children: string }) => {
-      const cells = children
+      const lines = children
         .split('\n')
-        .map((line) => parseCellLine(line))
-        .filter((cell): cell is ImageRowCell => cell !== undefined);
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+      if (lines.length !== 2) return false;
+
+      const cells = lines.map((line) => parseCellLine(line)).filter((cell): cell is ImageRowCell => cell !== undefined);
       if (cells.length !== 2) return false;
 
       return { cells };
