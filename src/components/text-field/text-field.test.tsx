@@ -17,6 +17,11 @@ describe('TextField', () => {
     await expect.element(page.getByRole('textbox', { name: 'email' })).toHaveAttribute('type', 'email');
   });
 
+  it('reflects type="password" on the control', async () => {
+    render(<TextField label="password" name="password" type="password" />);
+    await expect.element(page.getByLabelText('password')).toHaveAttribute('type', 'password');
+  });
+
   it('reflects isRequired on the control', async () => {
     render(<TextField label="name" name="name" isRequired />);
     await expect.element(page.getByRole('textbox', { name: 'name' })).toHaveProperty('required', true);

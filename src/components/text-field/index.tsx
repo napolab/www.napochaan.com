@@ -7,7 +7,7 @@ import * as styles from './styles.css';
 type TextFieldProps = {
   label: string;
   name?: string;
-  type?: 'text' | 'email' | 'url' | 'tel';
+  type?: 'text' | 'email' | 'url' | 'tel' | 'password';
   isRequired?: boolean;
   defaultValue?: string;
   description?: string;
