@@ -19,4 +19,9 @@ describe('buildBlogIndexMarkdown', () => {
   it('renders an empty-state line when there are no posts', () => {
     expect(buildBlogIndexMarkdown([], BASE)).toBe('# blog\n\nNo entries yet.\n');
   });
+
+  it('collapses newlines in a multi-line excerpt into a single list line', () => {
+    const posts = [post('c', '記事C', '2026-03-01', '概要C\n続きの行')];
+    expect(buildBlogIndexMarkdown(posts, BASE)).toBe(['# blog', '', '- 2026-03-01 — [記事C](https://example.com/blog/c.md) — 概要C 続きの行', ''].join('\n'));
+  });
 });

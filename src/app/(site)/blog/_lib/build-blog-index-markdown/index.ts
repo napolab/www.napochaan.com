@@ -2,8 +2,9 @@ import type { Post } from '../post';
 
 const entryLine = (post: Post, baseUrl: string): string => {
   const url = new URL(`/blog/${post.slug}.md`, baseUrl).toString();
+  const excerpt = post.excerpt.replace(/\s*\r?\n\s*/g, ' ');
 
-  return `- ${post.date} — [${post.title}](${url}) — ${post.excerpt}`;
+  return `- ${post.date} — [${post.title}](${url}) — ${excerpt}`;
 };
 
 /** The blog index as markdown (`/blog.md`): one linked line per published post. Pure. */
