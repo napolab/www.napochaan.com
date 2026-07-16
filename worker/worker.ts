@@ -1,34 +1,11 @@
 import { OAuthProvider } from '@cloudflare/workers-oauth-provider';
-import { cache } from 'hono/cache';
-import { createFactory } from 'hono/factory';
 
 // @ts-ignore - Generated at build time by OpenNext
 import handler from '../.open-next/worker.js';
 
-import { imageHandlers } from './handlers/images';
-import { cursorRoutes } from './routes/cursors';
-import { mcpGuardRoutes } from './routes/mcp-guard';
+import { createWorkerApp, type MountedFetch } from './app';
 
-type HonoEnv = {
-  Bindings: Cloudflare.Env;
-};
-
-const factory = createFactory<HonoEnv>();
-const app = factory.createApp();
-
-app
-  .get(
-    '/_next/image',
-    cache({
-      cacheName: 'opennextjs-cloudflare-images',
-      cacheControl: 'public, max-age=3600, must-revalidate',
-      vary: ['Accept', 'Accept-Encoding'],
-    }),
-    ...imageHandlers,
-  )
-  .route('/', cursorRoutes)
-  .route('/', mcpGuardRoutes)
-  .mount('/', handler.fetch as (request: Request, ...args: unknown[]) => Promise<Response>);
+const app = createWorkerApp(handler.fetch as MountedFetch);
 
 // OAuthProvider が Bearer token を検証し grant props を ctx.props に復号済み。
 // Next の /api/mcp へ in-process forward する(Hono を経由しないので mcp-guard に
