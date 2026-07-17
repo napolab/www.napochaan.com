@@ -41,6 +41,7 @@ import { NewsRowDemo } from './news-row-demo';
 import { NoAction } from './no-action';
 import { richTextSample } from './rich-text-sample';
 import { TypographyBandDemo } from './typography-band-demo';
+import { VideoDemo } from './video-demo';
 
 import flyerBooth0424 from '@assets/flyer-booth-0424.jpg';
 import flyerBooth0523 from '@assets/flyer-booth-0523.jpg';
@@ -262,6 +263,7 @@ export const demos: Record<ComponentName, ReactNode> = {
       </QuoteShare>
     </NoAction>
   ),
+  Video: <VideoDemo />,
   DecodingSkeleton: <DecodingSkeleton rows={4} />,
   TypographyBand: <TypographyBandDemo />,
   GameOfLife: <GameOfLifeDemo />,
