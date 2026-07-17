@@ -21,9 +21,12 @@ import { blockSyntaxHelp, extractBlockMediaIDs, hasUnsupportedBlocks, validateBl
 import { mapTextSegments, splitCodeFences } from '../markdown/code-fences';
 import { hasNonEmptyParens, isRoundTrippableAlt, parseInlineNodes, serializeImageRef, serializeInlineNodes } from '../markdown/image-ref';
 
+import { createRawRefHint } from './raw-ref-hints';
+
 import type { McpToolError } from '../errors';
 import type { MarkdownCodec } from '../markdown';
-import type { ImageRef, InlineNode } from '../markdown/image-ref';
+import type { ImageNode, ImageRef, InlineNode } from '../markdown/image-ref';
+import type { MediaHit } from './raw-ref-hints';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Result, ResultAsync } from 'neverthrow';
 import type { Blog, User } from '@payload-types';
@@ -275,8 +278,7 @@ const verifyAllMediaExist = (verifyMediaExists: VerifyMediaExists, ids: number[]
 // ===== image-ref ノードパイプライン(parse -> transform/collect -> serialize) =====
 // フェンス外の text セグメントだけを image-ref パーサに通す薄い合成層。個々の変換
 // (media file → placeholder / alt 充填 / alt 除去 / 生 URL 判定)はこの上に定義する。
-
-type ImageNode = InlineNode & { kind: 'image' };
+// ImageNode は image-ref/index.ts の共通定義を使う(raw-ref-hints も同じ型を参照するため)。
 
 // フェンス外の image ノードだけを出現順に列挙する(image-row セル等のフェンス内構文は対象外)。
 const collectImageNodes = (markdown: string): ImageNode[] =>
@@ -323,7 +325,6 @@ const isRawImageRef = (node: ImageNode): boolean => {
 
 const collectRawImageRefNodes = (markdown: string): ImageNode[] => collectImageNodes(markdown).filter(isRawImageRef);
 
-type MediaHit = { id: number; alt: string };
 type FindMediaByFilename = (filename: string) => ResultAsync<MediaHit | undefined, PayloadOperationError>;
 type FindMediaAltsByIDs = (ids: number[]) => ResultAsync<ReadonlyMap<number, string>, PayloadOperationError>;
 
@@ -377,25 +378,15 @@ const fillPlaceholderAlts = (markdown: string, altByID: ReadonlyMap<number, stri
 // 空括弧のみマッチするため、Lexical 変換直前に必ず通す)。
 const stripPlaceholderAlts = (markdown: string): string => transformImageRefs(markdown, (ref) => (ref.kind === 'placeholder' ? { ...ref, alt: '' } : undefined));
 
-// 生 URL 画像 1 件分の回復指示。サイト内 media URL で対応 doc が見つかる場合は
-// alt 入りの具体的な置き換え先(![media:<id>](alt))まで提示し、LLM が 1 往復で
-// そのまま貼り戻せる形で自己修正できるようにする。
-const rawRefHint = (node: ImageNode, hitByFilename: ReadonlyMap<string, MediaHit>): string => {
-  const { raw, ref } = node;
-  if (ref.kind !== 'mediaFile') return `- ${raw}: 外部 URL は使えません。upload_media で画像を登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。`;
-  const hit = hitByFilename.get(ref.filename);
-  if (hit === undefined) return `- ${raw}: 対応する media(${ref.filename})が見つかりません。upload_media で登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。`;
-  return `- ${raw}: media id=${hit.id} の画像です。![media:${hit.id}](${hit.alt}) に置き換えて再送してください。`;
-};
-
 // 本文 Markdown の生URL画像参照 + image-row フェンス構造 + cell media 実在性を検証し、
 // 問題があれば LLM 向け回復指示メッセージを持つ Result を返す。
 const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMediaExists, findMediaByFilename: FindMediaByFilename): ResultAsync<void, McpToolError> => {
   const rawRefNodes = collectRawImageRefNodes(bodyMarkdown);
   if (rawRefNodes.length > 0) {
-    return collectMediaFileHits(bodyMarkdown, findMediaByFilename).andThen((hitByFilename) =>
-      errAsync(new BodyValidationError(`本文に生 URL の画像参照があります。画像は ![media:<id>](alt) 参照で書いてください:\n${rawRefNodes.map((node) => rawRefHint(node, hitByFilename)).join('\n')}`)),
-    );
+    return collectMediaFileHits(bodyMarkdown, findMediaByFilename).andThen((hitByFilename) => {
+      const hint = createRawRefHint(hitByFilename);
+      return errAsync(new BodyValidationError(`本文に生 URL の画像参照があります。画像は ![media:<id>](alt) 参照で書いてください:\n${rawRefNodes.map(hint).join('\n')}`));
+    });
   }
   const [firstFenceError] = validateBlockFences(bodyMarkdown);
   if (firstFenceError !== undefined) return errAsync(new BodyValidationError(firstFenceError));

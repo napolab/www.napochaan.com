@@ -21,6 +21,10 @@ export type ImageRef = { kind: 'placeholder'; id: number; rawID: string; alt: st
 
 export type InlineNode = { kind: 'text'; raw: string } | { kind: 'image'; raw: string; ref: ImageRef };
 
+// フェンス外の image ノード限定型。tools 側(raw ref 収集・hint 生成)が
+// text ノードを除いた image ノードだけを扱うために使う。
+export type ImageNode = InlineNode & { kind: 'image' };
+
 // デフォルトの family classification registry: placeholder → mediaFile(標準 prefix) → external
 // の順(より具体的な family を先に試す。最後の external は必ず ok を返す終端)。
 // classifyImageRef / parseInlineNodes は plugins 引数省略時にこれを使う(review L46:
