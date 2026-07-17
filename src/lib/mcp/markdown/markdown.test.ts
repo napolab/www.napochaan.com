@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { extractImageRowMediaIDs, findRawImageRefs, hasUnsupportedBlocks, validateImageRowFences } from '.';
+import { blockSyntaxHelp, extractBlockMediaIDs, findRawImageRefs, hasUnsupportedBlocks, validateBlockFences } from '.';
 
 import type { Blog } from '@payload-types';
 
@@ -11,7 +11,7 @@ const bodyWith = (children: unknown[]): Blog['body'] =>
 
 const FENCE = ['```image-row', '![media:79](left)', '![media:78]()', '```'].join('\n');
 
-describe('findRawImageRefs (image-row aware)', () => {
+describe('findRawImageRefs (registry-aware)', () => {
   it('excludes image-row cell lines with captions inside a fence', () => {
     expect(findRawImageRefs(FENCE)).toEqual([]);
   });
@@ -34,8 +34,8 @@ describe('findRawImageRefs (image-row aware)', () => {
   });
 });
 
-describe('hasUnsupportedBlocks (image-row supported)', () => {
-  it('returns false for an image-row block', () => {
+describe('hasUnsupportedBlocks (registry-driven)', () => {
+  it('returns false for a registered block type (image-row)', () => {
     const body = bodyWith([{ type: 'block', version: 2, fields: { blockType: 'image-row' } }]);
     expect(hasUnsupportedBlocks(body)).toBe(false);
   });
@@ -56,35 +56,36 @@ describe('hasUnsupportedBlocks (image-row supported)', () => {
   });
 });
 
-describe('validateImageRowFences', () => {
-  it('accepts a well-formed 2-cell fence', () => {
-    expect(validateImageRowFences(FENCE)).toEqual([]);
-  });
-
-  it('rejects a fence with only one cell', () => {
+// フェンス形状(セル数・行内容)ごとの詳細ケースは登録済み plugin 自体の責務なので
+// src/blocks/image-row/mcp-support/mcp-support.test.ts で imageRowMcpSupport を
+// 単体テストする。ここでは registry 経由の集約(全 plugin を実行して結果を連結する)
+// だけを確認する。
+describe('validateBlockFences (registry aggregation)', () => {
+  it('surfaces a violation reported by a registered plugin', () => {
     const bad = ['```image-row', '![media:79](x)', '```'].join('\n');
-    const errors = validateImageRowFences(bad);
+    const errors = validateBlockFences(bad);
     expect(errors.length).toBe(1);
     expect(errors[0]).toContain('2');
   });
 
-  it('rejects a fence with a non-image line', () => {
-    const bad = ['```image-row', '![media:79](x)', 'not an image', '```'].join('\n');
-    expect(validateImageRowFences(bad).length).toBe(1);
-  });
-
-  it('accepts a doc with no fences', () => {
-    expect(validateImageRowFences('# hi\n\npara')).toEqual([]);
+  it('returns no violations for a well-formed fence', () => {
+    expect(validateBlockFences(FENCE)).toEqual([]);
   });
 });
 
-describe('extractImageRowMediaIDs', () => {
-  it('lists media ids from all fences', () => {
+describe('extractBlockMediaIDs (registry aggregation)', () => {
+  it('collects media ids across all registered plugins', () => {
     const md = `${FENCE}\n\n${FENCE}`;
-    expect(extractImageRowMediaIDs(md)).toEqual([79, 78, 79, 78]);
+    expect(extractBlockMediaIDs(md)).toEqual([79, 78, 79, 78]);
   });
 
-  it('returns empty for no fences', () => {
-    expect(extractImageRowMediaIDs('para')).toEqual([]);
+  it('returns empty when nothing matches', () => {
+    expect(extractBlockMediaIDs('para')).toEqual([]);
+  });
+});
+
+describe('blockSyntaxHelp (registry aggregation)', () => {
+  it('includes each registered block fence syntax for the LLM', () => {
+    expect(blockSyntaxHelp()).toContain('```image-row');
   });
 });

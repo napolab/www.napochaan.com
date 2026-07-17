@@ -1,5 +1,9 @@
 import { convertLexicalToMarkdown, convertMarkdownToLexical } from '@payloadcms/richtext-lexical';
 
+import { imageRowMcpSupport } from '../../../blocks/image-row/mcp-support';
+import { stripAllFences } from './block-support';
+
+import type { McpBlockSupport } from './block-support';
 import type { SanitizedServerEditorConfig } from '@payloadcms/richtext-lexical';
 import type { Blog } from '@payload-types';
 
@@ -21,61 +25,53 @@ export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): 
   toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),
 });
 
-// ```image-row フェンスとセル行。
-const IMAGE_ROW_FENCE = /^```image-row\s*\n([\s\S]*?)^```\s*$/gm;
-const CELL_LINE = /^\s*!\[media:(\d+)\]\((.*)\)\s*$/;
+// MCP が Markdown ⇔ Lexical を往復できる block の registry。増えたら block 側に
+// plugin(McpBlockSupport)を書いてここに登録する。block 追加時にこのファイルに
+// 増えるのは import 1 行と blockSupports への登録 1 行だけで、分岐やロジックは
+// 増えない。fan-out 集約 — 全 plugin を毎回実行し結果を連結する(Payload 自身の
+// markdown transformer は jsx.customStartRegex で first-match dispatch 済みなので、
+// この層で二重にやる必要はない)。
+const blockSupports: readonly McpBlockSupport[] = [imageRowMcpSupport];
 
-const fenceCellLines = (inner: string): string[] =>
-  inner
-    .split('\n')
-    .map((line) => line.trim())
-    .filter((line) => line.length > 0);
+const SUPPORTED_BLOCK_TYPES = blockSupports.map((plugin) => plugin.blockType);
 
-// image-row フェンスを丸ごと除去した Markdown を返す。caption 付き media 参照
-// (![media:<id>](caption))は image-row フェンス内でのみ有効な構文なので、
-// フェンスを除去した残りを生URL画像参照スキャンにかければフェンス外の誤用
-// (caption 付き media 参照 / 本物の生 URL)だけが対象になる。
-const stripImageRowFences = (markdown: string): string => markdown.replace(IMAGE_ROW_FENCE, '');
-
-// 画像参照。フェンス除去後に ![alt](非空) が残っていたら、生 URL 画像か
-// image-row 専用構文(caption 付き media 参照)のフェンス外での誤用。
+// 画像参照。登録済み block のフェンスを全除去した残りに ![alt](非空) が残っていたら、
+// 生 URL 画像か block 専用構文(caption 付き media 参照など)のフェンス外での誤用。
 // 単一 media プレースホルダ ![media:<id>]() は空 parens のためマッチしない。
 const RAW_IMAGE_REF = /!\[[^\]]*\]\([^)]+\)/g;
 
-export const findRawImageRefs = (markdown: string): string[] => [...stripImageRowFences(markdown).matchAll(RAW_IMAGE_REF)].map((match) => match[0]);
+export const findRawImageRefs = (markdown: string): string[] => [...stripAllFences(blockSupports, markdown).matchAll(RAW_IMAGE_REF)].map((match) => match[0]);
 
-// MCP が Markdown 往復できる block。増えたらここに足す。
-const SUPPORTED_BLOCK_TYPES = ['image-row'];
+const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
-type LexicalNode = { type?: string; fields?: { blockType?: string }; children?: LexicalNode[] };
+// node.fields は Payload 生成型では index signature 越しの unknown。
+// レコードとして narrowing した上で blockType(string)だけを取り出す。
+const blockTypeOf = (fields: unknown): string => {
+  if (!isRecord(fields)) return '';
+  const { blockType } = fields;
+  return typeof blockType === 'string' ? blockType : '';
+};
 
-const containsUnsupportedBlock = (nodes: LexicalNode[]): boolean =>
+// node.children も同様に index signature 越しの unknown。配列でなければ子なし扱い。
+const childrenOf = (children: unknown): unknown[] => (Array.isArray(children) ? children : []);
+
+const containsUnsupportedBlock = (nodes: unknown[]): boolean =>
   nodes.some((node) => {
+    if (!isRecord(node)) return false;
     const isBlock = node.type === 'block' || node.type === 'inlineBlock';
-    if (isBlock && SUPPORTED_BLOCK_TYPES.includes(node.fields?.blockType ?? '') === false) return true;
-    return containsUnsupportedBlock(node.children ?? []);
+    if (isBlock && SUPPORTED_BLOCK_TYPES.includes(blockTypeOf(node.fields)) === false) return true;
+    return containsUnsupportedBlock(childrenOf(node.children));
   });
 
-// 対応済み block(image-row)は Markdown 往復できるので拒否しない。
-// 未対応 block(将来の block 等)を含む本文だけ true。
-export const hasUnsupportedBlocks = (body: Blog['body']): boolean => containsUnsupportedBlock(body.root.children as LexicalNode[]);
+// registry に対応済みの block は Markdown 往復できるので拒否しない。
+// 未登録 block(将来追加される block 等)を含む本文だけ true。
+export const hasUnsupportedBlocks = (body: Blog['body']): boolean => containsUnsupportedBlock(body.root.children);
 
-// 各 image-row フェンスが「ちょうど2行の ![media:<id>](...)」であることを検証。
-// 違反ごとに LLM 向け回復指示を返す。
-export const validateImageRowFences = (markdown: string): string[] =>
-  [...markdown.matchAll(IMAGE_ROW_FENCE)]
-    .filter((match) => {
-      const lines = fenceCellLines(match[1] ?? '');
-      const cells = lines.filter((line) => CELL_LINE.test(line));
-      return lines.length !== 2 || cells.length !== 2;
-    })
-    .map((match) => `image-row フェンスは ![media:<id>](caption) をちょうど2行含む必要があります(画像2枚固定)。caption は省略可(![media:<id>]())。該当:\n${match[0]}`);
+// 登録済み全 block のフェンス形状を検証し、違反ごとの LLM 向け回復指示を連結して返す。
+export const validateBlockFences = (markdown: string): string[] => blockSupports.flatMap((plugin) => plugin.validateFences(markdown));
 
-// 全 image-row フェンスの cell media id を列挙(存在チェック用)。
-export const extractImageRowMediaIDs = (markdown: string): number[] =>
-  [...markdown.matchAll(IMAGE_ROW_FENCE)].flatMap((match) =>
-    fenceCellLines(match[1] ?? '')
-      .map((line) => line.match(CELL_LINE))
-      .filter((cell): cell is RegExpMatchArray => cell !== null)
-      .map((cell) => parseInt(cell[1] ?? '', 10)),
-  );
+// 登録済み全 block のフェンスが参照する media id を列挙(存在チェック用)。
+export const extractBlockMediaIDs = (markdown: string): number[] => blockSupports.flatMap((plugin) => plugin.extractMediaIDs(markdown));
+
+// 登録済み全 block の構文説明(LLM 向け)を連結。tool の bodyMarkdown 説明に載せる。
+export const blockSyntaxHelp = (): string => blockSupports.map((plugin) => plugin.syntaxHelp).join('\n\n');
