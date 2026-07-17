@@ -98,6 +98,25 @@ describe('createPost', () => {
     expect(payload.create).not.toHaveBeenCalled();
   });
 
+  it('accepts a raw image URL inside a generic code fence as example text', async () => {
+    // フェンス内は例示テキスト — get_post と write でフェンス扱いを統一(リファクタ後の意図的挙動をピン留め)
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    payload.create.mockResolvedValue({ id: 11, slug: 's2' });
+    const handlers = createBlogToolHandlers(deps);
+    const bodyMarkdown = ['intro', '', '```md', '![shot](https://example.com/a.png)', '```'].join('\n');
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's2',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown,
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.create).toHaveBeenCalled();
+  });
+
   it('rejects a missing thumbnail', async () => {
     const { payload, deps } = createDeps();
     payload.findByID.mockResolvedValue(null);

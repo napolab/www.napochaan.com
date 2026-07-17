@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { blockSyntaxHelp, extractBlockMediaIDs, findRawImageRefs, hasUnsupportedBlocks, validateBlockFences } from '.';
+import { blockSyntaxHelp, extractBlockMediaIDs, hasUnsupportedBlocks, validateBlockFences } from '.';
 
 import type { Blog } from '@payload-types';
 
@@ -10,29 +10,6 @@ const bodyWith = (children: unknown[]): Blog['body'] =>
   }) as Blog['body'];
 
 const FENCE = ['```image-row', '![media:79](left)', '![media:78]()', '```'].join('\n');
-
-describe('findRawImageRefs (registry-aware)', () => {
-  it('excludes image-row cell lines with captions inside a fence', () => {
-    expect(findRawImageRefs(FENCE)).toEqual([]);
-  });
-
-  it('excludes empty-paren media refs', () => {
-    expect(findRawImageRefs('![media:78]()')).toEqual([]);
-  });
-
-  it('detects a caption-bearing media ref outside any fence', () => {
-    expect(findRawImageRefs('![media:79](left cap)')).toEqual(['![media:79](left cap)']);
-  });
-
-  it('still detects raw URL images', () => {
-    expect(findRawImageRefs('![shot](https://example.com/a.png)')).toEqual(['![shot](https://example.com/a.png)']);
-  });
-
-  it('detects raw URL but not media cell in the same doc', () => {
-    const md = `${FENCE}\n\n![x](https://example.com/y.png)`;
-    expect(findRawImageRefs(md)).toEqual(['![x](https://example.com/y.png)']);
-  });
-});
 
 describe('hasUnsupportedBlocks (registry-driven)', () => {
   it('returns false for a registered block type (image-row)', () => {
