@@ -18,6 +18,7 @@ import {
   UploadTooLargeError,
 } from '../errors';
 import { blockSyntaxHelp, extractBlockMediaIDs, findRawImageRefs, hasUnsupportedBlocks, validateBlockFences } from '../markdown';
+import { findMediaFileRefs, rewriteMediaFileRefs } from '../markdown/media-file-refs';
 
 import type { McpToolError } from '../errors';
 import type { MarkdownCodec } from '../markdown';
@@ -65,6 +66,7 @@ const BODY_MARKDOWN_HELP = [
   '本文 Markdown。見出し・リスト・強調・リンク等の標準 Markdown が使える。',
   '画像は必ず upload_media で作成した media を使う。単一画像は ![media:<id>]()(空括弧)。',
   '生 URL 画像(![alt](https://...))は不可 — 先に upload_media で登録して id を得ること。',
+  'サイト内 media URL(/api/media/file/<filename>)もそのままは不可 — 拒否時のエラーが対応する media id と置き換え先を提示する。',
   '',
   blockSyntaxHelp(),
 ].join('\n');
@@ -257,12 +259,42 @@ const verifyAllMediaExist = (verifyMediaExists: VerifyMediaExists, ids: number[]
   );
 };
 
+type FindMediaIDByFilename = (filename: string) => ResultAsync<number | undefined, PayloadOperationError>;
+
+// filename → media id の対応表を逐次 lookup で構築する(`let` 禁止のため acc を引き回す再帰)。
+// 見つからない filename は黙ってスキップする — read 正規化は best-effort で失敗させず、
+// write 側は「見つからない」ことを自分のエラーメッセージで伝えるため、ここでは失敗にしない。
+const lookupFoundMediaIDs = (findMediaIDByFilename: FindMediaIDByFilename, filenames: string[], acc: ReadonlyMap<string, number>): ResultAsync<ReadonlyMap<string, number>, PayloadOperationError> => {
+  const [first, ...rest] = filenames;
+  if (first === undefined) return okAsync(acc);
+  return findMediaIDByFilename(first).andThen((id) => lookupFoundMediaIDs(findMediaIDByFilename, rest, id === undefined ? acc : new Map([...acc, [first, id]])));
+};
+
+// 本文中のサイト内 media 直リンクが参照する filename を重複排除して逐次 lookup し、
+// 見つかったものだけの対応表を返す(read 正規化と write エラーメッセージの両方で使う)。
+const collectMediaFileIDs = (markdown: string, findMediaIDByFilename: FindMediaIDByFilename): ResultAsync<ReadonlyMap<string, number>, PayloadOperationError> => {
+  const filenames = [...new Set(findMediaFileRefs(markdown).map((ref) => ref.filename))];
+  return lookupFoundMediaIDs(findMediaIDByFilename, filenames, new Map());
+};
+
+// 生 URL 画像 1 件分の回復指示。サイト内 media URL で対応 doc が見つかる場合は
+// 具体的な置き換え先(![media:<id>]())まで提示し、LLM が 1 往復で自己修正できるようにする。
+const rawRefHint = (rawRef: string, idByFilename: ReadonlyMap<string, number>): string => {
+  const [mediaRef] = findMediaFileRefs(rawRef);
+  if (mediaRef === undefined) return `- ${rawRef}: 外部 URL は使えません。upload_media で画像を登録し、返された ![media:<id>]() を使ってください。`;
+  const id = idByFilename.get(mediaRef.filename);
+  if (id === undefined) return `- ${rawRef}: 対応する media(${mediaRef.filename})が見つかりません。upload_media で登録し、返された ![media:<id>]() を使ってください。`;
+  return `- ${rawRef}: media id=${id} の画像です。![media:${id}]() に置き換えて再送してください。`;
+};
+
 // 本文 Markdown の生URL画像参照 + image-row フェンス構造 + cell media 実在性を検証し、
-// 問題があれば LLM 向け回復指示メッセージ(最初の1件)を持つ Result を返す。
-const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMediaExists): ResultAsync<void, McpToolError> => {
+// 問題があれば LLM 向け回復指示メッセージを持つ Result を返す。
+const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMediaExists, findMediaIDByFilename: FindMediaIDByFilename): ResultAsync<void, McpToolError> => {
   const rawRefs = findRawImageRefs(bodyMarkdown);
   if (rawRefs.length > 0) {
-    return errAsync(new BodyValidationError(`本文に生 URL の画像参照があります: ${rawRefs.join(', ')}\n先に upload_media で画像を登録し、返された ![media:<id>]() を使ってください。`));
+    return collectMediaFileIDs(bodyMarkdown, findMediaIDByFilename).andThen((idByFilename) =>
+      errAsync(new BodyValidationError(`本文に生 URL の画像参照があります。画像は ![media:<id>]() 参照で書いてください:\n${rawRefs.map((rawRef) => rawRefHint(rawRef, idByFilename)).join('\n')}`)),
+    );
   }
   const [firstFenceError] = validateBlockFences(bodyMarkdown);
   if (firstFenceError !== undefined) return errAsync(new BodyValidationError(firstFenceError));
@@ -274,7 +306,13 @@ const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMed
 type NextBody = { kind: 'skip' } | { kind: 'body'; body: Blog['body'] };
 
 // update_post の bodyMarkdown 差し替え可否を判定する。
-const resolveNextBody = (bodyMarkdown: string | undefined, current: Blog, toLexicalSafe: ToLexicalSafe, verifyMediaExists: VerifyMediaExists): ResultAsync<NextBody, McpToolError> => {
+const resolveNextBody = (
+  bodyMarkdown: string | undefined,
+  current: Blog,
+  toLexicalSafe: ToLexicalSafe,
+  verifyMediaExists: VerifyMediaExists,
+  findMediaIDByFilename: FindMediaIDByFilename,
+): ResultAsync<NextBody, McpToolError> => {
   if (bodyMarkdown === undefined) return okAsync({ kind: 'skip' });
   if (hasUnsupportedBlocks(current.body)) {
     return errAsync(
@@ -283,7 +321,7 @@ const resolveNextBody = (bodyMarkdown: string | undefined, current: Blog, toLexi
       ),
     );
   }
-  return validateBodyMarkdown(bodyMarkdown, verifyMediaExists)
+  return validateBodyMarkdown(bodyMarkdown, verifyMediaExists, findMediaIDByFilename)
     .andThen(() => toLexicalSafe(bodyMarkdown))
     .map((body): NextBody => ({ kind: 'body', body }));
 };
@@ -348,16 +386,31 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
       (media) => media !== null,
     );
 
+  const findMediaIDByFilename: FindMediaIDByFilename = (filename) =>
+    fromPromise(
+      payload.find({ collection: 'media', where: { filename: { equals: filename } }, limit: 1, overrideAccess: false, user, depth: 0 }),
+      (cause) => new PayloadOperationError('media 取得に失敗しました', { cause }),
+    ).map(({ docs }) => docs[0]?.id);
+
+  // get_post が返す Markdown 中のサイト内 media 直リンクを ![media:<id>]() に正規化する。
+  // admin UI 経由で raw 形のまま保存された既存記事でも LLM には常に canonical 形を見せ、
+  // そのまま update_post へ書き戻せるようにする。対応 media が無い ref は原文のまま返す
+  // (get_post はここでは失敗させない — write 側の検証が回復指示を出す)。
+  const normalizeBodyMarkdown = (bodyMarkdown: string): ResultAsync<string, McpToolError> =>
+    collectMediaFileIDs(bodyMarkdown, findMediaIDByFilename).map((idByFilename) => rewriteMediaFileRefs(bodyMarkdown, idByFilename));
+
   const buildGetPostPayload = (doc: Blog) => {
     const bodyEditable = !hasUnsupportedBlocks(doc.body);
     if (!bodyEditable) {
-      return okResult({
+      return okAsync({
         ...toSummary(doc),
         bodyEditable,
         warning: '本文に MCP 非対応の block が含まれます。bodyMarkdown での更新は不可。本文編集は admin UI で行ってください。',
       });
     }
-    return toMarkdownSafe(doc.body).map((bodyMarkdown) => ({ ...toSummary(doc), bodyEditable, bodyMarkdown }));
+    return toMarkdownSafe(doc.body)
+      .asyncAndThen(normalizeBodyMarkdown)
+      .map((bodyMarkdown) => ({ ...toSummary(doc), bodyEditable, bodyMarkdown }));
   };
 
   return {
@@ -408,7 +461,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         .match(ok, toToolError),
 
     createPost: (input: { title: string; slug: string; excerpt: string; thumbnailMediaID: number; bodyMarkdown: string; publishedAt?: string }): Promise<ToolResult> =>
-      validateBodyMarkdown(input.bodyMarkdown, verifyMediaExists)
+      validateBodyMarkdown(input.bodyMarkdown, verifyMediaExists, findMediaIDByFilename)
         .andThen(() =>
           verifyMediaExistsOrFail(verifyMediaExists, input.thumbnailMediaID, `thumbnailMediaID=${input.thumbnailMediaID} の media が存在しません。upload_media で作成した id を指定してください。`),
         )
@@ -446,7 +499,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
       findPost({ kind: 'id', id: input.id })
         .andThen((current) => (current === null ? errAsync(new PostNotFoundError('記事が見つかりません。list_posts で id を確認してください。')) : okAsync(current)))
         .andThen((current) => verifyThumbnailIfProvided(verifyMediaExists, input.thumbnailMediaID).map(() => current))
-        .andThen((current) => resolveNextBody(input.bodyMarkdown, current, toLexicalSafe, verifyMediaExists))
+        .andThen((current) => resolveNextBody(input.bodyMarkdown, current, toLexicalSafe, verifyMediaExists, findMediaIDByFilename))
         .andThen((nextBody) =>
           fromPromise(
             payload.update({

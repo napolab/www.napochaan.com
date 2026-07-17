@@ -141,6 +141,143 @@ describe('createPost with image-row', () => {
   });
 });
 
+describe('createPost with in-site media URLs', () => {
+  it('rejects with the resolved media id in the recovery hint', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [{ id: 42 }] }); // filename lookup hit
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: '![before](/api/media/file/IMG_0185.jpeg)',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('media id=42');
+    expect(result.content[0]?.text).toContain('![media:42]()');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects with an upload_media hint when the media file does not exist', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [] }); // filename lookup miss
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: '![](/api/media/file/missing.png)',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('missing.png');
+    expect(result.content[0]?.text).toContain('upload_media');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('updatePost with in-site media URLs', () => {
+  it('rejects bodyMarkdown containing in-site URLs with the resolved id hint', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 4, body: paragraphBody() }); // post fetch
+    payload.find.mockResolvedValue({ docs: [{ id: 9 }] }); // filename lookup hit
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.updatePost({ id: 4, bodyMarkdown: '![old](/api/media/file/IMG_0185.jpeg)' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('media id=9');
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('getPost normalizes in-site media URLs', () => {
+  it('rewrites raw in-site refs to media placeholders in bodyMarkdown', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    payload.find.mockResolvedValue({ docs: [{ id: 42 }] });
+    codec.toMarkdown.mockReturnValue('intro\n\n![](/api/media/file/IMG_0185.jpeg)');
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toBe('intro\n\n![media:42]()');
+  });
+
+  it('leaves refs whose media is missing untouched', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    payload.find.mockResolvedValue({ docs: [] });
+    codec.toMarkdown.mockReturnValue('![](/api/media/file/gone.png)');
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toBe('![](/api/media/file/gone.png)');
+  });
+});
+
+// LLM 向け回復指示メッセージと get_post 正規化出力は MCP の実質的な API contract。
+// 文言・形式の変化を snapshot で固定する。
+describe('I/O snapshot', () => {
+  const findByFilename = (filename: string, hit: number | undefined) => ({ docs: hit === undefined ? [] : [{ id: hit }] });
+
+  it('write rejection message covers all three hint variants', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockImplementation((args: { where: { filename: { equals: string } } }) =>
+      Promise.resolve(findByFilename(args.where.filename.equals, args.where.filename.equals === 'known.jpeg' ? 42 : undefined)),
+    );
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: ['![a](/api/media/file/known.jpeg)', '![b](/api/media/file/unknown.png)', '![c](https://example.com/ext.png)'].join('\n'),
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toMatchInlineSnapshot(`
+      "本文に生 URL の画像参照があります。画像は ![media:<id>]() 参照で書いてください:
+      - ![a](/api/media/file/known.jpeg): media id=42 の画像です。![media:42]() に置き換えて再送してください。
+      - ![b](/api/media/file/unknown.png): 対応する media(unknown.png)が見つかりません。upload_media で登録し、返された ![media:<id>]() を使ってください。
+      - ![c](https://example.com/ext.png): 外部 URL は使えません。upload_media で画像を登録し、返された ![media:<id>]() を使ってください。"
+    `);
+  });
+
+  it('get_post bodyMarkdown normalization output', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    payload.find.mockImplementation((args: { where: { filename: { equals: string } } }) =>
+      Promise.resolve(findByFilename(args.where.filename.equals, args.where.filename.equals === 'known.jpeg' ? 42 : undefined)),
+    );
+    codec.toMarkdown.mockReturnValue(['# post', '', '![x](/api/media/file/known.jpeg)', '![y](/api/media/file/unknown.png)', '![media:7]()'].join('\n'));
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toMatchInlineSnapshot(`
+      "# post
+
+      ![media:42]()
+      ![y](/api/media/file/unknown.png)
+      ![media:7]()"
+    `);
+  });
+});
+
 describe('updatePost', () => {
   it('rejects bodyMarkdown when the current body contains block nodes', async () => {
     const { payload, deps } = createDeps();
