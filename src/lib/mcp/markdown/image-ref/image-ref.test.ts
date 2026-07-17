@@ -163,6 +163,14 @@ describe('hasNonEmptyParens', () => {
   it('is true for parens containing only whitespace (matches the old `[^)]+` semantics)', () => {
     expect(hasNonEmptyParens('![x]( )')).toBe(true);
   });
+
+  it('is false for an empty-target ref whose alt contains parens (alt parens must not count)', () => {
+    expect(hasNonEmptyParens('![foo(bar)]()')).toBe(false);
+  });
+
+  it('is true for a non-empty target ref whose alt contains parens (target still counts)', () => {
+    expect(hasNonEmptyParens('![foo(bar)](x.png)')).toBe(true);
+  });
 });
 
 // parse -> serialize は恒等(raw を保持しているため)。fence 処理はこのモジュールの

@@ -95,5 +95,9 @@ export const isRoundTrippableAlt = (alt: string): boolean => !alt.includes(')');
 // rawID)を見るのではなく raw を直接判定することで、全 kind に一様に効かせる —
 // ![x]() のような空括弧の非 placeholder 参照を raw 扱いしない、という旧 regex の
 // 挙動をここで再現する(呼び出し側は placeholder を別途常に除外すること)。
-const RAW_PAREN_CONTENT = /\(([^)]+)\)/;
+// `](` の直後の括弧だけを見るよう `]\(...\)$` で終端アンカーする(旧 RAW_IMAGE_REF も
+// `](` 直後の括弧のみを見ていた)。alt はトークン文法上 `]` を含み得ないため `]\(` は
+// target の開始位置を一意に特定でき、alt 内の括弧(例: `![foo(bar)]()`)を
+// 誤って target の非空括弧として検出しない。
+const RAW_PAREN_CONTENT = /\]\(([^)]+)\)$/;
 export const hasNonEmptyParens = (raw: string): boolean => RAW_PAREN_CONTENT.test(raw);
