@@ -1,6 +1,6 @@
 import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 
-import { ImageRow } from '../../blocks/image-row';
+import { ImageRow } from '../../../blocks/image-row';
 
 // FeaturesInput は package root から export されていないので lexicalEditor の
 // パラメータ型から導出する。

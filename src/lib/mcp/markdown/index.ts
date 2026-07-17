@@ -9,10 +9,13 @@ export type MarkdownCodec = {
 };
 
 // editorConfig はプロジェクトの root lexical editor 設定(BlocksFeature([ImageRow]) 込み)を
-// 渡すこと(呼び出し側の責務。route.ts で `payload.config.editor.editorConfig` から解決する)。
-// `editorConfigFactory.default` は Payload のグローバルキャッシュされた汎用 default editor を
-// 返すだけで payload.config.editor から導出されないため、プロジェクトの block 登録
-// (BlocksFeature([ImageRow]) 等)を含まない。ここでは絶対に使わないこと。
+// 渡すこと(呼び出し側の責務)。route.ts で
+// `editorConfigFactory.fromFeatures({ config, features: blogEditorFeatures })` から解決する。
+// NG: `editorConfigFactory.default` は汎用 default editor で block 未登録。
+// NG: `payload.config.editor.editorConfig` は payload.config 側の lexical コピー製で、
+//     ここの convertLexicalToMarkdown が使う lexical コピーと ServerBlockNode が一致せず
+//     「multiple copies of lexical」で block 変換が throw する。詳細は
+//     src/lib/payload/editor-features/index.ts を参照。
 export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): MarkdownCodec => ({
   toLexical: (markdown) => convertMarkdownToLexical({ editorConfig, markdown }),
   toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),
