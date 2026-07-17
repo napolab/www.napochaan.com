@@ -198,6 +198,22 @@ const renderUpload = (node: unknown, opts: LexicalToMarkdownOptions): string | u
   return imageMarkdown(media, stringOf(isObject(node) ? node.fields : undefined, 'caption'), opts);
 };
 
+// `video` block(src/blocks/video)の1本埋め込みを consumer 向け markdown 用のリンクに
+// する。画像と違い動画は `![...]` の画像構文で表せない(ブラウザ/リーダーが img として
+// 解釈しても壊れて見えるだけ)ので、素の `[label](url)` リンクにする。caption を優先し、
+// 無ければ filename、それも無ければ絶対URL自体をラベルにする(link 先を必ず提示)。
+// poster はプレゼンテーション用の付随情報でしかないため、公開 markdown には出さない。
+const renderVideo = (fields: Record<string, unknown>, opts: LexicalToMarkdownOptions): string | undefined => {
+  const media = populatedMediaOf(fields.video);
+  if (media === undefined) return undefined;
+
+  const url = absolutize(media.url, opts);
+  const caption = stringOf(fields, 'caption');
+  const label = caption !== undefined && caption !== '' ? caption : (media.filename ?? url);
+
+  return `[${label}](${url})`;
+};
+
 const renderImageRow = (fields: Record<string, unknown>, opts: LexicalToMarkdownOptions): string | undefined => {
   const cells = Array.isArray(fields.cells) ? fields.cells : [];
   const rendered = cells
@@ -252,9 +268,15 @@ const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | un
     case 'block': {
       const fields = isObject(node) && isObject(node.fields) ? node.fields : undefined;
       if (fields === undefined) return undefined;
-      if (fields.blockType === 'image-row') return renderImageRow(fields, opts);
 
-      return undefined;
+      switch (fields.blockType) {
+        case 'image-row':
+          return renderImageRow(fields, opts);
+        case 'video':
+          return renderVideo(fields, opts);
+        default:
+          return undefined;
+      }
     }
     default:
       return undefined;
