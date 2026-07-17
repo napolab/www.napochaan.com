@@ -38,6 +38,22 @@ const createDeps = () => {
   return { payload, codec, deps };
 };
 
+// payload.find は「filename equals」(media-file-refs lookup)と「id in」(alt lookup)の
+// 2 用途で呼ばれる。fixtures から両クエリ形を判別して返すモック実装(args.where の形で分岐)。
+type MediaFixture = { id: number; alt: string; filename?: string };
+
+const mockMediaLookup = (payload: { find: ReturnType<typeof vi.fn> }, fixtures: readonly MediaFixture[]): void => {
+  payload.find.mockImplementation((args: { where: { filename: { equals: string } } | { id: { in: number[] } } }) => {
+    const { where } = args;
+    if ('filename' in where) {
+      const hit = fixtures.find((fixture) => fixture.filename === where.filename.equals);
+      return Promise.resolve({ docs: hit === undefined ? [] : [{ id: hit.id, alt: hit.alt }] });
+    }
+    const ids = where.id.in;
+    return Promise.resolve({ docs: fixtures.filter((fixture) => ids.includes(fixture.id)).map((fixture) => ({ id: fixture.id, alt: fixture.alt })) });
+  });
+};
+
 describe('createPost', () => {
   it('creates a draft with overrideAccess: false', async () => {
     const { payload, deps } = createDeps();
@@ -67,6 +83,7 @@ describe('createPost', () => {
 
   it('rejects raw image URLs with a recovery hint', async () => {
     const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
     const handlers = createBlogToolHandlers(deps);
     const result = await handlers.createPost({
       title: 't',
@@ -88,6 +105,23 @@ describe('createPost', () => {
     const result = await handlers.createPost({ title: 't', slug: 's', excerpt: 'e', thumbnailMediaID: 99, bodyMarkdown: '# hi' });
 
     expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('does not commit a media alt sync when the thumbnail is missing (thumbnail must be verified before prepareBody runs)', async () => {
+    const { payload, deps } = createDeps();
+    // thumbnail (99) missing; media id=5 referenced in bodyMarkdown exists with a
+    // different alt than what's written, so prepareBody would call payload.update
+    // for it if it ran. It must not run before the thumbnail check fails.
+    payload.findByID.mockImplementation(async ({ id }: { id: number }) => (id === 99 ? null : { id }));
+    mockMediaLookup(payload, [{ id: 5, alt: '古い説明' }]);
+    payload.update.mockResolvedValue({});
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 's', excerpt: 'e', thumbnailMediaID: 99, bodyMarkdown: '![media:5](新しい説明)' });
+
+    expect(result.isError).toBe(true);
+    expect(payload.update).not.toHaveBeenCalled();
     expect(payload.create).not.toHaveBeenCalled();
   });
 
@@ -141,6 +175,223 @@ describe('createPost with image-row', () => {
   });
 });
 
+describe('createPost with alt-mandatory placeholders', () => {
+  it('syncs the written alt to the media doc and strips it before Lexical conversion', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 8 }); // thumbnail exists
+    mockMediaLookup(payload, [{ id: 5, alt: '古い説明' }]);
+    payload.create.mockResolvedValue({ id: 20, slug: 'alt-sync' });
+    payload.update.mockResolvedValue({});
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'alt-sync', excerpt: 'e', thumbnailMediaID: 8, bodyMarkdown: '![media:5](新しい説明)' });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'media', id: 5, data: { alt: '新しい説明' } }));
+    expect(codec.toLexical).toHaveBeenCalledWith('![media:5]()');
+    expect(payload.create).toHaveBeenCalled();
+  });
+
+  it('does not touch the media doc when the written alt matches the current one', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 8 });
+    mockMediaLookup(payload, [{ id: 5, alt: '説明' }]);
+    payload.create.mockResolvedValue({ id: 20, slug: 'alt-same' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'alt-same', excerpt: 'e', thumbnailMediaID: 8, bodyMarkdown: '![media:5](説明)' });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.update).not.toHaveBeenCalled();
+    expect(payload.create).toHaveBeenCalled();
+  });
+
+  it('rejects an empty alt', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 8 }); // thumbnail exists
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'empty-alt', excerpt: 'e', thumbnailMediaID: 8, bodyMarkdown: '![media:5]()' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('alt');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects conflicting alts for the same media id', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 8 }); // thumbnail exists
+    const handlers = createBlogToolHandlers(deps);
+    const bodyMarkdown = ['![media:5](A)', '![media:5](B)'].join('\n');
+    const result = await handlers.createPost({ title: 't', slug: 'conflict-alt', excerpt: 'e', thumbnailMediaID: 8, bodyMarkdown });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('統一');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a placeholder referencing a media id that does not exist', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 8 }); // thumbnail exists
+    mockMediaLookup(payload, []);
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'missing-media', excerpt: 'e', thumbnailMediaID: 8, bodyMarkdown: '![media:999](desc)' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('存在しません');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('does not run alt validation on image-row cell captions and passes the fence through unchanged', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail + cells all exist
+    payload.create.mockResolvedValue({ id: 30, slug: 'fence-only' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const bodyMarkdown = `intro\n\n${FENCE}`;
+    const result = await handlers.createPost({ title: 't', slug: 'fence-only', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown });
+
+    expect(result.isError).toBeUndefined();
+    expect(codec.toLexical).toHaveBeenCalledWith(bodyMarkdown);
+  });
+});
+
+describe('createPost with in-site media URLs', () => {
+  it('rejects with the resolved media id in the recovery hint', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    mockMediaLookup(payload, [{ id: 42, alt: '既存のalt', filename: 'IMG_0185.jpeg' }]); // filename lookup hit
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: '![before](/api/media/file/IMG_0185.jpeg)',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('media id=42');
+    expect(result.content[0]?.text).toContain('![media:42](既存のalt)');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects with an upload_media hint when the media file does not exist', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    payload.find.mockResolvedValue({ docs: [] }); // filename lookup miss
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: '![](/api/media/file/missing.png)',
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('missing.png');
+    expect(result.content[0]?.text).toContain('upload_media');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('updatePost with in-site media URLs', () => {
+  it('rejects bodyMarkdown containing in-site URLs with the resolved id hint', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 4, body: paragraphBody() }); // post fetch
+    mockMediaLookup(payload, [{ id: 9, alt: '別のalt', filename: 'IMG_0185.jpeg' }]); // filename lookup hit
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.updatePost({ id: 4, bodyMarkdown: '![old](/api/media/file/IMG_0185.jpeg)' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('media id=9');
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('getPost normalizes in-site media URLs', () => {
+  it('rewrites raw in-site refs to media placeholders in bodyMarkdown, filled with the doc alt', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    mockMediaLookup(payload, [{ id: 42, alt: 'IMG の alt', filename: 'IMG_0185.jpeg' }]);
+    codec.toMarkdown.mockReturnValue('intro\n\n![](/api/media/file/IMG_0185.jpeg)');
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toBe('intro\n\n![media:42](IMG の alt)');
+  });
+
+  it('leaves refs whose media is missing untouched', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    mockMediaLookup(payload, []);
+    codec.toMarkdown.mockReturnValue('![](/api/media/file/gone.png)');
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toBe('![](/api/media/file/gone.png)');
+  });
+});
+
+// LLM 向け回復指示メッセージと get_post 正規化出力は MCP の実質的な API contract。
+// 文言・形式の変化を snapshot で固定する。
+describe('I/O snapshot', () => {
+  it('write rejection message covers all three hint variants', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    mockMediaLookup(payload, [{ id: 42, alt: '既存のalt', filename: 'known.jpeg' }]);
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: ['![a](/api/media/file/known.jpeg)', '![b](/api/media/file/unknown.png)', '![c](https://example.com/ext.png)'].join('\n'),
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toMatchInlineSnapshot(`
+      "本文に生 URL の画像参照があります。画像は ![media:<id>](alt) 参照で書いてください:
+      - ![a](/api/media/file/known.jpeg): media id=42 の画像です。![media:42](既存のalt) に置き換えて再送してください。
+      - ![b](/api/media/file/unknown.png): 対応する media(unknown.png)が見つかりません。upload_media で登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。
+      - ![c](https://example.com/ext.png): 外部 URL は使えません。upload_media で画像を登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。"
+    `);
+  });
+
+  it('get_post bodyMarkdown normalization output', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    mockMediaLookup(payload, [
+      { id: 42, alt: '写真の説明', filename: 'known.jpeg' },
+      { id: 7, alt: '既存プレースホルダの説明' },
+    ]);
+    codec.toMarkdown.mockReturnValue(['# post', '', '![x](/api/media/file/known.jpeg)', '![y](/api/media/file/unknown.png)', '![media:7]()'].join('\n'));
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toMatchInlineSnapshot(`
+      "# post
+
+      ![media:42](写真の説明)
+      ![y](/api/media/file/unknown.png)
+      ![media:7](既存プレースホルダの説明)"
+    `);
+  });
+});
+
 describe('updatePost', () => {
   it('rejects bodyMarkdown when the current body contains block nodes', async () => {
     const { payload, deps } = createDeps();
@@ -164,6 +415,20 @@ describe('updatePost', () => {
     expect(arg.draft).toBe(true);
     expect(arg.data).not.toHaveProperty('body');
     expect(arg.data).toHaveProperty('title', 'new title');
+  });
+
+  it('syncs the written alt to the media doc when bodyMarkdown changes a placeholder alt', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 4, body: paragraphBody() }); // post fetch
+    mockMediaLookup(payload, [{ id: 5, alt: '古い説明' }]);
+    payload.update.mockResolvedValue({ id: 4, slug: 's' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.updatePost({ id: 4, bodyMarkdown: '![media:5](新しい説明)' });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'media', id: 5, data: { alt: '新しい説明' } }));
+    expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 4 }));
   });
 });
 
@@ -235,6 +500,53 @@ describe('getPost', () => {
 
     expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user, depth: 0 }));
   });
+
+  it('fills an existing empty-alt placeholder with the current media doc alt', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    mockMediaLookup(payload, [{ id: 42, alt: 'docのalt' }]);
+    codec.toMarkdown.mockReturnValue('![media:42]()');
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toBe('![media:42](docのalt)');
+  });
+
+  it('leaves a placeholder unfilled when the doc alt contains a half-width close paren (unrepresentable in ![media:<id>](alt))', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    mockMediaLookup(payload, [{ id: 42, alt: '図(A)B' }]);
+    codec.toMarkdown.mockReturnValue('![media:42]()');
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toBe('![media:42]()');
+  });
+
+  it('round-trips a filled alt through updatePost without touching the media doc (getPost fill -> update_post with that exact bodyMarkdown)', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: paragraphBody() });
+    mockMediaLookup(payload, [{ id: 42, alt: '写真の説明' }]);
+    codec.toMarkdown.mockReturnValue('![media:42]()');
+    payload.update.mockResolvedValue({ id: 3, slug: 's' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const getResult = await handlers.getPost({ id: 3 });
+    const parsed = JSON.parse(getResult.content[0]?.text ?? '{}') as { bodyMarkdown: string };
+    expect(parsed.bodyMarkdown).toBe('![media:42](写真の説明)');
+
+    const updateResult = await handlers.updatePost({ id: 3, bodyMarkdown: parsed.bodyMarkdown });
+
+    expect(updateResult.isError).toBeUndefined();
+    expect(payload.update).toHaveBeenCalledTimes(1);
+    expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3 }));
+  });
 });
 
 describe('uploadMedia', () => {
@@ -253,7 +565,7 @@ describe('uploadMedia', () => {
         file: expect.objectContaining({ mimetype: 'image/png', name: 'x.png' }),
       }),
     );
-    expect(result.content[0]?.text).toContain('![media:42]()');
+    expect(result.content[0]?.text).toContain('![media:42](x)');
   });
 
   it('fails without url or base64', async () => {
@@ -261,6 +573,16 @@ describe('uploadMedia', () => {
     const handlers = createBlogToolHandlers(deps);
     const result = await handlers.uploadMedia({ alt: 'x', filename: 'x.png' });
     expect(result.isError).toBe(true);
+  });
+
+  it('rejects an alt containing a half-width close paren (unrepresentable in ![media:<id>](alt))', async () => {
+    const { payload, deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.uploadMedia({ base64: Buffer.from('png-bytes').toString('base64'), alt: '図(A)B', filename: 'x.png' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('）');
+    expect(payload.create).not.toHaveBeenCalled();
   });
 
   describe('SSRF guard', () => {
@@ -388,5 +710,104 @@ describe('listPosts', () => {
     await handlers.listPosts({});
 
     expect(payload.find).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', draft: true, overrideAccess: false, user, sort: '-publishedAt' }));
+  });
+});
+
+describe('listMedia', () => {
+  it('queries media without a where clause when search is omitted', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [{ id: 1, filename: 'a.png', alt: '説明A', url: '/api/media/file/a.png', width: 100, height: 50, mimeType: 'image/png' }] });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.listMedia({});
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.find).toHaveBeenCalledWith(expect.objectContaining({ collection: 'media', sort: '-createdAt', limit: 20, overrideAccess: false, user, depth: 0 }));
+    const arg = payload.find.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect('where' in arg).toBe(false);
+  });
+
+  it('queries media with a filename/alt where clause when search is provided', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [] });
+    const handlers = createBlogToolHandlers(deps);
+    await handlers.listMedia({ search: 'VJ' });
+
+    expect(payload.find).toHaveBeenCalledWith(expect.objectContaining({ where: { or: [{ filename: { contains: 'VJ' } }, { alt: { contains: 'VJ' } }] } }));
+  });
+
+  it('returns id/filename/alt/url/width/height/mimeType and a media placeholder', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [{ id: 1, filename: 'a.png', alt: '説明A', url: '/api/media/file/a.png', width: 100, height: 50, mimeType: 'image/png' }] });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.listMedia({});
+
+    const parsed = JSON.parse(result.content[0]?.text ?? '[]') as unknown[];
+    expect(parsed[0]).toEqual({
+      id: 1,
+      filename: 'a.png',
+      alt: '説明A',
+      url: '/api/media/file/a.png',
+      width: 100,
+      height: 50,
+      mimeType: 'image/png',
+      placeholder: '![media:1](説明A)',
+    });
+  });
+
+  it('emits an empty placeholder (but keeps the raw alt) when the doc alt contains ")"', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [{ id: 9, alt: '図(A)B', filename: null, url: null, width: null, height: null, mimeType: null }] });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.listMedia({});
+
+    const parsed = JSON.parse(result.content[0]?.text ?? '[]') as unknown[];
+    expect(parsed[0]).toEqual({ id: 9, alt: '図(A)B', placeholder: '![media:9]()' });
+  });
+
+  it('coerces null fields to undefined so they are dropped by JSON.stringify', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [{ id: 2, alt: 'B', filename: null, url: null, width: null, height: null, mimeType: null }] });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.listMedia({});
+
+    const parsed = JSON.parse(result.content[0]?.text ?? '[]') as unknown[];
+    expect(parsed[0]).toEqual({ id: 2, alt: 'B', placeholder: '![media:2](B)' });
+  });
+
+  it('I/O snapshot', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({
+      docs: [
+        { id: 1, filename: 'a.png', alt: '説明A', url: '/api/media/file/a.png', width: 100, height: 50, mimeType: 'image/png' },
+        { id: 2, filename: 'b.jpg', alt: '説明B', url: '/api/media/file/b.jpg', width: 200, height: 150, mimeType: 'image/jpeg' },
+      ],
+    });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.listMedia({});
+
+    expect(result.content[0]?.text).toMatchInlineSnapshot(`
+      "[
+        {
+          "id": 1,
+          "filename": "a.png",
+          "alt": "説明A",
+          "url": "/api/media/file/a.png",
+          "width": 100,
+          "height": 50,
+          "mimeType": "image/png",
+          "placeholder": "![media:1](説明A)"
+        },
+        {
+          "id": 2,
+          "filename": "b.jpg",
+          "alt": "説明B",
+          "url": "/api/media/file/b.jpg",
+          "width": 200,
+          "height": 150,
+          "mimeType": "image/jpeg",
+          "placeholder": "![media:2](説明B)"
+        }
+      ]"
+    `);
   });
 });

@@ -18,9 +18,13 @@ import {
   UploadTooLargeError,
 } from '../errors';
 import { blockSyntaxHelp, extractBlockMediaIDs, findRawImageRefs, hasUnsupportedBlocks, validateBlockFences } from '../markdown';
+import { mapTextSegments } from '../markdown/code-fences';
+import { findMediaFileRefs, rewriteMediaFileRefs } from '../markdown/media-file-refs';
+import { fillMediaPlaceholderAlts, findMediaPlaceholders, stripMediaPlaceholderAlts } from '../markdown/media-placeholders';
 
 import type { McpToolError } from '../errors';
 import type { MarkdownCodec } from '../markdown';
+import type { MediaPlaceholder } from '../markdown/media-placeholders';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Result, ResultAsync } from 'neverthrow';
 import type { Blog, User } from '@payload-types';
@@ -63,10 +67,14 @@ const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 // LLM に教える(block の構文は registry の blockSyntaxHelp から集約)。
 const BODY_MARKDOWN_HELP = [
   '本文 Markdown。見出し・リスト・強調・リンク等の標準 Markdown が使える。',
-  '画像は必ず upload_media で作成した media を使う。単一画像は ![media:<id>]()(空括弧)。',
-  '生 URL 画像(![alt](https://...))は不可 — 先に upload_media で登録して id を得ること。',
+  '画像は必ず media 参照で書く: ![media:<id>](alt)。alt は必須で、画像の内容を具体的に説明する日本語テキスト(ファイル名の流用は不可、")" は使えない)。',
+  'alt を書き換えて保存すると media 側の alt が更新され、その画像を使う全記事に反映される。',
+  '生 URL 画像(![alt](https://...))は不可 — 先に upload_media で登録すること。サイト内 media URL は拒否時のエラーが対応する media id と置き換え先を提示する。',
+  '既存の画像を使うときは list_media で id と alt を確認する。',
   '',
   blockSyntaxHelp(),
+  '',
+  'なお image-row フェンス内セルの括弧は caption であり alt ではない(セルの alt は media 側の alt が使われる)。',
 ].join('\n');
 
 const MIME_BY_EXT = {
@@ -91,6 +99,18 @@ const resolveMimetypeFromFilename = (filename: string): string | undefined => {
 const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 const UPLOAD_TOO_LARGE_MESSAGE = '画像が大きすぎます(上限 10MB)。縮小・圧縮してから再実行してください。';
+
+// alt は本文中で ![media:<id>](alt) 表記のまま保存・往復する。alt regex が [^)]* の
+// ため半角 ')' を含む alt は括弧を途中で閉じてしまい往復できない(get_post → write の
+// 再送で alt が途中で切り詰められ、末尾が本文へ漏れ出す)。schema(zod .refine)側の
+// 表明と同じ制約をここでも handler レベルで検証し、直接呼び出しでも防ぐ。
+const ALT_CLOSE_PAREN_MESSAGE = 'alt に半角の ")" は使えません。全角の「）」を使ってください。';
+
+// alt 往復可能性の単一判定源。upload_media の zod refine / handler 検証 / list_media の
+// placeholder 生成 / get_post の alt 充填除外(filterRoundTrippableAlts)が全てこれに合流する。
+const isRoundTrippableAlt = (alt: string): boolean => !alt.includes(')');
+
+const validateUploadAlt = (alt: string): Result<string, InvalidInputError> => (isRoundTrippableAlt(alt) ? okResult(alt) : errResult(new InvalidInputError(ALT_CLOSE_PAREN_MESSAGE)));
 
 const toSummary = (doc: Blog) => ({
   id: doc.id,
@@ -257,12 +277,57 @@ const verifyAllMediaExist = (verifyMediaExists: VerifyMediaExists, ids: number[]
   );
 };
 
+type MediaHit = { id: number; alt: string };
+type FindMediaByFilename = (filename: string) => ResultAsync<MediaHit | undefined, PayloadOperationError>;
+type FindMediaAltsByIDs = (ids: number[]) => ResultAsync<ReadonlyMap<number, string>, PayloadOperationError>;
+
+// alt に ')' を含む media doc は ![media:<id>](alt) 表記で往復できない(alt 正規表現が
+// [^)]* のため ')' 以降が本文に漏れ出す)。get_post の alt 充填対象からはこれを除外し、
+// 該当プレースホルダは ![media:<id>]() のまま返す — write 側の空 alt エラーで
+// LLM に明示的な修正(alt の書き換え)を促し、syncMediaAlts による doc alt の
+// 黙った切り詰め上書きを避ける。
+const filterRoundTrippableAlts = (altByID: ReadonlyMap<number, string>): ReadonlyMap<number, string> => new Map([...altByID].filter(([, alt]) => isRoundTrippableAlt(alt)));
+
+// filename → media hit(id + alt)の対応表を逐次 lookup で構築する(`let` 禁止のため acc を引き回す再帰)。
+// 見つからない filename は黙ってスキップする — read 正規化は best-effort で失敗させず、
+// write 側は「見つからない」ことを自分のエラーメッセージで伝えるため、ここでは失敗にしない。
+const lookupFoundMedia = (findMediaByFilename: FindMediaByFilename, filenames: string[], acc: ReadonlyMap<string, MediaHit>): ResultAsync<ReadonlyMap<string, MediaHit>, PayloadOperationError> => {
+  const [first, ...rest] = filenames;
+  if (first === undefined) return okAsync(acc);
+  return findMediaByFilename(first).andThen((hit) => lookupFoundMedia(findMediaByFilename, rest, hit === undefined ? acc : new Map([...acc, [first, hit]])));
+};
+
+// 本文中のサイト内 media 直リンクが参照する filename を重複排除して逐次 lookup し、
+// 見つかったものだけの対応表を返す(read 正規化と write エラーメッセージの両方で使う)。
+const collectMediaFileHits = (markdown: string, findMediaByFilename: FindMediaByFilename): ResultAsync<ReadonlyMap<string, MediaHit>, PayloadOperationError> => {
+  const filenames = [...new Set(findMediaFileRefs(markdown).map((ref) => ref.filename))];
+  return lookupFoundMedia(findMediaByFilename, filenames, new Map());
+};
+
+// 生 URL 画像 1 件分の回復指示。サイト内 media URL で対応 doc が見つかる場合は
+// alt 入りの具体的な置き換え先(![media:<id>](alt))まで提示し、LLM が 1 往復で
+// そのまま貼り戻せる形で自己修正できるようにする。
+const rawRefHint = (rawRef: string, hitByFilename: ReadonlyMap<string, MediaHit>): string => {
+  const [mediaRef] = findMediaFileRefs(rawRef);
+  if (mediaRef === undefined) return `- ${rawRef}: 外部 URL は使えません。upload_media で画像を登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。`;
+  const hit = hitByFilename.get(mediaRef.filename);
+  if (hit === undefined) return `- ${rawRef}: 対応する media(${mediaRef.filename})が見つかりません。upload_media で登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。`;
+  return `- ${rawRef}: media id=${hit.id} の画像です。![media:${hit.id}](${hit.alt}) に置き換えて再送してください。`;
+};
+
+// ![media:<id>](alt) は alt が非空だと括弧内も非空になるため、素朴な「非空括弧の
+// 画像参照」検出(RAW_IMAGE_REF)だけでは生 URL 画像と区別できない。生 URL 判定の
+// 対象から、正規のプレースホルダ表記に一致する ref を除外する。
+const isMediaPlaceholderRef = (ref: string): boolean => /^!\[media:\d+\]\([^)]*\)$/.test(ref);
+
 // 本文 Markdown の生URL画像参照 + image-row フェンス構造 + cell media 実在性を検証し、
-// 問題があれば LLM 向け回復指示メッセージ(最初の1件)を持つ Result を返す。
-const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMediaExists): ResultAsync<void, McpToolError> => {
-  const rawRefs = findRawImageRefs(bodyMarkdown);
+// 問題があれば LLM 向け回復指示メッセージを持つ Result を返す。
+const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMediaExists, findMediaByFilename: FindMediaByFilename): ResultAsync<void, McpToolError> => {
+  const rawRefs = findRawImageRefs(bodyMarkdown).filter((ref) => !isMediaPlaceholderRef(ref));
   if (rawRefs.length > 0) {
-    return errAsync(new BodyValidationError(`本文に生 URL の画像参照があります: ${rawRefs.join(', ')}\n先に upload_media で画像を登録し、返された ![media:<id>]() を使ってください。`));
+    return collectMediaFileHits(bodyMarkdown, findMediaByFilename).andThen((hitByFilename) =>
+      errAsync(new BodyValidationError(`本文に生 URL の画像参照があります。画像は ![media:<id>](alt) 参照で書いてください:\n${rawRefs.map((rawRef) => rawRefHint(rawRef, hitByFilename)).join('\n')}`)),
+    );
   }
   const [firstFenceError] = validateBlockFences(bodyMarkdown);
   if (firstFenceError !== undefined) return errAsync(new BodyValidationError(firstFenceError));
@@ -271,10 +336,51 @@ const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMed
   return verifyAllMediaExist(verifyMediaExists, mediaIDs);
 };
 
-type NextBody = { kind: 'skip' } | { kind: 'body'; body: Blog['body'] };
+// media id → 書かれた alt の対応表を蓄積する reduce ステップ(`let` 禁止)。
+// 空 alt の id は emptyIDs に、同一 id への異なる alt は最初の 1 件だけ conflict に積む
+// (以降の判定は emptyIDs/conflict の有無だけを見るため、2 件目以降は不要)。
+type PlaceholderAltState = {
+  altByID: ReadonlyMap<number, string>;
+  emptyIDs: readonly number[];
+  conflict: { id: number; altA: string; altB: string } | undefined;
+};
 
-// update_post の bodyMarkdown 差し替え可否を判定する。
-const resolveNextBody = (bodyMarkdown: string | undefined, current: Blog, toLexicalSafe: ToLexicalSafe, verifyMediaExists: VerifyMediaExists): ResultAsync<NextBody, McpToolError> => {
+const accumulatePlaceholderAlt = (state: PlaceholderAltState, placeholder: MediaPlaceholder): PlaceholderAltState => {
+  if (placeholder.alt === '') {
+    if (state.emptyIDs.includes(placeholder.id)) return state;
+    return { ...state, emptyIDs: [...state.emptyIDs, placeholder.id] };
+  }
+  const existingAlt = state.altByID.get(placeholder.id);
+  if (existingAlt === undefined) return { ...state, altByID: new Map([...state.altByID, [placeholder.id, placeholder.alt]]) };
+  if (existingAlt === placeholder.alt) return state;
+  if (state.conflict !== undefined) return state;
+  return { ...state, conflict: { id: placeholder.id, altA: existingAlt, altB: placeholder.alt } };
+};
+
+// プレースホルダの alt を検証し、id → alt(書かれた値)の対応表を返す。
+// 空 alt と、同一 id への異なる alt(どちらを doc に書くか決められない)を拒否する。
+const validatePlaceholderAlts = (bodyMarkdown: string): Result<ReadonlyMap<number, string>, BodyValidationError> => {
+  const { altByID, emptyIDs, conflict } = findMediaPlaceholders(bodyMarkdown).reduce(accumulatePlaceholderAlt, { altByID: new Map(), emptyIDs: [], conflict: undefined });
+  const [firstEmptyID] = emptyIDs;
+  if (firstEmptyID !== undefined) {
+    return errResult(
+      new BodyValidationError(
+        `![media:${firstEmptyID}]() の alt が空です。画像の内容を具体的に説明する alt を括弧内に書いてください(例: ![media:${firstEmptyID}](ライブ会場で撮った VJ ブースの写真))。対象: media id=${emptyIDs.join(', ')}`,
+      ),
+    );
+  }
+  if (conflict !== undefined) {
+    return errResult(new BodyValidationError(`media id=${conflict.id} に異なる alt が指定されています(「${conflict.altA}」「${conflict.altB}」)。同じ画像の alt は 1 つに統一してください。`));
+  }
+  return okResult(altByID);
+};
+
+type NextBody = { kind: 'skip' } | { kind: 'body'; body: Blog['body'] };
+type PrepareBody = (bodyMarkdown: string) => ResultAsync<Blog['body'], McpToolError>;
+
+// update_post の bodyMarkdown 差し替え可否を判定する。検証・alt 同期・Lexical 変換は
+// prepareBody(create_post と共通のパイプライン)に委譲する。
+const resolveNextBody = (bodyMarkdown: string | undefined, current: Blog, prepareBody: PrepareBody): ResultAsync<NextBody, McpToolError> => {
   if (bodyMarkdown === undefined) return okAsync({ kind: 'skip' });
   if (hasUnsupportedBlocks(current.body)) {
     return errAsync(
@@ -283,9 +389,7 @@ const resolveNextBody = (bodyMarkdown: string | undefined, current: Blog, toLexi
       ),
     );
   }
-  return validateBodyMarkdown(bodyMarkdown, verifyMediaExists)
-    .andThen(() => toLexicalSafe(bodyMarkdown))
-    .map((body): NextBody => ({ kind: 'body', body }));
+  return prepareBody(bodyMarkdown).map((body): NextBody => ({ kind: 'body', body }));
 };
 
 // IIFE 禁止ルールのため updatePost 本体から切り出した名前付きヘルパ。
@@ -348,16 +452,85 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
       (media) => media !== null,
     );
 
+  const findMediaByFilename: FindMediaByFilename = (filename) =>
+    fromPromise(
+      payload.find({ collection: 'media', where: { filename: { equals: filename } }, limit: 1, overrideAccess: false, user, depth: 0 }),
+      (cause) => new PayloadOperationError('media 取得に失敗しました', { cause }),
+    ).map(({ docs }) => {
+      const [doc] = docs;
+      return doc === undefined ? undefined : { id: doc.id, alt: doc.alt };
+    });
+
+  // id 群 → 現在の alt の対応表(get_post の alt 充填 と write 側の同期先確認の両方で使う)。
+  // ids が空なら問い合わせ不要(payload.find の where.id.in に空配列を渡す事故を避ける)。
+  const findMediaAltsByIDs: FindMediaAltsByIDs = (ids) => {
+    if (ids.length === 0) return okAsync(new Map());
+    return fromPromise(
+      payload.find({ collection: 'media', where: { id: { in: ids } }, limit: ids.length, overrideAccess: false, user, depth: 0 }),
+      (cause) => new PayloadOperationError('media 取得に失敗しました', { cause }),
+    ).map(({ docs }) => new Map(docs.map((doc) => [doc.id, doc.alt])));
+  };
+
+  // get_post が返す Markdown 中のサイト内 media 直リンクを ![media:<id>]() に正規化し、
+  // プレースホルダの alt を doc の現在値で充填する(いずれもコードフェンス外のみ)。
+  // admin UI 経由で raw 形のまま保存された既存記事でも LLM には常に「![media:<id>](alt)」の
+  // 完成形を見せ、そのまま update_post へ書き戻せるようにする。対応 media が無い ref/id は
+  // 原文のまま返す(get_post はここでは失敗させない — write 側の検証が回復指示を出す)。
+  const normalizeBodyMarkdown = (bodyMarkdown: string): ResultAsync<string, McpToolError> =>
+    collectMediaFileHits(bodyMarkdown, findMediaByFilename)
+      .map((hits) => mapTextSegments(bodyMarkdown, (text) => rewriteMediaFileRefs(text, new Map([...hits].map(([filename, hit]) => [filename, hit.id])))))
+      .andThen((rewritten) => {
+        const ids = [...new Set(findMediaPlaceholders(rewritten).map((placeholder) => placeholder.id))];
+        return findMediaAltsByIDs(ids).map((altByID) => fillMediaPlaceholderAlts(rewritten, filterRoundTrippableAlts(altByID)));
+      });
+
+  // 書かれた alt を media doc に同期する。doc に無い id はエラー、差分がある id だけ順次 update する。
+  const updateMediaAltsSequentially = (diffs: readonly (readonly [number, string])[]): ResultAsync<void, McpToolError> => {
+    const [first, ...rest] = diffs;
+    if (first === undefined) return okAsync(undefined);
+    const [id, alt] = first;
+    return fromPromise(
+      payload.update({ collection: 'media', id, data: { alt }, overrideAccess: false, user }),
+      (cause) => new PayloadOperationError('media の alt 更新に失敗しました', { cause }),
+    ).andThen(() => updateMediaAltsSequentially(rest));
+  };
+
+  // media doc の alt 更新はここで即 commit される(呼び出し元の post 保存が後で失敗しても
+  // ロールバックされない)。この非直感的な挙動はステークホルダー承認済みの設計。
+  const syncMediaAlts = (writtenAltByID: ReadonlyMap<number, string>): ResultAsync<void, McpToolError> => {
+    const ids = [...writtenAltByID.keys()];
+    if (ids.length === 0) return okAsync(undefined);
+    return findMediaAltsByIDs(ids).andThen((docAltByID) => {
+      const missingIDs = ids.filter((id) => !docAltByID.has(id));
+      const [firstMissingID] = missingIDs;
+      if (firstMissingID !== undefined) {
+        return errAsync(new BodyValidationError(`本文が参照する media id=${missingIDs.join(', ')} が存在しません。list_media で既存画像を確認するか、upload_media で登録してください。`));
+      }
+      const diffs = [...writtenAltByID].filter(([id, alt]) => docAltByID.get(id) !== alt);
+      return updateMediaAltsSequentially(diffs);
+    });
+  };
+
+  // bodyMarkdown の全検証 → media doc alt 同期 → alt を空括弧に戻して Lexical 変換。
+  // create_post / update_post 共通の body 保存パイプライン。
+  const prepareBody: PrepareBody = (bodyMarkdown) =>
+    validateBodyMarkdown(bodyMarkdown, verifyMediaExists, findMediaByFilename)
+      .andThen(() => validatePlaceholderAlts(bodyMarkdown))
+      .andThen((writtenAltByID) => syncMediaAlts(writtenAltByID))
+      .andThen(() => toLexicalSafe(stripMediaPlaceholderAlts(bodyMarkdown)));
+
   const buildGetPostPayload = (doc: Blog) => {
     const bodyEditable = !hasUnsupportedBlocks(doc.body);
     if (!bodyEditable) {
-      return okResult({
+      return okAsync({
         ...toSummary(doc),
         bodyEditable,
         warning: '本文に MCP 非対応の block が含まれます。bodyMarkdown での更新は不可。本文編集は admin UI で行ってください。',
       });
     }
-    return toMarkdownSafe(doc.body).map((bodyMarkdown) => ({ ...toSummary(doc), bodyEditable, bodyMarkdown }));
+    return toMarkdownSafe(doc.body)
+      .asyncAndThen(normalizeBodyMarkdown)
+      .map((bodyMarkdown) => ({ ...toSummary(doc), bodyEditable, bodyMarkdown }));
   };
 
   return {
@@ -377,6 +550,37 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         .map((result) => result.docs.map(toSummary))
         .match(ok, toToolError),
 
+    listMedia: (input: { search?: string; limit?: number }): Promise<ToolResult> =>
+      fromPromise(
+        payload.find({
+          collection: 'media',
+          sort: '-createdAt',
+          limit: input.limit ?? 20,
+          overrideAccess: false,
+          user,
+          depth: 0,
+          ...(input.search !== undefined ? { where: { or: [{ filename: { contains: input.search } }, { alt: { contains: input.search } }] } } : {}),
+        }),
+        (cause) => new PayloadOperationError('media 一覧取得に失敗しました', { cause }),
+      )
+        .map((result) =>
+          result.docs.map((media) => ({
+            id: media.id,
+            filename: media.filename ?? undefined,
+            alt: media.alt,
+            url: media.url ?? undefined,
+            width: media.width ?? undefined,
+            height: media.height ?? undefined,
+            mimeType: media.mimeType ?? undefined,
+            // alt が ')' を含む doc は placeholder に埋め込まない(get_post の
+            // filterRoundTrippableAlts と同じ往復制約) — 空 alt で返し、
+            // write 側の空 alt エラーで LLM に alt の書き換えを促す。alt フィールド自体は
+            // 生の doc alt のまま返す(情報として有用なため)。
+            placeholder: isRoundTrippableAlt(media.alt) ? `![media:${media.id}](${media.alt})` : `![media:${media.id}]()`,
+          })),
+        )
+        .match(ok, toToolError),
+
     getPost: (input: { id?: number; slug?: string }): Promise<ToolResult> =>
       parsePostQuery(input)
         .asyncAndThen(findPost)
@@ -385,7 +589,8 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         .match(ok, toToolError),
 
     uploadMedia: (input: { url?: string; base64?: string; alt: string; filename: string }): Promise<ToolResult> =>
-      resolveUploadSource(input)
+      validateUploadAlt(input.alt)
+        .asyncAndThen(() => resolveUploadSource(input))
         .andThen((source) => resolveUploadMimetype(source, input.filename).map((mimetype) => ({ source, mimetype })))
         .andThen(({ source, mimetype }) =>
           fromPromise(
@@ -401,18 +606,18 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         )
         .map((media) => ({
           id: media.id,
-          placeholder: `![media:${media.id}]()`,
+          placeholder: `![media:${media.id}](${input.alt})`,
           url: media.url ?? undefined,
-          note: '本文に画像を入れる場合は placeholder をそのまま Markdown に貼る。thumbnail に使う場合は id を thumbnailMediaID に渡す。',
+          note: '本文に画像を入れる場合は placeholder をそのまま貼る(括弧内は alt。変更すると media 側の alt も更新される)。thumbnail に使う場合は id を thumbnailMediaID に渡す。',
         }))
         .match(ok, toToolError),
 
     createPost: (input: { title: string; slug: string; excerpt: string; thumbnailMediaID: number; bodyMarkdown: string; publishedAt?: string }): Promise<ToolResult> =>
-      validateBodyMarkdown(input.bodyMarkdown, verifyMediaExists)
-        .andThen(() =>
-          verifyMediaExistsOrFail(verifyMediaExists, input.thumbnailMediaID, `thumbnailMediaID=${input.thumbnailMediaID} の media が存在しません。upload_media で作成した id を指定してください。`),
-        )
-        .andThen(() => toLexicalSafe(input.bodyMarkdown))
+      // thumbnail 検証を prepareBody より先に行う: prepareBody は media doc alt 更新を
+      // コミットする副作用を持つため、先に body を用意すると不正な thumbnailMediaID で
+      // create が失敗した際に alt 変更だけが残ってしまう(update_post と揃えた順序)。
+      verifyMediaExistsOrFail(verifyMediaExists, input.thumbnailMediaID, `thumbnailMediaID=${input.thumbnailMediaID} の media が存在しません。upload_media で作成した id を指定してください。`)
+        .andThen(() => prepareBody(input.bodyMarkdown))
         .andThen((body) =>
           fromPromise(
             payload.create({
@@ -446,7 +651,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
       findPost({ kind: 'id', id: input.id })
         .andThen((current) => (current === null ? errAsync(new PostNotFoundError('記事が見つかりません。list_posts で id を確認してください。')) : okAsync(current)))
         .andThen((current) => verifyThumbnailIfProvided(verifyMediaExists, input.thumbnailMediaID).map(() => current))
-        .andThen((current) => resolveNextBody(input.bodyMarkdown, current, toLexicalSafe, verifyMediaExists))
+        .andThen((current) => resolveNextBody(input.bodyMarkdown, current, prepareBody))
         .andThen((nextBody) =>
           fromPromise(
             payload.update({
@@ -537,6 +742,21 @@ export const registerBlogTools = (server: McpServer, deps: BlogToolDeps): void =
   );
 
   server.registerTool(
+    'list_media',
+    {
+      title: 'media 一覧',
+      description:
+        '登録済み media(画像)を新しい順に一覧する。search で filename / alt の部分一致検索。本文に既存画像を使うときはここで id と alt を確認し、返された placeholder(![media:<id>](alt))をそのまま貼る。',
+      inputSchema: {
+        search: z.string().min(1).optional().describe('filename / alt の部分一致キーワード。省略時は全件(新しい順)'),
+        limit: z.number().int().min(1).max(50).optional().describe('最大件数(default 20)'),
+      },
+      annotations: { readOnlyHint: true },
+    },
+    handlers.listMedia,
+  );
+
+  server.registerTool(
     'get_post',
     {
       title: 'blog 記事取得',
@@ -555,11 +775,11 @@ export const registerBlogTools = (server: McpServer, deps: BlogToolDeps): void =
     {
       title: '画像アップロード',
       description:
-        '画像を media コレクションに登録し、本文用プレースホルダ ![media:<id>]() と thumbnail 用の id を返す。本文への画像埋め込み・thumbnail 指定の前に必ずこれを使う。サイズ上限は 10MB(超過時はエラーになるため事前に縮小・圧縮すること)。',
+        '画像を media コレクションに登録し、本文用プレースホルダ ![media:<id>](alt) と thumbnail 用の id を返す。本文への画像埋め込み・thumbnail 指定の前に必ずこれを使う。サイズ上限は 10MB(超過時はエラーになるため事前に縮小・圧縮すること)。',
       inputSchema: {
         url: z.string().url().optional().describe('取得元 URL(url か base64 のどちらか必須。ダウンロードサイズ上限 10MB)'),
         base64: z.string().optional().describe('画像バイナリの base64(デコード後サイズ上限 10MB)'),
-        alt: z.string().min(1).describe('代替テキスト(必須)'),
+        alt: z.string().min(1).refine(isRoundTrippableAlt, ALT_CLOSE_PAREN_MESSAGE).describe('代替テキスト(必須。半角 ")" は使用不可 — 全角「）」を使うこと)'),
         filename: z.string().min(1).describe('拡張子付きファイル名(例: cover.png)'),
       },
       annotations: { destructiveHint: false },
