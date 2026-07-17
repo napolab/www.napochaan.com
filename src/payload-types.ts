@@ -167,6 +167,10 @@ export interface User {
 export interface Media {
   id: number;
   alt: string;
+  /**
+   * 動画アップロード時に自動設定されます（画像・PDFでは未設定）。
+   */
+  duration?: number | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -494,6 +498,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  duration?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
