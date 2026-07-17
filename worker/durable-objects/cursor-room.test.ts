@@ -15,8 +15,12 @@ const connect = async (room: string, uid: string): Promise<WebSocket> => {
 };
 
 const nav = (ws: WebSocket, path: string): void => ws.send(JSON.stringify({ t: 'nav', path }));
+// Positive assertions poll for arrival (a fixed 50ms budget flaked on loaded CI runners). Fixed
+// waits remain only where a test asserts that NOTHING arrives, or must let the server-side move
+// throttle window elapse.
 const settle = (): Promise<void> => new Promise((r) => setTimeout(r, 50));
 const wait = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms));
+const POLL = { timeout: 2000 };
 
 describe('CursorRoom', () => {
   it('announces a join to existing peers on the same page', async () => {
@@ -33,10 +37,17 @@ describe('CursorRoom', () => {
 
     const b = await connect(room, bUid);
     nav(b, '/x');
-    await settle();
 
-    const joins = seen.map((s) => JSON.parse(s)).filter((m) => m.t === 'join');
-    expect(joins.at(-1)).toEqual({ t: 'join', ...deriveIdentity(bUid) });
+    await expect
+      .poll(
+        () =>
+          seen
+            .map((s) => JSON.parse(s))
+            .filter((m) => m.t === 'join')
+            .at(-1),
+        POLL,
+      )
+      .toEqual({ t: 'join', ...deriveIdentity(bUid) });
   });
 
   it('replays existing peers to the newcomer', async () => {
@@ -52,10 +63,8 @@ describe('CursorRoom', () => {
     const seen: string[] = [];
     b.addEventListener('message', (e) => seen.push(`${e.data}`));
     nav(b, '/x');
-    await settle();
 
-    const joins = seen.map((s) => JSON.parse(s)).filter((m) => m.t === 'join');
-    expect(joins).toContainEqual({ t: 'join', ...deriveIdentity(aUid) });
+    await expect.poll(() => seen.map((s) => JSON.parse(s)).filter((m) => m.t === 'join'), POLL).toContainEqual({ t: 'join', ...deriveIdentity(aUid) });
   });
 
   it('routes move to same-page peers only', async () => {
@@ -78,11 +87,20 @@ describe('CursorRoom', () => {
     c.addEventListener('message', (e) => cSeen.push(`${e.data}`));
 
     a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.3, y: 0.7 }));
-    await settle();
 
-    const bMoves = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move');
+    await expect
+      .poll(
+        () =>
+          bSeen
+            .map((s) => JSON.parse(s))
+            .filter((m) => m.t === 'move')
+            .at(-1),
+        POLL,
+      )
+      .toMatchObject({ t: 'move', id: aUid, x: 0.3, y: 0.7 });
+    // The fan-out to b has landed, so a wrong send to c (same synchronous broadcast loop) would
+    // have landed too — no extra settle needed before the negative check.
     const cMoves = cSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move');
-    expect(bMoves.at(-1)).toMatchObject({ t: 'move', id: aUid, x: 0.3, y: 0.7 });
     expect(cMoves).toHaveLength(0);
   });
 
@@ -122,10 +140,8 @@ describe('CursorRoom', () => {
     b.addEventListener('message', (e) => bSeen.push(`${e.data}`));
 
     nav(a, '/y');
-    await settle();
 
-    const leaves = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'leave');
-    expect(leaves).toContainEqual({ t: 'leave', id: aUid });
+    await expect.poll(() => bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'leave'), POLL).toContainEqual({ t: 'leave', id: aUid });
   });
 
   it('treats a move carrying a new page as a navigation (leave old-page peers)', async () => {
@@ -144,10 +160,8 @@ describe('CursorRoom', () => {
 
     // a moves but reports a different page — the server applies the page change, so b sees a leave.
     a.send(JSON.stringify({ t: 'move', path: '/y', x: 0.4, y: 0.4 }));
-    await settle();
 
-    const leaves = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'leave');
-    expect(leaves).toContainEqual({ t: 'leave', id: aUid });
+    await expect.poll(() => bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'leave'), POLL).toContainEqual({ t: 'leave', id: aUid });
   });
 
   it('keeps the socket on the new page for later moves (no stale-attachment clobber)', async () => {
@@ -171,8 +185,7 @@ describe('CursorRoom', () => {
     a.send(JSON.stringify({ t: 'move', path: '/y', x: 0.5, y: 0.5 }));
     await wait(150);
 
-    const joins = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'join' && m.id === deriveIdentity(aUid).id);
-    expect(joins).toHaveLength(1);
+    await expect.poll(() => bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'join' && m.id === deriveIdentity(aUid).id), POLL).toHaveLength(1);
   });
 
   it('throttles rapid moves from the same socket', async () => {
@@ -201,10 +214,8 @@ describe('CursorRoom', () => {
     // A 4th move past the throttle window broadcasts again.
     await wait(150);
     a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.4, y: 0.4 }));
-    await settle();
 
-    const allMoves = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move');
-    expect(allMoves).toHaveLength(2);
+    await expect.poll(() => bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move'), POLL).toHaveLength(2);
   });
 
   it('counts presence per page', async () => {
@@ -220,10 +231,17 @@ describe('CursorRoom', () => {
     await settle();
     const b = await connect(room, bUid);
     nav(b, '/x');
-    await settle();
 
-    const counts = seen.map((s) => JSON.parse(s)).filter((m) => m.t === 'count');
-    expect(counts.at(-1)).toEqual({ t: 'count', n: 2 });
+    await expect
+      .poll(
+        () =>
+          seen
+            .map((s) => JSON.parse(s))
+            .filter((m) => m.t === 'count')
+            .at(-1),
+        POLL,
+      )
+      .toEqual({ t: 'count', n: 2 });
   });
 
   it('keeps a visitor present when one of their tabs (same uid) closes', async () => {
@@ -243,10 +261,19 @@ describe('CursorRoom', () => {
     peer.addEventListener('message', (e) => peerSeen.push(`${e.data}`));
 
     tab1.close(); // one tab of the shared uid closes; tab2 is still open
-    await settle();
 
-    const parsed = peerSeen.map((s) => JSON.parse(s));
-    expect(parsed.filter((m) => m.t === 'leave')).toHaveLength(0); // visitor still present via tab2
-    expect(parsed.filter((m) => m.t === 'count').at(-1)).toEqual({ t: 'count', n: 2 }); // shared + peer
+    // The close handler broadcasts count AFTER any (wrong) leave, so once the count lands the
+    // leave check below is meaningful without a fixed wait.
+    await expect
+      .poll(
+        () =>
+          peerSeen
+            .map((s) => JSON.parse(s))
+            .filter((m) => m.t === 'count')
+            .at(-1),
+        POLL,
+      )
+      .toEqual({ t: 'count', n: 2 }); // shared + peer
+    expect(peerSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'leave')).toHaveLength(0); // visitor still present via tab2
   });
 });
