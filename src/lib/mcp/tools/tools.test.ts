@@ -103,6 +103,44 @@ describe('createPost', () => {
   });
 });
 
+const FENCE = ['```image-row', '![media:5](left)', '![media:6]()', '```'].join('\n');
+
+describe('createPost with image-row', () => {
+  it('accepts a valid image-row fence and checks each cell media', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail + cells all exist
+    payload.create.mockResolvedValue({ id: 20, slug: 'ir' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'ir', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: `intro\n\n${FENCE}` });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.create).toHaveBeenCalled();
+  });
+
+  it('rejects a malformed image-row fence', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 });
+    const handlers = createBlogToolHandlers(deps);
+    const bad = ['```image-row', '![media:5](only one)', '```'].join('\n');
+    const result = await handlers.createPost({ title: 't', slug: 'ir', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: bad });
+
+    expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects when a cell media does not exist', async () => {
+    const { payload, deps } = createDeps();
+    // thumbnail (5) exists, cell media (6) missing
+    payload.findByID.mockImplementation(async ({ id }: { id: number }) => (id === 6 ? null : { id }));
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'ir', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: FENCE });
+
+    expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+});
+
 describe('updatePost', () => {
   it('rejects bodyMarkdown when the current body contains block nodes', async () => {
     const { payload, deps } = createDeps();
@@ -146,7 +184,7 @@ describe('publishPost', () => {
     const handlers = createBlogToolHandlers(deps);
     const result = await handlers.publishPost({ id: 3 });
 
-    expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user }));
+    expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user, depth: 0 }));
     expect(payload.update).toHaveBeenCalledWith(
       expect.objectContaining({
         collection: 'blog',
@@ -187,6 +225,15 @@ describe('getPost', () => {
 
     expect(result.content[0]?.text).toContain('"bodyEditable": false');
     expect(codec.toMarkdown).not.toHaveBeenCalled();
+  });
+
+  it('reads the post at depth 0 so body upload nodes keep raw ids instead of populating', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, slug: 's', title: 't', publishedAt: '2026-07-16', excerpt: 'e', body: paragraphBody() });
+    const handlers = createBlogToolHandlers(deps);
+    await handlers.getPost({ id: 3 });
+
+    expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 3, draft: true, overrideAccess: false, user, depth: 0 }));
   });
 });
 

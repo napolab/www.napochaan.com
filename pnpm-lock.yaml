@@ -60,6 +60,9 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.2.4
         version: 1.2.4(@types/react@19.2.16)(react@19.2.7)
+      bson-objectid:
+        specifier: ^2.0.4
+        version: 2.0.4
       budoux:
         specifier: ^0.8.4
         version: 0.8.4

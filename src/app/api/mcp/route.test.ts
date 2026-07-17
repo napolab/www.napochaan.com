@@ -3,12 +3,14 @@ import { describe, expect, it, vi } from 'vitest';
 const findByID = vi.fn();
 
 vi.mock('@lib/payload/client', () => ({
-  getPayloadClient: async () => ({ findByID, config: {} }),
+  getPayloadClient: async () => ({ findByID, config: { editor: { editorConfig: {} } } }),
 }));
 vi.mock('@payloadcms/richtext-lexical', () => ({
-  editorConfigFactory: { default: async () => ({}) },
+  editorConfigFactory: { fromFeatures: async () => ({}) },
   convertMarkdownToLexical: () => ({}),
   convertLexicalToMarkdown: () => '',
+  BlocksFeature: () => ({}),
+  lexicalEditor: () => ({}),
 }));
 vi.mock('@modelcontextprotocol/sdk/server/mcp.js', () => ({
   McpServer: class {

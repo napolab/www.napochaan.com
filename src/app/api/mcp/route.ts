@@ -1,9 +1,11 @@
+import { editorConfigFactory } from '@payloadcms/richtext-lexical';
+
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
-import { editorConfigFactory } from '@payloadcms/richtext-lexical';
 
 import { createMarkdownCodec } from '@lib/mcp/markdown';
 import { registerBlogTools } from '@lib/mcp/tools';
+import { blogEditorFeatures } from '@lib/payload/editor-features';
 import { getPayloadClient } from '@lib/payload/client';
 
 // Pair: worker/worker.ts の mcpAPIHandler が OAuth 検証後にこのヘッダーを付けて
@@ -33,9 +35,17 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   });
   if (user === null) return new Response('Unauthorized', { status: 401 });
 
+  // editorConfig は richtext-lexical の factory(このモジュールが import している
+  // convertLexicalToMarkdown と同一の lexical コピー)で、プロジェクト共通の features
+  // (BlocksFeature([ImageRow]) 込み)から組む。
+  // NG: `editorConfigFactory.default` は汎用 default で block 未登録。
+  // NG: `payload.config.editor.editorConfig` は payload.config 側の lexical コピーで
+  //     作られ、ここの convertLexicalToMarkdown と ServerBlockNode のクラスが一致せず
+  //     「multiple copies of lexical」で block 変換が throw する(next dev/バンドル環境)。
+  const editorConfig = await editorConfigFactory.fromFeatures({ config: payload.config, features: blogEditorFeatures });
+
   // MCP SDK 1.26+ はリクエストごとに server / transport を新規生成する必要がある
   // (共有すると "already connected" で throw する)。生成は安価。
-  const editorConfig = await editorConfigFactory.default({ config: payload.config });
   const server = new McpServer({ name: 'napochaan-blog', version: '1.0.0' });
   registerBlogTools(server, { payload, user, codec: createMarkdownCodec(editorConfig) });
 
