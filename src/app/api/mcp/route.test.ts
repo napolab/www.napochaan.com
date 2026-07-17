@@ -6,8 +6,11 @@ vi.mock('@lib/payload/client', () => ({
   getPayloadClient: async () => ({ findByID, config: { editor: { editorConfig: {} } } }),
 }));
 vi.mock('@payloadcms/richtext-lexical', () => ({
+  editorConfigFactory: { fromFeatures: async () => ({}) },
   convertMarkdownToLexical: () => ({}),
   convertLexicalToMarkdown: () => '',
+  BlocksFeature: () => ({}),
+  lexicalEditor: () => ({}),
 }));
 vi.mock('@modelcontextprotocol/sdk/server/mcp.js', () => ({
   McpServer: class {

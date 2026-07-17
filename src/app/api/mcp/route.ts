@@ -1,19 +1,12 @@
+import { editorConfigFactory } from '@payloadcms/richtext-lexical';
+
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 
 import { createMarkdownCodec } from '@lib/mcp/markdown';
 import { registerBlogTools } from '@lib/mcp/tools';
+import { blogEditorFeatures } from '@lib/payload/editor-features';
 import { getPayloadClient } from '@lib/payload/client';
-
-import type { LexicalRichTextAdapter } from '@payloadcms/richtext-lexical';
-import type { RichTextAdapter } from 'payload';
-
-// `SanitizedConfig['editor']` is typed as the generic core `RichTextAdapter`
-// (payload doesn't know about lexical specifics), but this project's root
-// editor is always `lexicalEditor(...)`, which resolves to a
-// `LexicalRichTextAdapter` — the same shape carrying `.editorConfig` that
-// `editorConfigFactory.fromField` reads off field-level editors.
-const isLexicalRichTextAdapter = (adapter: RichTextAdapter | undefined): adapter is LexicalRichTextAdapter => adapter !== undefined && 'editorConfig' in adapter;
 
 // Pair: worker/worker.ts の mcpAPIHandler が OAuth 検証後にこのヘッダーを付けて
 // in-process forward する。外部からの /api/mcp は Hono 層(mcp-guard, worker/app.ts。
@@ -42,13 +35,14 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   });
   if (user === null) return new Response('Unauthorized', { status: 401 });
 
-  // `editorConfigFactory.default` resolves Payload's generic default editor
-  // config (globally cached) — it is NOT derived from `payload.config.editor`
-  // at all, so it never includes this project's BlocksFeature([ImageRow])
-  // registration. `payload.config.editor.editorConfig` IS the project's real
-  // root editor config.
-  if (!isLexicalRichTextAdapter(payload.config.editor)) return new Response('Editor config unavailable', { status: 500 });
-  const editorConfig = payload.config.editor.editorConfig;
+  // editorConfig は richtext-lexical の factory(このモジュールが import している
+  // convertLexicalToMarkdown と同一の lexical コピー)で、プロジェクト共通の features
+  // (BlocksFeature([ImageRow]) 込み)から組む。
+  // NG: `editorConfigFactory.default` は汎用 default で block 未登録。
+  // NG: `payload.config.editor.editorConfig` は payload.config 側の lexical コピーで
+  //     作られ、ここの convertLexicalToMarkdown と ServerBlockNode のクラスが一致せず
+  //     「multiple copies of lexical」で block 変換が throw する(next dev/バンドル環境)。
+  const editorConfig = await editorConfigFactory.fromFeatures({ config: payload.config, features: blogEditorFeatures });
 
   // MCP SDK 1.26+ はリクエストごとに server / transport を新規生成する必要がある
   // (共有すると "already connected" で throw する)。生成は安価。
