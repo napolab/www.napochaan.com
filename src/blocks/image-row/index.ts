@@ -1,13 +1,14 @@
 import ObjectID from 'bson-objectid';
 
+import { CELL_LINE, FENCE_END, FENCE_START, fenceCellLines } from './fence';
+
 import type { Block } from 'payload';
 
 // Fence delimiters for the `image-row` Markdown round-trip (see `jsx` below).
 // customEndRegex makes Payload route this block through the multiline-element
 // transformer (linesInBetween join) instead of the default JSX <tag> parser.
-const FENCE_START = /^```image-row\s*$/;
-const FENCE_END = /^```\s*$/;
-const CELL_LINE = /^\s*!\[media:(\d+)\]\((.*)\)\s*$/;
+// Definitions live in ./fence (shared with src/lib/mcp/markdown via
+// src/blocks/image-row/mcp-support — single source of truth for the syntax).
 
 type ImageRowCell = { id: string; image: number; caption?: string };
 
@@ -63,7 +64,11 @@ export const ImageRow = {
   jsx: {
     customStartRegex: FENCE_START,
     customEndRegex: FENCE_END,
-    export: ({ fields }: { fields: Record<string, unknown> }) => {
+    // Payload's own `BlockFields` (payload/dist/fields/config/types.d.ts) is
+    // `{ [key: string]: any; blockName?: string; blockType?: string }` — an index
+    // signature is the actual boundary contract here, not an escape hatch we chose.
+    // `cells` is surfaced explicitly because it's the only field this block reads.
+    export: ({ fields }: { fields: { cells?: unknown; [key: string]: unknown } }) => {
       const cells = Array.isArray(fields.cells) ? fields.cells : [];
       const lines = cells
         .map(cellToLine)
@@ -73,10 +78,7 @@ export const ImageRow = {
       return `\`\`\`image-row\n${lines}\n\`\`\``;
     },
     import: ({ children }: { children: string }) => {
-      const lines = children
-        .split('\n')
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0);
+      const lines = fenceCellLines(children);
       if (lines.length !== 2) return false;
 
       const cells = lines.map((line) => parseCellLine(line)).filter((cell): cell is ImageRowCell => cell !== undefined);
