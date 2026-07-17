@@ -5,6 +5,9 @@ const findByID = vi.fn();
 vi.mock('@lib/payload/client', () => ({
   getPayloadClient: async () => ({ findByID, config: { editor: { editorConfig: {} } } }),
 }));
+vi.mock('@opennextjs/cloudflare', () => ({
+  getCloudflareContext: async () => ({ env: { PAYLOAD_SECRET: 'test-payload-secret' } }),
+}));
 vi.mock('@payloadcms/richtext-lexical', () => ({
   editorConfigFactory: { fromFeatures: async () => ({}) },
   convertMarkdownToLexical: () => ({}),

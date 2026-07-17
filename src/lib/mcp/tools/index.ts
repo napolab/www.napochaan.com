@@ -7,6 +7,7 @@ import { absoluteUrl } from '@utils/site-url';
 
 import {
   BodyValidationError,
+  formatPayloadValidationError,
   ImageFetchError,
   ImageURLError,
   InvalidInputError,
@@ -20,6 +21,7 @@ import {
 import { blockSyntaxHelp, extractBlockMediaIDs, hasUnsupportedBlocks, validateBlockFences } from '../markdown';
 import { mapTextSegments, splitCodeFences } from '../markdown/code-fences';
 import { hasNonEmptyParens, isRoundTrippableAlt, parseInlineNodes, serializeImageRef, serializeInlineNodes } from '../markdown/image-ref';
+import { MAX_UPLOAD_BYTES, UPLOAD_URL_TTL_SECONDS, resolveMimetypeFromFilename, signUploadURLParams } from '../upload-url';
 
 import { createRawRefHint } from './raw-ref-hints';
 
@@ -36,6 +38,7 @@ export type BlogToolDeps = {
   payload: Payload;
   user: User;
   codec: MarkdownCodec;
+  signingSecret: string;
 };
 
 export type ToolResult = {
@@ -52,10 +55,7 @@ const fail = (message: string): ToolResult => ({ content: [{ type: 'text', text:
 // 分岐が要るので個別分岐、それ以外は自身の message がそのままユーザー向け文言。
 const toToolError = (error: McpToolError): ToolResult => {
   if (error instanceof PayloadOperationError) {
-    if (error.cause instanceof ValidationError) {
-      const details = (error.cause.data.errors ?? []).map((item) => `- ${item.path ?? '(field)'}: ${item.message}`).join('\n');
-      return fail(`Payload の入力検証に失敗しました:\n${details}\n該当フィールドを修正して再実行してください。`);
-    }
+    if (error.cause instanceof ValidationError) return fail(formatPayloadValidationError(error.cause));
     console.error('[mcp] tool error', error.message, error.cause);
     return fail('内部エラーが発生しました。同一入力での再試行は避け、ユーザーに状況を報告してください。');
   }
@@ -78,27 +78,6 @@ const BODY_MARKDOWN_HELP = [
   '',
   'なお image-row フェンス内セルの括弧は caption であり alt ではない(セルの alt は media 側の alt が使われる)。',
 ].join('\n');
-
-const MIME_BY_EXT = {
-  avif: 'image/avif',
-  gif: 'image/gif',
-  jpeg: 'image/jpeg',
-  jpg: 'image/jpeg',
-  png: 'image/png',
-  webp: 'image/webp',
-} satisfies Record<string, string>;
-
-type ImageExtension = keyof typeof MIME_BY_EXT;
-
-const isImageExtension = (ext: string): ext is ImageExtension => Object.hasOwn(MIME_BY_EXT, ext);
-
-const resolveMimetypeFromFilename = (filename: string): string | undefined => {
-  const ext = filename.split('.').pop()?.toLowerCase() ?? '';
-  return isImageExtension(ext) ? MIME_BY_EXT[ext] : undefined;
-};
-
-// Workers の isolate メモリ保護。media は画像/PDF 想定。
-const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 const UPLOAD_TOO_LARGE_MESSAGE = '画像が大きすぎます(上限 10MB)。縮小・圧縮してから再実行してください。';
 
@@ -129,13 +108,20 @@ const parseUploadInput = (input: { url?: string; base64?: string }): Result<Uplo
   return errResult(new InvalidInputError('url か base64 のどちらかを指定してください。'));
 };
 
+const MIME_TYPE_ERROR_MESSAGE = 'MIME type を特定できません。filename に拡張子(jpg/png/webp/gif/avif)を付けて再実行してください。';
+
 const resolveUploadMimetype = (source: UploadSource, filename: string): Result<string, MimeTypeError> => {
   const mimetype = source.mimetype ?? resolveMimetypeFromFilename(filename);
   if (mimetype === undefined) {
-    return errResult(new MimeTypeError('MIME type を特定できません。filename に拡張子(jpg/png/webp/gif/avif)を付けて再実行してください。'));
+    return errResult(new MimeTypeError(MIME_TYPE_ERROR_MESSAGE));
   }
   return okResult(mimetype);
 };
+
+// create_upload_url は実バイトを持たないため resolveUploadMimetype(source ベース)は使えず、
+// 拡張子だけを見て事前に拒否する(実際の MIME 判定は POST /api/media-upload 側で行う)。
+const validateUploadFilenameExtension = (filename: string): Result<void, MimeTypeError> =>
+  resolveMimetypeFromFilename(filename) === undefined ? errResult(new MimeTypeError(MIME_TYPE_ERROR_MESSAGE)) : okResult(undefined);
 
 const isPrivateIPv4 = (hostname: string): boolean => {
   const octets = hostname.split('.');
@@ -473,7 +459,7 @@ const verifyThumbnailIfProvided = (verifyMediaExists: VerifyMediaExists, thumbna
 };
 
 export const createBlogToolHandlers = (deps: BlogToolDeps) => {
-  const { payload, user, codec } = deps;
+  const { payload, user, codec, signingSecret } = deps;
 
   const toLexicalSafe: ToLexicalSafe = fromThrowable(
     (markdown: string) => codec.toLexical(markdown),
@@ -672,6 +658,29 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         }))
         .match(ok, toToolError),
 
+    createUploadURL: (input: { filename: string; alt: string }): Promise<ToolResult> =>
+      validateUploadAlt(input.alt)
+        .andThen(() => validateUploadFilenameExtension(input.filename))
+        .asyncAndThen(() => {
+          const exp = Math.floor(Date.now() / 1000) + UPLOAD_URL_TTL_SECONDS;
+          return fromPromise(
+            signUploadURLParams(signingSecret, { userID: user.id, exp, filename: input.filename, alt: input.alt }),
+            (cause) => new PayloadOperationError('署名の生成に失敗しました', { cause }),
+          ).map((sig) => ({ exp, sig }));
+        })
+        .map(({ exp, sig }) => {
+          const params = new URLSearchParams({ user: `${user.id}`, exp: `${exp}`, filename: input.filename, alt: input.alt, sig });
+          const uploadURL = `${absoluteUrl('/api/media-upload')}?${params.toString()}`;
+          return {
+            uploadURL,
+            method: 'POST',
+            expiresAt: dayjs.unix(exp).tz('Asia/Tokyo').format(),
+            curlExample: `curl -sS -X POST --data-binary @<ローカル画像のパス> '${uploadURL}'`,
+            note: 'シェルで curlExample を実行する(@ の後を実ファイルパスに置換)。成功レスポンスの placeholder を本文にそのまま貼り、thumbnail には id を使う。上限 10MB、URL は発行から 10 分で失効。ワンタイムではないが期限内のみ有効。',
+          };
+        })
+        .match(ok, toToolError),
+
     createPost: (input: { title: string; slug: string; excerpt: string; thumbnailMediaID: number; bodyMarkdown: string; publishedAt?: string }): Promise<ToolResult> =>
       // thumbnail 検証を prepareBody より先に行う: prepareBody は media doc alt 更新を
       // コミットする副作用を持つため、先に body を用意すると不正な thumbnailMediaID で
@@ -835,7 +844,7 @@ export const registerBlogTools = (server: McpServer, deps: BlogToolDeps): void =
     {
       title: '画像アップロード',
       description:
-        '画像を media コレクションに登録し、本文用プレースホルダ ![media:<id>](alt) と thumbnail 用の id を返す。本文への画像埋め込み・thumbnail 指定の前に必ずこれを使う。サイズ上限は 10MB(超過時はエラーになるため事前に縮小・圧縮すること)。',
+        '画像を media コレクションに登録し、本文用プレースホルダ ![media:<id>](alt) と thumbnail 用の id を返す。本文への画像埋め込み・thumbnail 指定の前に必ずこれを使う。サイズ上限は 10MB(超過時はエラーになるため事前に縮小・圧縮すること)。ローカルファイルパスから上げたい場合は create_upload_url を使う。',
       inputSchema: {
         url: z.string().url().optional().describe('取得元 URL(url か base64 のどちらか必須。ダウンロードサイズ上限 10MB)'),
         base64: z.string().optional().describe('画像バイナリの base64(デコード後サイズ上限 10MB)'),
@@ -845,6 +854,21 @@ export const registerBlogTools = (server: McpServer, deps: BlogToolDeps): void =
       annotations: { destructiveHint: false },
     },
     handlers.uploadMedia,
+  );
+
+  server.registerTool(
+    'create_upload_url',
+    {
+      title: 'ローカルファイル用 upload URL 発行',
+      description:
+        'URL でも base64 でも渡せない手元のファイルを上げるときに使う。返る curlExample を Bash で実行するとアップロードされ、レスポンスに media id と placeholder が返る。url/base64 を直接渡せる場合は upload_media を使う。',
+      inputSchema: {
+        filename: z.string().min(1).describe('拡張子付きファイル名。jpg/jpeg/png/webp/gif/avif のみ'),
+        alt: z.string().min(1).refine(isRoundTrippableAlt, ALT_CLOSE_PAREN_MESSAGE).describe('代替テキスト(必須。半角 ")" は使用不可 — 全角「）」を使うこと)'),
+      },
+      annotations: { destructiveHint: false },
+    },
+    handlers.createUploadURL,
   );
 
   server.registerTool(
