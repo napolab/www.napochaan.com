@@ -17,14 +17,13 @@ import {
   UnsupportedBlockError,
   UploadTooLargeError,
 } from '../errors';
-import { blockSyntaxHelp, extractBlockMediaIDs, findRawImageRefs, hasUnsupportedBlocks, validateBlockFences } from '../markdown';
-import { mapTextSegments } from '../markdown/code-fences';
-import { findMediaFileRefs, rewriteMediaFileRefs } from '../markdown/media-file-refs';
-import { fillMediaPlaceholderAlts, findMediaPlaceholders, stripMediaPlaceholderAlts } from '../markdown/media-placeholders';
+import { blockSyntaxHelp, extractBlockMediaIDs, hasUnsupportedBlocks, validateBlockFences } from '../markdown';
+import { mapTextSegments, splitCodeFences } from '../markdown/code-fences';
+import { hasNonEmptyParens, isRoundTrippableAlt, parseInlineNodes, serializeImageRef, serializeInlineNodes } from '../markdown/image-ref';
 
 import type { McpToolError } from '../errors';
 import type { MarkdownCodec } from '../markdown';
-import type { MediaPlaceholder } from '../markdown/media-placeholders';
+import type { ImageRef, InlineNode } from '../markdown/image-ref';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Result, ResultAsync } from 'neverthrow';
 import type { Blog, User } from '@payload-types';
@@ -105,10 +104,6 @@ const UPLOAD_TOO_LARGE_MESSAGE = '画像が大きすぎます(上限 10MB)。縮
 // 再送で alt が途中で切り詰められ、末尾が本文へ漏れ出す)。schema(zod .refine)側の
 // 表明と同じ制約をここでも handler レベルで検証し、直接呼び出しでも防ぐ。
 const ALT_CLOSE_PAREN_MESSAGE = 'alt に半角の ")" は使えません。全角の「）」を使ってください。';
-
-// alt 往復可能性の単一判定源。upload_media の zod refine / handler 検証 / list_media の
-// placeholder 生成 / get_post の alt 充填除外(filterRoundTrippableAlts)が全てこれに合流する。
-const isRoundTrippableAlt = (alt: string): boolean => !alt.includes(')');
 
 const validateUploadAlt = (alt: string): Result<string, InvalidInputError> => (isRoundTrippableAlt(alt) ? okResult(alt) : errResult(new InvalidInputError(ALT_CLOSE_PAREN_MESSAGE)));
 
@@ -277,6 +272,57 @@ const verifyAllMediaExist = (verifyMediaExists: VerifyMediaExists, ids: number[]
   );
 };
 
+// ===== image-ref ノードパイプライン(parse -> transform/collect -> serialize) =====
+// フェンス外の text セグメントだけを image-ref パーサに通す薄い合成層。個々の変換
+// (media file → placeholder / alt 充填 / alt 除去 / 生 URL 判定)はこの上に定義する。
+
+type ImageNode = InlineNode & { kind: 'image' };
+
+// フェンス外の image ノードだけを出現順に列挙する(image-row セル等のフェンス内構文は対象外)。
+const collectImageNodes = (markdown: string): ImageNode[] =>
+  splitCodeFences(markdown)
+    .filter((segment) => segment.kind === 'text')
+    .flatMap((segment) => parseInlineNodes(segment.text))
+    .flatMap((node) => (node.kind === 'image' ? [node] : []));
+
+// フェンス外の全 ImageRef を列挙する。
+const collectImageRefs = (markdown: string): ImageRef[] => collectImageNodes(markdown).map((node) => node.ref);
+
+// フェンス外の text セグメントを parse し、image ノードへの変換 fn を適用して再構成する。
+// fn が undefined を返したら無変換(raw 温存)。変換したら serializeImageRef で再出力する。
+const transformImageRefs = (markdown: string, fn: (ref: ImageRef) => ImageRef | undefined): string =>
+  mapTextSegments(markdown, (text) =>
+    serializeInlineNodes(
+      parseInlineNodes(text).map((node): InlineNode => {
+        if (node.kind !== 'image') return node;
+        const nextRef = fn(node.ref);
+        if (nextRef === undefined) return node;
+        return { kind: 'image', raw: serializeImageRef(nextRef), ref: nextRef };
+      }),
+    ),
+  );
+
+// 生 URL 画像の raw 判定(旧 findRawImageRefs + isMediaPlaceholderRef フィルタの置換)。
+// placeholder は alt の有無・内容によらず常に除外、mediaFile は常に raw、external は
+// raw の括弧内容が非空のものだけ raw(hasNonEmptyParens が旧 RAW_IMAGE_REF `[^)]+` の
+// 意味論を再現 — ![x]() のような空括弧の非 placeholder 参照は raw 扱いしない)。
+const isRawImageRef = (node: ImageNode): boolean => {
+  switch (node.ref.kind) {
+    case 'placeholder':
+      return false;
+    case 'mediaFile':
+      return true;
+    case 'external':
+      return hasNonEmptyParens(node.raw);
+    default: {
+      const _exhaustive: never = node.ref;
+      throw new Error(`unhandled image ref: ${JSON.stringify(_exhaustive)}`);
+    }
+  }
+};
+
+const collectRawImageRefNodes = (markdown: string): ImageNode[] => collectImageNodes(markdown).filter(isRawImageRef);
+
 type MediaHit = { id: number; alt: string };
 type FindMediaByFilename = (filename: string) => ResultAsync<MediaHit | undefined, PayloadOperationError>;
 type FindMediaAltsByIDs = (ids: number[]) => ResultAsync<ReadonlyMap<number, string>, PayloadOperationError>;
@@ -300,33 +346,55 @@ const lookupFoundMedia = (findMediaByFilename: FindMediaByFilename, filenames: s
 // 本文中のサイト内 media 直リンクが参照する filename を重複排除して逐次 lookup し、
 // 見つかったものだけの対応表を返す(read 正規化と write エラーメッセージの両方で使う)。
 const collectMediaFileHits = (markdown: string, findMediaByFilename: FindMediaByFilename): ResultAsync<ReadonlyMap<string, MediaHit>, PayloadOperationError> => {
-  const filenames = [...new Set(findMediaFileRefs(markdown).map((ref) => ref.filename))];
+  const filenames = [...new Set(collectImageRefs(markdown).flatMap((ref) => (ref.kind === 'mediaFile' ? [ref.filename] : [])))];
   return lookupFoundMedia(findMediaByFilename, filenames, new Map());
 };
+
+// mediaFile ノードを alt 空の placeholder ノードへ変換する(hits に無い filename は
+// undefined を返し raw 温存)。alt は空のまま返す — doc alt の充填は後段
+// (get_post の fillPlaceholderAlts)の責務(旧 rewriteMediaFileRefs と同じ役割分担)。
+const rewriteMediaFileRefsToPlaceholders = (markdown: string, hitByFilename: ReadonlyMap<string, MediaHit>): string =>
+  transformImageRefs(markdown, (ref) => {
+    if (ref.kind !== 'mediaFile') return undefined;
+    const hit = hitByFilename.get(ref.filename);
+    if (hit === undefined) return undefined;
+    return { kind: 'placeholder', id: hit.id, rawID: `${hit.id}`, alt: '' };
+  });
+
+// placeholder の alt を doc の現在値で充填する(往復不能な alt / map に無い id は raw 温存)。
+// rawID は ref を spread して保つため leading zeros 等の表記が壊れない。
+const fillPlaceholderAlts = (markdown: string, altByID: ReadonlyMap<number, string>): string => {
+  const roundTrippable = filterRoundTrippableAlts(altByID);
+  return transformImageRefs(markdown, (ref) => {
+    if (ref.kind !== 'placeholder') return undefined;
+    const alt = roundTrippable.get(ref.id);
+    if (alt === undefined) return undefined;
+    return { ...ref, alt };
+  });
+};
+
+// 全 placeholder の alt を空にする(Payload の import regex ![media:<id>]() は
+// 空括弧のみマッチするため、Lexical 変換直前に必ず通す)。
+const stripPlaceholderAlts = (markdown: string): string => transformImageRefs(markdown, (ref) => (ref.kind === 'placeholder' ? { ...ref, alt: '' } : undefined));
 
 // 生 URL 画像 1 件分の回復指示。サイト内 media URL で対応 doc が見つかる場合は
 // alt 入りの具体的な置き換え先(![media:<id>](alt))まで提示し、LLM が 1 往復で
 // そのまま貼り戻せる形で自己修正できるようにする。
-const rawRefHint = (rawRef: string, hitByFilename: ReadonlyMap<string, MediaHit>): string => {
-  const [mediaRef] = findMediaFileRefs(rawRef);
-  if (mediaRef === undefined) return `- ${rawRef}: 外部 URL は使えません。upload_media で画像を登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。`;
-  const hit = hitByFilename.get(mediaRef.filename);
-  if (hit === undefined) return `- ${rawRef}: 対応する media(${mediaRef.filename})が見つかりません。upload_media で登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。`;
-  return `- ${rawRef}: media id=${hit.id} の画像です。![media:${hit.id}](${hit.alt}) に置き換えて再送してください。`;
+const rawRefHint = (node: ImageNode, hitByFilename: ReadonlyMap<string, MediaHit>): string => {
+  const { raw, ref } = node;
+  if (ref.kind !== 'mediaFile') return `- ${raw}: 外部 URL は使えません。upload_media で画像を登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。`;
+  const hit = hitByFilename.get(ref.filename);
+  if (hit === undefined) return `- ${raw}: 対応する media(${ref.filename})が見つかりません。upload_media で登録し、返された placeholder(![media:<id>](alt))をそのまま貼ってください。`;
+  return `- ${raw}: media id=${hit.id} の画像です。![media:${hit.id}](${hit.alt}) に置き換えて再送してください。`;
 };
-
-// ![media:<id>](alt) は alt が非空だと括弧内も非空になるため、素朴な「非空括弧の
-// 画像参照」検出(RAW_IMAGE_REF)だけでは生 URL 画像と区別できない。生 URL 判定の
-// 対象から、正規のプレースホルダ表記に一致する ref を除外する。
-const isMediaPlaceholderRef = (ref: string): boolean => /^!\[media:\d+\]\([^)]*\)$/.test(ref);
 
 // 本文 Markdown の生URL画像参照 + image-row フェンス構造 + cell media 実在性を検証し、
 // 問題があれば LLM 向け回復指示メッセージを持つ Result を返す。
 const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMediaExists, findMediaByFilename: FindMediaByFilename): ResultAsync<void, McpToolError> => {
-  const rawRefs = findRawImageRefs(bodyMarkdown).filter((ref) => !isMediaPlaceholderRef(ref));
-  if (rawRefs.length > 0) {
+  const rawRefNodes = collectRawImageRefNodes(bodyMarkdown);
+  if (rawRefNodes.length > 0) {
     return collectMediaFileHits(bodyMarkdown, findMediaByFilename).andThen((hitByFilename) =>
-      errAsync(new BodyValidationError(`本文に生 URL の画像参照があります。画像は ![media:<id>](alt) 参照で書いてください:\n${rawRefs.map((rawRef) => rawRefHint(rawRef, hitByFilename)).join('\n')}`)),
+      errAsync(new BodyValidationError(`本文に生 URL の画像参照があります。画像は ![media:<id>](alt) 参照で書いてください:\n${rawRefNodes.map((node) => rawRefHint(node, hitByFilename)).join('\n')}`)),
     );
   }
   const [firstFenceError] = validateBlockFences(bodyMarkdown);
@@ -345,7 +413,7 @@ type PlaceholderAltState = {
   conflict: { id: number; altA: string; altB: string } | undefined;
 };
 
-const accumulatePlaceholderAlt = (state: PlaceholderAltState, placeholder: MediaPlaceholder): PlaceholderAltState => {
+const accumulatePlaceholderAlt = (state: PlaceholderAltState, placeholder: Extract<ImageRef, { kind: 'placeholder' }>): PlaceholderAltState => {
   if (placeholder.alt === '') {
     if (state.emptyIDs.includes(placeholder.id)) return state;
     return { ...state, emptyIDs: [...state.emptyIDs, placeholder.id] };
@@ -360,7 +428,8 @@ const accumulatePlaceholderAlt = (state: PlaceholderAltState, placeholder: Media
 // プレースホルダの alt を検証し、id → alt(書かれた値)の対応表を返す。
 // 空 alt と、同一 id への異なる alt(どちらを doc に書くか決められない)を拒否する。
 const validatePlaceholderAlts = (bodyMarkdown: string): Result<ReadonlyMap<number, string>, BodyValidationError> => {
-  const { altByID, emptyIDs, conflict } = findMediaPlaceholders(bodyMarkdown).reduce(accumulatePlaceholderAlt, { altByID: new Map(), emptyIDs: [], conflict: undefined });
+  const placeholders = collectImageRefs(bodyMarkdown).filter((ref): ref is Extract<ImageRef, { kind: 'placeholder' }> => ref.kind === 'placeholder');
+  const { altByID, emptyIDs, conflict } = placeholders.reduce(accumulatePlaceholderAlt, { altByID: new Map(), emptyIDs: [], conflict: undefined });
   const [firstEmptyID] = emptyIDs;
   if (firstEmptyID !== undefined) {
     return errResult(
@@ -478,10 +547,10 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
   // 原文のまま返す(get_post はここでは失敗させない — write 側の検証が回復指示を出す)。
   const normalizeBodyMarkdown = (bodyMarkdown: string): ResultAsync<string, McpToolError> =>
     collectMediaFileHits(bodyMarkdown, findMediaByFilename)
-      .map((hits) => mapTextSegments(bodyMarkdown, (text) => rewriteMediaFileRefs(text, new Map([...hits].map(([filename, hit]) => [filename, hit.id])))))
+      .map((hits) => rewriteMediaFileRefsToPlaceholders(bodyMarkdown, hits))
       .andThen((rewritten) => {
-        const ids = [...new Set(findMediaPlaceholders(rewritten).map((placeholder) => placeholder.id))];
-        return findMediaAltsByIDs(ids).map((altByID) => fillMediaPlaceholderAlts(rewritten, filterRoundTrippableAlts(altByID)));
+        const ids = [...new Set(collectImageRefs(rewritten).flatMap((ref) => (ref.kind === 'placeholder' ? [ref.id] : [])))];
+        return findMediaAltsByIDs(ids).map((altByID) => fillPlaceholderAlts(rewritten, altByID));
       });
 
   // 書かれた alt を media doc に同期する。doc に無い id はエラー、差分がある id だけ順次 update する。
@@ -517,7 +586,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
     validateBodyMarkdown(bodyMarkdown, verifyMediaExists, findMediaByFilename)
       .andThen(() => validatePlaceholderAlts(bodyMarkdown))
       .andThen((writtenAltByID) => syncMediaAlts(writtenAltByID))
-      .andThen(() => toLexicalSafe(stripMediaPlaceholderAlts(bodyMarkdown)));
+      .andThen(() => toLexicalSafe(stripPlaceholderAlts(bodyMarkdown)));
 
   const buildGetPostPayload = (doc: Blog) => {
     const bodyEditable = !hasUnsupportedBlocks(doc.body);

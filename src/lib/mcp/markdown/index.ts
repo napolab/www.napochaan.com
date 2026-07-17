@@ -1,7 +1,6 @@
 import { convertLexicalToMarkdown, convertMarkdownToLexical } from '@payloadcms/richtext-lexical';
 
 import { imageRowMcpSupport } from '../../../blocks/image-row/mcp-support';
-import { stripAllFences } from './block-support';
 
 import type { McpBlockSupport } from './block-support';
 import type { SanitizedServerEditorConfig } from '@payloadcms/richtext-lexical';
@@ -34,13 +33,6 @@ export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): 
 const blockSupports: readonly McpBlockSupport[] = [imageRowMcpSupport];
 
 const SUPPORTED_BLOCK_TYPES = blockSupports.map((plugin) => plugin.blockType);
-
-// 画像参照。登録済み block のフェンスを全除去した残りに ![alt](非空) が残っていたら、
-// 生 URL 画像か block 専用構文(caption 付き media 参照など)のフェンス外での誤用。
-// 単一 media プレースホルダ ![media:<id>]() は空 parens のためマッチしない。
-const RAW_IMAGE_REF = /!\[[^\]]*\]\([^)]+\)/g;
-
-export const findRawImageRefs = (markdown: string): string[] => [...stripAllFences(blockSupports, markdown).matchAll(RAW_IMAGE_REF)].map((match) => match[0]);
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
 
