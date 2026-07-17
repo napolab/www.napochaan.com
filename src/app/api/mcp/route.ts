@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { editorConfigFactory } from '@payloadcms/richtext-lexical';
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
@@ -44,10 +45,14 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   //     「multiple copies of lexical」で block 変換が throw する(next dev/バンドル環境)。
   const editorConfig = await editorConfigFactory.fromFeatures({ config: payload.config, features: blogEditorFeatures });
 
+  // create_upload_url が発行する署名付き URL の HMAC secret。Payload 自体の secret を
+  // 再利用する(専用 secret を新設せず、既存の秘匿値を流用する設計判断)。
+  const { env } = await getCloudflareContext({ async: true });
+
   // MCP SDK 1.26+ はリクエストごとに server / transport を新規生成する必要がある
   // (共有すると "already connected" で throw する)。生成は安価。
   const server = new McpServer({ name: 'napochaan-blog', version: '1.0.0' });
-  registerBlogTools(server, { payload, user, codec: createMarkdownCodec(editorConfig) });
+  registerBlogTools(server, { payload, user, codec: createMarkdownCodec(editorConfig), signingSecret: env.PAYLOAD_SECRET });
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined, // stateless モード

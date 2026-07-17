@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { verifyUploadURLParams } from '../upload-url';
+
 import { createBlogToolHandlers } from '.';
 
 import type { BlogToolDeps } from '.';
@@ -18,6 +20,7 @@ afterEach(() => {
 });
 
 const user = { id: 1, email: 'dev@napochaan.com' } as User;
+const SIGNING_SECRET = 'test-signing-secret';
 
 const paragraphBody = (): Blog['body'] => ({ root: { type: 'root', children: [{ type: 'paragraph', version: 1 }], direction: null, format: '', indent: 0, version: 1 } }) as Blog['body'];
 
@@ -34,7 +37,7 @@ const createDeps = () => {
     toLexical: vi.fn((_markdown: string) => paragraphBody()),
     toMarkdown: vi.fn(() => '# md'),
   };
-  const deps = { payload, user, codec } as unknown as BlogToolDeps;
+  const deps = { payload, user, codec, signingSecret: SIGNING_SECRET } as unknown as BlogToolDeps;
   return { payload, codec, deps };
 };
 
@@ -718,6 +721,62 @@ describe('uploadMedia', () => {
       expect(result.content[0]?.text).toContain('上限 10MB');
       expect(payload.create).not.toHaveBeenCalled();
     });
+  });
+});
+
+describe('createUploadURL', () => {
+  it('issues a URL whose query params verify against the same secret, expiring ~10min from now', async () => {
+    const { deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+    const before = Math.floor(Date.now() / 1000);
+
+    const result = await handlers.createUploadURL({ filename: 'cover.png', alt: 'テスト画像' });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { uploadURL: string; method: string; expiresAt: string; curlExample: string; note: string };
+    const url = new URL(parsed.uploadURL);
+    const userParam = url.searchParams.get('user');
+    const expParam = url.searchParams.get('exp');
+    const filenameParam = url.searchParams.get('filename');
+    const altParam = url.searchParams.get('alt');
+    const sigParam = url.searchParams.get('sig');
+
+    expect(userParam).toBe('1');
+    expect(filenameParam).toBe('cover.png');
+    expect(altParam).toBe('テスト画像');
+    expect(sigParam).not.toBeNull();
+    expect(expParam).not.toBeNull();
+
+    const exp = parseInt(expParam ?? '', 10);
+    expect(exp).toBeGreaterThanOrEqual(before + 600);
+    expect(exp).toBeLessThanOrEqual(before + 605);
+
+    const verifyResult = await verifyUploadURLParams(SIGNING_SECRET, { userID: 1, exp, filename: 'cover.png', alt: 'テスト画像' }, sigParam ?? '', before);
+    expect(verifyResult.isOk()).toBe(true);
+
+    expect(parsed.method).toBe('POST');
+    expect(new Date(parsed.expiresAt).getTime()).toBe(exp * 1000);
+    expect(parsed.curlExample).toContain(parsed.uploadURL);
+  });
+
+  it('rejects a filename with an unresolvable extension', async () => {
+    const { deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+
+    const result = await handlers.createUploadURL({ filename: 'cover.bmp', alt: 'テスト画像' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('MIME type を特定できません');
+  });
+
+  it('rejects an alt containing a half-width close paren', async () => {
+    const { deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+
+    const result = await handlers.createUploadURL({ filename: 'cover.png', alt: '図(A)B' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('）');
   });
 });
 
