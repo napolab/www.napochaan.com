@@ -9,6 +9,7 @@ import { quoteConverter } from './quote';
 import { tableConverter } from './table';
 import { textConverter } from './text';
 import { uploadConverter } from './upload';
+import { youtubeEmbedBlockConverters } from './youtube-embed';
 
 import type { JSXConvertersFunction } from '@payloadcms/richtext-lexical/react';
 
@@ -31,5 +32,5 @@ export const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConvert
   ...tableConverter,
   ...uploadConverter,
   ...hrConverter,
-  blocks: { ...imageRowBlockConverters, ...codeBlockConverters },
+  blocks: { ...imageRowBlockConverters, ...codeBlockConverters, ...youtubeEmbedBlockConverters },
 });

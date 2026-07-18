@@ -32,9 +32,23 @@ export type CodeBlock = {
 };
 
 /**
- * Node types handled by the rich-text JSX converters: every Payload default
- * Lexical node plus the project's custom `image-row` and `Code` blocks. When a
- * collection adds another custom block, widen this union and add a matching
- * converter.
+ * The serialized fields of the `youtube-embed` lexical block (see
+ * `src/blocks/youtube-embed`). Same rationale as the other in-editor block
+ * shapes above: hand-declared because editor-only blocks are not emitted into
+ * `payload-types.ts`. The write path validates that `url` is a parseable
+ * YouTube URL; the converter defensively re-validates and skips render on
+ * failure so pre-validation data can't crash the page.
  */
-export type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageRowBlock> | SerializedBlockNode<CodeBlock>;
+export type YouTubeEmbedBlock = {
+  readonly blockType: 'youtube-embed';
+  readonly url?: string;
+  readonly caption?: string;
+};
+
+/**
+ * Node types handled by the rich-text JSX converters: every Payload default
+ * Lexical node plus the project's custom `image-row`, `Code`, and
+ * `youtube-embed` blocks. When a collection adds another custom block, widen
+ * this union and add a matching converter.
+ */
+export type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageRowBlock> | SerializedBlockNode<CodeBlock> | SerializedBlockNode<YouTubeEmbedBlock>;

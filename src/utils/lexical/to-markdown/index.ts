@@ -206,6 +206,18 @@ const renderCodeBlock = (fields: Record<string, unknown>): string => {
   return `${fence}${lang}\n${code}\n${fence}`;
 };
 
+// The `youtube-embed` block (src/blocks/youtube-embed) stores a YouTube URL and
+// an optional caption — emit the same ```youtube-embed fence the MCP write path
+// accepts so round-trip through llms.txt is lossless.
+const renderYouTubeEmbed = (fields: Record<string, unknown>): string | undefined => {
+  const url = stringOf(fields, 'url');
+  if (url === undefined || url === '') return undefined;
+  const caption = stringOf(fields, 'caption') ?? '';
+  const body = caption === '' ? url : `${url}\n${caption}`;
+
+  return `\`\`\`youtube-embed\n${body}\n\`\`\``;
+};
+
 // Block renderer: returns the markdown for one top-level block, or undefined
 // for unknown/empty blocks (skipped by the caller).
 const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | undefined => {
@@ -243,6 +255,7 @@ const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | un
       if (fields === undefined) return undefined;
       if (fields.blockType === 'image-row') return renderImageRow(fields, opts);
       if (fields.blockType === 'Code') return renderCodeBlock(fields);
+      if (fields.blockType === 'youtube-embed') return renderYouTubeEmbed(fields);
 
       return undefined;
     }
