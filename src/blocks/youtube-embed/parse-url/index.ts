@@ -2,7 +2,6 @@
 //   - https://www.youtube.com/watch?v=<ID>
 //   - https://youtu.be/<ID>
 //   - https://www.youtube.com/embed/<ID>
-//   - https://www.youtube.com/shorts/<ID>
 //   - https://m.youtube.com/watch?v=<ID>
 // スキームは https のみ許可(埋め込み iframe が https 前提)。
 // videoID は英数字 + '-' + '_' の 11 文字(YouTube の内部ID仕様)。
@@ -13,7 +12,7 @@ const ALLOWED_HOSTS: readonly string[] = ['www.youtube.com', 'youtube.com', 'm.y
 
 const isVideoID = (value: string | null | undefined): value is string => typeof value === 'string' && VIDEO_ID.test(value);
 
-// URL.pathname は先頭 '/'。'/embed/<id>' や '/shorts/<id>' から <id> を取り出す。
+// URL.pathname は先頭 '/'。'/embed/<id>' や '/v/<id>' から <id> を取り出す。
 const idFromPathPrefix = (pathname: string, prefix: string): string | undefined => {
   if (!pathname.startsWith(prefix)) return undefined;
   const rest = pathname.slice(prefix.length);
@@ -30,7 +29,7 @@ const parseHosted = (url: URL): string | undefined => {
     return isVideoID(v) ? v : undefined;
   }
 
-  return idFromPathPrefix(path, '/embed/') ?? idFromPathPrefix(path, '/shorts/') ?? idFromPathPrefix(path, '/v/');
+  return idFromPathPrefix(path, '/embed/') ?? idFromPathPrefix(path, '/v/');
 };
 
 // youtu.be/<id> は host 側で判定するため path 先頭 '/' の直後を videoID とみなす。

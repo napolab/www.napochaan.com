@@ -22,8 +22,8 @@ describe('parseYouTubeVideoID', () => {
     expect(parseYouTubeVideoID(`https://www.youtube.com/embed/${ID}`)).toBe(ID);
   });
 
-  it('accepts the /shorts/ URL', () => {
-    expect(parseYouTubeVideoID(`https://www.youtube.com/shorts/${ID}`)).toBe(ID);
+  it('rejects the /shorts/ URL (not supported)', () => {
+    expect(parseYouTubeVideoID(`https://www.youtube.com/shorts/${ID}`)).toBeUndefined();
   });
 
   it('accepts the mobile watch URL', () => {

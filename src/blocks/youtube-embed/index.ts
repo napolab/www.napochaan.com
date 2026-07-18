@@ -66,11 +66,11 @@ export const YouTubeEmbed = {
       type: 'text',
       required: true,
       admin: {
-        description: 'https://www.youtube.com/watch?v=... / https://youtu.be/... / /embed/ / /shorts/ を受け付けます。',
+        description: 'https://www.youtube.com/watch?v=... / https://youtu.be/... / /embed/ を受け付けます。',
       },
       validate: (value: string | null | undefined, _options: unknown): true | string => {
         if (typeof value !== 'string' || value === '') return 'YouTube URL は必須です。';
-        if (parseYouTubeVideoID(value) === undefined) return 'YouTube の動画 URL として解釈できません(watch?v=、youtu.be、/embed/、/shorts/ のいずれか)。';
+        if (parseYouTubeVideoID(value) === undefined) return 'YouTube の動画 URL として解釈できません(watch?v=、youtu.be、/embed/ のいずれか)。';
 
         return true;
       },

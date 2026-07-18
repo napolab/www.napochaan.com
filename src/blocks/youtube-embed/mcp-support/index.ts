@@ -18,7 +18,7 @@ const validateFences = (markdown: string): string[] =>
     if (lines.length > 2) return [`youtube-embed フェンスは 1 行目 URL、2 行目 caption(任意)の最大 2 行までです。該当:\n${match[0]}`];
     const [url] = lines;
     if (url === undefined || parseYouTubeVideoID(url) === undefined) {
-      return [`youtube-embed フェンス 1 行目は YouTube の動画 URL(watch?v= / youtu.be / /embed/ / /shorts/)である必要があります。該当:\n${match[0]}`];
+      return [`youtube-embed フェンス 1 行目は YouTube の動画 URL(watch?v= / youtu.be / /embed/)である必要があります。該当:\n${match[0]}`];
     }
 
     return [];
@@ -28,7 +28,7 @@ const validateFences = (markdown: string): string[] =>
 const syntaxHelp = [
   'YouTube 動画を埋め込む youtube-embed block(標準 Markdown ではない):',
   '```youtube-embed フェンスの中に 1 行目 = YouTube 動画 URL、2 行目 = caption(任意)。',
-  'URL は https の watch?v= / youtu.be / /embed/ / /shorts/ のいずれか。例:',
+  'URL は https の watch?v= / youtu.be / /embed/ のいずれか。例:',
   '```youtube-embed',
   'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
   'キャプションテキスト',
