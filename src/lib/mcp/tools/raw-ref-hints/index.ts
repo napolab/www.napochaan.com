@@ -1,9 +1,9 @@
 import { err, ok } from 'neverthrow';
 
-import { runPlugins } from '../../markdown/image-ref/plugins';
+import { runPlugins } from '@utils/run-plugins';
 
 import type { ImageNode } from '../../markdown/image-ref';
-import type { Plugin } from '../../markdown/image-ref/plugins';
+import type { Plugin } from '@utils/run-plugins';
 
 // filename → media doc の対応表 1 件分(tools/index.ts の FindMediaByFilename が返す形と同じ)。
 // tools/index.ts はこれをここから import する(旧: tools/index.ts にローカル定義)。

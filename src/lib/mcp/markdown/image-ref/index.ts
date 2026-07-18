@@ -1,7 +1,8 @@
+import { runPlugins } from '@utils/run-plugins';
+
 import { createMediaFilePlugin, DEFAULT_MEDIA_FILE_PATH_PREFIX } from './plugins/media-file';
 import { externalPlugin } from './plugins/external';
 import { placeholderPlugin } from './plugins/placeholder';
-import { runPlugins } from './plugins';
 
 import type { ImageRefPlugin } from './plugins';
 import type { Result } from 'neverthrow';
