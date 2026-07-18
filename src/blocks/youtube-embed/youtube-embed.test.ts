@@ -16,7 +16,7 @@ const runUrlValidate = (value: unknown): string | true | Promise<string | true> 
 };
 
 describe('YouTubeEmbed block definition', () => {
-  it('uses the hyphenated slug "youtube-embed" so the Code fence regex cannot claim it', () => {
+  it('uses the hyphenated slug "youtube-embed"', () => {
     expect(YouTubeEmbed.slug).toBe('youtube-embed');
   });
 
@@ -45,71 +45,39 @@ describe('YouTubeEmbed block definition', () => {
   });
 });
 
-describe('YouTubeEmbed markdown round-trip (jsx converter)', () => {
-  // The Payload transformer wires markdownToLexical / lexicalToMarkdown for
-  // nested-node conversion, plus close/open match arrays for regex-driven
-  // parsers. This block uses none of that — supply typed stubs so the tests
-  // exercise the same call shape Payload uses at runtime.
+describe('YouTubeEmbed markdown export (jsx converter)', () => {
+  // The Payload transformer wires lexicalToMarkdown for nested-node conversion;
+  // this block's export does not use it — a typed stub matches the call shape.
   const lexicalToMarkdown = () => '';
-  const markdownToLexical = () => ({});
-  const openMatchOf = (line: string): RegExpMatchArray => {
-    const match = line.match(/^```youtube-embed\s*$/);
-    if (match === null) throw new Error('open match failed');
 
-    return match;
-  };
-  const closeMatchOf = (): RegExpMatchArray => {
-    const match = '```'.match(/^```\s*$/);
-    if (match === null) throw new Error('close match failed');
-
-    return match;
-  };
-  const openMatch = openMatchOf('```youtube-embed');
-  const closeMatch = closeMatchOf();
-
-  it('exports a URL-only field set as a two-line fence (open / URL / close)', () => {
+  it('exports a URL-only field set as a bare URL line', () => {
     const markdown = YouTubeEmbed.jsx.export({ fields: { url: URL_HTTPS }, lexicalToMarkdown });
-    expect(markdown).toBe(['```youtube-embed', URL_HTTPS, '```'].join('\n'));
+    expect(markdown).toBe(URL_HTTPS);
   });
 
-  it('exports URL + caption as URL on line 1 and caption on line 2', () => {
+  it('exports URL + caption as a [caption](url) line', () => {
     const markdown = YouTubeEmbed.jsx.export({ fields: { url: URL_HTTPS, caption: 'Rick roll' }, lexicalToMarkdown });
-    expect(markdown).toBe(['```youtube-embed', URL_HTTPS, 'Rick roll', '```'].join('\n'));
+    expect(markdown).toBe(`[Rick roll](${URL_HTTPS})`);
   });
 
-  it('imports a URL-only fence body', () => {
-    const result = YouTubeEmbed.jsx.import({ children: URL_HTTPS, closeMatch, openMatch, markdownToLexical, props: {} });
-    expect(result).toEqual({ url: URL_HTTPS });
+  it('escapes [ and ] in the exported caption', () => {
+    const markdown = YouTubeEmbed.jsx.export({ fields: { url: URL_HTTPS, caption: 'a [b] c' }, lexicalToMarkdown });
+    expect(markdown).toBe(`[a \\[b\\] c](${URL_HTTPS})`);
+  });
+});
+
+// この block は Markdown import に参加しない(公開構文はリンク行で、取り込みは
+// 汎用 link-embed transform + ./embed-provider が担う)。BlockJSX 型が import を必須にしている
+// ための意図的な dead スタブであることをピン留めする。
+describe('YouTubeEmbed jsx import stub is intentionally dead', () => {
+  it('customStartRegex matches no line at all', () => {
+    for (const line of ['```youtube-embed', URL_HTTPS, `[cap](${URL_HTTPS})`, '', '<youtube-embed>']) {
+      expect(YouTubeEmbed.jsx.customStartRegex?.test(line)).toBe(false);
+    }
   });
 
-  it('imports a URL + caption fence body', () => {
-    const result = YouTubeEmbed.jsx.import({ children: `${URL_HTTPS}\nRick roll`, closeMatch, openMatch, markdownToLexical, props: {} });
-    expect(result).toEqual({ url: URL_HTTPS, caption: 'Rick roll' });
-  });
-
-  it('trims each line and strips blank lines before parsing', () => {
-    const result = YouTubeEmbed.jsx.import({ children: `   ${URL_HTTPS}   \n\n  caption text  \n`, closeMatch, openMatch, markdownToLexical, props: {} });
-    expect(result).toEqual({ url: URL_HTTPS, caption: 'caption text' });
-  });
-
-  it('accepts the youtu.be short link form on import', () => {
-    const short = `https://youtu.be/${ID}`;
-    const result = YouTubeEmbed.jsx.import({ children: short, closeMatch, openMatch, markdownToLexical, props: {} });
-    expect(result).toEqual({ url: short });
-  });
-
-  it('rejects a fence body whose URL line is not a YouTube URL', () => {
-    const result = YouTubeEmbed.jsx.import({ children: 'https://vimeo.com/1234', closeMatch, openMatch, markdownToLexical, props: {} });
-    expect(result).toBe(false);
-  });
-
-  it('rejects an empty fence body', () => {
-    const result = YouTubeEmbed.jsx.import({ children: '', closeMatch, openMatch, markdownToLexical, props: {} });
-    expect(result).toBe(false);
-  });
-
-  it('rejects a fence body with more than two content lines', () => {
-    const result = YouTubeEmbed.jsx.import({ children: `${URL_HTTPS}\ncaption\nextra`, closeMatch, openMatch, markdownToLexical, props: {} });
-    expect(result).toBe(false);
+  it('import always returns false', () => {
+    const markdownToLexical = () => ({});
+    expect(YouTubeEmbed.jsx.import({ children: URL_HTTPS, closeMatch: null, markdownToLexical, props: {} })).toBe(false);
   });
 });

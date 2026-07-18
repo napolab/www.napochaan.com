@@ -1,3 +1,4 @@
+import { formatYouTubeEmbedMarkdown } from '../../../blocks/youtube-embed/markdown-format';
 import { fenceForCode } from '../../code-fence';
 
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
@@ -207,15 +208,15 @@ const renderCodeBlock = (fields: Record<string, unknown>): string => {
 };
 
 // The `youtube-embed` block (src/blocks/youtube-embed) stores a YouTube URL and
-// an optional caption — emit the same ```youtube-embed fence the MCP write path
-// accepts so round-trip through llms.txt is lossless.
+// an optional caption — emit the same standalone link line the MCP write path
+// accepts so round-trip through llms.txt is lossless. The emission format has a
+// single source of truth (formatYouTubeEmbedMarkdown) shared with jsx.export.
 const renderYouTubeEmbed = (fields: Record<string, unknown>): string | undefined => {
   const url = stringOf(fields, 'url');
   if (url === undefined || url === '') return undefined;
   const caption = stringOf(fields, 'caption') ?? '';
-  const body = caption === '' ? url : `${url}\n${caption}`;
 
-  return `\`\`\`youtube-embed\n${body}\n\`\`\``;
+  return formatYouTubeEmbedMarkdown(url, caption);
 };
 
 // Block renderer: returns the markdown for one top-level block, or undefined

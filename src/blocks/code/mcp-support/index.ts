@@ -1,4 +1,4 @@
-import { splitCodeFences } from '@lib/mcp/markdown/code-fences';
+import { fenceOpeningLines } from '@lib/mcp/markdown/code-fences';
 
 import { CODE_LANGUAGES } from '../index';
 
@@ -16,25 +16,6 @@ const CODE_FENCE_OPEN = /^```(\w*)[ \t]*$/;
 // フェンス長を突き合わせられず内側の ``` で早期終了して内容を壊す。silent 破壊を
 // 防ぐため書き込み側では明示的に拒否する。
 const LONG_FENCE_OPEN = /^````/;
-
-// splitCodeFences の fence セグメントは「開始行〜終了行」の連なりだが、隣接する
-// フェンス同士は 1 セグメントに融合する。行を歩いてトグルを復元し、各フェンスの
-// 開始行だけを列挙する(終了行 ``` を次のフェンスの開始と取り違えないため)。
-const openingLines = (segment: string): string[] =>
-  segment.split('\n').reduce<{ inFence: boolean; opens: string[] }>(
-    (state, line) => {
-      if (!line.startsWith('```')) return state;
-      if (state.inFence) return { inFence: false, opens: state.opens };
-
-      return { inFence: true, opens: [...state.opens, line] };
-    },
-    { inFence: false, opens: [] },
-  ).opens;
-
-const fenceSegments = (markdown: string): string[] =>
-  splitCodeFences(markdown)
-    .filter((segment) => segment.kind === 'fence')
-    .map((segment) => segment.text);
 
 // フェンス開始行 1 行を検証し、違反なら LLM 向け回復指示を返す。
 // 通常の(バランスした)フェンスは構造としては常に妥当 — 検証するのは開始行のみ。
@@ -56,10 +37,7 @@ const validateOpeningLine = (line: string): string[] => {
   return [`コードフェンスの言語キー "${lang}" は未対応です。対応キー: ${LANGUAGE_KEYS.join(' / ')}(キー省略も可)。該当行: ${line}`];
 };
 
-const validateFences = (markdown: string): string[] =>
-  fenceSegments(markdown)
-    .flatMap((segment) => openingLines(segment))
-    .flatMap((line) => validateOpeningLine(line));
+const validateFences = (markdown: string): string[] => fenceOpeningLines(markdown).flatMap((line) => validateOpeningLine(line));
 
 // LLM 向けの構文説明。tool の bodyMarkdown 説明に集約される。
 const syntaxHelp = [
@@ -75,10 +53,10 @@ const syntaxHelp = [
 // MCP の markdown registry(src/lib/mcp/markdown)に登録する Code block の plugin。
 // フェンス構文は標準 Markdown そのもので、Lexical との往復は src/blocks/code の
 // 自前 jsx converter が担う — ここは validate だけを持つ。
-export const codeMcpSupport: McpBlockSupport = {
+export const codeMcpSupport = {
   blockType: 'Code',
   syntaxHelp,
   validateFences,
   // コードフェンスは media を参照しない。
-  extractMediaIDs: () => [],
-};
+  extractMediaIDs: (_markdown: string): number[] => [],
+} satisfies McpBlockSupport;

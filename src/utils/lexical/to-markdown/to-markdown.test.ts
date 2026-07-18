@@ -172,14 +172,19 @@ describe('lexicalToMarkdown: upload & image-row', () => {
 describe('lexicalToMarkdown: youtube-embed', () => {
   const URL_HTTPS = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
 
-  it('renders a URL-only youtube-embed block as a two-line fence', () => {
+  it('renders a URL-only youtube-embed block as a bare URL line', () => {
     const body = state({ type: 'block', fields: { blockType: 'youtube-embed', url: URL_HTTPS } });
-    expect(lexicalToMarkdown(body, opts)).toBe(`\`\`\`youtube-embed\n${URL_HTTPS}\n\`\`\``);
+    expect(lexicalToMarkdown(body, opts)).toBe(URL_HTTPS);
   });
 
-  it('renders URL + caption as URL on line 1 and caption on line 2', () => {
+  it('renders URL + caption as a [caption](url) line', () => {
     const body = state({ type: 'block', fields: { blockType: 'youtube-embed', url: URL_HTTPS, caption: 'Rick roll' } });
-    expect(lexicalToMarkdown(body, opts)).toBe(`\`\`\`youtube-embed\n${URL_HTTPS}\nRick roll\n\`\`\``);
+    expect(lexicalToMarkdown(body, opts)).toBe(`[Rick roll](${URL_HTTPS})`);
+  });
+
+  it('escapes [ and ] in the caption (same formatter as the MCP export path)', () => {
+    const body = state({ type: 'block', fields: { blockType: 'youtube-embed', url: URL_HTTPS, caption: 'a [b] c' } });
+    expect(lexicalToMarkdown(body, opts)).toBe(`[a \\[b\\] c](${URL_HTTPS})`);
   });
 
   it('skips a youtube-embed block whose url field is missing', () => {

@@ -36,9 +36,9 @@ const syntaxHelp = [
   '```',
 ].join('\n');
 
-export const imageRowMcpSupport: McpBlockSupport = {
+export const imageRowMcpSupport = {
   blockType: 'image-row',
   syntaxHelp,
   validateFences,
   extractMediaIDs,
-};
+} satisfies McpBlockSupport;
