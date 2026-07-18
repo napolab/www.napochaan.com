@@ -13,6 +13,7 @@ vi.mock('@payloadcms/richtext-lexical', () => ({
   convertMarkdownToLexical: () => ({}),
   convertLexicalToMarkdown: () => '',
   BlocksFeature: () => ({}),
+  CodeBlock: () => ({ slug: 'Code', fields: [] }),
   lexicalEditor: () => ({}),
 }));
 vi.mock('@modelcontextprotocol/sdk/server/mcp.js', () => ({

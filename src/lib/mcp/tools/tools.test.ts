@@ -102,12 +102,14 @@ describe('createPost', () => {
   });
 
   it('accepts a raw image URL inside a generic code fence as example text', async () => {
-    // フェンス内は例示テキスト — get_post と write でフェンス扱いを統一(リファクタ後の意図的挙動をピン留め)
+    // フェンス内は例示テキスト — get_post と write でフェンス扱いを統一(リファクタ後の意図的挙動をピン留め)。
+    // 言語キーは Code block の select options として別途検証される(後続テスト参照)ため、
+    // ここではキー省略の素の ``` フェンスを使う。
     const { payload, deps } = createDeps();
     payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
     payload.create.mockResolvedValue({ id: 11, slug: 's2' });
     const handlers = createBlogToolHandlers(deps);
-    const bodyMarkdown = ['intro', '', '```md', '![shot](https://example.com/a.png)', '```'].join('\n');
+    const bodyMarkdown = ['intro', '', '```', '![shot](https://example.com/a.png)', '```'].join('\n');
     const result = await handlers.createPost({
       title: 't',
       slug: 's2',
@@ -118,6 +120,39 @@ describe('createPost', () => {
 
     expect(result.isError).toBeUndefined();
     expect(payload.create).toHaveBeenCalled();
+  });
+
+  it('passes a language-tagged code fence through unchanged, even when it contains image syntax', async () => {
+    // フェンス内の ![media:...] / 生 URL は検証・書き換えの対象外(splitCodeFences 保護)。
+    // 空 alt の placeholder はフェンス外なら拒否されるが、フェンス内なら素通りする。
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    payload.create.mockResolvedValue({ id: 12, slug: 'code' });
+    const handlers = createBlogToolHandlers(deps);
+    const bodyMarkdown = ['intro', '', '```bash', 'curl https://example.com/x.png', '![media:99]()', '![shot](https://example.com/a.png)', '```'].join('\n');
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 'code',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown,
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(codec.toLexical).toHaveBeenCalledWith(bodyMarkdown);
+  });
+
+  it('rejects an unsupported code-fence language key with a recovery hint', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    const handlers = createBlogToolHandlers(deps);
+    const bodyMarkdown = ['```python', 'print(1)', '```'].join('\n');
+    const result = await handlers.createPost({ title: 't', slug: 's3', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('python');
+    expect(result.content[0]?.text).toContain('typescript');
+    expect(payload.create).not.toHaveBeenCalled();
   });
 
   it('rejects a missing thumbnail', async () => {
