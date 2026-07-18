@@ -37,7 +37,7 @@ const createDeps = () => {
     toLexical: vi.fn((_markdown: string) => paragraphBody()),
     toMarkdown: vi.fn(() => '# md'),
   };
-  const deps = { payload, user, codec, signingSecret: SIGNING_SECRET } as unknown as BlogToolDeps;
+  const deps = { payload, user, codec, signingSecret: SIGNING_SECRET, siteBaseUrl: 'https://napochaan.com' } as unknown as BlogToolDeps;
   return { payload, codec, deps };
 };
 
@@ -191,6 +191,46 @@ describe('createPost', () => {
 
     const arg = payload.create.mock.calls[0]?.[0] as { data: { publishedAt: string } };
     expect(arg.data.publishedAt).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+
+  it('本文リンクの newTab を URL から導出して保存する', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    payload.create.mockResolvedValue({ id: 12, slug: 'links' });
+    codec.toLexical.mockReturnValue({
+      root: {
+        type: 'root',
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
+        children: [
+          {
+            type: 'paragraph',
+            version: 1,
+            children: [
+              { type: 'link', version: 3, fields: { linkType: 'custom', newTab: false, url: 'https://booth.pm/x' }, children: [] },
+              { type: 'link', version: 3, fields: { linkType: 'custom', newTab: false, url: '/blog/v3' }, children: [] },
+            ],
+          },
+        ],
+      },
+    } as unknown as Blog['body']);
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 'links',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: '[a](https://booth.pm/x) と [b](/blog/v3)',
+    });
+
+    expect(result.isError).toBeUndefined();
+    const data = payload.create.mock.calls[0]?.[0]?.data as Blog;
+    const [paragraph] = data.body.root.children;
+    const links = (paragraph as unknown as { children: { fields: { newTab: boolean } }[] }).children;
+    expect(links.map((link) => link.fields.newTab)).toEqual([true, false]);
   });
 });
 

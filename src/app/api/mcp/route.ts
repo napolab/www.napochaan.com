@@ -52,7 +52,13 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   // MCP SDK 1.26+ はリクエストごとに server / transport を新規生成する必要がある
   // (共有すると "already connected" で throw する)。生成は安価。
   const server = new McpServer({ name: 'napochaan-blog', version: '1.0.0' });
-  registerBlogTools(server, { payload, user, codec: createMarkdownCodec(editorConfig), signingSecret: env.PAYLOAD_SECRET });
+  registerBlogTools(server, {
+    payload,
+    user,
+    codec: createMarkdownCodec(editorConfig),
+    signingSecret: env.PAYLOAD_SECRET,
+    siteBaseUrl: process.env.BASE_URL ?? 'http://localhost:3000',
+  });
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined, // stateless モード
