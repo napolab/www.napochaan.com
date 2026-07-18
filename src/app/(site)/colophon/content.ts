@@ -72,6 +72,10 @@ export const colophon = {
       { name: 'PhrasedText', why: 'BudouX で日本語を文節ごとに折り返す。auto-phrase が効かない iOS でも改行位置がそろうやつ。' },
       { name: 'Card', why: 'コンテンツの最小枠。as で中の要素を差し替えられるようにしてあるよ。' },
       { name: 'Figure', why: '画像とキャプションのセット。比率を保ったまま枠に収める。' },
+      {
+        name: 'Video',
+        why: 'richText に埋め込む動画。ambient は音なしループの背景クリップ、player はコントロール付き。どちらも RSC のまま、クライアント JS はゼロ。',
+      },
       { name: 'Gallery', why: 'タイル状の写真グリッド。クリックで lightbox が開く。' },
       {
         name: 'GalleryArchive',

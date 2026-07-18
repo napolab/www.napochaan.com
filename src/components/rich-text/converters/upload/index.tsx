@@ -1,5 +1,6 @@
 import { Figure } from '@components/figure';
 import { formatBlurURL } from '@components/image/helper';
+import { Video } from '@components/video';
 
 import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
@@ -26,7 +27,10 @@ const captionOf = (fields: unknown): string | undefined => {
  * look). `fit="intrinsic"` keeps small in-body images at their own size, centred
  * over the backdrop, rather than upscaling them to the 16:9 frame. `zoomable`
  * makes the body image a tap target that opens the shared gallery Lightbox.
- * Non-image uploads fall back to a download link.
+ * A standalone video upload (dropped straight into the editor rather than via
+ * the `video` block) renders as a plain controlled player, no caption — the
+ * `video` block is the only path that carries a caption or ambient/poster
+ * options for video. Any other non-image upload falls back to a download link.
  */
 export const uploadConverter: Partial<JSXConverters<NodeTypes>> = {
   upload: ({ node }) => {
@@ -38,7 +42,13 @@ export const uploadConverter: Partial<JSXConverters<NodeTypes>> = {
 
     if (url === undefined) return null;
 
-    // Non-image: render a download link
+    if (mimeType.startsWith('video')) {
+      const width = typeof doc.width === 'number' ? doc.width : 800;
+      const height = typeof doc.height === 'number' ? doc.height : 450;
+      return <Video src={url} variant="player" width={width} height={height} />;
+    }
+
+    // Non-image, non-video: render a download link
     if (!mimeType.startsWith('image')) {
       const filename = typeof doc.filename === 'string' ? doc.filename : url;
       return (

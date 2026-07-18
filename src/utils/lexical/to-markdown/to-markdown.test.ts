@@ -159,3 +159,41 @@ describe('lexicalToMarkdown: upload & image-row', () => {
     expect(lexicalToMarkdown(body, opts)).toBe('生存');
   });
 });
+
+describe('lexicalToMarkdown: video block', () => {
+  const clip = { url: '/api/media/file/clip.mp4', alt: '', mimeType: 'video/mp4', filename: 'clip.mp4' };
+
+  it('renders a populated video as a link with its caption as link text', () => {
+    const body = state({ type: 'block', fields: { blockType: 'video', video: clip, variant: 'ambient', caption: '制作の裏側' } });
+    expect(lexicalToMarkdown(body, opts)).toBe('[制作の裏側](https://example.com/api/media/file/clip.mp4)');
+  });
+
+  it('falls back to the filename when there is no caption', () => {
+    const body = state({ type: 'block', fields: { blockType: 'video', video: clip, variant: 'player' } });
+    expect(lexicalToMarkdown(body, opts)).toBe('[clip.mp4](https://example.com/api/media/file/clip.mp4)');
+  });
+
+  it('falls back to the absolute URL when neither caption nor filename is present', () => {
+    const noFilename = { url: '/api/media/file/clip.mp4', alt: '', mimeType: 'video/mp4' };
+    const body = state({ type: 'block', fields: { blockType: 'video', video: noFilename, variant: 'ambient' } });
+    expect(lexicalToMarkdown(body, opts)).toBe('[https://example.com/api/media/file/clip.mp4](https://example.com/api/media/file/clip.mp4)');
+  });
+
+  it('skips an unresolved (id-only) video', () => {
+    const body = state({ type: 'block', fields: { blockType: 'video', video: 42, variant: 'ambient' } }, paragraph(text('生存')));
+    expect(lexicalToMarkdown(body, opts)).toBe('生存');
+  });
+
+  it('omits the poster from public markdown output', () => {
+    const body = state({
+      type: 'block',
+      fields: { blockType: 'video', video: clip, variant: 'player', poster: { url: '/api/media/file/poster.jpg', alt: 'poster', mimeType: 'image/jpeg' } },
+    });
+    expect(lexicalToMarkdown(body, opts)).toBe('[clip.mp4](https://example.com/api/media/file/clip.mp4)');
+  });
+
+  it('absolutizes a relative video URL', () => {
+    const body = state({ type: 'block', fields: { blockType: 'video', video: clip, variant: 'ambient' } });
+    expect(lexicalToMarkdown(body, opts)).toContain('https://example.com/api/media/file/clip.mp4');
+  });
+});

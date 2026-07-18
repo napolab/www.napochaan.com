@@ -89,6 +89,7 @@ head_sampling_rate = 1
 [env.staging.vars]
 BASE_URL = "https://stg.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
+MEDIA_TRANSFORMS = "1"
 # CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
 
 [[env.staging.routes]]
@@ -149,6 +150,7 @@ head_sampling_rate = 1
 [env.production.vars]
 BASE_URL = "https://napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
+MEDIA_TRANSFORMS = "1"
 # CURSOR_SALT is a wrangler secret in production (set via `wrangler secret put CURSOR_SALT --env production`).
 
 [[env.production.routes]]

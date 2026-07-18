@@ -19,8 +19,24 @@ export type ImageRowBlock = {
 };
 
 /**
- * Node types handled by the rich-text JSX converters: every Payload default
- * Lexical node plus the project's custom `image-row` block. When a collection
- * adds another custom block, widen this union and add a matching converter.
+ * The serialized fields of the `video` lexical block (see `src/blocks/video`).
+ * Same rationale as `ImageRowBlock` above: BlocksFeature-only blocks never make
+ * it into `payload-types.ts`, so the shape is hand-declared here. `video` and
+ * `poster` are `unknown` because Payload populates each with either a numeric
+ * id or a full Media object; the converter narrows them.
  */
-export type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageRowBlock>;
+export type VideoBlock = {
+  readonly blockType: 'video';
+  readonly video: unknown;
+  readonly variant: 'ambient' | 'player';
+  readonly caption?: string;
+  readonly poster?: unknown;
+};
+
+/**
+ * Node types handled by the rich-text JSX converters: every Payload default
+ * Lexical node plus the project's custom `image-row` and `video` blocks. When a
+ * collection adds another custom block, widen this union and add a matching
+ * converter.
+ */
+export type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageRowBlock> | SerializedBlockNode<VideoBlock>;
