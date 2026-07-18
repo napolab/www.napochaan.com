@@ -147,26 +147,6 @@ const headingLevel = (tag: string | undefined): number => {
   return parsed;
 };
 
-// One code-block child → its raw text. linebreak/tab carry no text field of
-// their own, so they must be special-cased before falling back to `text`
-// (mirrors converters/code/extract-code's childText).
-const codeChildText = (node: unknown): string => {
-  switch (typeOf(node)) {
-    case 'linebreak':
-      return '\n';
-    case 'tab':
-      return '\t';
-    default:
-      return stringOf(node, 'text') ?? '';
-  }
-};
-
-// Raw text of a code block: text nodes joined verbatim, linebreak → '\n',
-// tab → '\t' (no inline formatting inside a fence).
-const renderCodeText = (nodes: readonly unknown[]): string => {
-  return nodes.map((node) => codeChildText(node)).join('');
-};
-
 const absolutize = (url: string, opts: LexicalToMarkdownOptions): string => (url.startsWith('/') ? new URL(url, opts.baseUrl).toString() : url);
 
 // A populated media value carries url (+ alt/mimeType); an unpopulated one is a
@@ -212,6 +192,15 @@ const renderImageRow = (fields: Record<string, unknown>, opts: LexicalToMarkdown
   return rendered.length === 0 ? undefined : rendered.join('\n');
 };
 
+// The premade `Code` block (src/blocks/code) stores the raw source in `code`
+// and the fence language key in `language` — emit a standard ```lang fence.
+const renderCodeBlock = (fields: Record<string, unknown>): string => {
+  const code = stringOf(fields, 'code') ?? '';
+  const lang = stringOf(fields, 'language') ?? '';
+
+  return `\`\`\`${lang}\n${code}\n\`\`\``;
+};
+
 // Block renderer: returns the markdown for one top-level block, or undefined
 // for unknown/empty blocks (skipped by the caller).
 const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | undefined => {
@@ -238,11 +227,6 @@ const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | un
             .map((line) => `> ${line}`)
             .join('\n');
     }
-    case 'code': {
-      const lang = stringOf(node, 'language') ?? '';
-
-      return `\`\`\`${lang}\n${renderCodeText(childrenOf(node))}\n\`\`\``;
-    }
     case 'table':
       return renderTable(node, opts);
     case 'horizontalrule':
@@ -253,6 +237,7 @@ const renderBlock = (node: unknown, opts: LexicalToMarkdownOptions): string | un
       const fields = isObject(node) && isObject(node.fields) ? node.fields : undefined;
       if (fields === undefined) return undefined;
       if (fields.blockType === 'image-row') return renderImageRow(fields, opts);
+      if (fields.blockType === 'Code') return renderCodeBlock(fields);
 
       return undefined;
     }

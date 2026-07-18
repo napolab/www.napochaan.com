@@ -97,19 +97,21 @@ describe('lexicalToMarkdown: quote/code/table/hr', () => {
     expect(lexicalToMarkdown(body, opts)).toBe('> 一行目\n> 二行目');
   });
 
-  it('renders fenced code blocks with language', () => {
-    const body = state({ type: 'code', language: 'ts', children: [text('const a = 1;'), { type: 'linebreak' }, text('const b = 2;')] });
-    expect(lexicalToMarkdown(body, opts)).toBe('```ts\nconst a = 1;\nconst b = 2;\n```');
+  // The `Code` block (src/blocks/code) stores the raw source directly in
+  // fields.code — newlines/tabs included — so no child-node folding is needed.
+  it('renders Code blocks as fenced code with language', () => {
+    const body = state({ type: 'block', fields: { blockType: 'Code', language: 'typescript', code: 'const a = 1;\nconst b = 2;' } });
+    expect(lexicalToMarkdown(body, opts)).toBe('```typescript\nconst a = 1;\nconst b = 2;\n```');
   });
 
-  it('renders a fence without language when language is absent', () => {
-    const body = state({ type: 'code', children: [text('plain')] });
+  it('renders a fence without language when the Code block language is absent', () => {
+    const body = state({ type: 'block', fields: { blockType: 'Code', code: 'plain' } });
     expect(lexicalToMarkdown(body, opts)).toBe('```\nplain\n```');
   });
 
-  it('preserves tab nodes as \\t inside fenced code', () => {
-    const body = state({ type: 'code', language: 'ts', children: [text('if (a) {'), { type: 'linebreak' }, { type: 'tab' }, text('run();'), { type: 'linebreak' }, text('}')] });
-    expect(lexicalToMarkdown(body, opts)).toBe('```ts\nif (a) {\n\trun();\n}\n```');
+  it('preserves tabs verbatim inside a Code block fence', () => {
+    const body = state({ type: 'block', fields: { blockType: 'Code', language: 'typescript', code: 'if (a) {\n\trun();\n}' } });
+    expect(lexicalToMarkdown(body, opts)).toBe('```typescript\nif (a) {\n\trun();\n}\n```');
   });
 
   it('renders tables with a separator after the first row', () => {
