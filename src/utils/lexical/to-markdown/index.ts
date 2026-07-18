@@ -1,3 +1,5 @@
+import { fenceForCode } from '../../code-fence';
+
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 
 // NOTE: 対応ノードは src/components/rich-text/converters/types.ts の NodeTypes
@@ -194,11 +196,14 @@ const renderImageRow = (fields: Record<string, unknown>, opts: LexicalToMarkdown
 
 // The premade `Code` block (src/blocks/code) stores the raw source in `code`
 // and the fence language key in `language` — emit a standard ```lang fence.
+// fenceForCode widens the fence when the code itself contains fence lines,
+// so the emitted markdown never terminates early.
 const renderCodeBlock = (fields: Record<string, unknown>): string => {
   const code = stringOf(fields, 'code') ?? '';
   const lang = stringOf(fields, 'language') ?? '';
+  const fence = fenceForCode(code);
 
-  return `\`\`\`${lang}\n${code}\n\`\`\``;
+  return `${fence}${lang}\n${code}\n${fence}`;
 };
 
 // Block renderer: returns the markdown for one top-level block, or undefined

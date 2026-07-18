@@ -10,24 +10,6 @@ describe('imageRowMcpSupport.blockType', () => {
   });
 });
 
-describe('imageRowMcpSupport.stripFences', () => {
-  it('removes a well-formed fence entirely', () => {
-    expect(imageRowMcpSupport.stripFences(FENCE)).toBe('');
-  });
-
-  it('keeps surrounding content while removing the fence', () => {
-    const md = `intro\n\n${FENCE}\n\noutro`;
-    const stripped = imageRowMcpSupport.stripFences(md);
-    expect(stripped).toContain('intro');
-    expect(stripped).toContain('outro');
-    expect(stripped).not.toContain('media:79');
-  });
-
-  it('leaves non-fence content untouched when there is no fence', () => {
-    expect(imageRowMcpSupport.stripFences('# hi\n\npara')).toBe('# hi\n\npara');
-  });
-});
-
 describe('imageRowMcpSupport.validateFences', () => {
   it('accepts a well-formed 2-cell fence', () => {
     expect(imageRowMcpSupport.validateFences(FENCE)).toEqual([]);

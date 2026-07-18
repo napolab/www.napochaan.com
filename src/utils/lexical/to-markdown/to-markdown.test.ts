@@ -114,6 +114,13 @@ describe('lexicalToMarkdown: quote/code/table/hr', () => {
     expect(lexicalToMarkdown(body, opts)).toBe('```typescript\nif (a) {\n\trun();\n}\n```');
   });
 
+  // コード内容自体が ``` 行を含む場合、外側のフェンスを 1 段長くしないと
+  // フェンスが早期終了して以降の本文構造が壊れる(CommonMark の規則)。
+  it('widens the fence when the Code block content contains a ``` line', () => {
+    const body = state({ type: 'block', fields: { blockType: 'Code', language: 'bash', code: '例:\n```bash\nnpm run build\n```' } });
+    expect(lexicalToMarkdown(body, opts)).toBe('````bash\n例:\n```bash\nnpm run build\n```\n````');
+  });
+
   it('renders tables with a separator after the first row', () => {
     const cell = (value: string, headerState = 0) => ({ type: 'tablecell', headerState, children: [paragraph(text(value))] });
     const row = (...cells: readonly unknown[]) => ({ type: 'tablerow', children: cells });

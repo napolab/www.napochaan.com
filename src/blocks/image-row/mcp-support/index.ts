@@ -2,12 +2,6 @@ import { CELL_LINE, IMAGE_ROW_FENCE, fenceCellLines } from '../fence';
 
 import type { McpBlockSupport } from '@lib/mcp/markdown/block-support';
 
-// image-row フェンスを丸ごと除去した Markdown を返す。caption 付き media 参照
-// (![media:<id>](caption))は image-row フェンス内でのみ有効な構文なので、
-// フェンスを除去した残りを生URL画像参照スキャンにかければフェンス外の誤用
-// (caption 付き media 参照 / 本物の生 URL)だけが対象になる。
-const stripFences = (markdown: string): string => markdown.replace(IMAGE_ROW_FENCE, '');
-
 // 各 image-row フェンスが「ちょうど2行の ![media:<id>](...)」であることを検証。
 // 違反ごとに LLM 向け回復指示を返す。
 const validateFences = (markdown: string): string[] =>
@@ -30,7 +24,7 @@ const extractMediaIDs = (markdown: string): number[] =>
 
 // MCP の markdown registry(src/lib/mcp/markdown)に登録する image-row の plugin。
 // fence 構文自体は ../fence が唯一の定義元 — ここはその構文を使った
-// strip/validate/extract のロジックだけを持つ。
+// validate/extract のロジックだけを持つ。
 // LLM 向けの構文説明。tool の bodyMarkdown 説明に集約される。
 const syntaxHelp = [
   '画像2枚を横並びにする image-row block(標準 Markdown ではない):',
@@ -45,7 +39,6 @@ const syntaxHelp = [
 export const imageRowMcpSupport: McpBlockSupport = {
   blockType: 'image-row',
   syntaxHelp,
-  stripFences,
   validateFences,
   extractMediaIDs,
 };

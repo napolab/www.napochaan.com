@@ -11,33 +11,6 @@ describe('codeMcpSupport.blockType', () => {
   });
 });
 
-describe('codeMcpSupport.stripFences', () => {
-  it('removes a language-tagged fence entirely', () => {
-    const md = `intro\n\n${FENCE}\n\noutro`;
-    const stripped = codeMcpSupport.stripFences(md);
-    expect(stripped).toContain('intro');
-    expect(stripped).toContain('outro');
-    expect(stripped).not.toContain('const x = 1;');
-  });
-
-  it('removes a plain ``` fence without a language', () => {
-    const md = ['```', '![alt](https://example.com/x.png)', '```'].join('\n');
-    expect(codeMcpSupport.stripFences(md)).not.toContain('example.com');
-  });
-
-  it("leaves other blocks' fences (```image-row) untouched", () => {
-    const md = `before\n\n${IMAGE_ROW_FENCE}\n\nafter`;
-    const stripped = codeMcpSupport.stripFences(md);
-    expect(stripped).toContain('![media:79](left)');
-    expect(stripped).toContain('before');
-    expect(stripped).toContain('after');
-  });
-
-  it('leaves fence-free content untouched', () => {
-    expect(codeMcpSupport.stripFences('# hi\n\npara')).toBe('# hi\n\npara');
-  });
-});
-
 describe('codeMcpSupport.validateFences', () => {
   it('accepts a balanced fence with a supported language key', () => {
     expect(codeMcpSupport.validateFences(FENCE)).toEqual([]);
@@ -73,6 +46,15 @@ describe('codeMcpSupport.validateFences', () => {
 
   it('accepts a doc with no fences', () => {
     expect(codeMcpSupport.validateFences('# hi\n\npara')).toEqual([]);
+  });
+
+  // get_post は ``` 行入りコードを 4 連フェンスで出力するが、書き戻しは lexical の
+  // import 機構がフェンス長を照合できず内容を壊す — silent 破壊ではなく明示 reject。
+  it('rejects a 4+ backtick fence with a recovery hint', () => {
+    const md = ['````typescript', '例:', '```bash', 'npm run build', '```', '````'].join('\n');
+    const errors = codeMcpSupport.validateFences(md);
+    expect(errors.length).toBeGreaterThanOrEqual(1);
+    expect(errors[0]).toContain('4連以上');
   });
 });
 
