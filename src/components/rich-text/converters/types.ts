@@ -19,8 +19,22 @@ export type ImageRowBlock = {
 };
 
 /**
- * Node types handled by the rich-text JSX converters: every Payload default
- * Lexical node plus the project's custom `image-row` block. When a collection
- * adds another custom block, widen this union and add a matching converter.
+ * The serialized fields of the premade `Code` lexical block (see
+ * `src/blocks/code`). Like `ImageRowBlock`, the shape is hand-declared because
+ * editor-only blocks are not emitted into `payload-types.ts`. `code`/`language`
+ * are optional defensively — the converter falls back to an empty string /
+ * plain-text highlighting.
  */
-export type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageRowBlock>;
+export type CodeBlock = {
+  readonly blockType: 'Code';
+  readonly code?: string;
+  readonly language?: string;
+};
+
+/**
+ * Node types handled by the rich-text JSX converters: every Payload default
+ * Lexical node plus the project's custom `image-row` and `Code` blocks. When a
+ * collection adds another custom block, widen this union and add a matching
+ * converter.
+ */
+export type NodeTypes = DefaultNodeTypes | SerializedBlockNode<ImageRowBlock> | SerializedBlockNode<CodeBlock>;
