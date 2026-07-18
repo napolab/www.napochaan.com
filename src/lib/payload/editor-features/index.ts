@@ -2,6 +2,7 @@ import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 
 import { Code } from '../../../blocks/code';
 import { ImageRow } from '../../../blocks/image-row';
+import { YouTubeEmbed } from '../../../blocks/youtube-embed';
 
 // FeaturesInput は package root から export されていないので lexicalEditor の
 // パラメータ型から導出する。
@@ -18,5 +19,6 @@ type BlogEditorFeatures = NonNullable<NonNullable<Parameters<typeof lexicalEdito
 // factory で組めば同一 lexical インスタンスになり整合する。
 // blocks の登録順は Markdown import の優先順でもある($importMultiline は transformer を
 // 登録順に試して最初の一致を採用する)。Code(premade)の customStartRegex ```(\w+)? は
-// ```image-row 行の先頭にも部分一致するため、ImageRow を必ず Code より先に置くこと。
-export const blogEditorFeatures: BlogEditorFeatures = ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow, Code] })];
+// ```image-row / ```youtube-embed 行の先頭にも部分一致するため、これらのハイフン付き
+// スラッグの block はすべて Code より先に置くこと(順番に試して最初の一致で確定する)。
+export const blogEditorFeatures: BlogEditorFeatures = ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow, YouTubeEmbed, Code] })];

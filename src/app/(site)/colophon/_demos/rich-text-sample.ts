@@ -44,6 +44,17 @@ const makeCell = (asset: { src: string; width: number; height: number }, alt: st
   caption,
 });
 
+// A `youtube-embed` lexical block node (src/blocks/youtube-embed, blockType
+// 'youtube-embed'). The converter parses the videoID at render time and drops
+// a privacy-enhanced (youtube-nocookie) 16:9 iframe with the caption as its
+// figcaption + iframe title.
+const makeYouTube = (url: string, caption: string) => ({
+  type: 'block',
+  format: '',
+  version: 2,
+  fields: { id: 'demo-youtube', blockType: 'youtube-embed', url, caption },
+});
+
 // A single image upload node shaped like Payload returns it, exercising the
 // standalone in-body figure (intrinsic when small, capped to 85% when large).
 const makeUpload = (asset: { src: string; width: number; height: number }, alt: string, caption: string) => ({
@@ -169,6 +180,7 @@ const raw: unknown = {
         children: [makeText('TERMINAL-style blockquote. Monospaced, muted, prefixed with "> ".')],
       },
       makeCode('typescript', skylineSnippet),
+      makeYouTube('https://www.youtube.com/watch?v=dQw4w9WgXcQ', 'YouTube embed / demo'),
       makeUpload(vrchatGlitch, 'VRChat アバター glitch', 'single / 2024'),
       {
         type: 'block',

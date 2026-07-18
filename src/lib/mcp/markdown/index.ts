@@ -2,6 +2,7 @@ import { convertLexicalToMarkdown, convertMarkdownToLexical } from '@payloadcms/
 
 import { codeMcpSupport } from '../../../blocks/code/mcp-support';
 import { imageRowMcpSupport } from '../../../blocks/image-row/mcp-support';
+import { youtubeEmbedMcpSupport } from '../../../blocks/youtube-embed/mcp-support';
 
 import type { McpBlockSupport } from './block-support';
 import type { SanitizedServerEditorConfig } from '@payloadcms/richtext-lexical';
@@ -31,7 +32,7 @@ export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): 
 // 増えない。fan-out 集約 — 全 plugin を毎回実行し結果を連結する(Payload 自身の
 // markdown transformer は jsx.customStartRegex で first-match dispatch 済みなので、
 // この層で二重にやる必要はない)。
-const blockSupports: readonly McpBlockSupport[] = [imageRowMcpSupport, codeMcpSupport];
+const blockSupports: readonly McpBlockSupport[] = [imageRowMcpSupport, youtubeEmbedMcpSupport, codeMcpSupport];
 
 const SUPPORTED_BLOCK_TYPES = blockSupports.map((plugin) => plugin.blockType);
 

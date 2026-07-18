@@ -168,3 +168,22 @@ describe('lexicalToMarkdown: upload & image-row', () => {
     expect(lexicalToMarkdown(body, opts)).toBe('生存');
   });
 });
+
+describe('lexicalToMarkdown: youtube-embed', () => {
+  const URL_HTTPS = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+
+  it('renders a URL-only youtube-embed block as a two-line fence', () => {
+    const body = state({ type: 'block', fields: { blockType: 'youtube-embed', url: URL_HTTPS } });
+    expect(lexicalToMarkdown(body, opts)).toBe(`\`\`\`youtube-embed\n${URL_HTTPS}\n\`\`\``);
+  });
+
+  it('renders URL + caption as URL on line 1 and caption on line 2', () => {
+    const body = state({ type: 'block', fields: { blockType: 'youtube-embed', url: URL_HTTPS, caption: 'Rick roll' } });
+    expect(lexicalToMarkdown(body, opts)).toBe(`\`\`\`youtube-embed\n${URL_HTTPS}\nRick roll\n\`\`\``);
+  });
+
+  it('skips a youtube-embed block whose url field is missing', () => {
+    const body = state({ type: 'block', fields: { blockType: 'youtube-embed' } }, paragraph(text('after')));
+    expect(lexicalToMarkdown(body, opts)).toBe('after');
+  });
+});
