@@ -36,6 +36,27 @@ export const splitCodeFences = (markdown: string): FenceSegment[] => {
   return result.segments.map(({ kind, lines: segmentLines }) => ({ kind, text: segmentLines.join('\n') }));
 };
 
+// fence セグメント内の各フェンスの「開始行」だけを列挙する。隣接するフェンス同士は
+// splitCodeFences 上は 1 セグメントに融合するため、行を歩いてトグルを復元する
+// (終了行 ``` を次のフェンスの開始と取り違えないため)。block plugin の
+// validateFences がフェンス開始行(info string)を検証する用途で共有する
+// (src/blocks/code/mcp-support, src/blocks/youtube-embed/mcp-support)。
+export const fenceOpeningLines = (markdown: string): string[] =>
+  splitCodeFences(markdown)
+    .filter((segment) => segment.kind === 'fence')
+    .flatMap(
+      (segment) =>
+        segment.text.split('\n').reduce<{ inFence: boolean; opens: string[] }>(
+          (state, line) => {
+            if (!FENCE_TOGGLE.test(line)) return state;
+            if (state.inFence) return { inFence: false, opens: state.opens };
+
+            return { inFence: true, opens: [...state.opens, line] };
+          },
+          { inFence: false, opens: [] },
+        ).opens,
+    );
+
 // text セグメントだけに transform を適用して再結合する。fence セグメントは原文のまま。
 // セグメントの text は行群を '\n' join したもの — 全セグメントを '\n' join すると元に戻る(可逆)。
 export const mapTextSegments = (markdown: string, transform: (text: string) => string): string =>

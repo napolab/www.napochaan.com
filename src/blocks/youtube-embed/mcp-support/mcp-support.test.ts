@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { youtubeEmbedProvider } from '../embed-provider';
+
 import { youtubeEmbedMcpSupport } from '.';
 
 const ID = 'dQw4w9WgXcQ';
 const URL_HTTPS = `https://www.youtube.com/watch?v=${ID}`;
-const FENCE_URL_ONLY = ['```youtube-embed', URL_HTTPS, '```'].join('\n');
-const FENCE_WITH_CAPTION = ['```youtube-embed', URL_HTTPS, 'キャプション', '```'].join('\n');
 
 describe('youtubeEmbedMcpSupport.blockType', () => {
   it('is "youtube-embed"', () => {
@@ -13,72 +13,58 @@ describe('youtubeEmbedMcpSupport.blockType', () => {
   });
 });
 
+// 旧内部フェンスは廃止済み。素通しすると Code block の customStartRegex が行頭に
+// 部分一致して silent 破壊(language: "youtube" + code 先頭 "-embed" 混入)になるため、
+// write 側では回復指示つきで明示的に拒否する(mcp-write-strict)。
 describe('youtubeEmbedMcpSupport.validateFences', () => {
-  it('accepts a fence with only a valid URL', () => {
-    expect(youtubeEmbedMcpSupport.validateFences(FENCE_URL_ONLY)).toEqual([]);
-  });
-
-  it('accepts a fence with URL + caption', () => {
-    expect(youtubeEmbedMcpSupport.validateFences(FENCE_WITH_CAPTION)).toEqual([]);
-  });
-
-  it('accepts the youtu.be short link inside the fence', () => {
-    const md = ['```youtube-embed', `https://youtu.be/${ID}`, '```'].join('\n');
-    expect(youtubeEmbedMcpSupport.validateFences(md)).toEqual([]);
-  });
-
-  it('rejects an empty fence body with a hint', () => {
-    const md = ['```youtube-embed', '```'].join('\n');
+  it('rejects the retired ```youtube-embed fence with a recovery hint pointing to the link syntax', () => {
+    const md = ['```youtube-embed', URL_HTTPS, '```'].join('\n');
     const errors = youtubeEmbedMcpSupport.validateFences(md);
-    expect(errors.length).toBe(1);
-    expect(errors[0]).toContain('URL');
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toContain('廃止');
+    expect(errors[0]).toContain('[キャプション](URL)');
+    expect(errors[0]).toContain('該当行');
   });
 
-  it('rejects a fence whose URL line is not a YouTube URL', () => {
-    const md = ['```youtube-embed', 'https://vimeo.com/1234', '```'].join('\n');
-    const errors = youtubeEmbedMcpSupport.validateFences(md);
-    expect(errors.length).toBe(1);
-    expect(errors[0]).toContain('watch?v=');
+  it('reports one violation per retired fence', () => {
+    const fence = ['```youtube-embed', URL_HTTPS, '```'].join('\n');
+    expect(youtubeEmbedMcpSupport.validateFences(`${fence}\n\n${fence}`)).toHaveLength(2);
   });
 
-  it('rejects a fence with more than two content lines', () => {
-    const md = ['```youtube-embed', URL_HTTPS, 'caption', 'extra', '```'].join('\n');
-    const errors = youtubeEmbedMcpSupport.validateFences(md);
-    expect(errors.length).toBe(1);
-    expect(errors[0]).toContain('最大 2 行');
+  it('does not flag ordinary code fences (other plugins own those)', () => {
+    expect(youtubeEmbedMcpSupport.validateFences('```typescript\nconst x = 1;\n```')).toEqual([]);
   });
 
-  it('does not touch a plain code fence', () => {
-    const md = ['```typescript', 'const x = 1;', '```'].join('\n');
-    expect(youtubeEmbedMcpSupport.validateFences(md)).toEqual([]);
+  it('does not flag the standalone link syntax', () => {
+    expect(youtubeEmbedMcpSupport.validateFences(`intro\n\n${URL_HTTPS}\n\noutro`)).toEqual([]);
   });
+});
 
-  it('does not touch an image-row fence', () => {
-    const md = ['```image-row', '![media:1](x)', '![media:2](y)', '```'].join('\n');
-    expect(youtubeEmbedMcpSupport.validateFences(md)).toEqual([]);
-  });
-
-  it('validates each fence when multiple youtube-embed fences appear', () => {
-    const md = `${FENCE_URL_ONLY}\n\n${['```youtube-embed', 'https://vimeo.com/x', '```'].join('\n')}`;
-    const errors = youtubeEmbedMcpSupport.validateFences(md);
-    expect(errors.length).toBe(1);
-    expect(errors[0]).toContain('watch?v=');
-  });
-
-  it('accepts a doc with no fences', () => {
-    expect(youtubeEmbedMcpSupport.validateFences('# hi\n\npara')).toEqual([]);
+// 変換規則の網羅は provider 単体(../embed-provider/embed-provider.test.ts)と
+// 汎用層(src/utils/lexical/link-embed/link-embed.test.ts)の責務。registry 経由で
+// block node になるまでの smoke は src/lib/mcp/markdown/markdown.test.ts が持つ。
+// ここでは plugin が provider そのもの(同一参照)を公開していることだけ確認する。
+describe('youtubeEmbedMcpSupport.linkEmbedProvider', () => {
+  it('exposes the youtube embed provider for the registry to compose', () => {
+    expect(youtubeEmbedMcpSupport.linkEmbedProvider).toBe(youtubeEmbedProvider);
   });
 });
 
 describe('youtubeEmbedMcpSupport.extractMediaIDs', () => {
   it('never reports media ids (embed only references YouTube URLs)', () => {
-    expect(youtubeEmbedMcpSupport.extractMediaIDs(FENCE_URL_ONLY)).toEqual([]);
+    expect(youtubeEmbedMcpSupport.extractMediaIDs(`intro\n\n${URL_HTTPS}`)).toEqual([]);
   });
 });
 
 describe('youtubeEmbedMcpSupport.syntaxHelp', () => {
-  it('documents the fence syntax with a concrete example', () => {
-    expect(youtubeEmbedMcpSupport.syntaxHelp).toContain('```youtube-embed');
+  it('documents the standalone link syntax with accepted URL shapes', () => {
+    expect(youtubeEmbedMcpSupport.syntaxHelp).toContain('[キャプション](URL)');
     expect(youtubeEmbedMcpSupport.syntaxHelp).toContain('watch?v=');
+    expect(youtubeEmbedMcpSupport.syntaxHelp).toContain('youtu.be');
+    expect(youtubeEmbedMcpSupport.syntaxHelp).toContain('/embed/');
+  });
+
+  it('notes that inline links stay links', () => {
+    expect(youtubeEmbedMcpSupport.syntaxHelp).toContain('インライン');
   });
 });

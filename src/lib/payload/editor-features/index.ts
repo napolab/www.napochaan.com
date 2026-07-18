@@ -19,6 +19,9 @@ type BlogEditorFeatures = NonNullable<NonNullable<Parameters<typeof lexicalEdito
 // factory で組めば同一 lexical インスタンスになり整合する。
 // blocks の登録順は Markdown import の優先順でもある($importMultiline は transformer を
 // 登録順に試して最初の一致を採用する)。Code(premade)の customStartRegex ```(\w+)? は
-// ```image-row / ```youtube-embed 行の先頭にも部分一致するため、これらのハイフン付き
-// スラッグの block はすべて Code より先に置くこと(順番に試して最初の一致で確定する)。
+// ```image-row 行の先頭にも部分一致するため、ImageRow は必ず Code より先に置くこと。
+// YouTubeEmbed は Markdown import に参加しない(customStartRegex はどの行にも
+// マッチしない dead スタブ — 取り込みは汎用 link-embed transform
+// (src/utils/lexical/link-embed)+ src/blocks/youtube-embed/embed-provider が担う)
+// ため順序に制約はないが、editor/admin と export のために登録は必要。
 export const blogEditorFeatures: BlogEditorFeatures = ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow, YouTubeEmbed, Code] })];

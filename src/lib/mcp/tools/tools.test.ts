@@ -155,6 +155,37 @@ describe('createPost', () => {
     expect(payload.create).not.toHaveBeenCalled();
   });
 
+  it('accepts the standalone YouTube link syntax and hands the raw markdown to the codec (tree transform は codec 内)', async () => {
+    // 検証は raw 入力に対して走り、リンク行 → block node の置き換えは codec.toLexical の
+    // 内側(convertMarkdownToLexical 後の lexical tree 変換)で行われる —
+    // tools 層は Markdown を書き換えないことをピン留めする。
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    payload.create.mockResolvedValue({ id: 13, slug: 'yt' });
+    const handlers = createBlogToolHandlers(deps);
+    const bodyMarkdown = ['intro', '', '[ライブ映像](https://youtu.be/dQw4w9WgXcQ)', '', 'outro'].join('\n');
+    const result = await handlers.createPost({ title: 't', slug: 'yt', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown });
+
+    expect(result.isError).toBeUndefined();
+    expect(codec.toLexical).toHaveBeenCalledWith(bodyMarkdown);
+  });
+
+  it('rejects the retired ```youtube-embed fence with a recovery hint pointing to the link syntax', async () => {
+    // 旧内部フェンスは廃止済み。素通しすると Code block の customStartRegex が行頭に
+    // 部分一致して silent 破壊になるため、youtube-embed plugin の validateFences が
+    // Payload に届く前に回復指示つきで拒否する(mcp-write-strict)。
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    const handlers = createBlogToolHandlers(deps);
+    const bodyMarkdown = ['```youtube-embed', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', '```'].join('\n');
+    const result = await handlers.createPost({ title: 't', slug: 's4', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('廃止');
+    expect(result.content[0]?.text).toContain('[キャプション](URL)');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
   it('rejects a missing thumbnail', async () => {
     const { payload, deps } = createDeps();
     payload.findByID.mockResolvedValue(null);

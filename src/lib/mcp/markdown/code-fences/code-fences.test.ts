@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mapTextSegments, splitCodeFences } from '.';
+import { fenceOpeningLines, mapTextSegments, splitCodeFences } from '.';
 
 describe('splitCodeFences', () => {
   it('returns a single text segment when there is no fence', () => {
@@ -68,5 +68,25 @@ describe('mapTextSegments', () => {
     const markdown = ['![media:1](x)', '```image-row', '![media:1](x)', '```', '![media:1](x)'].join('\n');
     const result = mapTextSegments(markdown, (text) => text.replaceAll('![media:1](x)', 'REPLACED'));
     expect(result).toBe(['REPLACED', '```image-row', '![media:1](x)', '```', 'REPLACED'].join('\n'));
+  });
+});
+
+describe('fenceOpeningLines', () => {
+  it('returns no lines for markdown without fences', () => {
+    expect(fenceOpeningLines('a\n\nb')).toEqual([]);
+  });
+
+  it('lists the opening line of each fence (info string included)', () => {
+    const markdown = ['```typescript', 'const x = 1;', '```', '', 'text', '', '```image-row', '![media:5](x)', '```'].join('\n');
+    expect(fenceOpeningLines(markdown)).toEqual(['```typescript', '```image-row']);
+  });
+
+  it('does not mistake a closing ``` for the opening of the next fence when fences are adjacent', () => {
+    const markdown = ['```bash', 'echo hi', '```', '```json', '{}', '```'].join('\n');
+    expect(fenceOpeningLines(markdown)).toEqual(['```bash', '```json']);
+  });
+
+  it('treats an unclosed fence opening as an opening line', () => {
+    expect(fenceOpeningLines('```css\nbody {}')).toEqual(['```css']);
   });
 });

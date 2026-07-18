@@ -1,5 +1,7 @@
 import { convertLexicalToMarkdown, convertMarkdownToLexical } from '@payloadcms/richtext-lexical';
 
+import { createLinkEmbedTransform } from '@utils/lexical/link-embed';
+
 import { codeMcpSupport } from '../../../blocks/code/mcp-support';
 import { imageRowMcpSupport } from '../../../blocks/image-row/mcp-support';
 import { youtubeEmbedMcpSupport } from '../../../blocks/youtube-embed/mcp-support';
@@ -21,17 +23,23 @@ export type MarkdownCodec = {
 //     ここの convertLexicalToMarkdown が使う lexical コピーと ServerBlockNode が一致せず
 //     「multiple copies of lexical」で block 変換が throw する。詳細は
 //     src/lib/payload/editor-features/index.ts を参照。
+// write 側の順序は「呼び出し元(src/lib/mcp/tools の validateBodyMarkdown)が raw 入力を
+// validateBlockFences で検証 → toLexical が convertMarkdownToLexical → transformBlockLinkEmbeds」。
+// Markdown は前処理なしでそのまま変換に渡り(内部フェンス等の中間表現は存在しない)、
+// 公開構文 → block node の置き換えは変換後の lexical tree に対して行う
+// (markdown.test.ts が順序を固定している)。
 export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): MarkdownCodec => ({
-  toLexical: (markdown) => convertMarkdownToLexical({ editorConfig, markdown }),
+  toLexical: (markdown) => transformBlockLinkEmbeds(convertMarkdownToLexical({ editorConfig, markdown })),
   toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),
 });
 
 // MCP が Markdown ⇔ Lexical を往復できる block の registry。増えたら block 側に
 // plugin(McpBlockSupport)を書いてここに登録する。block 追加時にこのファイルに
 // 増えるのは import 1 行と blockSupports への登録 1 行だけで、分岐やロジックは
-// 増えない。fan-out 集約 — 全 plugin を毎回実行し結果を連結する(Payload 自身の
-// markdown transformer は jsx.customStartRegex で first-match dispatch 済みなので、
-// この層で二重にやる必要はない)。
+// 増えない。validate / extract / syntaxHelp は fan-out 集約 — 全 plugin を毎回実行し
+// 結果を連結する(Payload 自身の markdown transformer は jsx.customStartRegex で
+// first-match dispatch 済みなので、この層で二重にやる必要はない)。linkEmbedProvider
+// だけは first-match 合成(下の transformBlockLinkEmbeds)で、優先順 = この登録順。
 const blockSupports: readonly McpBlockSupport[] = [imageRowMcpSupport, youtubeEmbedMcpSupport, codeMcpSupport];
 
 const SUPPORTED_BLOCK_TYPES = blockSupports.map((plugin) => plugin.blockType);
@@ -62,7 +70,17 @@ const containsUnsupportedBlock = (nodes: unknown[]): boolean =>
 export const hasUnsupportedBlocks = (body: Blog['body']): boolean => containsUnsupportedBlock(body.root.children);
 
 // 登録済み全 block のフェンス形状を検証し、違反ごとの LLM 向け回復指示を連結して返す。
-export const validateBlockFences = (markdown: string): string[] => blockSupports.flatMap((plugin) => plugin.validateFences(markdown));
+// validateFences を持たない plugin(フェンス構文を公開していない block)は素通し。
+export const validateBlockFences = (markdown: string): string[] => blockSupports.flatMap((plugin) => plugin.validateFences?.(markdown) ?? []);
+
+// linkEmbedProvider を公開する plugin の provider を集め、汎用 link-embed transform
+// 1 本に合成する(provider 無しの plugin は素通し)。段落ごとの first-match の優先順は
+// blockSupports の登録順 — より具体的な URL を受ける provider が将来必要になったら
+// その plugin を先に登録すること(prefix-match-processor: broad が先だと specific を隠す)。
+// codec.toLexical の内側でのみ使うこと — 検証(validateBlockFences)は raw Markdown
+// 入力に対して先に済んでいる前提。
+const linkEmbedProviders = blockSupports.flatMap((plugin) => plugin.linkEmbedProvider ?? []);
+export const transformBlockLinkEmbeds = createLinkEmbedTransform(linkEmbedProviders);
 
 // 登録済み全 block のフェンスが参照する media id を列挙(存在チェック用)。
 export const extractBlockMediaIDs = (markdown: string): number[] => blockSupports.flatMap((plugin) => plugin.extractMediaIDs(markdown));
