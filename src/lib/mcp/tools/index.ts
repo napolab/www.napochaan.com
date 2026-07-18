@@ -21,6 +21,7 @@ import {
 import { blockSyntaxHelp, extractBlockMediaIDs, hasUnsupportedBlocks, validateBlockFences } from '../markdown';
 import { mapTextSegments, splitCodeFences } from '../markdown/code-fences';
 import { hasNonEmptyParens, isRoundTrippableAlt, parseInlineNodes, serializeImageRef, serializeInlineNodes } from '../markdown/image-ref';
+import { applyLinkNewTabPolicy } from '../markdown/link-newtab';
 import { MAX_UPLOAD_BYTES, UPLOAD_URL_TTL_SECONDS, resolveMimetypeFromFilename, signUploadURLParams } from '../upload-url';
 
 import { createRawRefHint } from './raw-ref-hints';
@@ -39,6 +40,7 @@ export type BlogToolDeps = {
   user: User;
   codec: MarkdownCodec;
   signingSecret: string;
+  siteBaseUrl: string;
 };
 
 export type ToolResult = {
@@ -73,6 +75,7 @@ const BODY_MARKDOWN_HELP = [
   'alt を書き換えて保存すると media 側の alt が更新され、その画像を使う全記事に反映される。',
   '生 URL 画像(![alt](https://...))は不可 — 先に upload_media で登録すること。サイト内 media URL は拒否時のエラーが対応する media id と置き換え先を提示する。',
   '既存の画像を使うときは list_media で id と alt を確認する。',
+  'リンクは [テキスト](URL) 形式で書く(裸の URL はリンクにならない)。外部サイトへのリンクは自動で別タブ(newTab)になり、サイト内リンクは相対 URL(/blog/... 等)で書くと同タブになる。target 指定の構文はない。',
   '',
   blockSyntaxHelp(),
   '',
@@ -459,7 +462,7 @@ const verifyThumbnailIfProvided = (verifyMediaExists: VerifyMediaExists, thumbna
 };
 
 export const createBlogToolHandlers = (deps: BlogToolDeps) => {
-  const { payload, user, codec, signingSecret } = deps;
+  const { payload, user, codec, signingSecret, siteBaseUrl } = deps;
 
   const toLexicalSafe: ToLexicalSafe = fromThrowable(
     (markdown: string) => codec.toLexical(markdown),
@@ -563,7 +566,8 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
     validateBodyMarkdown(bodyMarkdown, verifyMediaExists, findMediaByFilename)
       .andThen(() => validatePlaceholderAlts(bodyMarkdown))
       .andThen((writtenAltByID) => syncMediaAlts(writtenAltByID))
-      .andThen(() => toLexicalSafe(stripPlaceholderAlts(bodyMarkdown)));
+      .andThen(() => toLexicalSafe(stripPlaceholderAlts(bodyMarkdown)))
+      .map((body) => applyLinkNewTabPolicy(body, siteBaseUrl));
 
   const buildGetPostPayload = (doc: Blog) => {
     const bodyEditable = !hasUnsupportedBlocks(doc.body);
