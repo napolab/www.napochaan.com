@@ -1,4 +1,4 @@
-import { codeConverter } from './code';
+import { codeBlockConverters } from './code';
 import { headingConverter } from './heading';
 import { hrConverter } from './hr';
 import { imageRowBlockConverters } from './image-row';
@@ -28,9 +28,8 @@ export const jsxConverters: JSXConvertersFunction<NodeTypes> = ({ defaultConvert
   ...linkConverter,
   ...listConverter,
   ...quoteConverter,
-  ...codeConverter,
   ...tableConverter,
   ...uploadConverter,
   ...hrConverter,
-  blocks: { ...imageRowBlockConverters },
+  blocks: { ...imageRowBlockConverters, ...codeBlockConverters },
 });

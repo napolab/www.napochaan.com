@@ -17,22 +17,14 @@ const makeText = (text: string, format = 0) => ({
   version: 1,
 });
 
-// A @lexical/code `code` block node. Each source line becomes a `code-highlight`
-// child, separated by `linebreak` nodes — the shape RichText's code converter
-// folds back into the raw string Shiki re-highlights server-side.
-const makeCode = (language: string, source: string) => ({
-  type: 'code',
-  language,
+// A premade `Code` lexical block node (src/blocks/code, blockType 'Code') —
+// the raw source lives directly in fields.code and RichText's code block
+// converter re-highlights it with Shiki server-side.
+const makeCode = (language: string, code: string) => ({
+  type: 'block',
   format: '',
-  indent: 0,
-  version: 1,
-  direction: 'ltr',
-  children: source.split('\n').flatMap((line, index) => {
-    const highlight = { type: 'code-highlight', text: line, version: 1 } as const;
-    const lineBreak = { type: 'linebreak', version: 1 } as const;
-
-    return index === 0 ? [highlight] : [lineBreak, highlight];
-  }),
+  version: 2,
+  fields: { id: 'demo-code', blockType: 'Code', language, code },
 });
 
 const skylineSnippet = `// pick the leftmost column whose covered shelf is lowest

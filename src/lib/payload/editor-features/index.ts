@@ -1,5 +1,6 @@
 import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 
+import { Code } from '../../../blocks/code';
 import { ImageRow } from '../../../blocks/image-row';
 
 // FeaturesInput は package root から export されていないので lexicalEditor の
@@ -15,4 +16,7 @@ type BlogEditorFeatures = NonNullable<NonNullable<Parameters<typeof lexicalEdito
 // convertLexicalToMarkdown が使う lexical コピーと ServerBlockNode のクラスが一致せず
 // 「multiple copies of lexical」エラーで block の変換が落ちる。同じ richtext-lexical の
 // factory で組めば同一 lexical インスタンスになり整合する。
-export const blogEditorFeatures: BlogEditorFeatures = ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow] })];
+// blocks の登録順は Markdown import の優先順でもある($importMultiline は transformer を
+// 登録順に試して最初の一致を採用する)。Code(premade)の customStartRegex ```(\w+)? は
+// ```image-row 行の先頭にも部分一致するため、ImageRow を必ず Code より先に置くこと。
+export const blogEditorFeatures: BlogEditorFeatures = ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow, Code] })];

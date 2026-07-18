@@ -242,4 +242,9 @@ describe('RichText', () => {
     await page.getByRole('button', { name: 'トップの巨大タイポ' }).click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
   });
+
+  // Code block (blockType 'Code') rendering is covered in
+  // src/components/rich-text/converters/code/code.test.tsx — its converter
+  // returns an async Server Component, which react-dom's client renderer used
+  // by this browser suite cannot mount directly.
 });
