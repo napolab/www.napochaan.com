@@ -4,11 +4,11 @@ import z from 'zod';
 import { factory } from '../factory';
 
 import { fetchImage } from './fetchers';
-import { buildFetchUrl, isAllowedUrl } from './helpers';
+import { buildFetchUrl, isAllowedUrl, isGifSource, resolveOutputFormat } from './helpers';
 
 import type { FetchContext } from './fetchers';
 
-const Format = z.union([z.literal('avif'), z.literal('webp'), z.literal('jpeg'), z.literal('png')]);
+const Format = z.union([z.literal('avif'), z.literal('webp'), z.literal('jpeg'), z.literal('png'), z.literal('gif')]);
 
 const TransformOptions = z.object({
   url: z.string(),
@@ -24,7 +24,7 @@ const TransformOptions = z.object({
 
 type TransformOptionsType = z.infer<typeof TransformOptions>;
 
-const transformImage = async (images: NonNullable<Cloudflare.Env['IMAGES']>, body: ReadableStream<Uint8Array>, query: TransformOptionsType, accept: string) => {
+const transformImage = async (images: NonNullable<Cloudflare.Env['IMAGES']>, body: ReadableStream<Uint8Array>, query: TransformOptionsType, accept: string, isGif: boolean) => {
   const transform = await images
     .input(body)
     .transform({
@@ -43,10 +43,7 @@ const transformImage = async (images: NonNullable<Cloudflare.Env['IMAGES']>, bod
         return query.quality ?? query.q;
       },
       get format() {
-        if (query.format !== undefined) return `image/${query.format}` as const;
-        if (/image\/avif/.test(accept)) return 'image/avif' as const;
-        if (/image\/webp/.test(accept)) return 'image/webp' as const;
-        return 'image/jpeg' as const;
+        return resolveOutputFormat({ explicit: query.format, accept, isGif });
       },
     });
 
@@ -87,5 +84,7 @@ export const imageHandlers = factory.createHandlers(zValidator('query', Transfor
   const images = c.env.IMAGES;
   if (images === undefined) return c.json({ error: 'IMAGES binding unavailable' }, 500);
 
-  return transformImage(images, body, query, accept);
+  const isGif = isGifSource(sourceRes.headers.get('content-type'), url.pathname);
+
+  return transformImage(images, body, query, accept, isGif);
 });

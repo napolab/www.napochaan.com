@@ -20,3 +20,27 @@ export const buildFetchUrl = (url: URL, origin: string): string => {
 export const isInternalAsset = (url: URL, origin: string): boolean => {
   return url.origin === origin && !isPayloadMediaPath(url.pathname);
 };
+
+export const isGifSource = (contentType: string | null, pathname: string): boolean => {
+  if (contentType !== null && contentType.toLowerCase().startsWith('image/gif')) return true;
+  return pathname.toLowerCase().endsWith('.gif');
+};
+
+type ExplicitFormat = 'avif' | 'webp' | 'jpeg' | 'png' | 'gif';
+type OutputFormat = `image/${ExplicitFormat}`;
+
+type ResolveOutputFormatArgs = {
+  explicit: ExplicitFormat | undefined;
+  accept: string;
+  isGif: boolean;
+};
+
+// GIF は avif/jpeg に落とすとアニメーションが失われるため、アニメ保持可能な
+// webp(accept にあれば)/ gif に限定して交渉する。
+export const resolveOutputFormat = ({ explicit, accept, isGif }: ResolveOutputFormatArgs): OutputFormat => {
+  if (explicit !== undefined) return `image/${explicit}`;
+  if (isGif) return /image\/webp/.test(accept) ? 'image/webp' : 'image/gif';
+  if (/image\/avif/.test(accept)) return 'image/avif';
+  if (/image\/webp/.test(accept)) return 'image/webp';
+  return 'image/jpeg';
+};
