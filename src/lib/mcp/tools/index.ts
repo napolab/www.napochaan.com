@@ -75,7 +75,7 @@ const BODY_MARKDOWN_HELP = [
   'alt を書き換えて保存すると media 側の alt が更新され、その画像を使う全記事に反映される。',
   '生 URL 画像(![alt](https://...))は不可 — 先に upload_media で登録すること。サイト内 media URL は拒否時のエラーが対応する media id と置き換え先を提示する。',
   '既存の画像を使うときは list_media で id と alt を確認する。',
-  '外部サイトへのリンクは自動で別タブ（newTab）になる。サイト内リンクは相対 URL（/blog/... 等）で書くと同タブになる。target 指定の構文はない。',
+  'リンクは [テキスト](URL) 形式で書く(裸の URL はリンクにならない)。外部サイトへのリンクは自動で別タブ(newTab)になり、サイト内リンクは相対 URL(/blog/... 等)で書くと同タブになる。target 指定の構文はない。',
   '',
   blockSyntaxHelp(),
   '',

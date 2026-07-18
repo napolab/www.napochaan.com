@@ -36,6 +36,7 @@ Payload の markdown→lexical リンク変換器
 
 - ホスト名は完全一致比較。`stg.napochaan.com` ≠ `napochaan.com` → stg へのリンクは外部扱い（実運用でほぼ書かないので許容）。
 - 判定に使う自サイトホストは `siteBaseUrl` から `new URL().hostname` で取り出す。
+- プロトコル相対 URL（`//host/path`）は `https?://` ゲートにマッチしないため、外部ホストに解決される場合でも `newTab: false`（同タブ）になる。LLM・手書き Markdown は明示的な `https://` を書く運用のため許容（承認済みの許容）。
 
 ## 実装配置
 
