@@ -8,11 +8,12 @@ import { youtubeEmbedMcpSupport } from '../../../blocks/youtube-embed/mcp-suppor
 
 import type { McpBlockSupport } from './block-support';
 import type { SanitizedServerEditorConfig } from '@payloadcms/richtext-lexical';
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { Blog } from '@payload-types';
 
-export type MarkdownCodec = {
-  toLexical: (markdown: string) => Blog['body'];
-  toMarkdown: (data: Blog['body']) => string;
+export type MarkdownCodec<TBody extends SerializedEditorState> = {
+  toLexical: (markdown: string) => TBody;
+  toMarkdown: (data: TBody) => string;
 };
 
 // editorConfig はプロジェクトの root lexical editor 設定(BlocksFeature([ImageRow]) 込み)を
@@ -28,8 +29,8 @@ export type MarkdownCodec = {
 // Markdown は前処理なしでそのまま変換に渡り(内部フェンス等の中間表現は存在しない)、
 // 公開構文 → block node の置き換えは変換後の lexical tree に対して行う
 // (markdown.test.ts が順序を固定している)。
-export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): MarkdownCodec => ({
-  toLexical: (markdown) => transformBlockLinkEmbeds(convertMarkdownToLexical({ editorConfig, markdown })),
+export const createMarkdownCodec = <TBody extends SerializedEditorState>(editorConfig: SanitizedServerEditorConfig): MarkdownCodec<TBody> => ({
+  toLexical: (markdown) => transformBlockLinkEmbeds(convertMarkdownToLexical({ editorConfig, markdown })) as unknown as TBody,
   toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),
 });
 

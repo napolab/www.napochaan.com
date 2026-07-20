@@ -10,4 +10,5 @@ export const CACHE_TAGS = {
   gallery: 'gallery',
   logs: 'logs',
   profile: 'profile',
+  legalDocuments: 'legal-documents',
 } as const;

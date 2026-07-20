@@ -116,7 +116,7 @@ describe('transformBlockLinkEmbeds (registry provider composition)', () => {
 // convertMarkdownToLexical に渡してから transformBlockLinkEmbeds を適用する。
 describe('createMarkdownCodec.toLexical applies transformBlockLinkEmbeds after conversion', () => {
   it('hands the raw markdown unchanged to convertMarkdownToLexical', () => {
-    const codec = createMarkdownCodec({} as SanitizedServerEditorConfig);
+    const codec = createMarkdownCodec<Blog['body']>({} as SanitizedServerEditorConfig);
     const markdown = `intro\n\n${YT_URL}\n\noutro`;
     expect(codec.toLexical(markdown)).toMatchObject({ receivedMarkdown: markdown });
     expect(vi.mocked(convertMarkdownToLexical)).toHaveBeenCalledWith(expect.objectContaining({ markdown }));
@@ -124,7 +124,7 @@ describe('createMarkdownCodec.toLexical applies transformBlockLinkEmbeds after c
 
   it('transforms the converted tree (a qualifying paragraph returned by the converter becomes a block)', () => {
     vi.mocked(convertMarkdownToLexical).mockReturnValueOnce(bodyWith([YT_PARAGRAPH]) as ReturnType<typeof convertMarkdownToLexical>);
-    const codec = createMarkdownCodec({} as SanitizedServerEditorConfig);
+    const codec = createMarkdownCodec<Blog['body']>({} as SanitizedServerEditorConfig);
     expect(codec.toLexical(YT_URL).root.children).toEqual([expect.objectContaining({ type: 'block', fields: expect.objectContaining({ blockType: 'youtube-embed' }) })]);
   });
 });

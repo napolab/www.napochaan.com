@@ -1,5 +1,4 @@
 import { err as errResult, errAsync, fromPromise, fromThrowable, ok as okResult, okAsync } from 'neverthrow';
-import { ValidationError } from 'payload';
 import { z } from 'zod';
 
 import { dayjs } from '@utils/dayjs';
@@ -7,7 +6,6 @@ import { absoluteUrl } from '@utils/site-url';
 
 import {
   BodyValidationError,
-  formatPayloadValidationError,
   ImageFetchError,
   ImageURLError,
   InvalidInputError,
@@ -25,11 +23,14 @@ import { applyLinkNewTabPolicy } from '../markdown/link-newtab';
 import { MAX_UPLOAD_BYTES, UPLOAD_URL_TTL_SECONDS, resolveMimetypeFromFilename, signUploadURLParams } from '../upload-url';
 
 import { createRawRefHint } from './raw-ref-hints';
+import { requireSlugAvailable } from './shared/require-slug-available';
+import { ok, toToolError } from './shared/tool-result';
 
 import type { McpToolError } from '../errors';
 import type { MarkdownCodec } from '../markdown';
 import type { ImageNode, ImageRef, InlineNode } from '../markdown/image-ref';
 import type { MediaHit } from './raw-ref-hints';
+import type { ToolResult } from './shared/tool-result';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { Result, ResultAsync } from 'neverthrow';
 import type { Blog, User } from '@payload-types';
@@ -38,30 +39,9 @@ import type { Payload } from 'payload';
 export type BlogToolDeps = {
   payload: Payload;
   user: User;
-  codec: MarkdownCodec;
+  codec: MarkdownCodec<Blog['body']>;
   signingSecret: string;
   siteBaseUrl: string;
-};
-
-export type ToolResult = {
-  content: { type: 'text'; text: string }[];
-  isError?: boolean;
-};
-
-const ok = (value: unknown): ToolResult => ({ content: [{ type: 'text', text: JSON.stringify(value, null, 2) }] });
-const fail = (message: string): ToolResult => ({ content: [{ type: 'text', text: message }], isError: true });
-
-// エラー文言は「LLM が次の一手を自己修正できる指示」として書く(spec のエラー処理方針)。
-// .match の edge で唯一 ToolResult に折り畳む(chaining-neverthrow-results)。discriminate は
-// instanceof(modeling-errors-as-classes) — PayloadOperationError だけ cause の中身で
-// 分岐が要るので個別分岐、それ以外は自身の message がそのままユーザー向け文言。
-const toToolError = (error: McpToolError): ToolResult => {
-  if (error instanceof PayloadOperationError) {
-    if (error.cause instanceof ValidationError) return fail(formatPayloadValidationError(error.cause));
-    console.error('[mcp] tool error', error.message, error.cause);
-    return fail('内部エラーが発生しました。同一入力での再試行は避け、ユーザーに状況を報告してください。');
-  }
-  return fail(error.message);
 };
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -689,7 +669,9 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
       // thumbnail 検証を prepareBody より先に行う: prepareBody は media doc alt 更新を
       // コミットする副作用を持つため、先に body を用意すると不正な thumbnailMediaID で
       // create が失敗した際に alt 変更だけが残ってしまう(update_post と揃えた順序)。
+      // slug 重複チェックも同様に prepareBody より前 — 重複時に alt 副作用を走らせない。
       verifyMediaExistsOrFail(verifyMediaExists, input.thumbnailMediaID, `thumbnailMediaID=${input.thumbnailMediaID} の media が存在しません。upload_media で作成した id を指定してください。`)
+        .andThen(() => requireSlugAvailable(payload, 'blog', input.slug, 'update_post'))
         .andThen(() => prepareBody(input.bodyMarkdown))
         .andThen((body) =>
           fromPromise(

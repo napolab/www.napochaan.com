@@ -12,6 +12,7 @@ import { buildConfig } from 'payload';
 import { blogEditorFeatures } from './lib/payload/editor-features';
 import { Blog } from './collections/blog';
 import { Gallery } from './collections/gallery';
+import { LegalDocuments } from './collections/legal-documents';
 import { Logs } from './collections/logs';
 import { Media } from './collections/media';
 import { News } from './collections/news';
@@ -153,7 +154,7 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, News, Works, Blog, Gallery, Logs],
+  collections: [Users, Media, News, Works, Blog, Gallery, Logs, LegalDocuments],
   globals: [Profile],
   editor: lexicalEditor({ features: blogEditorFeatures }),
   secret,
