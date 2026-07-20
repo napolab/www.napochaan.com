@@ -9,6 +9,8 @@ import { registerBlogTools } from '@lib/mcp/tools';
 import { blogEditorFeatures } from '@lib/payload/editor-features';
 import { getPayloadClient } from '@lib/payload/client';
 
+import type { Blog } from '@payload-types';
+
 // Pair: worker/worker.ts の mcpAPIHandler が OAuth 検証後にこのヘッダーを付けて
 // in-process forward する。外部からの /api/mcp は Hono 層(mcp-guard, worker/app.ts。
 // 登録順序は worker/app.test.ts で回帰テスト済み)で 404 になるため、ここに届いた
@@ -55,7 +57,7 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   registerBlogTools(server, {
     payload,
     user,
-    codec: createMarkdownCodec(editorConfig),
+    codec: createMarkdownCodec<Blog['body']>(editorConfig),
     signingSecret: env.PAYLOAD_SECRET,
     siteBaseUrl: process.env.BASE_URL ?? 'http://localhost:3000',
   });

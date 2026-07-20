@@ -42,7 +42,7 @@ const blockFieldsOf = (body: Blog['body']): Record<string, unknown> | undefined 
 // id は toLexical 側で新規採番されるため除いて比較し、形式だけ確認する。
 describe('markdown codec round-trip for youtube-embed (real editorConfig)', () => {
   const roundTrip = async (fields: Record<string, unknown>) => {
-    const codec = createMarkdownCodec(await buildEditorConfig());
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
     const markdown = codec.toMarkdown(bodyWithBlock({ blockType: 'youtube-embed', id: 'seed-id', ...fields }));
     const body = codec.toLexical(markdown);
     const roundTripped = blockFieldsOf(body);
@@ -71,7 +71,7 @@ describe('markdown codec round-trip for youtube-embed (real editorConfig)', () =
   });
 
   it('keeps surrounding prose intact when the embed sits between paragraphs', async () => {
-    const codec = createMarkdownCodec(await buildEditorConfig());
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
     const body = codec.toLexical(['intro', '', URL_HTTPS, '', 'outro'].join('\n'));
     expect(body.root.children).toEqual([
       expect.objectContaining({ type: 'paragraph' }),

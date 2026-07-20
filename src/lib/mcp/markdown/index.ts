@@ -10,9 +10,9 @@ import type { McpBlockSupport } from './block-support';
 import type { SanitizedServerEditorConfig } from '@payloadcms/richtext-lexical';
 import type { Blog } from '@payload-types';
 
-export type MarkdownCodec = {
-  toLexical: (markdown: string) => Blog['body'];
-  toMarkdown: (data: Blog['body']) => string;
+export type MarkdownCodec<TBody> = {
+  toLexical: (markdown: string) => TBody;
+  toMarkdown: (data: TBody) => string;
 };
 
 // editorConfig はプロジェクトの root lexical editor 設定(BlocksFeature([ImageRow]) 込み)を
@@ -28,9 +28,9 @@ export type MarkdownCodec = {
 // Markdown は前処理なしでそのまま変換に渡り(内部フェンス等の中間表現は存在しない)、
 // 公開構文 → block node の置き換えは変換後の lexical tree に対して行う
 // (markdown.test.ts が順序を固定している)。
-export const createMarkdownCodec = (editorConfig: SanitizedServerEditorConfig): MarkdownCodec => ({
-  toLexical: (markdown) => transformBlockLinkEmbeds(convertMarkdownToLexical({ editorConfig, markdown })),
-  toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),
+export const createMarkdownCodec = <TBody>(editorConfig: SanitizedServerEditorConfig): MarkdownCodec<TBody> => ({
+  toLexical: (markdown) => transformBlockLinkEmbeds(convertMarkdownToLexical({ editorConfig, markdown })) as TBody,
+  toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data: data as never }),
 });
 
 // MCP が Markdown ⇔ Lexical を往復できる block の registry。増えたら block 側に
