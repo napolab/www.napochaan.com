@@ -70,6 +70,66 @@ const containsUnsupportedBlock = (nodes: unknown[]): boolean =>
 // 未登録 block(将来追加される block 等)を含む本文だけ true。
 export const hasUnsupportedBlocks = (body: Blog['body']): boolean => containsUnsupportedBlock(body.root.children);
 
+// ---- table round-trip guard --------------------------------------------------
+// EXPERIMENTAL_TableFeature の markdown transformer は結合セル(colSpan/rowSpan)を
+// export で捨て、セル内の | をエスケープしない。また | で開始・終了する段落テキストは
+// export した markdown が table 行として re-import される。これらを含む本文は
+// get_post → update_post の往復で黙って壊れるため、hasUnsupportedBlocks と同じ
+// bodyEditable=false 扱いにする(判定はここ、tool 側の分岐は src/lib/mcp/tools)。
+
+const TABLE_LIKE_LINE = /^\|.*\|\s*$/;
+
+const cellHasMergedSpan = (cell: Record<string, unknown>): boolean => {
+  const colSpan = typeof cell.colSpan === 'number' ? cell.colSpan : 1;
+  const rowSpan = typeof cell.rowSpan === 'number' ? cell.rowSpan : 1;
+
+  return colSpan > 1 || rowSpan > 1;
+};
+
+const textOf = (nodes: unknown[]): string =>
+  nodes
+    .map((node) => {
+      if (!isRecord(node)) return '';
+      if (typeof node.text === 'string') return node.text;
+
+      return textOf(childrenOf(node.children));
+    })
+    .join('');
+
+const containsPipeText = (nodes: unknown[]): boolean =>
+  nodes.some((node) => {
+    if (!isRecord(node)) return false;
+    if (typeof node.text === 'string' && node.text.includes('|')) return true;
+
+    return containsPipeText(childrenOf(node.children));
+  });
+
+const containsLineBreak = (nodes: unknown[]): boolean =>
+  nodes.some((node) => {
+    if (!isRecord(node)) return false;
+    if (node.type === 'linebreak') return true;
+
+    return containsLineBreak(childrenOf(node.children));
+  });
+
+// セル内改行(linebreak node / 複数ブロック)は export が literal \n にするが、
+// re-import で space に潰れる(markdown.integration.test.ts で pin 済みの lossy 挙動)。
+const cellHasLineBreaks = (cell: Record<string, unknown>): boolean => childrenOf(cell.children).length > 1 || containsLineBreak(childrenOf(cell.children));
+
+const isNonRoundTrippableCell = (cell: Record<string, unknown>): boolean => cellHasMergedSpan(cell) || containsPipeText(childrenOf(cell.children)) || cellHasLineBreaks(cell);
+
+const containsNonRoundTrippableTable = (nodes: unknown[]): boolean =>
+  nodes.some((node) => {
+    if (!isRecord(node)) return false;
+    if (node.type === 'tablecell' && isNonRoundTrippableCell(node)) return true;
+    if (node.type === 'paragraph' && TABLE_LIKE_LINE.test(textOf(childrenOf(node.children)).trim())) return true;
+
+    return containsNonRoundTrippableTable(childrenOf(node.children));
+  });
+
+// markdown 往復で情報が失われる・構造が壊れる table(または table に化ける段落)を含むか。
+export const hasNonRoundTrippableTables = (body: Blog['body']): boolean => containsNonRoundTrippableTable(body.root.children);
+
 // 登録済み全 block のフェンス形状を検証し、違反ごとの LLM 向け回復指示を連結して返す。
 // validateFences を持たない plugin(フェンス構文を公開していない block)は素通し。
 export const validateBlockFences = (markdown: string): string[] => blockSupports.flatMap((plugin) => plugin.validateFences?.(markdown) ?? []);

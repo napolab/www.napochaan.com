@@ -1,7 +1,7 @@
 import { convertMarkdownToLexical } from '@payloadcms/richtext-lexical';
 import { describe, expect, it, vi } from 'vitest';
 
-import { blockSyntaxHelp, createMarkdownCodec, extractBlockMediaIDs, hasUnsupportedBlocks, transformBlockLinkEmbeds, validateBlockFences } from '.';
+import { blockSyntaxHelp, createMarkdownCodec, extractBlockMediaIDs, hasNonRoundTrippableTables, hasUnsupportedBlocks, transformBlockLinkEmbeds, validateBlockFences } from '.';
 
 import type { SanitizedServerEditorConfig } from '@payloadcms/richtext-lexical';
 import type { Blog } from '@payload-types';
@@ -144,5 +144,77 @@ describe('blockSyntaxHelp (registry aggregation)', () => {
   it('includes each registered block fence syntax for the LLM', () => {
     expect(blockSyntaxHelp()).toContain('```image-row');
     expect(blockSyntaxHelp()).toContain('```typescript');
+  });
+});
+
+// フィクスチャ: 1 セル table。cell に colSpan/rowSpan/children/テキストを注入して境界を試す
+// (...cell を最後に spread して children も上書き可能にする)。
+const tableBody = (cell: Record<string, unknown>, text = 'a'): Blog['body'] =>
+  ({
+    root: {
+      type: 'root',
+      children: [
+        {
+          type: 'table',
+          children: [
+            {
+              type: 'tablerow',
+              children: [{ type: 'tablecell', headerState: 0, children: [{ type: 'paragraph', children: [{ type: 'text', text }] }], ...cell }],
+            },
+          ],
+        },
+      ],
+      direction: null,
+      format: '',
+      indent: 0,
+      version: 1,
+    },
+  }) as unknown as Blog['body'];
+
+const paragraphTextBody = (text: string): Blog['body'] =>
+  ({
+    root: { type: 'root', children: [{ type: 'paragraph', children: [{ type: 'text', text }] }], direction: null, format: '', indent: 0, version: 1 },
+  }) as unknown as Blog['body'];
+
+describe('hasNonRoundTrippableTables', () => {
+  it('通常の table は false', () => {
+    expect(hasNonRoundTrippableTables(tableBody({}))).toBe(false);
+  });
+
+  it('colSpan > 1 の結合セルは true', () => {
+    expect(hasNonRoundTrippableTables(tableBody({ colSpan: 2 }))).toBe(true);
+  });
+
+  it('rowSpan > 1 の結合セルは true', () => {
+    expect(hasNonRoundTrippableTables(tableBody({ rowSpan: 3 }))).toBe(true);
+  });
+
+  it('セル内テキストに | を含むと true(export がエスケープしない)', () => {
+    expect(hasNonRoundTrippableTables(tableBody({}, 'a | b'))).toBe(true);
+  });
+
+  it('セル内に linebreak node があると true(export の \\n が re-import で space に潰れる)', () => {
+    const cellChildren = [{ type: 'paragraph', children: [{ type: 'text', text: 'a' }, { type: 'linebreak' }, { type: 'text', text: 'b' }] }];
+    expect(hasNonRoundTrippableTables(tableBody({ children: cellChildren }))).toBe(true);
+  });
+
+  it('セルの子が複数段落だと true(段落間が export で \\n になり往復不能)', () => {
+    const cellChildren = [
+      { type: 'paragraph', children: [{ type: 'text', text: 'a' }] },
+      { type: 'paragraph', children: [{ type: 'text', text: 'b' }] },
+    ];
+    expect(hasNonRoundTrippableTables(tableBody({ children: cellChildren }))).toBe(true);
+  });
+
+  it('| で開始・終了する段落は true(export で table 行に化ける)', () => {
+    expect(hasNonRoundTrippableTables(paragraphTextBody('| これは表ではない |'))).toBe(true);
+  });
+
+  it('| を途中に含むだけの段落は false', () => {
+    expect(hasNonRoundTrippableTables(paragraphTextBody('a | b'))).toBe(false);
+  });
+
+  it('table を含まない本文は false', () => {
+    expect(hasNonRoundTrippableTables(paragraphTextBody('普通の本文'))).toBe(false);
   });
 });
