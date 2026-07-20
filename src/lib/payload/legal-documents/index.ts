@@ -37,3 +37,24 @@ export const findLegalDocumentBySlug = async (slug: string): Promise<LegalDocume
 
   return fetchLegalDocumentBySlug(slug);
 };
+
+// Draft パスは意図的に uncached(unstable_cache で包まない)で、draft: true により
+// _status を問わず最新 draft を返す。secret ゲート済みの preview ルート
+// (/legal/preview/{id})からのみ到達するため、公開側に draft が漏れることはない。
+export const findLegalDocumentDraftById = async (id: string): Promise<LegalDocument | undefined> => {
+  if (isBuildPhase()) return undefined;
+
+  const payload = await getPayloadClient();
+  const result = await payload.find({
+    collection: 'legal-documents',
+    where: { id: { equals: id } },
+    draft: true,
+    overrideAccess: true,
+    limit: 1,
+  });
+
+  const [doc] = result.docs;
+  if (doc === undefined) return undefined;
+
+  return doc;
+};

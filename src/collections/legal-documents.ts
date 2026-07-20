@@ -25,9 +25,9 @@ export const LegalDocuments = {
     update: ({ req: { user } }) => user !== null,
     delete: ({ req: { user } }) => user !== null,
   },
-  // autosave は付けない。法務文書は書きながら見た目を確認するものではなく、下書きで改訂を
-  // 用意して施行日に publish する運用のため、素の drafts で足りる。
-  versions: { drafts: true },
+  // Live Preview を real time 反映させるため autosave を有効化(news/works/blog と同じ)。
+  // draft edits をストリームし、preview ルートの RefreshRouteOnSave が最新 draft を再取得する。
+  versions: { drafts: { autosave: { interval: 375 } } },
   hooks: {
     afterChange: [revalidateLegalDocuments.afterChange],
     afterDelete: [revalidateLegalDocuments.afterDelete],
@@ -58,6 +58,18 @@ export const LegalDocuments = {
       label: '本文',
       type: 'richText',
       required: true,
+    },
+    {
+      // 編集中の slug から公開 URL(/legal/{slug})をサイドバーにリンク表示する UI フィールド。
+      // 販売ページに貼る URL をここからコピーできる。スキーマには載らない(type: 'ui')。
+      name: 'publicURL',
+      type: 'ui',
+      admin: {
+        position: 'sidebar',
+        components: {
+          Field: '/components/admin/legal-public-url#LegalPublicURLField',
+        },
+      },
     },
   ],
 } satisfies CollectionConfig;
