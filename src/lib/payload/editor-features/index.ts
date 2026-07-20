@@ -1,4 +1,4 @@
-import { BlocksFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
+import { BlocksFeature, EXPERIMENTAL_TableFeature, lexicalEditor } from '@payloadcms/richtext-lexical';
 
 import { Code } from '../../../blocks/code';
 import { ImageRow } from '../../../blocks/image-row';
@@ -24,4 +24,9 @@ type BlogEditorFeatures = NonNullable<NonNullable<Parameters<typeof lexicalEdito
 // マッチしない dead スタブ — 取り込みは汎用 link-embed transform
 // (src/utils/lexical/link-embed)+ src/blocks/youtube-embed/embed-provider が担う)
 // ため順序に制約はないが、editor/admin と export のために登録は必要。
-export const blogEditorFeatures: BlogEditorFeatures = ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow, YouTubeEmbed, Code] })];
+// EXPERIMENTAL_TableFeature は table nodes + TableMarkdownTransformer(GFM table 往復)を
+// 提供する。table row の regex ^\|(.+)\|\s?$ はフェンス行(```...)と非衝突のため
+// BlocksFeature との順序制約はない(markdown.integration.test.ts の共存テストで固定)。
+// vendor transformer の穴(セル内 \| / 配置指定 / 結合セル)は MCP 層で guard する
+// (src/lib/mcp/markdown/table-syntax, hasNonRoundTrippableTables)。
+export const blogEditorFeatures: BlogEditorFeatures = ({ defaultFeatures }) => [...defaultFeatures, BlocksFeature({ blocks: [ImageRow, YouTubeEmbed, Code] }), EXPERIMENTAL_TableFeature()];

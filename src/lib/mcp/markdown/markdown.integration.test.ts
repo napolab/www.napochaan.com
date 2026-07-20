@@ -80,3 +80,77 @@ describe('markdown codec round-trip for youtube-embed (real editorConfig)', () =
     ]);
   });
 });
+
+const HEADER_TABLE = ['| A | B |', '| --- | --- |', '| 1 | 2 |'].join('\n');
+
+type SerializedCellLike = { type: string; headerState: number };
+type SerializedRowLike = { type: string; children: SerializedCellLike[] };
+
+const tableRowsOf = (body: Blog['body']): SerializedRowLike[] => {
+  const [node] = body.root.children;
+  if (node === undefined || node.type !== 'table') return [];
+
+  return (node as unknown as { children: SerializedRowLike[] }).children;
+};
+
+// vendor(EXPERIMENTAL_TableFeature)の markdown transformer の挙動を実 editorConfig で
+// pin する。ソース精読からの推論でなく実行結果を固定する(markdown-fence-emission ルール)。
+describe('markdown codec round-trip for tables (real editorConfig)', () => {
+  it('imports a GFM header table into a table node with headerState=1 on the header row', async () => {
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
+    const rows = tableRowsOf(codec.toLexical(HEADER_TABLE));
+    expect(rows).toHaveLength(2);
+    expect(rows[0]?.children.map((cell) => cell.headerState)).toEqual([1, 1]);
+    expect(rows[1]?.children.map((cell) => cell.headerState)).toEqual([0, 0]);
+  });
+
+  it('exports back to the same GFM string (divider restored under the header row)', async () => {
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
+    expect(codec.toMarkdown(codec.toLexical(HEADER_TABLE)).trim()).toBe(HEADER_TABLE);
+  });
+
+  it('round-trips a header-less table without a divider line(非標準 GFM だが往復は安定)', async () => {
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
+    const md = ['| 1 | 2 |', '| 3 | 4 |'].join('\n');
+    expect(codec.toMarkdown(codec.toLexical(md)).trim()).toBe(md);
+  });
+
+  it('round-trips inline formatting inside cells', async () => {
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
+    const md = '| **bold** | plain |';
+    expect(codec.toMarkdown(codec.toLexical(md)).trim()).toBe(md);
+  });
+
+  // 実挙動: import 側は正規表現で literal "\n" を実改行に変換してから $convertFromMarkdownString
+  // に渡すが、単一改行は soft break としてスペースに畳まれ LineBreakNode は作られない。
+  // そのため export 側の \n→\\n 変換対象が残らず非可逆(brief の「round-trip する」想定は誤り
+  // だったため実行結果に合わせて修正 — markdown-fence-emission ルール: ソース精読でなく実行で pin)。
+  it('collapses a literal \\n inside a cell to a space on round-trip (vendor が単一改行を soft break として畳む — 非可逆)', async () => {
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
+    const md = '| a\\nb | c |';
+    expect(codec.toMarkdown(codec.toLexical(md)).trim()).toBe('| a b | c |');
+  });
+
+  it('連続する同列数 table の import 挙動を snapshot で pin する(vendor はマージすることがある)', async () => {
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
+    const body = codec.toLexical(['| a | b |', '', '| c | d |'].join('\n'));
+    expect(body.root.children.map((node) => node.type)).toMatchInlineSnapshot(`
+      [
+        "table",
+        "table",
+      ]
+    `);
+  });
+
+  it('table と Code fence が同一本文で共存する', async () => {
+    const codec = createMarkdownCodec<Blog['body']>(await buildEditorConfig());
+    const md = ['| A |', '| --- |', '| 1 |', '', '```typescript', 'const x = 1;', '```'].join('\n');
+    const body = codec.toLexical(md);
+    expect(body.root.children.map((node) => node.type)).toMatchInlineSnapshot(`
+      [
+        "table",
+        "block",
+      ]
+    `);
+  });
+});
