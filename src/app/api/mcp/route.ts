@@ -6,10 +6,11 @@ import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/
 
 import { createMarkdownCodec } from '@lib/mcp/markdown';
 import { registerBlogTools } from '@lib/mcp/tools';
+import { registerLegalTools } from '@lib/mcp/tools/legal';
 import { blogEditorFeatures } from '@lib/payload/editor-features';
 import { getPayloadClient } from '@lib/payload/client';
 
-import type { Blog } from '@payload-types';
+import type { Blog, LegalDocument } from '@payload-types';
 
 // Pair: worker/worker.ts の mcpAPIHandler が OAuth 検証後にこのヘッダーを付けて
 // in-process forward する。外部からの /api/mcp は Hono 層(mcp-guard, worker/app.ts。
@@ -61,6 +62,7 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
     signingSecret: env.PAYLOAD_SECRET,
     siteBaseUrl: process.env.BASE_URL ?? 'http://localhost:3000',
   });
+  registerLegalTools(server, { payload, user, codec: createMarkdownCodec<LegalDocument['body']>(editorConfig) });
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined, // stateless モード
