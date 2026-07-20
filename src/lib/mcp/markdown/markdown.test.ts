@@ -217,4 +217,39 @@ describe('hasNonRoundTrippableTables', () => {
   it('table を含まない本文は false', () => {
     expect(hasNonRoundTrippableTables(paragraphTextBody('普通の本文'))).toBe(false);
   });
+
+  it('linebreak で区切られた行の1つが table 行に見えると true(export で複数行になり、その1行が re-import で table 行になる)', () => {
+    const body = {
+      root: {
+        type: 'root',
+        children: [{ type: 'paragraph', children: [{ type: 'text', text: 'x' }, { type: 'linebreak' }, { type: 'text', text: '| a | b |' }] }],
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    } as unknown as Blog['body'];
+
+    expect(hasNonRoundTrippableTables(body)).toBe(true);
+  });
+
+  it('linebreak があっても各行が table に見えなければ false', () => {
+    const body = {
+      root: {
+        type: 'root',
+        children: [{ type: 'paragraph', children: [{ type: 'text', text: 'x' }, { type: 'linebreak' }, { type: 'text', text: 'y' }] }],
+        direction: null,
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    } as unknown as Blog['body'];
+
+    expect(hasNonRoundTrippableTables(body)).toBe(false);
+  });
+
+  it('セルの子ブロックが paragraph 以外(heading 等)だと true(export/re-import で構造が変わる)', () => {
+    const cellChildren = [{ type: 'heading', tag: 'h2', children: [{ type: 'text', text: 'x' }] }];
+    expect(hasNonRoundTrippableTables(tableBody({ children: cellChildren }))).toBe(true);
+  });
 });
