@@ -28,6 +28,7 @@ const createDeps = () => {
 describe('createLegalDocument', () => {
   it('draft として作成する', async () => {
     const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [] }); // slug 未使用
     payload.create.mockResolvedValue({ id: 3, slug: 'terms' });
 
     const handlers = createLegalToolHandlers(deps);
@@ -43,6 +44,19 @@ describe('createLegalDocument', () => {
         data: expect.objectContaining({ _status: 'draft', slug: 'terms', effectiveAt: '2026-08-01' }),
       }),
     );
+  });
+
+  it('slug が既に使われていたら回復ヒント付きで reject し、create しない', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [{ id: 1 }] }); // slug 使用済み
+
+    const handlers = createLegalToolHandlers(deps);
+    const result = await handlers.createLegalDocument({ title: '利用規約', slug: 'terms', effectiveAt: '2026-08-01', bodyMarkdown: '# 第1条' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('terms');
+    expect(result.content[0]?.text).toContain('update_legal_document');
+    expect(payload.create).not.toHaveBeenCalled();
   });
 
   it('effectiveAt が YYYY-MM-DD でなければ回復ヒント付きで reject する', async () => {

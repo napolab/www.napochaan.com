@@ -5,6 +5,7 @@ import { dayjs } from '@utils/dayjs';
 import { createValidator } from '@utils/run-validators';
 
 import { InvalidInputError, PayloadOperationError, PostNotFoundError } from '../../errors';
+import { requireSlugAvailable } from '../shared/require-slug-available';
 import { ok, toToolError } from '../shared/tool-result';
 
 import type { McpToolError } from '../../errors';
@@ -130,6 +131,8 @@ export const createLegalToolHandlers = (deps: LegalToolDeps) => {
 
     createLegalDocument: (input: { title: string; slug: string; effectiveAt: string; bodyMarkdown: string }): Promise<ToolResult> =>
       parseEffectiveAt(input.effectiveAt)
+        // create 前に slug の重複を回復ヒントで弾く(DB unique 制約の opaque エラーを避ける)。
+        .andThen(() => requireSlugAvailable(payload, 'legal-documents', input.slug, 'update_legal_document'))
         .andThen(() => toLexicalSafe(input.bodyMarkdown))
         .andThen((body) =>
           fromPromise(

@@ -23,6 +23,7 @@ import { applyLinkNewTabPolicy } from '../markdown/link-newtab';
 import { MAX_UPLOAD_BYTES, UPLOAD_URL_TTL_SECONDS, resolveMimetypeFromFilename, signUploadURLParams } from '../upload-url';
 
 import { createRawRefHint } from './raw-ref-hints';
+import { requireSlugAvailable } from './shared/require-slug-available';
 import { ok, toToolError } from './shared/tool-result';
 
 import type { McpToolError } from '../errors';
@@ -668,7 +669,9 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
       // thumbnail 検証を prepareBody より先に行う: prepareBody は media doc alt 更新を
       // コミットする副作用を持つため、先に body を用意すると不正な thumbnailMediaID で
       // create が失敗した際に alt 変更だけが残ってしまう(update_post と揃えた順序)。
+      // slug 重複チェックも同様に prepareBody より前 — 重複時に alt 副作用を走らせない。
       verifyMediaExistsOrFail(verifyMediaExists, input.thumbnailMediaID, `thumbnailMediaID=${input.thumbnailMediaID} の media が存在しません。upload_media で作成した id を指定してください。`)
+        .andThen(() => requireSlugAvailable(payload, 'blog', input.slug, 'update_post'))
         .andThen(() => prepareBody(input.bodyMarkdown))
         .andThen((body) =>
           fromPromise(

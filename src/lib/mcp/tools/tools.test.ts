@@ -28,7 +28,9 @@ const blockBody = (): Blog['body'] => ({ root: { type: 'root', children: [{ type
 
 const createDeps = () => {
   const payload = {
-    find: vi.fn(),
+    // 既定は slug 未使用(requireSlugAvailable の重複チェックが通る)。個別テストは
+    // mockMediaLookup / mockResolvedValue で上書きする。
+    find: vi.fn().mockResolvedValue({ docs: [] }),
     findByID: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
@@ -46,8 +48,10 @@ const createDeps = () => {
 type MediaFixture = { id: number; alt: string; filename?: string };
 
 const mockMediaLookup = (payload: { find: ReturnType<typeof vi.fn> }, fixtures: readonly MediaFixture[]): void => {
-  payload.find.mockImplementation((args: { where: { filename: { equals: string } } | { id: { in: number[] } } }) => {
+  payload.find.mockImplementation((args: { where: { slug: { equals: string } } | { filename: { equals: string } } | { id: { in: number[] } } }) => {
     const { where } = args;
+    // requireSlugAvailable の重複チェック。media fixtures とは無関係に「未使用」を返す。
+    if ('slug' in where) return Promise.resolve({ docs: [] });
     if ('filename' in where) {
       const hit = fixtures.find((fixture) => fixture.filename === where.filename.equals);
       return Promise.resolve({ docs: hit === undefined ? [] : [{ id: hit.id, alt: hit.alt }] });
@@ -193,6 +197,19 @@ describe('createPost', () => {
     const result = await handlers.createPost({ title: 't', slug: 's', excerpt: 'e', thumbnailMediaID: 99, bodyMarkdown: '# hi' });
 
     expect(result.isError).toBe(true);
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a duplicate slug with a recovery hint and does not create', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    payload.find.mockResolvedValue({ docs: [{ id: 1 }] }); // slug already taken
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 'taken', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: '# hi' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('taken');
+    expect(result.content[0]?.text).toContain('update_post');
     expect(payload.create).not.toHaveBeenCalled();
   });
 
