@@ -74,6 +74,7 @@ export interface Config {
     blog: Blog;
     gallery: Gallery;
     logs: Log;
+    'legal-documents': LegalDocument;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     blog: BlogSelect<false> | BlogSelect<true>;
     gallery: GallerySelect<false> | GallerySelect<true>;
     logs: LogsSelect<false> | LogsSelect<true>;
+    'legal-documents': LegalDocumentsSelect<false> | LegalDocumentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -373,6 +375,40 @@ export interface Log {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-documents".
+ */
+export interface LegalDocument {
+  id: number;
+  /**
+   * URL に使う英数字の識別子。小文字英数字とハイフンのみ（例: napochaan-v3-0-0）。
+   */
+  slug: string;
+  title: string;
+  /**
+   * この文書が効力を持つ日。公開ページの末尾に「YYYY年M月D日 施行」として表示される。
+   */
+  effectiveAt: string;
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -422,6 +458,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'logs';
         value: number | Log;
+      } | null)
+    | ({
+        relationTo: 'legal-documents';
+        value: number | LegalDocument;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -604,6 +644,19 @@ export interface LogsSelect<T extends boolean = true> {
   date?: T;
   meta?: T;
   url?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "legal-documents_select".
+ */
+export interface LegalDocumentsSelect<T extends boolean = true> {
+  slug?: T;
+  title?: T;
+  effectiveAt?: T;
+  body?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
