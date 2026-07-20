@@ -171,20 +171,45 @@ richText と挙動を揃える方を優先した。
 
 ## MCP tools
 
-`src/lib/mcp/tools/` を 3 つに分割する。
+既存の `src/lib/mcp/tools/index.ts`(928 行、blog)は**移動しない**。legal が実際に必要とする
+共有部分だけを小さな unit として切り出す。
 
 ```
 src/lib/mcp/tools/
-  blog/index.ts     ← 既存 928 行をそのまま移設(中身は変更しない)
-  legal/index.ts    ← 新規
-  shared/index.ts   ← 両者が使う payload 取得・エラー整形
+  index.ts              ← blog のまま。import 先の変更のみ
+  shared/
+    tool-result/        ok / fail / toToolError
+    body-pipeline/      prepareBody 一式(検証 → alt 同期 → lexical 変換)
+  legal/index.ts        ← 新規
 ```
 
-既存 blog の 8 tools(`list_posts` / `list_media` / `get_post` / `upload_media` /
-`create_upload_url` / `create_post` / `update_post` / `publish_post`)は**ファイル移動のみ**で
-中身を変更しない。移動と変更を混ぜると回帰の切り分けが効かなくなるため。
+当初は blog を `tools/blog/` へ移設する案だったが、調査の結果:
 
-markdown 変換パイプライン(`src/lib/mcp/markdown`)は既に collection 非依存なので丸ごと再利用する。
+- `tools/index.ts` の module-private ヘルパ約 45 個のうち、legal が使うのは 10 個程度。
+  残り(SSRF ガード、アップロード読み取り、画像 ref 書き換え)は `upload_media` /
+  `create_upload_url` 専用で legal からは触らない。
+- 928 行の移設は inline snapshot 3 箇所と相対 import 全書き換えを伴い、機能追加の PR に
+  乗せるにはリスクが見合わない。
+
+よって「必要な分だけ抽出」に変更した。`tools/` 全体の再編成が必要になったら別 PR で行う。
+
+### 共有するのは本文 Markdown パイプライン
+
+本当に共有が要るのは `prepareBody`(検証 → placeholder alt 検証 → media alt 同期 →
+strip → lexical 変換)。この処理順は load-bearing で、特に:
+
+- `create_post` は thumbnail 検証を `prepareBody` **より先に**行う。`prepareBody` は media の
+  alt 更新をコミットする副作用を持ち、ロールバックされないため。
+- `stripPlaceholderAlts` は必ず最後。Payload の import 正規表現が `![media:<id>]()` の
+  空括弧形しか受け付けないため。
+
+`MarkdownCodec` は現在 `Blog['body']` にハードコードされている
+(`src/lib/mcp/markdown/index.ts`)。body 型で generic 化する。
+
+### media tools は再利用する
+
+`list_media` / `upload_media` / `create_upload_url` は同一 `McpServer` に登録済みなので、
+legal 文書に画像を入れる場合もそのまま使える。legal 側への複製は不要。
 
 ### 新規 tools
 
