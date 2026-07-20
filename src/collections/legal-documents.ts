@@ -15,7 +15,7 @@ export const LegalDocuments = {
   slug: 'legal-documents',
   labels: { singular: '法務文書', plural: '法務文書' },
   admin: {
-    group: 'コンテンツ',
+    group: '法務',
     useAsTitle: 'title',
     defaultColumns: ['title', 'slug', 'effectiveAt', '_status'],
   },
