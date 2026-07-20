@@ -71,7 +71,8 @@ describe('createLegalDocument', () => {
 describe('getLegalDocument', () => {
   it('本文を Markdown で返し、effectiveAt は独立フィールドで返す', async () => {
     const { payload, deps } = createDeps();
-    payload.find.mockResolvedValue({ docs: [{ id: 3, slug: 'terms', title: '利用規約', effectiveAt: '2026-08-01', _status: 'published', body: paragraphBody() }] });
+    // Payload は date フィールドを ISO タイムスタンプで返す。read は YYYY-MM-DD に正規化する。
+    payload.find.mockResolvedValue({ docs: [{ id: 3, slug: 'terms', title: '利用規約', effectiveAt: '2026-08-01T00:00:00.000Z', _status: 'published', body: paragraphBody() }] });
 
     const handlers = createLegalToolHandlers(deps);
     const result = await handlers.getLegalDocument({ slug: 'terms' });
@@ -82,6 +83,18 @@ describe('getLegalDocument', () => {
     expect(parsed.effectiveAt).toBe('2026-08-01');
     // 施行日を本文に混ぜない(read → write の往復で本文に焼き付くのを防ぐ)
     expect(parsed.bodyMarkdown).not.toContain('2026-08-01');
+  });
+
+  it('effectiveAt を UTC ではなく JST の暦日に正規化する', async () => {
+    const { payload, deps } = createDeps();
+    // UTC 2026-07-31T15:00:00Z = JST 2026-08-01。UTC 切りだと 07-31 になり write で弾かれる。
+    payload.find.mockResolvedValue({ docs: [{ id: 3, slug: 'terms', title: '利用規約', effectiveAt: '2026-07-31T15:00:00.000Z', _status: 'published', body: paragraphBody() }] });
+
+    const handlers = createLegalToolHandlers(deps);
+    const result = await handlers.getLegalDocument({ slug: 'terms' });
+
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { effectiveAt: string };
+    expect(parsed.effectiveAt).toBe('2026-08-01');
   });
 
   it('id も slug も無ければ回復ヒントを返す', async () => {
@@ -141,7 +154,8 @@ describe('updateLegalDocument', () => {
 describe('listLegalDocuments', () => {
   it('slug / title / effectiveAt / status を返す', async () => {
     const { payload, deps } = createDeps();
-    payload.find.mockResolvedValue({ docs: [{ id: 3, slug: 'terms', title: '利用規約', effectiveAt: '2026-08-01', _status: 'published' }] });
+    // Payload の ISO タイムスタンプが YYYY-MM-DD に正規化されて返ることを確認する。
+    payload.find.mockResolvedValue({ docs: [{ id: 3, slug: 'terms', title: '利用規約', effectiveAt: '2026-08-01T00:00:00.000Z', _status: 'published' }] });
 
     const handlers = createLegalToolHandlers(deps);
     const result = await handlers.listLegalDocuments();

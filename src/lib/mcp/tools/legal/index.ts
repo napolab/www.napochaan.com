@@ -50,7 +50,11 @@ const toSummary = (doc: LegalDocument) => ({
   id: doc.id,
   slug: doc.slug,
   title: doc.title,
-  effectiveAt: doc.effectiveAt,
+  // Payload の date フィールドは ISO タイムスタンプ("2026-08-01T00:00:00.000Z")で返る。
+  // read は write が受け付ける正準形(YYYY-MM-DD)に正規化して返す — でないと get → update の
+  // 往復で effectiveAt を素直に渡し戻すと parseEffectiveAt の DAY_PATTERN に弾かれる
+  // (read-normalize / write-strict、.claude/rules/mcp-write-strict.md)。JST 暦日で切る。
+  effectiveAt: dayjs(doc.effectiveAt).tz('Asia/Tokyo').format('YYYY-MM-DD'),
   status: doc._status ?? 'draft',
 });
 
