@@ -1,7 +1,8 @@
-import { errAsync, fromPromise, okAsync } from 'neverthrow';
+import { err as errResult, errAsync, fromPromise, ok as okResult, okAsync } from 'neverthrow';
 import { z } from 'zod';
 
 import { dayjs } from '@utils/dayjs';
+import { createValidator } from '@utils/run-validators';
 
 import { InvalidInputError, PayloadOperationError, PostNotFoundError } from '../../errors';
 import { ok, toToolError } from '../shared/tool-result';
@@ -9,6 +10,7 @@ import { ok, toToolError } from '../shared/tool-result';
 import type { McpToolError } from '../../errors';
 import type { MarkdownCodec } from '../../markdown';
 import type { ToolResult } from '../shared/tool-result';
+import type { Validator } from '@utils/run-validators';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { LegalDocument, User } from '@payload-types';
 import type { ResultAsync } from 'neverthrow';
@@ -27,24 +29,27 @@ const BODY_MARKDOWN_HELP =
   '法務文書の本文を Markdown で書く。見出し・箇条書き・リンクが使える。画像を入れる場合は upload_media で登録し、返された ![media:<id>](alt) 参照をそのまま貼ること(生 URL は不可)。';
 
 // write path は strict。変換せず reject し、LLM が 1 回のリトライで自己修正できるヒントを返す
-// (.claude/rules/mcp-write-strict.md)。
-//
-// 検証は 2 段:
-//   1. 形式 — YYYY-MM-DD かどうか
-//   2. 実在 — 2026-02-30 のような「形式は合うが存在しない日付」を弾く。dayjs の strict parse
-//      (customParseFormat) は、存在しない日付(2/30 等)をロールオーバーせず invalid として
-//      検出する(.claude/rules/dayjs-timezone.md 準拠、dayjs は @utils/dayjs 経由)。
-const parseEffectiveAt = (value: string): ResultAsync<string, McpToolError> => {
-  if (!DAY_PATTERN.test(value)) {
-    return errAsync(new InvalidInputError(`effectiveAt は YYYY-MM-DD 形式で指定してください。受け取った値: "${value}"`));
-  }
+// (.claude/rules/mcp-write-strict.md)。逐次バリデーションを @utils/run-validators の
+// sequence plugin に落とし込む(小関数合成、validator-composition-style.md の系譜)。
 
-  if (!dayjs(value, 'YYYY-MM-DD', true).isValid()) {
-    return errAsync(new InvalidInputError(`effectiveAt が存在しない日付です。受け取った値: "${value}"`));
-  }
-
-  return okAsync(value);
+// 1. 形式 — YYYY-MM-DD かどうか。
+const requireDayFormat: Validator<string, McpToolError> = {
+  run: (value) => (DAY_PATTERN.test(value) ? okResult(value) : errResult(new InvalidInputError(`effectiveAt は YYYY-MM-DD 形式で指定してください。受け取った値: "${value}"`))),
 };
+
+// 2. 実在 — 2026-02-30 のような「形式は合うが存在しない日付」を弾く。dayjs の strict parse
+//    (customParseFormat)は存在しない日付(2/30 等)をロールオーバーせず invalid として
+//    検出する(.claude/rules/dayjs-timezone.md 準拠、dayjs は @utils/dayjs 経由)。
+const requireRealDay: Validator<string, McpToolError> = {
+  run: (value) => (dayjs(value, 'YYYY-MM-DD', true).isValid() ? okResult(value) : errResult(new InvalidInputError(`effectiveAt が存在しない日付です。受け取った値: "${value}"`))),
+};
+
+// validators を固定した具体 validator。sync な Result を返す。
+const validateEffectiveAt = createValidator([requireDayFormat, requireRealDay]);
+
+// 既存の call site が ResultAsync チェーンなので、sync な validator 合成を async に持ち上げる
+// (okAsync の恒等 andThen で err 型も McpToolError に合流する)。
+const parseEffectiveAt = (value: string): ResultAsync<string, McpToolError> => validateEffectiveAt(value).asyncAndThen((valid) => okAsync(valid));
 
 const toSummary = (doc: LegalDocument) => ({
   id: doc.id,
