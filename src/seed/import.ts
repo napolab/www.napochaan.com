@@ -7,11 +7,11 @@ import payload from 'payload';
 
 import { applyResolvedMedia, collectUploadSentinels } from './resolve-body-media';
 
-import type { Blog, Log, News, Work } from '@payload-types';
+import type { Blog, LegalDocument, Log, News, Work } from '@payload-types';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { Payload, SanitizedConfig } from 'payload';
 
-type UpsertCollection = 'news' | 'works' | 'blog';
+type UpsertCollection = 'news' | 'works' | 'blog' | 'legal-documents';
 
 // Reads src/seed/data/*.json (produced by `seed:export`, or hand-edited) and
 // upserts every collection + the profile global. Idempotent: re-running must not
@@ -200,6 +200,20 @@ export const importBlog = async (instance: Payload): Promise<void> => {
   instance.logger.info(`[seed:import] upserted ${records.length} blog`);
 };
 
+type LegalDocumentRecord = Omit<LegalDocument, 'id' | 'createdAt' | 'updatedAt'>;
+
+// body の upload sentinel → media id 解決を fake Payload で end-to-end に検証できるよう export する
+// (importBlog / importWorks と同じ理由)。thumbnail は持たないので body の解決だけ。
+export const importLegalDocuments = async (instance: Payload): Promise<void> => {
+  const records = await readData<LegalDocumentRecord>('legal-documents');
+  for (const record of records) {
+    const body = await resolveBodyMedia(instance, record.body);
+    const data = { ...record, body };
+    await upsertBySlug(instance, 'legal-documents', record.slug, data);
+  }
+  instance.logger.info(`[seed:import] upserted ${records.length} legal-documents`);
+};
+
 // Logs: title is not a unique key — recurring events (e.g. a series at the same
 // venue) legitimately repeat the same title across different dates, so a
 // title-keyed upsert would collapse them. Mirror the gallery strategy: delete-all
@@ -257,6 +271,7 @@ export const importContent = async (instance: Payload): Promise<void> => {
   await importNews(instance);
   await importWorks(instance);
   await importBlog(instance);
+  await importLegalDocuments(instance);
   await importLogs(instance);
   await importGallery(instance);
   await importProfile(instance);

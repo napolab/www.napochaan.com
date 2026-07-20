@@ -11,7 +11,7 @@ import { r2Bucket } from '../payload.config';
 import { saveMediaFile } from './save-media-file';
 import { applyBodySentinels, collectBodyMedia } from './sentinelize-body-media';
 
-import type { Blog, Gallery, Media, Work } from '@payload-types';
+import type { Blog, Gallery, LegalDocument, Media, Work } from '@payload-types';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { Payload, SanitizedConfig } from 'payload';
 
@@ -24,6 +24,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const dataDir = path.resolve(dirname, 'data');
 const assetsDir = path.resolve(dirname, 'assets');
 const blogAssetsDir = path.resolve(assetsDir, 'blog');
+const legalAssetsDir = path.resolve(assetsDir, 'legal');
 
 // Keys Payload manages for us — never hand-edited, regenerated on import.
 // `globalType` is injected by findGlobal and rejected by updateGlobal on the way back.
@@ -176,6 +177,23 @@ const exportBlog = async (instance: Payload): Promise<void> => {
   await writeJson(instance, 'blog', docs.map(toBlogRecord));
 };
 
+// thumbnail を持たないので body の sentinel 化と system key の除去だけ。effectiveAt は
+// 暦日フィールドなので ISO タイムスタンプではなく YYYY-MM-DD に落とす。
+const toLegalDocumentRecord = (doc: LegalDocument): Record<string, unknown> => sentinelizeBodyField(formatDayField(stripSystemKeys(doc), 'effectiveAt'));
+
+const exportLegalDocuments = async (instance: Payload): Promise<void> => {
+  const { docs } = await instance.find({ collection: 'legal-documents', depth: 1, limit: 0, sort: 'slug', overrideAccess: true });
+  for (const doc of docs) {
+    // 本文の media バイナリを先に保存してから toLegalDocumentRecord で sentinel 化する
+    // (sentinel 化後は filename が取れない)。
+    if (!isEditorState(doc.body)) continue;
+    for (const media of collectBodyMedia(asEditorState(doc.body))) {
+      await saveMediaFile(media, legalAssetsDir, r2Bucket, instance.logger);
+    }
+  }
+  await writeJson(instance, 'legal-documents', docs.map(toLegalDocumentRecord));
+};
+
 const exportProfile = async (instance: Payload): Promise<void> => {
   const profile = await instance.findGlobal({ slug: 'profile', depth: 1, overrideAccess: true });
   const record = stripArrayRowIds(stripSystemKeys(profile));
@@ -190,9 +208,11 @@ export const script = async (config: SanitizedConfig): Promise<void> => {
   await mkdir(dataDir, { recursive: true });
   await mkdir(assetsDir, { recursive: true });
   await mkdir(blogAssetsDir, { recursive: true });
+  await mkdir(legalAssetsDir, { recursive: true });
   await exportWorks(payload);
   await exportSimple(payload, 'news', 'publishedAt');
   await exportBlog(payload);
+  await exportLegalDocuments(payload);
   await exportSimple(payload, 'logs', 'date');
   await exportGallery(payload);
   await exportProfile(payload);

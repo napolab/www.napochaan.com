@@ -3,7 +3,7 @@ import { readdir, readFile } from 'node:fs/promises';
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ensureAdminUser, ensureMediaBytes, importBlog, importContent, importSeedData, importWorks } from './import';
+import { ensureAdminUser, ensureMediaBytes, importBlog, importContent, importLegalDocuments, importSeedData, importWorks } from './import';
 import { r2Bucket } from '../payload.config';
 
 import { richTextFromBlocks } from '@utils/sample-rich-text';
@@ -211,6 +211,43 @@ describe('importWorks — body image media resolution', () => {
     await importWorks(payload);
 
     expect(writes.some((call) => call.collection === 'works')).toBe(true);
+  });
+});
+
+describe('importLegalDocuments — body image media resolution', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('body の upload sentinel を media id に解決してから upsert する', async () => {
+    const body = richTextFromBlocks([
+      { type: 'p', text: 'intro' },
+      { type: 'img', file: 'tos-diagram.png', alt: 'diagram' },
+    ]);
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: '利用規約', slug: 'terms', effectiveAt: '2026-08-01', body }]));
+    direntsOnce([asDirent('tos-diagram.png')]);
+
+    const { payload, writes } = makeMediaFakePayload();
+    await importLegalDocuments(payload);
+
+    expect(writes.some((call) => call.collection === 'media')).toBe(true);
+    const write = writes.find((call) => call.collection === 'legal-documents');
+    expect(uploadValuesOf(write?.data)).toEqual([101]);
+  });
+
+  it('asset が見つからない upload ノードは落とす', async () => {
+    const body = richTextFromBlocks([
+      { type: 'p', text: 'intro' },
+      { type: 'img', file: 'missing.png', alt: 'gone' },
+    ]);
+    vi.mocked(readFile).mockResolvedValueOnce(JSON.stringify([{ title: '利用規約', slug: 'terms', effectiveAt: '2026-08-01', body }]));
+    direntsOnce([]);
+
+    const { payload, writes } = makeMediaFakePayload();
+    await importLegalDocuments(payload);
+
+    const write = writes.find((call) => call.collection === 'legal-documents');
+    expect(uploadValuesOf(write?.data)).toEqual([]);
   });
 });
 
