@@ -42,6 +42,11 @@ describe('LegalDocumentView', () => {
     await expect.element(page.getByText('2026年8月1日 施行')).toHaveAttribute('datetime', '2026-08-01');
   });
 
+  it('UTC タイムスタンプ入力でも表示テキストと datetime を同じ JST 暦日に揃える', async () => {
+    await render(<LegalDocumentView title="ソフトウェア利用規約" effectiveAt="2026-07-31T15:00:00.000Z" body={body} />);
+    await expect.element(page.getByText('2026年8月1日 施行')).toHaveAttribute('datetime', '2026-08-01');
+  });
+
   it('パンくずを 2 階層で描画する(中間の legal クラムを置かない)', async () => {
     await render(<LegalDocumentView title="ソフトウェア利用規約" effectiveAt="2026-08-01" body={body} />);
     await expect.element(page.getByRole('navigation', { name: 'パンくず' })).toBeInTheDocument();

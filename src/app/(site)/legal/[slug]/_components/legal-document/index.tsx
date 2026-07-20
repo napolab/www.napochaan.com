@@ -2,6 +2,7 @@ import * as s from './styles.css';
 
 import { PageHeader } from '@components/page-header';
 import { RichText } from '@components/rich-text';
+import { dayjs } from '@utils/dayjs';
 import { formatJapaneseDate } from '@utils/format-japanese-date';
 
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
@@ -19,8 +20,10 @@ const buildCrumbs = (title: string) => [{ href: '/', label: 'home' }, { label: t
 
 export const LegalDocumentView = ({ title, effectiveAt, body }: Props) => {
   const crumbs = buildCrumbs(title);
-  // Payload の date フィールドは ISO タイムスタンプで返る。datetime 属性は暦日だけを載せる。
-  const isoDay = effectiveAt.slice(0, 10);
+  // Payload の date フィールドは UTC インスタントで返る。datetime 属性は表示テキスト
+  // (formatJapaneseDate、同じく Asia/Tokyo 変換)と同じ JST 暦日にする — 素の UTC スライスだと
+  // 1 日ズレる(dayjs-timezone.md)。
+  const isoDay = dayjs(effectiveAt).tz('Asia/Tokyo').format('YYYY-MM-DD');
 
   return (
     <>

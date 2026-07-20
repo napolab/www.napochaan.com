@@ -7,7 +7,7 @@ import type { CollectionConfig } from 'payload';
 
 // ソフトウェア販売に伴う利用規約・免責事項。外部の販売ページから直リンクされる前提で、
 // 安定した公開 URL `/legal/{slug}` を持つ。CACHE_TAGS.legalDocuments を落とすとローダーの
-// キャッシュが、revalidatePath が path 固定の ISR HTML が飛ぶ。
+// キャッシュが飛び、revalidatePath が path 固定の ISR HTML を飛ばす。
 // 一覧ページは持たないので静的 path の配列は空。
 const revalidateLegalDocuments = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.legalDocuments], [], (slug) => `/legal/${slug}`);
 
