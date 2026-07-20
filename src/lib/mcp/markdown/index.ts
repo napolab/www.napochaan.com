@@ -8,9 +8,10 @@ import { youtubeEmbedMcpSupport } from '../../../blocks/youtube-embed/mcp-suppor
 
 import type { McpBlockSupport } from './block-support';
 import type { SanitizedServerEditorConfig } from '@payloadcms/richtext-lexical';
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 import type { Blog } from '@payload-types';
 
-export type MarkdownCodec<TBody> = {
+export type MarkdownCodec<TBody extends SerializedEditorState> = {
   toLexical: (markdown: string) => TBody;
   toMarkdown: (data: TBody) => string;
 };
@@ -28,9 +29,9 @@ export type MarkdownCodec<TBody> = {
 // Markdown は前処理なしでそのまま変換に渡り(内部フェンス等の中間表現は存在しない)、
 // 公開構文 → block node の置き換えは変換後の lexical tree に対して行う
 // (markdown.test.ts が順序を固定している)。
-export const createMarkdownCodec = <TBody>(editorConfig: SanitizedServerEditorConfig): MarkdownCodec<TBody> => ({
-  toLexical: (markdown) => transformBlockLinkEmbeds(convertMarkdownToLexical({ editorConfig, markdown })) as TBody,
-  toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data: data as never }),
+export const createMarkdownCodec = <TBody extends SerializedEditorState>(editorConfig: SanitizedServerEditorConfig): MarkdownCodec<TBody> => ({
+  toLexical: (markdown) => transformBlockLinkEmbeds(convertMarkdownToLexical({ editorConfig, markdown })) as unknown as TBody,
+  toMarkdown: (data) => convertLexicalToMarkdown({ editorConfig, data }),
 });
 
 // MCP が Markdown ⇔ Lexical を往復できる block の registry。増えたら block 側に
