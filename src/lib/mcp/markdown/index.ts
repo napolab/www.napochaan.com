@@ -70,6 +70,84 @@ const containsUnsupportedBlock = (nodes: unknown[]): boolean =>
 // 未登録 block(将来追加される block 等)を含む本文だけ true。
 export const hasUnsupportedBlocks = (body: Blog['body']): boolean => containsUnsupportedBlock(body.root.children);
 
+// ---- table round-trip guard --------------------------------------------------
+// EXPERIMENTAL_TableFeature の markdown transformer は結合セル(colSpan/rowSpan)を
+// export で捨て、セル内の | をエスケープしない。また | で開始・終了する段落テキストは
+// export した markdown が table 行として re-import される(linebreak で複数行に
+// 分かれる段落は、その行単位で判定する必要がある)。加えて table セルの子ブロックが
+// paragraph 以外(heading 等)だと export で `| ## x |` のような行に潰れ、re-import では
+// 通常の段落にダウングレードされる。これらを含む本文は get_post → update_post の
+// 往復で黙って壊れるため、hasUnsupportedBlocks と同じ bodyEditable=false 扱いにする
+// (判定はここ、tool 側の分岐は src/lib/mcp/tools)。
+
+const TABLE_LIKE_LINE = /^\|.*\|\s*$/;
+
+const cellHasMergedSpan = (cell: Record<string, unknown>): boolean => {
+  const colSpan = typeof cell.colSpan === 'number' ? cell.colSpan : 1;
+  const rowSpan = typeof cell.rowSpan === 'number' ? cell.rowSpan : 1;
+
+  return colSpan > 1 || rowSpan > 1;
+};
+
+// linebreak node は '\n' として出す。export が実際に改行するため、
+// TABLE_LIKE_LINE の判定は行単位で行う必要がある(paragraphLinesOf 参照)。
+const textOf = (nodes: unknown[]): string =>
+  nodes
+    .map((node) => {
+      if (!isRecord(node)) return '';
+      if (node.type === 'linebreak') return '\n';
+      if (typeof node.text === 'string') return node.text;
+
+      return textOf(childrenOf(node.children));
+    })
+    .join('');
+
+// 段落の inline children を linebreak で分割した各行のテキストを返す。
+const paragraphLinesOf = (nodes: unknown[]): string[] => textOf(nodes).split('\n');
+
+const containsPipeText = (nodes: unknown[]): boolean =>
+  nodes.some((node) => {
+    if (!isRecord(node)) return false;
+    if (typeof node.text === 'string' && node.text.includes('|')) return true;
+
+    return containsPipeText(childrenOf(node.children));
+  });
+
+const containsLineBreak = (nodes: unknown[]): boolean =>
+  nodes.some((node) => {
+    if (!isRecord(node)) return false;
+    if (node.type === 'linebreak') return true;
+
+    return containsLineBreak(childrenOf(node.children));
+  });
+
+// セル内改行(linebreak node / 複数ブロック)は export が literal \n にするが、
+// re-import で space に潰れる(markdown.integration.test.ts で pin 済みの lossy 挙動)。
+const cellHasLineBreaks = (cell: Record<string, unknown>): boolean => childrenOf(cell.children).length > 1 || containsLineBreak(childrenOf(cell.children));
+
+// セルの直下ブロックが paragraph 以外(heading 等)だと export で `| ## x |` のような
+// 1行に潰れ、re-import では通常の(パディングされた)段落にダウングレードされる。
+const cellHasNonParagraphChild = (cell: Record<string, unknown>): boolean => childrenOf(cell.children).some((child) => isRecord(child) && child.type !== 'paragraph');
+
+const isNonRoundTrippableCell = (cell: Record<string, unknown>): boolean =>
+  cellHasMergedSpan(cell) || containsPipeText(childrenOf(cell.children)) || cellHasLineBreaks(cell) || cellHasNonParagraphChild(cell);
+
+// 段落は linebreak で複数行に export される。そのうち1行でも table 行の形をしていれば、
+// re-import 時にその行だけ table 行として取り込まれてしまう。
+const paragraphHasTableLikeLine = (node: Record<string, unknown>): boolean => paragraphLinesOf(childrenOf(node.children)).some((line) => TABLE_LIKE_LINE.test(line.trim()));
+
+const containsNonRoundTrippableTable = (nodes: unknown[]): boolean =>
+  nodes.some((node) => {
+    if (!isRecord(node)) return false;
+    if (node.type === 'tablecell' && isNonRoundTrippableCell(node)) return true;
+    if (node.type === 'paragraph' && paragraphHasTableLikeLine(node)) return true;
+
+    return containsNonRoundTrippableTable(childrenOf(node.children));
+  });
+
+// markdown 往復で情報が失われる・構造が壊れる table(または table に化ける段落)を含むか。
+export const hasNonRoundTrippableTables = (body: Blog['body']): boolean => containsNonRoundTrippableTable(body.root.children);
+
 // 登録済み全 block のフェンス形状を検証し、違反ごとの LLM 向け回復指示を連結して返す。
 // validateFences を持たない plugin(フェンス構文を公開していない block)は素通し。
 export const validateBlockFences = (markdown: string): string[] => blockSupports.flatMap((plugin) => plugin.validateFences?.(markdown) ?? []);

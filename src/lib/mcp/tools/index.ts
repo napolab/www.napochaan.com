@@ -16,10 +16,11 @@ import {
   UnsupportedBlockError,
   UploadTooLargeError,
 } from '../errors';
-import { blockSyntaxHelp, extractBlockMediaIDs, hasUnsupportedBlocks, validateBlockFences } from '../markdown';
+import { blockSyntaxHelp, extractBlockMediaIDs, hasNonRoundTrippableTables, hasUnsupportedBlocks, validateBlockFences } from '../markdown';
 import { mapTextSegments, splitCodeFences } from '../markdown/code-fences';
 import { hasNonEmptyParens, isRoundTrippableAlt, parseInlineNodes, serializeImageRef, serializeInlineNodes } from '../markdown/image-ref';
 import { applyLinkNewTabPolicy } from '../markdown/link-newtab';
+import { tableSyntaxHelp, validateTableSyntax } from '../markdown/table-syntax';
 import { MAX_UPLOAD_BYTES, UPLOAD_URL_TTL_SECONDS, resolveMimetypeFromFilename, signUploadURLParams } from '../upload-url';
 
 import { createRawRefHint } from './raw-ref-hints';
@@ -58,6 +59,7 @@ const BODY_MARKDOWN_HELP = [
   'リンクは [テキスト](URL) 形式で書く(裸の URL はリンクにならない)。外部サイトへのリンクは自動で別タブ(newTab)になり、サイト内リンクは相対 URL(/blog/... 等)で書くと同タブになる。target 指定の構文はない。',
   '',
   blockSyntaxHelp(),
+  tableSyntaxHelp,
   '',
   'なお image-row フェンス内セルの括弧は caption であり alt ではない(セルの alt は media 側の alt が使われる)。',
 ].join('\n');
@@ -360,6 +362,9 @@ const validateBodyMarkdown = (bodyMarkdown: string, verifyMediaExists: VerifyMed
   const [firstFenceError] = validateBlockFences(bodyMarkdown);
   if (firstFenceError !== undefined) return errAsync(new BodyValidationError(firstFenceError));
 
+  const [firstTableError] = validateTableSyntax(bodyMarkdown);
+  if (firstTableError !== undefined) return errAsync(new BodyValidationError(firstTableError));
+
   const mediaIDs = [...new Set(extractBlockMediaIDs(bodyMarkdown))];
   return verifyAllMediaExist(verifyMediaExists, mediaIDs);
 };
@@ -415,6 +420,13 @@ const resolveNextBody = (bodyMarkdown: string | undefined, current: Blog, prepar
     return errAsync(
       new UnsupportedBlockError(
         'この記事の本文には MCP 非対応の block が含まれるため、bodyMarkdown での上書きはできません(既存 block が破壊されます)。title/excerpt 等の他フィールドのみ更新するか、本文は admin UI で編集してください。',
+      ),
+    );
+  }
+  if (hasNonRoundTrippableTables(current.body)) {
+    return errAsync(
+      new UnsupportedBlockError(
+        'この記事の本文には markdown に往復できない table(結合セル、または | を含むセル/行)が含まれるため、bodyMarkdown での上書きはできません。title/excerpt 等の他フィールドのみ更新するか、本文は admin UI で編集してください。',
       ),
     );
   }
@@ -549,18 +561,24 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
       .andThen(() => toLexicalSafe(stripPlaceholderAlts(bodyMarkdown)))
       .map((body) => applyLinkNewTabPolicy(body, siteBaseUrl));
 
+  // bodyMarkdown 経由の編集を拒否すべき本文の理由文。undefined = 編集可。
+  const resolveUneditableWarning = (body: Blog['body']): string | undefined => {
+    if (hasUnsupportedBlocks(body)) return '本文に MCP 非対応の block が含まれます。bodyMarkdown での更新は不可。本文編集は admin UI で行ってください。';
+    if (hasNonRoundTrippableTables(body))
+      return '本文に markdown へ往復できない table(結合セル、または | を含むセル/行)が含まれます。bodyMarkdown での更新は不可。本文編集は admin UI で行ってください。';
+
+    return undefined;
+  };
+
   const buildGetPostPayload = (doc: Blog) => {
-    const bodyEditable = !hasUnsupportedBlocks(doc.body);
-    if (!bodyEditable) {
-      return okAsync({
-        ...toSummary(doc),
-        bodyEditable,
-        warning: '本文に MCP 非対応の block が含まれます。bodyMarkdown での更新は不可。本文編集は admin UI で行ってください。',
-      });
+    const warning = resolveUneditableWarning(doc.body);
+    if (warning !== undefined) {
+      return okAsync({ ...toSummary(doc), bodyEditable: false, warning });
     }
+
     return toMarkdownSafe(doc.body)
       .asyncAndThen(normalizeBodyMarkdown)
-      .map((bodyMarkdown) => ({ ...toSummary(doc), bodyEditable, bodyMarkdown }));
+      .map((bodyMarkdown) => ({ ...toSummary(doc), bodyEditable: true, bodyMarkdown }));
   };
 
   return {

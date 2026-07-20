@@ -131,6 +131,34 @@ describe('getLegalDocument', () => {
     expect(result.isError).toBe(true);
     expect(result.content[0]?.text).toContain('list_legal_documents');
   });
+
+  it('結合セル table を含む本文は bodyEditable: false と警告を返し、bodyMarkdown は含めない', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [{ id: 3, slug: 'terms', title: '利用規約', effectiveAt: '2026-08-01T00:00:00.000Z', _status: 'published', body: mergedCellTableBody() }] });
+
+    const handlers = createLegalToolHandlers(deps);
+    const result = await handlers.getLegalDocument({ slug: 'terms' });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyEditable: boolean; warning: string; bodyMarkdown: string | undefined };
+    expect(parsed.bodyEditable).toBe(false);
+    expect(parsed.warning).toContain('table');
+    expect(parsed.bodyMarkdown).toBeUndefined();
+    expect(codec.toMarkdown).not.toHaveBeenCalled();
+  });
+
+  it('通常の本文は bodyEditable: true と bodyMarkdown を返す', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [{ id: 3, slug: 'terms', title: '利用規約', effectiveAt: '2026-08-01T00:00:00.000Z', _status: 'published', body: paragraphBody() }] });
+
+    const handlers = createLegalToolHandlers(deps);
+    const result = await handlers.getLegalDocument({ slug: 'terms' });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyEditable: boolean; bodyMarkdown: string };
+    expect(parsed.bodyEditable).toBe(true);
+    expect(typeof parsed.bodyMarkdown).toBe('string');
+  });
 });
 
 describe('updateLegalDocument', () => {
@@ -161,6 +189,55 @@ describe('updateLegalDocument', () => {
     const result = await handlers.updateLegalDocument({ id: 999, bodyMarkdown: '# 改訂' });
 
     expect(result.isError).toBe(true);
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+});
+
+const mergedCellTableBody = () => ({
+  root: {
+    type: 'root',
+    children: [{ type: 'table', children: [{ type: 'tablerow', children: [{ type: 'tablecell', headerState: 0, colSpan: 2, children: [] }] }] }],
+    direction: null,
+    format: '',
+    indent: 0,
+    version: 1,
+  },
+});
+
+describe('legal documents with tables', () => {
+  it('createLegalDocument はセル内 \\| を回復ヒント付きで reject する', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [] }); // slug 未使用
+
+    const handlers = createLegalToolHandlers(deps);
+    const result = await handlers.createLegalDocument({ title: '利用規約', slug: 'terms', effectiveAt: '2026-08-01', bodyMarkdown: '| a \\| b | c |' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('該当行: | a \\| b | c |');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('updateLegalDocument は bodyMarkdown の table 構文違反を reject する', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 1, slug: 'terms', body: paragraphBody() });
+
+    const handlers = createLegalToolHandlers(deps);
+    const result = await handlers.updateLegalDocument({ id: 1, bodyMarkdown: ['| A |', '| :--- |'].join('\n') });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('配置指定');
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  it('updateLegalDocument は結合セル table を含む既存本文への bodyMarkdown 上書きを reject する', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 1, slug: 'terms', body: mergedCellTableBody() });
+
+    const handlers = createLegalToolHandlers(deps);
+    const result = await handlers.updateLegalDocument({ id: 1, bodyMarkdown: '# 全面改稿' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('table');
     expect(payload.update).not.toHaveBeenCalled();
   });
 });

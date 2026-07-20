@@ -1012,3 +1012,108 @@ describe('listMedia', () => {
     `);
   });
 });
+
+// 結合セル入り table 本文(hasNonRoundTrippableTables が true になる最小形)。
+const mergedCellTableBody = (): Blog['body'] =>
+  ({
+    root: {
+      type: 'root',
+      children: [{ type: 'table', children: [{ type: 'tablerow', children: [{ type: 'tablecell', headerState: 0, colSpan: 2, children: [] }] }] }],
+      direction: null,
+      format: '',
+      indent: 0,
+      version: 1,
+    },
+  }) as unknown as Blog['body'];
+
+describe('createPost with tables', () => {
+  it('accepts a plain GFM table', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 }); // thumbnail exists
+    payload.create.mockResolvedValue({ id: 10, slug: 'tbl' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 'tbl',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: ['| A | B |', '| --- | --- |', '| 1 | 2 |'].join('\n'),
+    });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.create).toHaveBeenCalled();
+  });
+
+  it('rejects a table cell containing \\| with a recovery hint quoting the line', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({ title: 't', slug: 's', excerpt: 'e', thumbnailMediaID: 5, bodyMarkdown: '| a \\| b | c |' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('該当行: | a \\| b | c |');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects an alignment divider (:---) with a recovery hint', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 5 });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.createPost({
+      title: 't',
+      slug: 's',
+      excerpt: 'e',
+      thumbnailMediaID: 5,
+      bodyMarkdown: ['| A |', '| :--- |', '| 1 |'].join('\n'),
+    });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('配置指定');
+    expect(payload.create).not.toHaveBeenCalled();
+  });
+});
+
+describe('non-round-trippable tables (bodyEditable guard)', () => {
+  it('updatePost rejects bodyMarkdown when the current body has a merged-cell table', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: mergedCellTableBody() });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.updatePost({ id: 3, bodyMarkdown: '# rewrite' });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text).toContain('table');
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  it('updatePost still updates non-body fields of such a post', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: mergedCellTableBody() });
+    payload.update.mockResolvedValue({ id: 3, slug: 's' });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.updatePost({ id: 3, title: 'new title' });
+
+    expect(result.isError).toBeUndefined();
+    const arg = payload.update.mock.calls[0]?.[0] as { data: Record<string, unknown> };
+    expect(arg.data).not.toHaveProperty('body');
+    expect(arg.data).toHaveProperty('title', 'new title');
+  });
+
+  it('getPost returns bodyEditable=false with a table warning', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, body: mergedCellTableBody() });
+
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 3 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { bodyEditable: boolean; warning?: string; bodyMarkdown?: string };
+    expect(parsed.bodyEditable).toBe(false);
+    expect(parsed.warning).toContain('table');
+    expect(parsed.bodyMarkdown).toBeUndefined();
+  });
+});
