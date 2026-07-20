@@ -4,7 +4,9 @@ import { z } from 'zod';
 import { dayjs } from '@utils/dayjs';
 import { createValidator } from '@utils/run-validators';
 
-import { InvalidInputError, PayloadOperationError, PostNotFoundError } from '../../errors';
+import { BodyValidationError, InvalidInputError, PayloadOperationError, PostNotFoundError, UnsupportedBlockError } from '../../errors';
+import { hasNonRoundTrippableTables } from '../../markdown';
+import { tableSyntaxHelp, validateTableSyntax } from '../../markdown/table-syntax';
 import { requireSlugAvailable } from '../shared/require-slug-available';
 import { ok, toToolError } from '../shared/tool-result';
 
@@ -14,7 +16,7 @@ import type { ToolResult } from '../shared/tool-result';
 import type { Validator } from '@utils/run-validators';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import type { LegalDocument, User } from '@payload-types';
-import type { ResultAsync } from 'neverthrow';
+import type { Result, ResultAsync } from 'neverthrow';
 import type { Payload } from 'payload';
 
 export type LegalToolDeps = {
@@ -26,8 +28,7 @@ export type LegalToolDeps = {
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 
-const BODY_MARKDOWN_HELP =
-  '法務文書の本文を Markdown で書く。見出し・箇条書き・リンクが使える。画像を入れる場合は upload_media で登録し、返された ![media:<id>](alt) 参照をそのまま貼ること(生 URL は不可)。';
+const BODY_MARKDOWN_HELP = `法務文書の本文を Markdown で書く。見出し・箇条書き・リンクが使える。画像を入れる場合は upload_media で登録し、返された ![media:<id>](alt) 参照をそのまま貼ること(生 URL は不可)。\n\n${tableSyntaxHelp}`;
 
 // write path は strict。変換せず reject し、LLM が 1 回のリトライで自己修正できるヒントを返す
 // (.claude/rules/mcp-write-strict.md)。逐次バリデーションを @utils/run-validators の
@@ -89,6 +90,14 @@ export const createLegalToolHandlers = (deps: LegalToolDeps) => {
     (cause) => new PayloadOperationError('Lexical → Markdown 変換に失敗しました', { cause }),
   );
 
+  // legal の write path は blog の validateBodyMarkdown(画像・フェンス検証)を通らないため、
+  // table 構文検証だけを個別に配線する(blog 側と同じ回復ヒント)。
+  const requireValidTableSyntax = (markdown: string): Result<void, McpToolError> => {
+    const [firstError] = validateTableSyntax(markdown);
+
+    return firstError === undefined ? okResult(undefined) : errResult(new BodyValidationError(firstError));
+  };
+
   const findDocument = (query: DocumentQuery): ResultAsync<LegalDocument | null, McpToolError> => {
     switch (query.kind) {
       case 'id':
@@ -111,6 +120,21 @@ export const createLegalToolHandlers = (deps: LegalToolDeps) => {
   const requireDocument = (doc: LegalDocument | null): ResultAsync<LegalDocument, McpToolError> =>
     doc === null ? errAsync(new PostNotFoundError('法務文書が見つかりません。list_legal_documents で id / slug を確認してください。')) : okAsync(doc);
 
+  // LLM が lossy な markdown を読んで編集を下書きしても update が拒否されるため、read 時点で
+  // 警告する(blog 側の resolveUneditableWarning / buildGetPostPayload と同じ形、
+  // src/lib/mcp/tools/index.ts)。
+  const buildGetLegalDocumentPayload = (doc: LegalDocument) => {
+    if (hasNonRoundTrippableTables(doc.body)) {
+      return okResult({
+        ...toSummary(doc),
+        bodyEditable: false,
+        warning: '本文に markdown へ往復できない table(結合セル、または | を含むセル/行)が含まれます。bodyMarkdown での更新は不可。本文編集は admin UI で行ってください。',
+      });
+    }
+
+    return toMarkdownSafe(doc.body).map((bodyMarkdown) => ({ ...toSummary(doc), bodyEditable: true, bodyMarkdown }));
+  };
+
   return {
     listLegalDocuments: (): Promise<ToolResult> =>
       fromPromise(
@@ -126,13 +150,14 @@ export const createLegalToolHandlers = (deps: LegalToolDeps) => {
         .andThen(requireDocument)
         // effectiveAt は本文に混ぜず独立フィールドで返す。frontmatter に埋めると
         // read → write の往復で本文の一部として書き戻される。
-        .andThen((doc) => toMarkdownSafe(doc.body).map((bodyMarkdown) => ({ ...toSummary(doc), bodyMarkdown })))
+        .andThen(buildGetLegalDocumentPayload)
         .match(ok, toToolError),
 
     createLegalDocument: (input: { title: string; slug: string; effectiveAt: string; bodyMarkdown: string }): Promise<ToolResult> =>
       parseEffectiveAt(input.effectiveAt)
         // create 前に slug の重複を回復ヒントで弾く(DB unique 制約の opaque エラーを避ける)。
         .andThen(() => requireSlugAvailable(payload, 'legal-documents', input.slug, 'update_legal_document'))
+        .andThen(() => requireValidTableSyntax(input.bodyMarkdown))
         .andThen(() => toLexicalSafe(input.bodyMarkdown))
         .andThen((body) =>
           fromPromise(
@@ -167,7 +192,23 @@ export const createLegalToolHandlers = (deps: LegalToolDeps) => {
         .andThen((doc) => (input.effectiveAt === undefined ? okAsync(doc) : parseEffectiveAt(input.effectiveAt).map(() => doc)))
         // toLexicalSafe は同期 Result なので、無変換ブランチも同期 okResult に揃える
         // (ResultAsync | Result の union を作らず、外側の async .andThen が受け取れる形に)。
-        .andThen((doc) => (input.bodyMarkdown === undefined ? okResult({ doc, body: undefined }) : toLexicalSafe(input.bodyMarkdown).map((body) => ({ doc, body }))))
+        // bodyMarkdown での上書き前に、既存本文が markdown に往復できる table か guard する
+        // (往復 guard → table 構文検証 → toLexicalSafe の順。blog 側の resolveNextBody と同じ)。
+        .andThen((doc) => {
+          const { bodyMarkdown } = input;
+          if (bodyMarkdown === undefined) return okResult({ doc, body: undefined });
+          if (hasNonRoundTrippableTables(doc.body)) {
+            return errResult(
+              new UnsupportedBlockError(
+                'この文書の本文には markdown に往復できない table(結合セル、または | を含むセル/行)が含まれるため、bodyMarkdown での上書きはできません。title/effectiveAt 等の他フィールドのみ更新するか、本文は admin UI で編集してください。',
+              ),
+            );
+          }
+
+          return requireValidTableSyntax(bodyMarkdown)
+            .andThen(() => toLexicalSafe(bodyMarkdown))
+            .map((body) => ({ doc, body }));
+        })
         .andThen(({ doc, body }) =>
           fromPromise(
             payload.update({
