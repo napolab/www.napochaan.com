@@ -1,4 +1,4 @@
-import { err as errResult, errAsync, fromPromise, ok as okResult, okAsync } from 'neverthrow';
+import { err as errResult, errAsync, fromPromise, fromThrowable, ok as okResult, okAsync } from 'neverthrow';
 import { z } from 'zod';
 
 import { dayjs } from '@utils/dayjs';
@@ -75,17 +75,18 @@ const parseDocumentQuery = (input: { id?: number; slug?: string }): ResultAsync<
 export const createLegalToolHandlers = (deps: LegalToolDeps) => {
   const { payload, user, codec } = deps;
 
-  const toLexicalSafe = (markdown: string): ResultAsync<LegalDocument['body'], McpToolError> =>
-    fromPromise(
-      Promise.resolve().then(() => codec.toLexical(markdown)),
-      (cause) => new PayloadOperationError('Markdown → Lexical 変換に失敗しました', { cause }),
-    );
+  // codec.toLexical / toMarkdown は同期関数なので、fromThrowable で同期 throw を Result に
+  // 拾う(blog 側の toLexicalSafe と同じ形)。返りは同期 Result で、async チェーンの
+  // .andThen はこれをそのまま受け付ける。
+  const toLexicalSafe = fromThrowable(
+    (markdown: string) => codec.toLexical(markdown),
+    (cause) => new PayloadOperationError('Markdown → Lexical 変換に失敗しました', { cause }),
+  );
 
-  const toMarkdownSafe = (data: LegalDocument['body']): ResultAsync<string, McpToolError> =>
-    fromPromise(
-      Promise.resolve().then(() => codec.toMarkdown(data)),
-      (cause) => new PayloadOperationError('Lexical → Markdown 変換に失敗しました', { cause }),
-    );
+  const toMarkdownSafe = fromThrowable(
+    (data: LegalDocument['body']) => codec.toMarkdown(data),
+    (cause) => new PayloadOperationError('Lexical → Markdown 変換に失敗しました', { cause }),
+  );
 
   const findDocument = (query: DocumentQuery): ResultAsync<LegalDocument | null, McpToolError> => {
     switch (query.kind) {
@@ -161,7 +162,9 @@ export const createLegalToolHandlers = (deps: LegalToolDeps) => {
         .andThen(findDocument)
         .andThen(requireDocument)
         .andThen((doc) => (input.effectiveAt === undefined ? okAsync(doc) : parseEffectiveAt(input.effectiveAt).map(() => doc)))
-        .andThen((doc) => (input.bodyMarkdown === undefined ? okAsync({ doc, body: undefined }) : toLexicalSafe(input.bodyMarkdown).map((body) => ({ doc, body }))))
+        // toLexicalSafe は同期 Result なので、無変換ブランチも同期 okResult に揃える
+        // (ResultAsync | Result の union を作らず、外側の async .andThen が受け取れる形に)。
+        .andThen((doc) => (input.bodyMarkdown === undefined ? okResult({ doc, body: undefined }) : toLexicalSafe(input.bodyMarkdown).map((body) => ({ doc, body }))))
         .andThen(({ doc, body }) =>
           fromPromise(
             payload.update({
