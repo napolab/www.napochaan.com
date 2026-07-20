@@ -139,8 +139,13 @@ export default buildConfig({
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
           buildPath: () => '/log/preview',
         }),
+        draftPreviewRoute({
+          slug: 'legal-documents',
+          previewSecret: cfEnv.PREVIEW_SECRET ?? '',
+          buildPath: (data) => `/legal/preview/${data.id}`,
+        }),
       ]),
-      collections: ['news', 'works', 'blog', 'gallery', 'logs'],
+      collections: ['news', 'works', 'blog', 'gallery', 'logs', 'legal-documents'],
     },
     get autoLogin() {
       if (process.env.NODE_ENV !== 'development') return false;

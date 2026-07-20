@@ -20,12 +20,12 @@ describe('LegalDocuments', () => {
     expect(callRead({ id: 1 })).toBe(true);
   });
 
-  it('draft を有効にしている', () => {
-    expect(LegalDocuments.versions).toEqual({ drafts: true });
+  it('draft + autosave を有効にしている(Live Preview リアルタイム反映用)', () => {
+    expect(LegalDocuments.versions).toEqual({ drafts: { autosave: { interval: 375 } } });
   });
 
-  it('slug / title / effectiveAt / body を持つ', () => {
+  it('slug / title / effectiveAt / body + 公開 URL の ui フィールドを持つ', () => {
     const names = LegalDocuments.fields.map((field) => ('name' in field ? field.name : undefined));
-    expect(names).toEqual(['slug', 'title', 'effectiveAt', 'body']);
+    expect(names).toEqual(['slug', 'title', 'effectiveAt', 'body', 'publicURL']);
   });
 });
