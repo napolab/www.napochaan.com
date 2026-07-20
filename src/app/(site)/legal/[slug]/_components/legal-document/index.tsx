@@ -25,7 +25,8 @@ export const LegalDocumentView = ({ title, effectiveAt, body }: Props) => {
   return (
     <>
       <PageHeader title={title} breadcrumbs={crumbs} titleTracking="tight" />
-      <article className={s.body}>
+      {/* The page <h1> lives in PageHeader, so this renders no heading. */}
+      <article className={s.body} aria-label="法務文書本文">
         <RichText data={body} />
         <footer className={s.footer}>
           <time className={s.effectiveAt} dateTime={isoDay}>

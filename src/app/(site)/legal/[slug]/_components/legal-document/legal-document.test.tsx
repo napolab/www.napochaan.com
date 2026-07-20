@@ -49,4 +49,9 @@ describe('LegalDocumentView', () => {
     await expect.element(page.getByText('home').first()).toBeInTheDocument();
     await expect.element(page.getByText('legal')).not.toBeInTheDocument();
   });
+
+  it('article に aria-label が付いている', async () => {
+    await render(<LegalDocumentView title="ソフトウェア利用規約" effectiveAt="2026-08-01" body={body} />);
+    await expect.element(page.getByRole('article', { name: '法務文書本文' })).toBeInTheDocument();
+  });
 });
