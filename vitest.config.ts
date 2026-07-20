@@ -74,6 +74,7 @@ export default defineConfig({
             'dayjs',
             'dayjs/plugin/utc',
             'dayjs/plugin/timezone',
+            'dayjs/plugin/customParseFormat',
             'durabcast/helpers/client',
             'hono/client',
             'reconnecting-websocket',

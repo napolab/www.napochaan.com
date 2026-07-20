@@ -1,6 +1,8 @@
 import { errAsync, fromPromise, okAsync } from 'neverthrow';
 import { z } from 'zod';
 
+import { dayjs } from '@utils/dayjs';
+
 import { InvalidInputError, PayloadOperationError, PostNotFoundError } from '../../errors';
 import { ok, toToolError } from '../shared/tool-result';
 
@@ -29,19 +31,15 @@ const BODY_MARKDOWN_HELP =
 //
 // 検証は 2 段:
 //   1. 形式 — YYYY-MM-DD かどうか
-//   2. 実在 — 2026-02-30 のような「形式は合うが存在しない日付」を弾く。JST 正午で Date を
-//      組み、Asia/Tokyo で暦日に戻して入力と一致するか見る。Date は存在しない日を翌月に
-//      繰り上げる(2/30 → 3/2)ので、往復が一致しなければ実在しない日付と判定できる。
-//      正午を使うのは、深夜だと DST や丸めで日付がズレる余地を残さないため。
-const dayFormatter = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit' });
-
+//   2. 実在 — 2026-02-30 のような「形式は合うが存在しない日付」を弾く。dayjs の strict parse
+//      (customParseFormat) は、存在しない日付(2/30 等)をロールオーバーせず invalid として
+//      検出する(.claude/rules/dayjs-timezone.md 準拠、dayjs は @utils/dayjs 経由)。
 const parseEffectiveAt = (value: string): ResultAsync<string, McpToolError> => {
   if (!DAY_PATTERN.test(value)) {
     return errAsync(new InvalidInputError(`effectiveAt は YYYY-MM-DD 形式で指定してください。受け取った値: "${value}"`));
   }
 
-  const noon = new Date(`${value}T12:00:00+09:00`);
-  if (Number.isNaN(noon.getTime()) || dayFormatter.format(noon) !== value) {
+  if (!dayjs(value, 'YYYY-MM-DD', true).isValid()) {
     return errAsync(new InvalidInputError(`effectiveAt が存在しない日付です。受け取った値: "${value}"`));
   }
 
