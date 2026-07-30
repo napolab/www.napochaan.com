@@ -5,7 +5,7 @@ import type { LogManualItem } from '../log-manual-item';
 import type { WorkRow } from '../../../works/_lib/work-row';
 
 // 集計結果の 1 日ぶん。upcoming は log ドメインの意味論（当日いっぱいまで）で、
-// 表示トーンへの変換は描画側（log-calendar-section）の責務。
+// 表示トーンへの変換は描画側（_lib/load-log-calendar）の責務。
 export type LogDateMark = {
   date: string;
   upcoming: boolean;

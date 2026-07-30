@@ -50,4 +50,18 @@ describe('Calendar', () => {
     render(<Calendar marks={marks} label="活動カレンダー" />);
     await expect.element(page.getByRole('button', { name: '前の月' })).not.toBeDisabled();
   });
+
+  it('size 省略時は compact として描画される', async () => {
+    render(<Calendar marks={marks} {...singleMonth} label="活動カレンダー" />);
+    await expect.poll(() => document.querySelectorAll('[data-size="compact"]').length).toBeGreaterThan(0);
+    expect(document.querySelectorAll('[data-size="full"]').length).toBe(0);
+  });
+
+  it('size="full" のときセルまで data-size が伝わる（単体ページ用の拡大表示）', async () => {
+    render(<Calendar marks={marks} {...singleMonth} label="活動カレンダー" size="full" />);
+    // 2026-01 は 31 日 + 前後の埋めセル。セル自身が data-size を持つことで
+    // 子孫セレクタなしに拡大スタイルを当てられる。
+    await expect.poll(() => document.querySelectorAll('td [data-size="full"]').length).toBeGreaterThan(30);
+    expect(document.querySelectorAll('[data-size="compact"]').length).toBe(0);
+  });
 });
