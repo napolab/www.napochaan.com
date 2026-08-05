@@ -18,22 +18,12 @@ export const generateMetadata = (): Metadata =>
     markdown: '/works.md',
   });
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
-
-type Props = {
-  searchParams: SearchParams;
-};
-
-const WorksPage = async ({ searchParams }: Props) => {
-  const { page: raw } = await searchParams;
-  const requested = typeof raw === 'string' ? parseInt(raw, 10) : 1;
-  const page = Number.isNaN(requested) ? 1 : Math.max(requested, 1);
-
-  return (
-    <Suspense fallback={<DecodingSkeleton fill />}>
-      <WorksListSection page={page} />
-    </Suspense>
-  );
-};
+// Fully static — no searchParams (reading them would opt the route into dynamic
+// rendering). Page 1 only; deeper pages live at `/works/page/[num]`.
+const WorksPage = () => (
+  <Suspense fallback={<DecodingSkeleton fill />}>
+    <WorksListSection page={1} />
+  </Suspense>
+);
 
 export default WorksPage;

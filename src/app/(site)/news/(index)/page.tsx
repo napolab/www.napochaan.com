@@ -7,12 +7,6 @@ import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
-
-type Props = {
-  searchParams: SearchParams;
-};
-
 const newsDescription = 'お知らせ — 制作・出演・公開のアナウンス。';
 
 export const generateMetadata = (): Metadata =>
@@ -24,16 +18,12 @@ export const generateMetadata = (): Metadata =>
     markdown: '/news.md',
   });
 
-const NewsPage = async ({ searchParams }: Props) => {
-  const { page: raw } = await searchParams;
-  const requested = typeof raw === 'string' ? parseInt(raw, 10) : 1;
-  const page = Number.isNaN(requested) ? 1 : Math.max(requested, 1);
-
-  return (
-    <Suspense fallback={<DecodingSkeleton fill />}>
-      <NewsListSection page={page} />
-    </Suspense>
-  );
-};
+// Fully static — no searchParams (reading them would opt the route into dynamic
+// rendering). Page 1 only; deeper pages live at `/news/page/[num]`.
+const NewsPage = () => (
+  <Suspense fallback={<DecodingSkeleton fill />}>
+    <NewsListSection page={1} />
+  </Suspense>
+);
 
 export default NewsPage;

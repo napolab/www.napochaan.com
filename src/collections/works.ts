@@ -10,7 +10,7 @@ import type { CollectionConfig } from 'payload';
 // the unstable_cache tags; revalidatePath('/'), ('/works'), ('/log'), and the
 // `/works/[slug]` pattern cover the path-keyed ISR HTML (the pattern busts every
 // detail page — these pages carry no time-based revalidate).
-const revalidateWorks = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.works], ['/', '/works', '/log', '/works/[slug]']);
+const revalidateWorks = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.works], ['/', '/works', '/works/page/[num]', '/log', '/works/[slug]']);
 
 export const Works = {
   slug: 'works',

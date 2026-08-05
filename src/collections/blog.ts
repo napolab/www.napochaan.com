@@ -11,7 +11,7 @@ import type { CollectionConfig } from 'payload';
 // The pattern (not a per-doc path) is required: every detail page renders prev/next
 // navigation from the full list, so a publish must bust ALL detail pages — these
 // pages carry no time-based revalidate, purge is their only refresh.
-const revalidateBlog = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.blog], ['/', '/blog', '/blog/[slug]']);
+const revalidateBlog = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.blog], ['/', '/blog', '/blog/page/[num]', '/blog/[slug]']);
 
 export const Blog = {
   slug: 'blog',

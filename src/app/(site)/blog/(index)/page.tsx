@@ -7,12 +7,6 @@ import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
-type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
-
-type Props = {
-  searchParams: SearchParams;
-};
-
 const blogDescription = '記事 — プログラミング・DJ・VJ についての覚え書き。';
 
 export const generateMetadata = (): Metadata =>
@@ -24,16 +18,12 @@ export const generateMetadata = (): Metadata =>
     markdown: '/blog.md',
   });
 
-const BlogPage = async ({ searchParams }: Props) => {
-  const { page: raw } = await searchParams;
-  const requested = typeof raw === 'string' ? parseInt(raw, 10) : 1;
-  const page = Number.isNaN(requested) ? 1 : Math.max(requested, 1);
-
-  return (
-    <Suspense fallback={<DecodingSkeleton fill />}>
-      <BlogListSection page={page} />
-    </Suspense>
-  );
-};
+// Fully static — no searchParams (reading them would opt the route into dynamic
+// rendering). Page 1 only; deeper pages live at `/blog/page/[num]`.
+const BlogPage = () => (
+  <Suspense fallback={<DecodingSkeleton fill />}>
+    <BlogListSection page={1} />
+  </Suspense>
+);
 
 export default BlogPage;

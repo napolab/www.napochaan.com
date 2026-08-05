@@ -13,7 +13,7 @@ import type { CollectionConfig } from 'payload';
 // detail page, keeping cross-doc derivations like prev/next fresh — these pages
 // carry no time-based revalidate). Drafts are skipped — only a published-state
 // change reaches the public site.
-const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news], ['/', '/news', '/news/[slug]']);
+const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news], ['/', '/news', '/news/page/[num]', '/news/[slug]']);
 
 export const News = {
   slug: 'news',

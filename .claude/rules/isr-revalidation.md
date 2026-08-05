@@ -33,16 +33,20 @@ If a new page renders external (non-CMS) data or time-dependent output (`dayjs()
 
 ## Current hook wiring (src/collections, src/globals)
 
-- `blog` → tag `blog`, paths `/`, `/blog`, `/blog/[slug]`
-- `news` → tag `news`, paths `/`, `/news`, `/news/[slug]`
-- `works` → tag `works`, paths `/`, `/works`, `/log`, `/works/[slug]`
+- `blog` → tag `blog`, paths `/`, `/blog`, `/blog/page/[num]`, `/blog/[slug]`
+- `news` → tag `news`, paths `/`, `/news`, `/news/page/[num]`, `/news/[slug]`
+- `works` → tag `works`, paths `/`, `/works`, `/works/page/[num]`, `/log`, `/works/[slug]`
 - `gallery` → tag `gallery`, paths `/`, `/gallery`
 - `logs` → tag `logs`, paths `/`, `/log`
 - `legal-documents` → tag `legal-documents`, path `/legal/[slug]`
-- `media` → tags `news`/`works`/`gallery`/`blog`, all their list + `[slug]` pattern paths
+- `media` → tags `news`/`works`/`gallery`/`blog`, all their list + `page/[num]` + `[slug]` pattern paths
 - `profile` (global) → tag `profile`, path `/about`
 
 Route handlers (`rss.xml`, `llms.txt`, `*.md`, `sitemap`) are `force-dynamic` — no path purge needed; their data freshness comes from the tag purge alone.
+
+## Pagination must be path-keyed, never query-keyed
+
+List pages paginate via `/blog/page/[num]` routes, NOT `?page=N`. Reading `searchParams` opts the whole route into dynamic rendering (SSR on every request — no static cache at all). If you add pagination or filtering to a page, model it as a path segment and add the pattern to the owning hook's path list.
 
 ## When editing a `page.tsx`
 

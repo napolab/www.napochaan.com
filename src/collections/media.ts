@@ -8,7 +8,10 @@ import type { CollectionConfig } from 'payload';
 // changed or deleted — the `[slug]` pattern paths bust the detail-page HTML too,
 // which no longer self-heals via a time-based revalidate.
 const revalidateMedia = (): void =>
-  revalidateTagsAndPaths([CACHE_TAGS.news, CACHE_TAGS.works, CACHE_TAGS.gallery, CACHE_TAGS.blog], ['/', '/news', '/news/[slug]', '/works', '/works/[slug]', '/gallery', '/blog', '/blog/[slug]']);
+  revalidateTagsAndPaths(
+    [CACHE_TAGS.news, CACHE_TAGS.works, CACHE_TAGS.gallery, CACHE_TAGS.blog],
+    ['/', '/news', '/news/page/[num]', '/news/[slug]', '/works', '/works/page/[num]', '/works/[slug]', '/gallery', '/blog', '/blog/page/[num]', '/blog/[slug]'],
+  );
 
 export const Media: CollectionConfig = {
   slug: 'media',
