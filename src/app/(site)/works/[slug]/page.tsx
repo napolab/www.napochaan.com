@@ -16,9 +16,9 @@ import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly — ISR. Detail pages are static (no searchParams), so this
-// drives the static cache for the pre-rendered sample slugs.
-export const revalidate = 3600;
+// Fully static — no time-based revalidate. The works collection's afterChange hook
+// busts the `/works/[slug]` pattern on publish/delete; otherwise the cached HTML is
+// served indefinitely.
 
 export const generateStaticParams = async () => {
   const works = await findWorksList();

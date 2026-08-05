@@ -10,11 +10,10 @@ import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly — ISR. Detail pages render on demand and are then cached;
-// the collection's afterChange hook revalidates `/news/{slug}` on every edit.
-// Draft Live Preview is served by the separate `/news/preview/{id}` route, so
-// this page never touches draftMode and stays fully static.
-export const revalidate = 3600;
+// Fully static — no time-based revalidate. Detail pages render on demand and are
+// then cached until the collection's afterChange hook busts the `/news/[slug]`
+// pattern on publish/delete. Draft Live Preview is served by the separate
+// `/news/preview/{id}` route, so this page never touches draftMode.
 
 // Build the news slugs on demand (build phase can't read Payload). `dynamicParams`
 // lets any published slug be served + cached via on-demand ISR.

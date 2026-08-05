@@ -6,8 +6,8 @@ import { DecodingSkeleton } from '@components/decoding-skeleton';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly so OpenNext serves the page via ISR.
-export const revalidate = 3600;
+// Fully static — no time-based revalidate. The gallery/media hooks bust `/gallery`
+// on every change, so the cached HTML refreshes on-demand only.
 
 export const metadata: Metadata = {
   alternates: {

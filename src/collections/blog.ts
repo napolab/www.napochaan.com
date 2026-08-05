@@ -7,8 +7,11 @@ import type { CollectionConfig } from 'payload';
 
 // Blog posts are self-authored articles (the home teaser + `/blog` + `/blog/{id}`).
 // External RSS posts are NOT part of this collection — they stay in the log feed.
-// revalidatePath('/'), ('/blog'), and the per-doc detail path bust the ISR HTML.
-const revalidateBlog = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.blog], ['/', '/blog'], (slug) => `/blog/${slug}`);
+// revalidatePath('/'), ('/blog'), and the `/blog/[slug]` pattern bust the ISR HTML.
+// The pattern (not a per-doc path) is required: every detail page renders prev/next
+// navigation from the full list, so a publish must bust ALL detail pages — these
+// pages carry no time-based revalidate, purge is their only refresh.
+const revalidateBlog = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.blog], ['/', '/blog', '/blog/[slug]']);
 
 export const Blog = {
   slug: 'blog',

@@ -5,7 +5,9 @@
 // prerendered EMPTY and pushed to the OpenNext R2 incremental cache by `deploy`.
 // CMS data only lands afterwards (seed / admin edits), and a Payload CLI seed runs
 // outside the worker so its revalidation never reaches the deployed cache. Result:
-// list pages keep serving the empty build snapshot until their 1h ISR window elapses.
+// list pages keep serving the empty build snapshot. Since the CMS pages carry NO
+// time-based revalidate (they are purge-driven only), there is no ISR window to
+// self-heal — this script is the ONLY thing that flushes the empty snapshot.
 //
 // This writes fresh revalidation rows (build-id-prefixed, matching OpenNext's
 // D1NextModeTagCache.getCacheKey = `${NEXT_BUILD_ID}/${tag}`) into the OpenNext D1

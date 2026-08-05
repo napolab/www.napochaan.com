@@ -11,7 +11,10 @@ import { DecodingSkeleton } from '@components/decoding-skeleton';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly so OpenNext serves the page via ISR.
+// Revalidate hourly — the home page CANNOT go purge-only: the log teaser renders
+// external RSS posts (outside the CMS, no hook can bust them) and flips entries
+// between upcoming/past based on the current time. The time window is what keeps
+// both fresh; CMS edits still purge instantly via the collection hooks.
 export const revalidate = 3600;
 
 const homeDescription = 'DJ・VJ・グラフィック・デジタル制作。napochaan の個人サイト。';

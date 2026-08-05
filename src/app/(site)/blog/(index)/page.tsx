@@ -7,11 +7,6 @@ import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly. NOTE: reading `searchParams` below opts this route into
-// dynamic rendering, so this `revalidate` no longer drives static ISR caching —
-// kept for parity with the other site pages.
-export const revalidate = 3600;
-
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>;
 
 type Props = {

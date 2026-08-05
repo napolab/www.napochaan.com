@@ -1,74 +1,69 @@
 ---
-description: Ensure ISR-cached pages are purged via revalidatePath alongside any revalidateTag — the path-keyed cache is unreachable by revalidateTag alone
+description: Ensure cached pages are purged via revalidatePath alongside any revalidateTag — the path-keyed cache is unreachable by revalidateTag alone, and CMS pages have no time-based self-heal
 paths:
-  - "src/app/(site)/page.tsx"
+  - "src/app/(site)/**/page.tsx"
   - "src/app/(site)/layout.tsx"
   - "src/collections/**/*.ts"
   - "src/utils/cache/**/*.ts"
   - "src/utils/payload/**/*.ts"
 ---
 
-The home route (`src/app/(site)/page.tsx`) is ISR-cached via `export const revalidate = 3600`. The rendered HTML lives in a **path-keyed** cache that `revalidateTag` does **not** reach — `revalidateTag` only purges `unstable_cache` entries (the data layer).
+# Caching & Revalidation Strategy
 
-When a collection's data flows into an ISR page, its `afterChange` / `afterDelete` hooks must call **both**:
+CMS-sourced pages are **purge-driven, not time-driven**: they carry NO `export const revalidate` and are cached indefinitely until a Payload hook busts them. The rendered HTML lives in a **path-keyed** cache that `revalidateTag` does **not** reach — `revalidateTag` only purges `unstable_cache` entries (the data layer). So when a collection's data flows into a cached page, its `afterChange` / `afterDelete` hooks must call **both**:
 
-- `revalidateTag(<tag>)` — if the data is wrapped in `unstable_cache` with that tag
-- `revalidatePath(<path>)` — for every ISR-cached page that renders the data
+- `revalidateTag(<tag>)` — for the `unstable_cache` reads tagged with it
+- `revalidatePath(<path>)` — for every cached page that renders the data
 
-Without both, CMS edits surface on the site only after the page's `revalidate` window elapses (up to 1 h).
+Because there is no time window anymore, **a missing path in a hook means the page is stale forever**, not "stale up to 1 h". Hook path coverage is load-bearing.
 
-## Current wiring
+## Detail pages: purge the `[slug]` pattern, not the single slug
 
-- **Uses `unstable_cache`** (`how-to-connect`, `media`) → `revalidateTag(HOW_TO_CONNECT_TAG)` + `revalidatePath('/')`
-- **Rendered directly** (`events`, `performers`) → `revalidatePath('/')` only (`performers` is dormant until `<Timetable />` is re-enabled)
+`revalidatePath('/blog/[slug]', 'page')` busts EVERY rendered page of that route (Next tags each page with `_N_T_<pattern>/page`). The hook helpers (`src/collections/hooks/revalidate`) do this automatically for any path containing `[`. This is required — not an optimization — because detail pages render cross-document derivations (prev/next navigation from the full list), so publishing one doc must bust all sibling detail pages.
 
-## Example
+## Pages that MUST keep `export const revalidate`
 
-```ts
-// src/collections/how-to-connect.ts — cached via unstable_cache
-import { revalidatePath, revalidateTag } from 'next/cache';
+| Page | Why purge-only is impossible |
+| --- | --- |
+| `(home)/page.tsx` | log teaser renders external RSS posts (no CMS hook) + `upcoming` flips with current time |
+| `log/page.tsx` | same: external RSS + time-based `upcoming` |
+| `*/opengraph-image.tsx` | `revalidatePath` does not reach metadata image routes |
 
-hooks: {
-  afterChange: [() => {
-    revalidateTag(HOW_TO_CONNECT_TAG);
-    revalidatePath('/');
-  }],
-},
-```
+If a new page renders external (non-CMS) data or time-dependent output (`dayjs()` now), it needs a time-based `revalidate`. Otherwise leave it off.
 
-```ts
-// src/collections/events.ts — queried directly, no tag
-import { revalidatePath } from 'next/cache';
+## Current hook wiring (src/collections, src/globals)
 
-hooks: {
-  afterChange: [() => revalidatePath('/')],
-  afterDelete: [() => revalidatePath('/')],
-},
-```
+- `blog` → tag `blog`, paths `/`, `/blog`, `/blog/[slug]`
+- `news` → tag `news`, paths `/`, `/news`, `/news/[slug]`
+- `works` → tag `works`, paths `/`, `/works`, `/log`, `/works/[slug]`
+- `gallery` → tag `gallery`, paths `/`, `/gallery`
+- `logs` → tag `logs`, paths `/`, `/log`
+- `legal-documents` → tag `legal-documents`, path `/legal/[slug]`
+- `media` → tags `news`/`works`/`gallery`/`blog`, all their list + `[slug]` pattern paths
+- `profile` (global) → tag `profile`, path `/about`
 
-## When editing `page.tsx`
+Route handlers (`rss.xml`, `llms.txt`, `*.md`, `sitemap`) are `force-dynamic` — no path purge needed; their data freshness comes from the tag purge alone.
 
-Before landing:
+## When editing a `page.tsx`
 
-1. List every collection / global queried (directly, via `getPayload`, `unstable_cache`, or a helper)
-2. For each:
-   - `unstable_cache` wrapped → hook calls **both** `revalidateTag()` + `revalidatePath('/')`
-   - Rendered directly → hook calls **`revalidatePath('/')`** only
-3. New ISR page? → repeat the mapping for its path
+1. List every collection / global queried (directly, via `unstable_cache`, or a helper)
+2. For each one, verify its hook busts **both** the tag and **this page's path** (list page → literal path, detail page → `[slug]` pattern)
+3. New CMS collection feeding pages? → wire `createPublishedTagAndPathRevalidateHooks` and extend `scripts/bust-isr-cache.mjs`'s tag list
+4. External data or `dayjs()`-now rendering? → the page keeps a time-based `revalidate`
+
+## Deploy note
+
+`next build` prerenders CMS pages EMPTY (payload bindings are inert at build). `scripts/bust-isr-cache.mjs` — run at the tail of `deploy:staging` / `deploy:production` — is the ONLY mechanism that flushes that empty snapshot now that there is no hourly self-heal. Keep its tag list in sync with the wiring table above.
 
 ## Anti-patterns
 
 ```ts
-// Bad — only purges the data cache; ISR HTML stays stale up to 1 h
-afterChange: [() => revalidateTag(HOW_TO_CONNECT_TAG)]
+// Bad — only purges the data cache; the page HTML never refreshes (no time window exists)
+afterChange: [() => revalidateTag(CACHE_TAGS.blog)]
 
-// Bad — rendering event data on '/' without wiring up revalidation
-// (page caches 1 h of stale JSON-LD)
-const event = await getNextEvent();
+// Bad — per-slug purge leaves sibling detail pages (prev/next nav) stale forever
+revalidatePath(`/blog/${doc.slug}`);
 
-// Good — pairs data changes with path invalidation
-afterChange: [() => {
-  revalidateTag(HOW_TO_CONNECT_TAG);
-  revalidatePath('/');
-}],
+// Good — pattern purge busts all detail pages + list + home
+createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.blog], ['/', '/blog', '/blog/[slug]'])
 ```
