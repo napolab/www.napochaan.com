@@ -8,8 +8,8 @@ import { findProfile } from '@lib/payload/profile';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly — ISR. Static page (no searchParams).
-export const revalidate = 3600;
+// Fully static — no time-based revalidate. The profile global's afterChange hook
+// busts `/about` on every edit.
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const profile = await findProfile();

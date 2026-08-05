@@ -25,12 +25,16 @@ const dispatch = (req: PayloadRequest, tags: readonly string[]): void => {
   }
 };
 
-// Read a document's slug without an `as` cast. Slug-less docs (e.g. a brand-new
-// draft before the required field is filled) yield undefined.
-const readSlug = (doc: unknown): string | undefined => {
-  if (typeof doc !== 'object' || doc === null || !('slug' in doc)) return undefined;
-  const slug: unknown = doc.slug;
-  return typeof slug === 'string' && slug.length > 0 ? slug : undefined;
+// Bust one path-keyed HTML entry. A dynamic pattern path (`/blog/[slug]`) must be
+// revalidated with type 'page' — it busts EVERY rendered page of that route (Next
+// tags each page with `_N_T_<pattern>/page`), which is what keeps cross-document
+// derivations (prev/next navigation, adjacent lists) fresh without a time window.
+const dispatchPath = (path: string): void => {
+  if (path.includes('[')) {
+    revalidatePath(path, 'page');
+    return;
+  }
+  revalidatePath(path);
 };
 
 // Bust both the cache tags and the ISR path HTML. Mirrors `dispatch`'s opt-out and
@@ -40,7 +44,7 @@ const dispatchTagsAndPaths = (req: PayloadRequest, tags: readonly string[], path
   if (context.disableRevalidate === true) return;
   try {
     for (const tag of tags) revalidateTag(tag);
-    for (const path of paths) revalidatePath(path);
+    for (const path of paths) dispatchPath(path);
   } catch {
     // Outside a request context (CLI seed/migrate). Those writes surface on the next
     // build/request, so swallowing is safe. `disableRevalidate` is the explicit opt-out.
@@ -54,7 +58,7 @@ const dispatchTagsAndPaths = (req: PayloadRequest, tags: readonly string[], path
 export const revalidateTagsAndPaths = (tags: readonly string[], paths: readonly string[]): void => {
   try {
     for (const tag of tags) revalidateTag(tag);
-    for (const path of paths) revalidatePath(path);
+    for (const path of paths) dispatchPath(path);
   } catch {
     // Outside a request context (CLI). Safe to swallow.
   }
@@ -86,25 +90,16 @@ export const createPublishedTagRevalidateHooks = (tags: readonly string[]): Reva
   },
 });
 
-// Resolve the full path set: the static paths, plus the per-doc detail path when
-// the doc has a slug. Path-keyed ISR HTML lives outside the tag cache, so detail
-// pages need their own bust.
-const resolvePaths = (doc: unknown, paths: readonly string[], detailPath?: (slug: string) => string): readonly string[] => {
-  const slug = readSlug(doc);
-  if (detailPath === undefined || slug === undefined) return paths;
-  return [...paths, detailPath(slug)];
-};
-
 /** For draft-enabled collections whose data fans out to ISR pages: bust both the cache
- * tags AND the path-keyed ISR HTML (list/home + the per-doc detail page) when the
- * published state is touched. */
-export const createPublishedTagAndPathRevalidateHooks = (tags: readonly string[], paths: readonly string[], detailPath?: (slug: string) => string): RevalidateHooks => ({
+ * tags AND the path-keyed ISR HTML (list/home + detail pages, via a `[slug]` pattern
+ * path) when the published state is touched. */
+export const createPublishedTagAndPathRevalidateHooks = (tags: readonly string[], paths: readonly string[]): RevalidateHooks => ({
   afterChange: ({ doc, previousDoc, req }) => {
-    if (isPublishedChange(doc, previousDoc)) dispatchTagsAndPaths(req, tags, resolvePaths(doc, paths, detailPath));
+    if (isPublishedChange(doc, previousDoc)) dispatchTagsAndPaths(req, tags, paths);
     return doc;
   },
   afterDelete: ({ doc, req }) => {
-    if (isPublished(doc)) dispatchTagsAndPaths(req, tags, resolvePaths(doc, paths, detailPath));
+    if (isPublished(doc)) dispatchTagsAndPaths(req, tags, paths);
     return doc;
   },
 });

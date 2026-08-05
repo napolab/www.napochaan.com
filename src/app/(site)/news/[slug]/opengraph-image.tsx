@@ -11,7 +11,8 @@ import { CONTENT_TYPE, OgCard, SIZE } from '@utils/og/og-card';
 import { ogLifeBoard } from '@utils/og/og-life-board';
 import { resolveOgCardData } from '@utils/og/resolve-og-card-data';
 
-// Revalidate hourly — mirrors the news detail page's ISR window.
+// Revalidate hourly — the detail page itself is purge-driven, but revalidatePath
+// does not reach this metadata image route, so it keeps a time window.
 export const revalidate = 3600;
 export const size = SIZE;
 export const contentType = CONTENT_TYPE;

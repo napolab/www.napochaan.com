@@ -9,9 +9,11 @@ import type { CollectionConfig } from 'payload';
 // home teaser `/`, the archive `/news`, the chronicle `/log`, and the detail
 // page `/news/{id}`). Busting the tag on publish/unpublish purges the data caches
 // via the NEXT_TAG_CACHE_D1 binding; revalidatePath('/'), ('/news'), and the
-// per-doc detail path cover the path-keyed ISR HTML. Drafts are skipped — only a
-// published-state change reaches the public site.
-const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news], ['/', '/news'], (slug) => `/news/${slug}`);
+// `/news/[slug]` pattern cover the path-keyed ISR HTML (the pattern busts every
+// detail page, keeping cross-doc derivations like prev/next fresh — these pages
+// carry no time-based revalidate). Drafts are skipped — only a published-state
+// change reaches the public site.
+const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news], ['/', '/news', '/news/page/[num]', '/news/[slug]']);
 
 export const News = {
   slug: 'news',

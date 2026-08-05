@@ -19,9 +19,10 @@ import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly — ISR. Detail pages are static (no searchParams), so this
-// drives the static cache for the pre-rendered sample slugs.
-export const revalidate = 3600;
+// Fully static — no time-based revalidate. The blog collection's afterChange hook
+// busts `/blog/[slug]` (pattern, type 'page') on every publish/delete, so the cached
+// HTML — including prev/next navigation derived from the full list — refreshes
+// on-demand and is otherwise served from cache indefinitely.
 
 export const generateStaticParams = async () => {
   const posts = await findBlogList();

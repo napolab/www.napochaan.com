@@ -33,4 +33,14 @@ describe('createWorkerApp', () => {
     expect(await response.text()).toBe('next');
     expect(handlerFetch).toHaveBeenCalledOnce();
   });
+
+  it('weakens a strong ETag on mounted handler responses so the edge can compress', async () => {
+    const handlerFetch = vi.fn(async () => new Response('html', { headers: { ETag: '"abc123"' } }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('/some-page');
+
+    expect(response.headers.get('ETag')).toBe('W/"abc123"');
+    expect(await response.text()).toBe('html');
+  });
 });

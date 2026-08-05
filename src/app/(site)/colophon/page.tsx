@@ -10,9 +10,8 @@ import { SectionHeading } from '@components/section-heading';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly — ISR. Static page; its content is sourced from the repo's
-// own rules, not the CMS.
-export const revalidate = 3600;
+// Fully static — content is sourced from the repo's own rules, not the CMS, so the
+// page only changes on deploy (new build ID = new cache keys). No revalidate needed.
 
 export const generateMetadata = (): Metadata => {
   return {

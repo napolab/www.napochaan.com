@@ -12,8 +12,6 @@ import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
-export const revalidate = 3600;
-
 const contactDescription = 'お問い合わせ — フォーム、または各種 SNS から直接どうぞ。';
 
 // Use the shared section helper (like about/works/news/blog/log) so contact gets a

@@ -1,7 +1,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createPublishedTagAndPathRevalidateHooks, createPublishedTagRevalidateHooks, createTagRevalidateHooks, isPublished, isPublishedChange } from '.';
+import { createPublishedTagAndPathRevalidateHooks, createPublishedTagRevalidateHooks, createTagRevalidateHooks, isPublished, isPublishedChange, revalidateTagsAndPaths } from '.';
 
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from 'payload';
 
@@ -115,27 +115,14 @@ describe('createPublishedTagAndPathRevalidateHooks', () => {
     expect(revalidatePathMock).toHaveBeenCalledTimes(2);
   });
 
-  it('includes the detail path keyed by slug when detailPath is provided', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog'], (slug) => `/blog/${slug}`);
+  it('purges a dynamic pattern path with type "page" so every rendered detail page is busted', () => {
+    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog', '/blog/[slug]']);
     hooks.afterChange({ doc: { id: 42, slug: 'my-post-slug', _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
 
-    expect(revalidatePathMock).toHaveBeenCalledWith('/blog/my-post-slug');
+    expect(revalidatePathMock).toHaveBeenCalledWith('/');
+    expect(revalidatePathMock).toHaveBeenCalledWith('/blog');
+    expect(revalidatePathMock).toHaveBeenCalledWith('/blog/[slug]', 'page');
     expect(revalidatePathMock).toHaveBeenCalledTimes(3);
-  });
-
-  it('omits the detail path when no slug is present on the doc', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog'], (slug) => `/blog/${slug}`);
-    hooks.afterChange({ doc: { id: 1, _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
-
-    expect(revalidatePathMock).toHaveBeenCalledTimes(2);
-    expect(revalidatePathMock).not.toHaveBeenCalledWith('/blog/undefined');
-  });
-
-  it('omits the detail path when slug is an empty string', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog'], (slug) => `/blog/${slug}`);
-    hooks.afterChange({ doc: { id: 1, slug: '', _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
-
-    expect(revalidatePathMock).toHaveBeenCalledTimes(2);
   });
 
   it('does NOT fire for a draft-only change', () => {
@@ -147,22 +134,22 @@ describe('createPublishedTagAndPathRevalidateHooks', () => {
   });
 
   it('skips when req.context.disableRevalidate is true', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog'], (slug) => `/blog/${slug}`);
+    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog', '/blog/[slug]']);
     hooks.afterChange({ doc: { id: 1, slug: 'some-slug', _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
 
     expect(revalidateTagMock).not.toHaveBeenCalled();
     expect(revalidatePathMock).not.toHaveBeenCalled();
   });
 
-  it('fires on delete only when the doc was published, using slug for detail path', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog'], (slug) => `/blog/${slug}`);
+  it('fires on delete only when the doc was published', () => {
+    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog', '/blog/[slug]']);
     hooks.afterDelete({ doc: { id: 7, slug: 'old-post', _status: 'draft' }, req: makeReq() } as unknown as DeleteArgs);
     expect(revalidateTagMock).not.toHaveBeenCalled();
     expect(revalidatePathMock).not.toHaveBeenCalled();
 
     hooks.afterDelete({ doc: { id: 7, slug: 'old-post', _status: 'published' }, req: makeReq() } as unknown as DeleteArgs);
     expect(revalidateTagMock).toHaveBeenCalledWith('blog');
-    expect(revalidatePathMock).toHaveBeenCalledWith('/blog/old-post');
+    expect(revalidatePathMock).toHaveBeenCalledWith('/blog/[slug]', 'page');
   });
 
   it('does not throw when revalidateTag/revalidatePath throw (CLI context)', () => {
@@ -172,8 +159,27 @@ describe('createPublishedTagAndPathRevalidateHooks', () => {
     revalidatePathMock.mockImplementation(() => {
       throw new Error('static generation store missing');
     });
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog'], (slug) => `/blog/${slug}`);
+    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog', '/blog/[slug]']);
 
     expect(() => hooks.afterChange({ doc: { id: 1, slug: 'my-post', _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs)).not.toThrow();
+  });
+});
+
+describe('revalidateTagsAndPaths', () => {
+  it('busts literal paths as-is and dynamic pattern paths with type "page"', () => {
+    revalidateTagsAndPaths(['works'], ['/', '/works', '/works/[slug]']);
+
+    expect(revalidateTagMock).toHaveBeenCalledWith('works');
+    expect(revalidatePathMock).toHaveBeenCalledWith('/');
+    expect(revalidatePathMock).toHaveBeenCalledWith('/works');
+    expect(revalidatePathMock).toHaveBeenCalledWith('/works/[slug]', 'page');
+  });
+
+  it('does not throw when the revalidators throw (CLI context)', () => {
+    revalidateTagMock.mockImplementation(() => {
+      throw new Error('static generation store missing');
+    });
+
+    expect(() => revalidateTagsAndPaths(['works'], ['/'])).not.toThrow();
   });
 });

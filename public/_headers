@@ -1,0 +1,8 @@
+# Workers Static Assets header rules (copied into .open-next/assets at build).
+# Cloudflare's edge refuses to compress responses carrying a strong ETag, so
+# hashed-immutable assets drop the ETag entirely and rely on `immutable`
+# caching instead — no revalidation, no validator needed. Pair: the HTML
+# (worker-rendered) side is handled by worker/middleware/weaken-etag.ts.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+  ! ETag

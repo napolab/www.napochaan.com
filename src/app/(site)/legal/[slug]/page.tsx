@@ -7,9 +7,9 @@ import { findLegalDocumentBySlug } from '@lib/payload/legal-documents';
 import type { Metadata } from 'next';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 
-// ISR。詳細ページはオンデマンドで描画してキャッシュし、collection の afterChange hook が
-// `/legal/{slug}` を revalidate する。Live Preview は持たないので draftMode に触らない。
-export const revalidate = 3600;
+// 完全 static（時間ベース revalidate なし）。詳細ページはオンデマンドで描画してキャッシュし、
+// collection の afterChange hook が `/legal/[slug]` パターンを bust するまで配信され続ける。
+// Live Preview は持たないので draftMode に触らない。
 
 // build phase は Payload を読めないため slug は空で始め、公開済み slug をオンデマンド ISR で配る。
 export const generateStaticParams = (): { slug: string }[] => [];

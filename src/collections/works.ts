@@ -8,8 +8,9 @@ import type { CollectionConfig } from 'payload';
 // Works feed the archive (`/works`), the detail page (`/works/{id}`), the home
 // teaser, and the log chronicle. Busting CACHE_TAGS.works purges those reads via
 // the unstable_cache tags; revalidatePath('/'), ('/works'), ('/log'), and the
-// per-doc detail path cover the path-keyed ISR HTML.
-const revalidateWorks = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.works], ['/', '/works', '/log'], (slug) => `/works/${slug}`);
+// `/works/[slug]` pattern cover the path-keyed ISR HTML (the pattern busts every
+// detail page — these pages carry no time-based revalidate).
+const revalidateWorks = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.works], ['/', '/works', '/works/page/[num]', '/log', '/works/[slug]']);
 
 export const Works = {
   slug: 'works',
