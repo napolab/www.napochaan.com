@@ -2,6 +2,7 @@ import { cache } from 'hono/cache';
 import { createFactory } from 'hono/factory';
 
 import { imageHandlers } from './handlers/images';
+import { weakenETag } from './middleware/weaken-etag';
 import { cursorRoutes } from './routes/cursors';
 import { mcpGuardRoutes } from './routes/mcp-guard';
 
@@ -17,6 +18,7 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
   const app = factory.createApp();
 
   app
+    .use('*', weakenETag())
     .get(
       '/_next/image',
       cache({
