@@ -22,14 +22,23 @@ export const root = css({
   // frame, with the same blue + white-mono voice as the TypographyBand.
   bg: 'accent.solid',
   opacity: '[0]',
+  // `visibility: hidden` at rest removes the overlay from painting entirely once
+  // the fade ends. This matters beyond hygiene: layout shifts of PAINTED content
+  // count toward CLS even at opacity 0 (and even under an opaque cover), so the
+  // typewriter island was accruing CLS forever behind the invisible overlay.
+  // Transitioning visibility alongside opacity keeps the element visible for the
+  // whole fade (visible→hidden flips only at transition end per spec) and shows
+  // it instantly on the way in.
+  visibility: 'hidden',
   pointerEvents: 'none',
-  transitionProperty: '[opacity]',
+  transitionProperty: '[opacity, visibility]',
   transitionDuration: 'slow',
   // `bootAutoDismiss` (see global.css) is a no-JS fail-safe: if the Typekit loader
   // never removes `boot`, this fades the overlay out after ~7s so content is always
-  // reachable. When the loader DOES remove `boot`, this rule stops applying and the
-  // overlay fades via the opacity transition above instead.
-  'html.boot &': { opacity: '[1]', pointerEvents: 'auto', animation: '[bootAutoDismiss 7s linear forwards]' },
+  // reachable (its 100% frame also lands on visibility:hidden). When the loader
+  // DOES remove `boot`, this rule stops applying and the overlay fades via the
+  // opacity+visibility transition above instead.
+  'html.boot &': { opacity: '[1]', visibility: 'visible', pointerEvents: 'auto', animation: '[bootAutoDismiss 7s linear forwards]' },
 });
 
 // Left-aligned mono console block, centered as a unit. Fixed-ish width gives the

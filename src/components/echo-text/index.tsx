@@ -29,13 +29,28 @@ export const EchoText = ({ children, size = 'hero' }: Props) => {
 
   const decode = () => {
     if (prefersReducedMotion()) return;
+    const el = fillRef.current;
+    if (el === null) return;
+    // The scramble glyphs vary in advance width, so the span's inline size
+    // jitters on every refresh — nudging the trailing red dot (and the centered
+    // line box) each tick, and every nudge counts toward CLS (this was the
+    // page's dominant layout-shift source). Pin the box to the settled wordmark
+    // width for the tween's lifetime so the jitter stays inside; the momentary
+    // overflow of a wide glyph reads as part of the glitch. `overwrite` kills a
+    // still-running decode on hover re-entry so its clearProps can't unlock the
+    // box mid-scramble.
+    gsap.set(el, { display: 'inline-block', width: el.offsetWidth });
     // revealDelay holds the full scramble before decoding; low speed keeps the
     // glyph refresh chunky (digital) rather than a 60fps blur; tweenLength off
     // since the word length never changes.
-    gsap.to(fillRef.current, {
+    gsap.to(el, {
       duration: DURATION,
       ease: 'none',
+      overwrite: true,
       scrambleText: { text: children, chars: CHARS, speed: 0.45, revealDelay: 0.35, tweenLength: false },
+      onComplete: () => {
+        gsap.set(el, { clearProps: 'display,width' });
+      },
     });
   };
 
@@ -61,7 +76,9 @@ export const EchoText = ({ children, size = 'hero' }: Props) => {
         {children}
       </span>
       <span aria-hidden className={styles.fill}>
-        <span ref={fillRef}>{children}</span>
+        <span ref={fillRef} data-scramble>
+          {children}
+        </span>
         <span className={styles.red}>.</span>
       </span>
     </span>
