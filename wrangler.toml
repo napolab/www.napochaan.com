@@ -135,7 +135,7 @@ database_id = "0af66616-6458-492f-92b3-0f1d305abd06"
 
 [[env.staging.kv_namespaces]]
 binding = "OAUTH_KV"
-id = "385b19e3196d42408ea8466591d1ce8a"
+id = "385b19e3196d42408ea8466591d1ce8a" # napochaan-mcp-oauth-staging
 
 # ===== Production Environment =====
 [env.production]
@@ -193,7 +193,7 @@ database_id = "f3f67f2e-3e9d-45e6-b522-de8a90256d36"
 
 [[env.production.kv_namespaces]]
 binding = "OAUTH_KV"
-id = "d19a648ce9224e16be0927ba5d594460"
+id = "d19a648ce9224e16be0927ba5d594460" # napochaan-mcp-oauth-production
 
 # ===== Test Environment =====
 # Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
