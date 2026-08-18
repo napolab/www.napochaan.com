@@ -37,10 +37,10 @@
   "dependencies": {
     "@cloudflare/workers-oauth-provider": "^0.8.1",
     "@gsap/react": "^2.1.2",
-    "@hono/zod-validator": "^0.7.6",
+    "@hono/zod-validator": "^0.9.0",
     "@internationalized/date": "^3.12.2",
     "@marsidev/react-turnstile": "^1.5.3",
-    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@modelcontextprotocol/server": "^2.0.0",
     "@opennextjs/cloudflare": "1.18.0",
     "@payloadcms/db-d1-sqlite": "3.84.1",
     "@payloadcms/live-preview-react": "3.84.1",
@@ -67,7 +67,7 @@
     "reconnecting-websocket": "^4.4.0",
     "server-only": "^0.0.1",
     "shiki": "^4.2.0",
-    "zod": "^3.25.76"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@cloudflare/vitest-pool-workers": "^0.13.5",

@@ -14,7 +14,7 @@ import type { McpToolError } from '../../errors';
 import type { MarkdownCodec } from '../../markdown';
 import type { ToolResult } from '../shared/tool-result';
 import type { Validator } from '@utils/run-validators';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import type { LegalDocument, User } from '@payload-types';
 import type { Result, ResultAsync } from 'neverthrow';
 import type { Payload } from 'payload';

@@ -22,17 +22,17 @@ importers:
         specifier: ^2.1.2
         version: 2.1.2(gsap@3.15.0)(react@19.2.7)
       '@hono/zod-validator':
-        specifier: ^0.7.6
-        version: 0.7.6(hono@4.12.23)(zod@3.25.76)
+        specifier: ^0.9.0
+        version: 0.9.0(hono@4.12.23)(zod@4.4.3)
       '@internationalized/date':
         specifier: ^3.12.2
         version: 3.12.2
       '@marsidev/react-turnstile':
         specifier: ^1.5.3
         version: 1.5.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      '@modelcontextprotocol/sdk':
-        specifier: ^1.29.0
-        version: 1.29.0(zod@3.25.76)
+      '@modelcontextprotocol/server':
+        specifier: ^2.0.0
+        version: 2.0.0
       '@opennextjs/cloudflare':
         specifier: 1.18.0
         version: 1.18.0(next@15.3.9(@babel/core@7.29.7)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(sass@1.77.4))(wrangler@4.98.0)
@@ -112,8 +112,8 @@ importers:
         specifier: ^4.2.0
         version: 4.2.0
       zod:
-        specifier: ^3.25.76
-        version: 3.25.76
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@cloudflare/vitest-pool-workers':
         specifier: ^0.13.5
@@ -2018,10 +2018,10 @@ packages:
       hono: '>=3.9.0'
       zod: ^3.19.1
 
-  '@hono/zod-validator@0.7.6':
-    resolution: {integrity: sha512-Io1B6d011Gj1KknV4rXYz4le5+5EubcWEU/speUjuw9XMMIaP3n78yXLhjd2A3PXaXaUwEAluOiAyLqhBEJgsw==}
+  '@hono/zod-validator@0.9.0':
+    resolution: {integrity: sha512-n0ZSXmCiHVIp4Y5wlOOyZCeTd/rsawA/qW1cipB8QOYKZ9N8Tk0nZUZCXho9cu374AN4JpDNKioNKBJ/W+LBug==}
     peerDependencies:
-      hono: '>=3.9.0'
+      hono: '>=4.11.2'
       zod: ^3.25.0 || ^4.0.0
 
   '@img/colour@1.1.0':
@@ -2298,6 +2298,10 @@ packages:
       react: ^17.0.2 || ^18.0.0 || ^19.0
       react-dom: ^17.0.2 || ^18.0.0 || ^19.0
 
+  '@modelcontextprotocol/core@2.0.0':
+    resolution: {integrity: sha512-pJCEwGG7Lfr/+PQp9ZTwKXNeO5wzbfKL7H3MYpCorM4oFBoQrdjnBgEoqG+RjhsvS1FKrDbKux+M1HhlnGWqcA==}
+    engines: {node: '>=20'}
+
   '@modelcontextprotocol/sdk@1.29.0':
     resolution: {integrity: sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ==}
     engines: {node: '>=18'}
@@ -2307,6 +2311,10 @@ packages:
     peerDependenciesMeta:
       '@cfworker/json-schema':
         optional: true
+
+  '@modelcontextprotocol/server@2.0.0':
+    resolution: {integrity: sha512-YhHWdHfpFMQfd0prsEnxKeS3Qz3ytIGmsS0sth4KDjnacIT7hxk6hXHkJ9KysxlkvTM+WZAtQbbcUhdoP4Hvtw==}
+    engines: {node: '>=20'}
 
   '@monaco-editor/loader@1.7.0':
     resolution: {integrity: sha512-gIwR1HrJrrx+vfyOhYmCZ0/JcWqG5kbfG7+d3f/C1LXk2EvzAbHSg3MQ5lO2sMlo9izoAZ04shohfKLVT6crVA==}
@@ -8301,10 +8309,10 @@ snapshots:
       hono: 4.12.23
       zod: 3.25.76
 
-  '@hono/zod-validator@0.7.6(hono@4.12.23)(zod@3.25.76)':
+  '@hono/zod-validator@0.9.0(hono@4.12.23)(zod@4.4.3)':
     dependencies:
       hono: 4.12.23
-      zod: 3.25.76
+      zod: 4.4.3
 
   '@img/colour@1.1.0': {}
 
@@ -8619,27 +8627,9 @@ snapshots:
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
-  '@modelcontextprotocol/sdk@1.29.0(zod@3.25.76)':
+  '@modelcontextprotocol/core@2.0.0':
     dependencies:
-      '@hono/node-server': 1.19.14(hono@4.12.23)
-      ajv: 8.20.0
-      ajv-formats: 3.0.1(ajv@8.20.0)
-      content-type: 1.0.5
-      cors: 2.8.6
-      cross-spawn: 7.0.6
-      eventsource: 3.0.7
-      eventsource-parser: 3.1.0
-      express: 5.2.1
-      express-rate-limit: 8.5.2(express@5.2.1)
-      hono: 4.12.23
-      jose: 6.2.3
-      json-schema-typed: 8.0.2
-      pkce-challenge: 5.0.1
-      raw-body: 3.0.2
-      zod: 3.25.76
-      zod-to-json-schema: 3.25.2(zod@3.25.76)
-    transitivePeerDependencies:
-      - supports-color
+      zod: 4.4.3
 
   '@modelcontextprotocol/sdk@1.29.0(zod@4.4.3)':
     dependencies:
@@ -8662,6 +8652,11 @@ snapshots:
       zod-to-json-schema: 3.25.2(zod@4.4.3)
     transitivePeerDependencies:
       - supports-color
+
+  '@modelcontextprotocol/server@2.0.0':
+    dependencies:
+      '@modelcontextprotocol/core': 2.0.0
+      zod: 4.4.3
 
   '@monaco-editor/loader@1.7.0':
     dependencies:
@@ -13086,10 +13081,6 @@ snapshots:
       '@speed-highlight/core': 1.2.15
       cookie: 1.1.1
       youch-core: 0.3.3
-
-  zod-to-json-schema@3.25.2(zod@3.25.76):
-    dependencies:
-      zod: 3.25.76
 
   zod-to-json-schema@3.25.2(zod@4.4.3):
     dependencies:
