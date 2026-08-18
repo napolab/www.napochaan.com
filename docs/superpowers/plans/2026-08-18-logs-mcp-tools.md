@@ -607,7 +607,8 @@ const parseDate = (value: string): ResultAsync<string, McpToolError> => validate
             payload.create({
               collection: 'logs',
               draft: true,
-              data: { title: input.title, date: input.date, meta: input.meta, url: input.url },
+              // `draft: true` に加えて `_status: 'draft'` も明示する(legal の createLegalDocument と同じ)。
+              data: { title: input.title, date: input.date, meta: input.meta, url: input.url, _status: 'draft' },
               overrideAccess: false,
               user,
             }),
