@@ -1,16 +1,23 @@
-import { fromPromise } from 'neverthrow';
+import { err as errResult, errAsync, fromPromise, ok as okResult, okAsync } from 'neverthrow';
 import { z } from 'zod';
 
 import { dayjs } from '@utils/dayjs';
+import { createValidator } from '@utils/run-validators';
 
-import { PayloadOperationError } from '../../errors';
+// collection 本体(src/collections/logs.ts)は next/cache を引くのでここからは import
+// できない。正準値は依存ゼロの葉モジュールに置いてある(Task 1)。
+// src/collections に path alias は無く、tsconfig の paths 変更は禁止(CLAUDE.md)なので相対。
+import { LOG_META_OPTIONS } from '../../../../collections/fields/log-meta';
+import { InvalidInputError, LogNotFoundError, PayloadOperationError } from '../../errors';
 import { ok, toToolError } from '../shared/tool-result';
 
+import type { McpToolError } from '../../errors';
 import type { ToolResult } from '../shared/tool-result';
+import type { Validator } from '@utils/run-validators';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { Log, User } from '@payload-types';
-import type { Payload } from 'payload';
-import type { Where } from 'payload';
+import type { ResultAsync } from 'neverthrow';
+import type { Payload, Where } from 'payload';
 
 // logs は richText を持たないフラットな collection なので、blog/legal が必要とする
 // MarkdownCodec は渡さない。deps は payload と user だけ。
@@ -20,6 +27,23 @@ export type LogToolDeps = {
 };
 
 type LogStatus = 'draft' | 'published' | 'all';
+
+const DAY_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+
+// 1. 形式 — YYYY-MM-DD かどうか。
+const requireDayFormat: Validator<string, McpToolError> = {
+  run: (value) => (DAY_PATTERN.test(value) ? okResult(value) : errResult(new InvalidInputError(`date は YYYY-MM-DD 形式で指定してください。受け取った値: "${value}"`))),
+};
+
+// 2. 実在 — 2026-02-30 のような「形式は合うが存在しない日付」を弾く。dayjs の strict parse
+//    (customParseFormat)はロールオーバーせず invalid として検出する。
+const requireRealDay: Validator<string, McpToolError> = {
+  run: (value) => (dayjs(value, 'YYYY-MM-DD', true).isValid() ? okResult(value) : errResult(new InvalidInputError(`date が存在しない日付です。受け取った値: "${value}"`))),
+};
+
+const validateDate = createValidator([requireDayFormat, requireRealDay]);
+
+const parseDate = (value: string): ResultAsync<string, McpToolError> => validateDate(value).asyncAndThen((valid) => okAsync(valid));
 
 // Payload の date フィールドは ISO タイムスタンプで返る。read は write が受け付ける
 // 正準形(YYYY-MM-DD)に正規化する — でないと list → update の往復で date を素直に
@@ -53,6 +77,14 @@ const resolveStatusWhere = (status: LogStatus): Where | undefined => {
 export const createLogToolHandlers = (deps: LogToolDeps) => {
   const { payload, user } = deps;
 
+  const findLog = (id: number): ResultAsync<Log | null, McpToolError> =>
+    fromPromise(
+      payload.findByID({ collection: 'logs', id, draft: true, disableErrors: true, overrideAccess: false, user, depth: 0 }),
+      (cause) => new PayloadOperationError('log の取得に失敗しました', { cause }),
+    );
+
+  const requireLog = (doc: Log | null): ResultAsync<Log, McpToolError> => (doc === null ? errAsync(new LogNotFoundError('log が見つかりません。list_logs で id を確認してください。')) : okAsync(doc));
+
   return {
     listLogs: (input: { status?: LogStatus; limit?: number }): Promise<ToolResult> =>
       fromPromise(
@@ -69,6 +101,51 @@ export const createLogToolHandlers = (deps: LogToolDeps) => {
         (cause) => new PayloadOperationError('log 一覧の取得に失敗しました', { cause }),
       )
         .map(({ docs }) => docs.map(toSummary))
+        .match(ok, toToolError),
+
+    createLog: (input: { title: string; date: string; meta: Log['meta']; url?: string }): Promise<ToolResult> =>
+      parseDate(input.date)
+        .andThen(() =>
+          fromPromise(
+            payload.create({
+              collection: 'logs',
+              draft: true,
+              data: { title: input.title, date: input.date, meta: input.meta, url: input.url, _status: 'draft' },
+              overrideAccess: false,
+              user,
+            }),
+            (cause) => new PayloadOperationError('log の作成に失敗しました', { cause }),
+          ),
+        )
+        .map((created) => ({ ...toSummary(created), note: 'draft として作成した。年表に載せるには publish_log を呼ぶこと。' }))
+        .match(ok, toToolError),
+
+    updateLog: (input: { id: number; title?: string; date?: string; meta?: Log['meta']; url?: string }): Promise<ToolResult> =>
+      // date が来ていれば先に検証する。未指定なら検証をスキップして素通しする。
+      (input.date === undefined ? okAsync<string | undefined, McpToolError>(undefined) : parseDate(input.date))
+        .andThen(() => findLog(input.id))
+        .andThen(requireLog)
+        .andThen(() =>
+          fromPromise(
+            payload.update({
+              collection: 'logs',
+              id: input.id,
+              draft: true,
+              // 指定されたフィールドだけを送る。undefined を混ぜると Payload 側で
+              // 既存値を上書きしうるため、キー自体を落とす。
+              data: {
+                ...(input.title === undefined ? {} : { title: input.title }),
+                ...(input.date === undefined ? {} : { date: input.date }),
+                ...(input.meta === undefined ? {} : { meta: input.meta }),
+                ...(input.url === undefined ? {} : { url: input.url }),
+              },
+              overrideAccess: false,
+              user,
+            }),
+            (cause) => new PayloadOperationError('log の更新に失敗しました', { cause }),
+          ),
+        )
+        .map((updated) => ({ ...toSummary(updated), note: 'draft を更新した。年表への反映は publish_log を呼ぶこと。' }))
         .match(ok, toToolError),
   };
 };
@@ -88,5 +165,38 @@ export const registerLogTools = (server: McpServer, deps: LogToolDeps): void => 
       annotations: { readOnlyHint: true },
     },
     handlers.listLogs,
+  );
+
+  server.registerTool(
+    'create_log',
+    {
+      title: 'log 作成(draft)',
+      description: '年表の手動エントリを draft として作成する。年表に載せるには publish_log を続けて呼ぶこと。',
+      inputSchema: {
+        title: z.string().min(1).describe('年表に出るテキスト。例: "Booth2Booth vol.03 at VRChat 開催"'),
+        date: z.string().describe('YYYY-MM-DD'),
+        meta: z.enum(LOG_META_OPTIONS).describe('年表に出る種別ラベル。この値がそのまま画面に表示される'),
+        url: z.string().url().optional().describe('設定するとタイトルがこの URL へのリンクになる'),
+      },
+      annotations: { destructiveHint: false },
+    },
+    handlers.createLog,
+  );
+
+  server.registerTool(
+    'update_log',
+    {
+      title: 'log 更新(draft)',
+      description: 'log を更新する。指定したフィールドだけが変わる。年表への反映は publish_log を呼ぶこと。',
+      inputSchema: {
+        id: z.number().int(),
+        title: z.string().min(1).optional(),
+        date: z.string().optional().describe('YYYY-MM-DD'),
+        meta: z.enum(LOG_META_OPTIONS).optional(),
+        url: z.string().url().optional(),
+      },
+      annotations: { destructiveHint: false },
+    },
+    handlers.updateLog,
   );
 };
