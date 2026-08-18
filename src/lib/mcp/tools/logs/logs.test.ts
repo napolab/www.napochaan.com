@@ -1,8 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
+import { z } from 'zod';
 
-import { createLogToolHandlers } from '.';
+import { LOG_META_OPTIONS } from '../../../../collections/fields/log-meta';
+
+import { createLogToolHandlers, registerLogTools } from '.';
 
 import type { LogToolDeps } from '.';
+import type { McpServer } from '@modelcontextprotocol/server';
 import type { User } from '@payload-types';
 
 const user = { id: 1, email: 'dev@napochaan.com' } as User;
@@ -120,6 +124,18 @@ describe('updateLog', () => {
     expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'logs', id: 9, data: { title: '新' } }));
   });
 
+  it('url: null を渡すとリンクをクリアする', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 9, title: '旧', date: '2026-11-01T00:00:00.000Z', meta: 'DJ', url: 'https://example.com', _status: 'draft' });
+    payload.update.mockResolvedValue({ id: 9, title: '旧', date: '2026-11-01T00:00:00.000Z', meta: 'DJ', url: null, _status: 'draft' });
+
+    const handlers = createLogToolHandlers(deps);
+    const result = await handlers.updateLog({ id: 9, url: null });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'logs', id: 9, data: { url: null } }));
+  });
+
   it('存在しない id は回復ヒント付きで reject し、update しない', async () => {
     const { payload, deps } = createDeps();
     payload.findByID.mockResolvedValue(null);
@@ -130,6 +146,53 @@ describe('updateLog', () => {
     expect(result.isError).toBe(true);
     expect(result.content[0]?.text ?? '').toContain('list_logs');
     expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  // toSummary はバージョンの _status をそのまま返すため、公開済みの log を更新した直後
+  // でも 'draft' に見えてしまう(実際の /log にはまだ古い published 内容が出ている)。
+  // blog の updatePost と同じ形で status を説明的な文言に上書きする(Fix 2)。
+  it('公開済み log を更新しても status は draft と断定せず説明的な文言を返す', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 9, title: '旧', date: '2026-11-01T00:00:00.000Z', meta: 'DJ', url: null, _status: 'published' });
+    payload.update.mockResolvedValue({ id: 9, title: '新', date: '2026-11-01T00:00:00.000Z', meta: 'DJ', url: null, _status: 'draft' });
+
+    const handlers = createLogToolHandlers(deps);
+    const result = await handlers.updateLog({ id: 9, title: '新' });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '');
+    expect(parsed.status).toBe('draft version saved');
+    expect(parsed.note).not.toContain('未公開');
+    expect(parsed.note).not.toContain('年表への反映は');
+  });
+});
+
+describe('registerLogTools - meta スキーマ', () => {
+  // meta の不正値の弾き込みは今は MCP SDK の JSON Schema バリデータが enum を
+  // 列挙していることに依存している。ハンドラ内の `meta: Log['meta']` は
+  // コンパイル時の型に過ぎず、もし誰かが inputSchema を z.string() に緩めても
+  // 気づけない(mcp-write-strict.md が言う「Payload に到達する前に弾く」対象)。
+  // registerTool に渡された実際の zod スキーマを捕まえて直接検証する。
+  it('create_log の meta スキーマは LOG_META_OPTIONS の 8 値のみ受理する', () => {
+    const { deps } = createDeps();
+    const captured: { inputSchema?: Record<string, z.ZodTypeAny> } = {};
+    const server = {
+      registerTool: (name: string, config: { inputSchema?: Record<string, z.ZodTypeAny> }) => {
+        if (name === 'create_log') {
+          captured.inputSchema = config.inputSchema;
+        }
+      },
+    } as unknown as McpServer;
+
+    registerLogTools(server, deps);
+
+    const metaSchema = captured.inputSchema?.meta;
+    if (metaSchema === undefined) throw new Error('create_log の inputSchema.meta が捕まえられなかった');
+
+    for (const value of LOG_META_OPTIONS) {
+      expect(metaSchema.safeParse(value).success).toBe(true);
+    }
+    expect(metaSchema.safeParse('存在しないラベル').success).toBe(false);
   });
 });
 

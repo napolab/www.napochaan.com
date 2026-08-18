@@ -120,7 +120,7 @@ export const createLogToolHandlers = (deps: LogToolDeps) => {
         .map((created) => ({ ...toSummary(created), note: 'draft として作成した。年表に載せるには publish_log を呼ぶこと。' }))
         .match(ok, toToolError),
 
-    updateLog: (input: { id: number; title?: string; date?: string; meta?: Log['meta']; url?: string }): Promise<ToolResult> =>
+    updateLog: (input: { id: number; title?: string; date?: string; meta?: Log['meta']; url?: string | null }): Promise<ToolResult> =>
       // date が来ていれば先に検証する。未指定なら検証をスキップして素通しする。
       (input.date === undefined ? okAsync<string | undefined, McpToolError>(undefined) : parseDate(input.date))
         .andThen(() => findLog(input.id))
@@ -132,7 +132,8 @@ export const createLogToolHandlers = (deps: LogToolDeps) => {
               id: input.id,
               draft: true,
               // 指定されたフィールドだけを送る。undefined を混ぜると Payload 側で
-              // 既存値を上書きしうるため、キー自体を落とす。
+              // 既存値を上書きしうるため、キー自体を落とす。url は null を明示的な
+              // 「リンクを外す」として forward する(undefined = 変更なし、null = クリア)。
               data: {
                 ...(input.title === undefined ? {} : { title: input.title }),
                 ...(input.date === undefined ? {} : { date: input.date }),
@@ -145,7 +146,11 @@ export const createLogToolHandlers = (deps: LogToolDeps) => {
             (cause) => new PayloadOperationError('log の更新に失敗しました', { cause }),
           ),
         )
-        .map((updated) => ({ ...toSummary(updated), note: 'draft を更新した。年表への反映は publish_log を呼ぶこと。' }))
+        // toSummary はバージョンの _status をそのまま返すため、公開済みの log を
+        // 更新した直後でも 'draft' に見えてしまう(実際に /log に出ている published
+        // 版はまだ古いまま)。blog の updatePost(src/lib/mcp/tools/index.ts)と同じ形で
+        // status を説明的な文言に上書きし、note も「未公開」と断定しないようにする。
+        .map((updated) => ({ ...toSummary(updated), status: 'draft version saved', note: '変更は draft version として保存済み。公開への反映には publish_log が必要。' }))
         .match(ok, toToolError),
 
     publishLog: (input: { id: number }): Promise<ToolResult> =>
@@ -234,7 +239,7 @@ export const registerLogTools = (server: McpServer, deps: LogToolDeps): void => 
         title: z.string().min(1).optional(),
         date: z.string().optional().describe('YYYY-MM-DD'),
         meta: z.enum(LOG_META_OPTIONS).optional(),
-        url: z.string().url().optional(),
+        url: z.string().url().nullable().optional().describe('省略すると変更なし。null を渡すとリンクを外す(url なしの状態にする)'),
       },
       annotations: { destructiveHint: false },
     },
