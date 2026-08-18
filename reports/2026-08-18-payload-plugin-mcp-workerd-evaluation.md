@@ -105,9 +105,11 @@ Payload が `/api` を前置するので `/api/mcp` 固定。本リポジトリ�
   ※ `initialize` ハンドシェイクや `Mcp-Session-Id` の仕組み自体は v2 の SDK から廃止されていない
   (`isInitializeRequest` / `sessionIdGenerator` は `@modelcontextprotocol/server` の
   `dist/index.mjs` に今も存在し、`sessionIdGenerator: () => crypto.randomUUID()` を渡せば
-  ステートフルにも動く)。`sessionIdGenerator: undefined` は SDK 自身のコメントも
-  「established stateless idiom, unchanged」と呼ぶ、v1 から続く一形態。加えて
-  `enableJsonResponse: true` で SSE ではなく素の JSON 応答にしている。
+  ステートフルにも動く)。`sessionIdGenerator` を省いた場合の挙動は SDK の型定義に
+  _"If not provided, session management is disabled (stateless mode)."_
+  (`@modelcontextprotocol/server/dist/index.d.mts:466`)と明記されている、
+  v1 から続く正規の使い方。加えて `enableJsonResponse: true` で SSE ではなく
+  素の JSON 応答にしている。
 - 認可は前段の Hono ガード(`worker/app.ts` の `mcpGuardRoutes`)が持つ
 
 v2 移行は Payload とは独立に進められる。
