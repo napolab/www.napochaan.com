@@ -4,7 +4,7 @@
 
 **Goal:** `/log` の年表に載る手動エントリ(`logs` collection)を MCP から追加・編集・公開・削除できるようにする。
 
-**Architecture:** `src/lib/mcp/tools/legal` を雛形に `src/lib/mcp/tools/logs` を新設する。`logs` は richText を持たないため Markdown codec 層は不要で、`LogToolDeps` は `{ payload, user }` のみ。ハンドラは neverthrow の `ResultAsync` チェーンで組み、`.match(ok, toToolError)` で終端する。`meta` の選択肢は collection から export して単一ソース化する。
+**Architecture:** `src/lib/mcp/tools/legal` を雛形に `src/lib/mcp/tools/logs` を新設する。`logs` は richText を持たないため Markdown codec 層は不要で、`LogToolDeps` は `{ payload, user }` のみ。ハンドラは neverthrow の `ResultAsync` チェーンで組み、`.match(ok, toToolError)` で終端する。`meta` の選択肢は依存ゼロの葉モジュール `src/collections/fields/log-meta` を単一の出所とし、collection の `options` も MCP の `z.enum` もそこから導出する。
 
 **Tech Stack:** Payload CMS 3.84.1 / `@modelcontextprotocol/server` 2.0.0 / zod 4 / neverthrow / vitest / `@utils/dayjs`
 
@@ -13,7 +13,7 @@
 - ツールは 5 つ: `list_logs` / `create_log` / `update_log` / `publish_log` / `delete_log`
 - `create_log` は必ず `_status: 'draft'` で作る。公開は `publish_log` のみ
 - `delete_log` は **`id` のみ**。title 照合は入れない(本人決定 2026-08-18)
-- `meta` の正準値は `src/collections/logs.ts` の `LOG_META_OPTIONS` ただ一つ。MCP 側にリテラルを複製しない
+- `meta` の正準値は `src/collections/fields/log-meta` の `LOG_META_OPTIONS` ただ一つ。MCP 側にも collection 側にもリテラルを複製しない(どちらも導出する)
 - 日付は `YYYY-MM-DD` 固定。検証は `@utils/dayjs` の strict parse。生の `Date` / `Intl` / `slice` 禁止(`.claude/rules/dayjs-timezone.md`)
 - write path は strict。不正入力は**変換せず reject** し、①何が不正か ②有効な選択肢の全列挙 ③問題の値 ④回避手段 を含む回復ヒントを返す(`.claude/rules/mcp-write-strict.md`)
 - 関数は arrow function。`let` / IIFE / 非 null assertion `!` / `forEach` / `any` 禁止
