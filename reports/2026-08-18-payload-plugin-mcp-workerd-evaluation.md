@@ -92,15 +92,22 @@ Payload が `/api` を前置するので `/api/mcp` 固定。本リポジトリ�
 「公式 plugin に寄せる」と「MCP v2 に移行する」は**別方向の話**である。
 
 - plugin が使う SDK は `1.30.0` = v1 系(protocol `2025-11-25`)。
-- v2 対応は TS SDK **2.0.0 beta** から(スキーマが `@modelcontextprotocol/core` に分離)。
-  npm の `latest` は現在も 1.30.0。
+- v2 対応は TS SDK **2.0.0(stable)** から(スキーマが `@modelcontextprotocol/core` に分離)。
+  npm 実測: `@modelcontextprotocol/core` / `/server` / `/client` / `/hono` はいずれも `2.0.0` が
+  publish 済み。npm の `latest`(`@modelcontextprotocol/sdk`)は今も `1.30.0` の v1 モノリスで、
+  v2 とは別パッケージ系列(詳細は `reports/2026-08-18-mcp-v2-migration-assessment.md`)。
 - したがって plugin に寄せることは、v2 対応を Payload 側の bump 待ちにする選択になる。
 
-一方、v2 の中心であるステートレス化(`initialize` ハンドシェイク廃止、`Mcp-Session-Id` 廃止、
-method/tool 名を HTTP ヘッダへ出してゲートウェイで認可)は、本リポジトリでは
-**既に手で到達している**:
+一方、v2 の設計が志向するステートレス運用(method/tool 名を HTTP ヘッダへ出してゲートウェイで
+認可する構成)は、本リポジトリでは**既に手で到達している**:
 
-- `src/app/api/mcp/route.ts` — `sessionIdGenerator: undefined` / `enableJsonResponse: true`
+- `src/app/api/mcp/route.ts` — `sessionIdGenerator: undefined` でステートレスに動かしている。
+  ※ `initialize` ハンドシェイクや `Mcp-Session-Id` の仕組み自体は v2 の SDK から廃止されていない
+  (`isInitializeRequest` / `sessionIdGenerator` は `@modelcontextprotocol/server` の
+  `dist/index.mjs` に今も存在し、`sessionIdGenerator: () => crypto.randomUUID()` を渡せば
+  ステートフルにも動く)。`sessionIdGenerator: undefined` は SDK 自身のコメントも
+  「established stateless idiom, unchanged」と呼ぶ、v1 から続く一形態。加えて
+  `enableJsonResponse: true` で SSE ではなく素の JSON 応答にしている。
 - 認可は前段の Hono ガード(`worker/app.ts` の `mcpGuardRoutes`)が持つ
 
 v2 移行は Payload とは独立に進められる。
