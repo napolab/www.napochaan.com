@@ -18,6 +18,10 @@
 - write path は strict。不正入力は**変換せず reject** し、①何が不正か ②有効な選択肢の全列挙 ③問題の値 ④回避手段 を含む回復ヒントを返す(`.claude/rules/mcp-write-strict.md`)
 - 関数は arrow function。`let` / IIFE / 非 null assertion `!` / `forEach` / `any` 禁止
 - `Boolean()` / `String()` / `Number()` 禁止。`parseInt(x, 10)` / テンプレートリテラル / 明示的な `!==` を使う
+- tsconfig は `noUncheckedIndexedAccess` が有効。テストでも配列の添字アクセスは
+  `result.content[0]?.text ?? ''` の形にする(`const [{ text }] = ...` や
+  `result.content[0].text` は typecheck に落ちる)。`pnpm exec vitest run` は
+  型検査をしないので単体では気づけない — **必ず `pnpm typecheck` まで通すこと**
 - 各タスク完了時に `pnpm lint && pnpm typecheck` を通す。`npx tsc` は使わない
 - commit はタスク毎に行う。push と PR はしない
 
@@ -482,8 +486,8 @@ describe('createLog', () => {
     const result = await handlers.createLog({ title: 'x', date: '2026/11/01', meta: 'DJ' });
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('YYYY-MM-DD');
-    expect(result.content[0].text).toContain('2026/11/01');
+    expect(result.content[0]?.text ?? '').toContain('YYYY-MM-DD');
+    expect(result.content[0]?.text ?? '').toContain('2026/11/01');
     expect(payload.create).not.toHaveBeenCalled();
   });
 
@@ -519,7 +523,7 @@ describe('updateLog', () => {
     const result = await handlers.updateLog({ id: 999, title: '新' });
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('list_logs');
+    expect(result.content[0]?.text ?? '').toContain('list_logs');
     expect(payload.update).not.toHaveBeenCalled();
   });
 });
@@ -756,7 +760,7 @@ describe('publishLog', () => {
     const result = await handlers.publishLog({ id: 999 });
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('list_logs');
+    expect(result.content[0]?.text ?? '').toContain('list_logs');
     expect(payload.update).not.toHaveBeenCalled();
   });
 });
@@ -772,7 +776,7 @@ describe('deleteLog', () => {
 
     expect(result.isError).toBeUndefined();
     expect(payload.delete).toHaveBeenCalledWith(expect.objectContaining({ collection: 'logs', id: 9, overrideAccess: false, user }));
-    expect(JSON.parse(result.content[0].text)).toEqual(expect.objectContaining({ id: 9, title: '消す対象' }));
+    expect(JSON.parse(result.content[0]?.text ?? '')).toEqual(expect.objectContaining({ id: 9, title: '消す対象' }));
   });
 
   it('存在しない id は回復ヒント付きで reject し、delete しない', async () => {
@@ -783,7 +787,7 @@ describe('deleteLog', () => {
     const result = await handlers.deleteLog({ id: 999 });
 
     expect(result.isError).toBe(true);
-    expect(result.content[0].text).toContain('list_logs');
+    expect(result.content[0]?.text ?? '').toContain('list_logs');
     expect(payload.delete).not.toHaveBeenCalled();
   });
 });
