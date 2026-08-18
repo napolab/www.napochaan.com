@@ -147,6 +147,47 @@ export const createLogToolHandlers = (deps: LogToolDeps) => {
         )
         .map((updated) => ({ ...toSummary(updated), note: 'draft を更新した。年表への反映は publish_log を呼ぶこと。' }))
         .match(ok, toToolError),
+
+    publishLog: (input: { id: number }): Promise<ToolResult> =>
+      findLog(input.id)
+        .andThen(requireLog)
+        // draft-promotion: versions.drafts が有効なため update_log の変更は versions
+        // テーブルに積まれる。ここで bare `_status` だけを update すると published 済みの
+        // main テーブル行の上に浅くマージされ、未公開の draft 編集が黙って失われる。
+        // 最新 draft を読み直し、全フィールドを published 付きで再送する
+        // (blog の publishPost と同じ形、src/lib/mcp/tools/index.ts)。
+        .andThen((current) =>
+          fromPromise(
+            payload.update({
+              collection: 'logs',
+              id: input.id,
+              data: {
+                title: current.title,
+                date: current.date,
+                meta: current.meta,
+                url: current.url,
+                _status: 'published',
+              },
+              overrideAccess: false,
+              user,
+            }),
+            (cause) => new PayloadOperationError('log の公開に失敗しました', { cause }),
+          ),
+        )
+        .map((published) => ({ ...toSummary(published), note: '公開した。/log の年表に反映される。' }))
+        .match(ok, toToolError),
+
+    deleteLog: (input: { id: number }): Promise<ToolResult> =>
+      // 削除前に実物を引くのは ①存在しない id を回復ヒントで弾く ②何を消したかを
+      // 応答に含める、の 2 つのため。Payload の delete はバージョンごと消すハード削除で
+      // 復元手段がない。
+      findLog(input.id)
+        .andThen(requireLog)
+        .andThen((doc) =>
+          fromPromise(payload.delete({ collection: 'logs', id: input.id, overrideAccess: false, user }), (cause) => new PayloadOperationError('log の削除に失敗しました', { cause })).map(() => doc),
+        )
+        .map((deleted) => ({ ...toSummary(deleted), note: '削除した。復元はできない。' }))
+        .match(ok, toToolError),
   };
 };
 
@@ -198,5 +239,27 @@ export const registerLogTools = (server: McpServer, deps: LogToolDeps): void => 
       annotations: { destructiveHint: false },
     },
     handlers.updateLog,
+  );
+
+  server.registerTool(
+    'publish_log',
+    {
+      title: 'log 公開',
+      description: 'log を公開して /log の年表に載せる。最新 draft の内容がそのまま公開される。',
+      inputSchema: { id: z.number().int() },
+      annotations: { destructiveHint: false },
+    },
+    handlers.publishLog,
+  );
+
+  server.registerTool(
+    'delete_log',
+    {
+      title: 'log 削除',
+      description: 'log を削除する。復元はできない。削除前に list_logs で対象の id を必ず確認すること。',
+      inputSchema: { id: z.number().int() },
+      annotations: { destructiveHint: true },
+    },
+    handlers.deleteLog,
   );
 };

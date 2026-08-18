@@ -132,3 +132,65 @@ describe('updateLog', () => {
     expect(payload.update).not.toHaveBeenCalled();
   });
 });
+
+describe('publishLog', () => {
+  // draft-promotion: versions.drafts が有効なため update_log の変更は versions テーブルに
+  // 積まれる。bare `_status` だけを update すると published 済みの main テーブル行の上に
+  // 浅くマージされ、未公開の draft 編集が黙って失われる(blog の publishPost と同じ罠)。
+  it('最新 draft の全フィールドを published で再送する', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 9, title: '最新draft', date: '2026-11-01T00:00:00.000Z', meta: 'DJ/VJ', url: 'https://example.com', _status: 'draft' });
+    payload.update.mockResolvedValue({ id: 9, title: '最新draft', date: '2026-11-01T00:00:00.000Z', meta: 'DJ/VJ', url: 'https://example.com', _status: 'published' });
+
+    const handlers = createLogToolHandlers(deps);
+    const result = await handlers.publishLog({ id: 9 });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        collection: 'logs',
+        id: 9,
+        data: { title: '最新draft', date: '2026-11-01T00:00:00.000Z', meta: 'DJ/VJ', url: 'https://example.com', _status: 'published' },
+      }),
+    );
+  });
+
+  it('存在しない id は reject し、update しない', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue(null);
+
+    const handlers = createLogToolHandlers(deps);
+    const result = await handlers.publishLog({ id: 999 });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text ?? '').toContain('list_logs');
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('deleteLog', () => {
+  it('存在する id を削除する', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 9, title: '消す対象', date: '2026-11-01T00:00:00.000Z', meta: 'DJ', url: null, _status: 'draft' });
+    payload.delete.mockResolvedValue({ id: 9 });
+
+    const handlers = createLogToolHandlers(deps);
+    const result = await handlers.deleteLog({ id: 9 });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.delete).toHaveBeenCalledWith(expect.objectContaining({ collection: 'logs', id: 9, overrideAccess: false, user }));
+    expect(JSON.parse(result.content[0]?.text ?? '')).toEqual(expect.objectContaining({ id: 9, title: '消す対象' }));
+  });
+
+  it('存在しない id は回復ヒント付きで reject し、delete しない', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue(null);
+
+    const handlers = createLogToolHandlers(deps);
+    const result = await handlers.deleteLog({ id: 999 });
+
+    expect(result.isError).toBe(true);
+    expect(result.content[0]?.text ?? '').toContain('list_logs');
+    expect(payload.delete).not.toHaveBeenCalled();
+  });
+});
