@@ -16,7 +16,10 @@
 - `@modelcontextprotocol/sdk`（v1 モノリス）は**削除する**。2.x は存在しない
 - `hono` は `^4.12.23`（既存）で v2 アダプタの peer `^4.11.4` を満たす。変更不要
 - 各タスク完了時に `pnpm lint && pnpm typecheck` を通すこと（`.claude/rules/coding-rules.md`）
-- **勝手に commit しない**（`CLAUDE.md`）。commit は最終レビュー承認後にまとめて行う
+- commit 運用: **タスク毎に commit してよい**（本人承認 2026-08-18。この決定が下の `CLAUDE.md` 既定を上書きする）。
+  ただし **push と PR 作成はしない** — それらは difit レビュー承認後に別途判断する。
+  （既定は `CLAUDE.md` の「勝手に commit しないこと」。本ブランチはローカル専用の feature branch であり、
+  タスク単位で差分が分離されている方がレビュー精度と巻き戻しやすさで勝るため、本人が明示的に緩和した）
 - 関数は arrow function、`let`/IIFE/非 null assertion/`forEach`/`any` 禁止（`.claude/rules/functional-programming.md`, `function-style.md`）
 
 ## 事前に実測済みの事実（推測ではない）

@@ -51,8 +51,11 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   // 再利用する(専用 secret を新設せず、既存の秘匿値を流用する設計判断)。
   const { env } = await getCloudflareContext({ async: true });
 
-  // MCP SDK 1.26+ はリクエストごとに server / transport を新規生成する必要がある
-  // (共有すると "already connected" で throw する)。生成は安価。
+  // server / transport はリクエストごとに新規生成する必要がある(共有すると
+  // "already connected" で throw する)。生成は安価。
+  // 元は SDK v1(@modelcontextprotocol/sdk 1.26+)で確認した制約だが、v2
+  // (@modelcontextprotocol/server 2.0.0)でも同じ。実挙動は workerd 上の
+  // worker/mcp-v2-runtime.test.ts が毎回この形で組み直して固定している。
   const server = new McpServer({ name: 'napochaan-blog', version: '1.0.0' });
   registerBlogTools(server, {
     payload,
