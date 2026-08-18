@@ -22,8 +22,8 @@ importers:
         specifier: ^2.1.2
         version: 2.1.2(gsap@3.15.0)(react@19.2.7)
       '@hono/zod-validator':
-        specifier: ^0.7.6
-        version: 0.7.6(hono@4.12.23)(zod@3.25.76)
+        specifier: ^0.9.0
+        version: 0.9.0(hono@4.12.23)(zod@3.25.76)
       '@internationalized/date':
         specifier: ^3.12.2
         version: 3.12.2
@@ -2018,10 +2018,10 @@ packages:
       hono: '>=3.9.0'
       zod: ^3.19.1
 
-  '@hono/zod-validator@0.7.6':
-    resolution: {integrity: sha512-Io1B6d011Gj1KknV4rXYz4le5+5EubcWEU/speUjuw9XMMIaP3n78yXLhjd2A3PXaXaUwEAluOiAyLqhBEJgsw==}
+  '@hono/zod-validator@0.9.0':
+    resolution: {integrity: sha512-n0ZSXmCiHVIp4Y5wlOOyZCeTd/rsawA/qW1cipB8QOYKZ9N8Tk0nZUZCXho9cu374AN4JpDNKioNKBJ/W+LBug==}
     peerDependencies:
-      hono: '>=3.9.0'
+      hono: '>=4.11.2'
       zod: ^3.25.0 || ^4.0.0
 
   '@img/colour@1.1.0':
@@ -8301,7 +8301,7 @@ snapshots:
       hono: 4.12.23
       zod: 3.25.76
 
-  '@hono/zod-validator@0.7.6(hono@4.12.23)(zod@3.25.76)':
+  '@hono/zod-validator@0.9.0(hono@4.12.23)(zod@3.25.76)':
     dependencies:
       hono: 4.12.23
       zod: 3.25.76
