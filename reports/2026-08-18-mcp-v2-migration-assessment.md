@@ -11,13 +11,13 @@
 
 当初「2.0.0 beta」と見えていたが、npm 実測では **stable が出ている**。
 
-| パッケージ | 最新 | 備考 |
-| --- | --- | --- |
-| `@modelcontextprotocol/sdk` | 1.30.0 | v1 モノリス。**2.x は存在しない**(ここで打ち止め) |
-| `@modelcontextprotocol/core` | 2.0.0 | 公開 Zod スキーマ(spec + OAuth/OpenID)。deps: `zod ^4.2.0` |
-| `@modelcontextprotocol/server` | 2.0.0 | サーバ実装。deps: `zod ^4.2.0` + core |
-| `@modelcontextprotocol/client` | 2.0.0 | クライアント実装 |
-| `@modelcontextprotocol/hono` | 2.0.0 | **Hono アダプタ**。deps ゼロ / peer: `hono ^4.11.4` |
+| パッケージ                     | 最新   | 備考                                                       |
+| ------------------------------ | ------ | ---------------------------------------------------------- |
+| `@modelcontextprotocol/sdk`    | 1.30.0 | v1 モノリス。**2.x は存在しない**(ここで打ち止め)          |
+| `@modelcontextprotocol/core`   | 2.0.0  | 公開 Zod スキーマ(spec + OAuth/OpenID)。deps: `zod ^4.2.0` |
+| `@modelcontextprotocol/server` | 2.0.0  | サーバ実装。deps: `zod ^4.2.0` + core                      |
+| `@modelcontextprotocol/client` | 2.0.0  | クライアント実装                                           |
+| `@modelcontextprotocol/hono`   | 2.0.0  | **Hono アダプタ**。deps ゼロ / peer: `hono ^4.11.4`        |
 
 「v1 の `@modelcontextprotocol/sdk` を 2.x に上げる」という移行経路は存在しない。
 **パッケージを差し替える**移行になる。
@@ -70,10 +70,10 @@ Workers 前提のユーザーが想定されている証拠。
 v2 は **zod 3 を非サポート**。移行ガイドいわく zod@3 では
 「ツールが最初に list されたときに初めてエラーになる」= **サイレントに壊れる**。
 
-| 項目 | 現状 | 必要 |
-| --- | --- | --- |
-| `zod` | `^3.25.76` | `^4.2.0` |
-| `@hono/zod-validator` | `^0.7.6` | `^0.9.0`(peer: `zod ^3.25.0 \|\| ^4.0.0`) |
+| 項目                  | 現状       | 必要                                      |
+| --------------------- | ---------- | ----------------------------------------- |
+| `zod`                 | `^3.25.76` | `^4.2.0`                                  |
+| `@hono/zod-validator` | `^0.7.6`   | `^0.9.0`(peer: `zod ^3.25.0 \|\| ^4.0.0`) |
 
 zod を import しているのは 6 ファイル。うち MCP 以外が 4 つあり、そこが本当の作業量:
 
@@ -109,8 +109,8 @@ v2 移行で強制される変更はない。ただし v2 の認可強化で **D
 > 2026-08-18 追記: 1〜3 は型定義と実測で解消済み。残るは 4 のみ(実装時に検証)。
 
 1. ~~workerd 上でデフォルト validator のままで動くか~~ → **解消**。`jsonSchemaValidator` の既定は
-   型定義に *"Runtime-selected validator (AJV-backed on Node.js, `@cfworker/json-schema`-backed on
-   browser/workerd runtimes)"* と明記。**SDK がランタイムを自動判別する**ので手動注入は原則不要。
+   型定義に _"Runtime-selected validator (AJV-backed on Node.js, `@cfworker/json-schema`-backed on
+   browser/workerd runtimes)"_ と明記。**SDK がランタイムを自動判別する**ので手動注入は原則不要。
    `validators/cf-worker` はカスタマイズ用の口であって必須ではない。
 2. ~~`transport.handleRequest(request)` の第2引数が省略可能か~~ → **解消**。
    `handleRequest(req: Request, options?: HandleRequestOptions)` で optional。

@@ -23,29 +23,29 @@
 
 計画の前提はすべて 2026-08-18 に実物で確認済み。詳細は `reports/2026-08-18-mcp-v2-migration-assessment.md`。
 
-| 確認事項 | 結果 |
-| --- | --- |
-| `WebStandardStreamableHTTPServerTransport` の v2 での提供 | `@modelcontextprotocol/server` から export。オプション同一 |
-| `transport.handleRequest(request)` の第2引数 | `handleRequest(req: Request, options?: HandleRequestOptions)` = **省略可** |
-| `registerTool` の生シェイプ `inputSchema` | `InputArgs extends ZodRawShape` overload が存在（`auto-wrapped with z.object()`）= **12 箇所とも書き換え不要** |
-| zod 4 の `z` named / default export | 両方あり |
-| zod 4 の `.email({ message })` / `.min(1, { message })` | 動作する |
-| zod 4 の `error.flatten().fieldErrors` | 動作し、出力も v3 と同一 |
-| zod 4 の `z.discriminatedUnion` | 動作する |
-| workerd での JSON Schema validator | `jsonSchemaValidator` の既定が**ランタイム自動判別**（Node=AJV / workerd=`@cfworker/json-schema`）。手動注入は原則不要 |
+| 確認事項                                                  | 結果                                                                                                                   |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `WebStandardStreamableHTTPServerTransport` の v2 での提供 | `@modelcontextprotocol/server` から export。オプション同一                                                             |
+| `transport.handleRequest(request)` の第2引数              | `handleRequest(req: Request, options?: HandleRequestOptions)` = **省略可**                                             |
+| `registerTool` の生シェイプ `inputSchema`                 | `InputArgs extends ZodRawShape` overload が存在（`auto-wrapped with z.object()`）= **12 箇所とも書き換え不要**         |
+| zod 4 の `z` named / default export                       | 両方あり                                                                                                               |
+| zod 4 の `.email({ message })` / `.min(1, { message })`   | 動作する                                                                                                               |
+| zod 4 の `error.flatten().fieldErrors`                    | 動作し、出力も v3 と同一                                                                                               |
+| zod 4 の `z.discriminatedUnion`                           | 動作する                                                                                                               |
+| workerd での JSON Schema validator                        | `jsonSchemaValidator` の既定が**ランタイム自動判別**（Node=AJV / workerd=`@cfworker/json-schema`）。手動注入は原則不要 |
 
 → 想定される**ソース変更はごく小さい**。大半は依存の差し替えと検証。
 
 ## File Structure
 
-| ファイル | 役割 | 本計画での扱い |
-| --- | --- | --- |
-| `package.json` | 依存定義 | Task 1/2/3 で変更 |
-| `src/app/api/mcp/route.ts` | MCP サーバのエントリ（transport 生成・tool 登録） | Task 3 で import 2 行のみ変更 |
-| `src/app/api/mcp/route.test.ts` | 上記のユニットテスト（SDK を `vi.mock` している） | Task 3 で mock パス 2 箇所を変更 |
-| `src/lib/mcp/tools/index.ts` | blog 系 tool 登録（`McpServer` を型としてのみ import） | Task 3 で type import 1 行を変更 |
-| `src/lib/mcp/tools/legal/index.ts` | legal 系 tool 登録（同上） | Task 3 で type import 1 行を変更 |
-| `worker/mcp-v2-runtime.test.ts` | **新規**。workerd 実行環境で v2 SDK が動くことを固定する回帰テスト | Task 4 で新規作成 |
+| ファイル                           | 役割                                                               | 本計画での扱い                   |
+| ---------------------------------- | ------------------------------------------------------------------ | -------------------------------- |
+| `package.json`                     | 依存定義                                                           | Task 1/2/3 で変更                |
+| `src/app/api/mcp/route.ts`         | MCP サーバのエントリ（transport 生成・tool 登録）                  | Task 3 で import 2 行のみ変更    |
+| `src/app/api/mcp/route.test.ts`    | 上記のユニットテスト（SDK を `vi.mock` している）                  | Task 3 で mock パス 2 箇所を変更 |
+| `src/lib/mcp/tools/index.ts`       | blog 系 tool 登録（`McpServer` を型としてのみ import）             | Task 3 で type import 1 行を変更 |
+| `src/lib/mcp/tools/legal/index.ts` | legal 系 tool 登録（同上）                                         | Task 3 で type import 1 行を変更 |
+| `worker/mcp-v2-runtime.test.ts`    | **新規**。workerd 実行環境で v2 SDK が動くことを固定する回帰テスト | Task 4 で新規作成                |
 
 zod を import する 6 ファイル（`src/lib/mcp/tools/index.ts`, `src/lib/mcp/tools/legal/index.ts`, `src/app/api/media-upload/route.ts`, `src/lib/contact/schema.ts`, `src/lib/cursor/protocol.ts`, `worker/handlers/images/index.ts`）と `src/app/(site)/contact/_actions/submit-contact.ts`（`error.flatten()` 使用）は、実測上ソース変更不要の見込み。Task 2 のテストで実際に確認する。
 
@@ -56,24 +56,29 @@ zod を import する 6 ファイル（`src/lib/mcp/tools/index.ts`, `src/lib/mc
 zod 本体はまだ動かさない。このタスク単体では**挙動が変わらない**ことを確認するのが目的。
 
 **Files:**
+
 - Modify: `package.json`（`"@hono/zod-validator": "^0.7.6"` → `"^0.9.0"`）
 - Test: `src/app/api/media-upload/route.test.ts`, `worker/handlers/images/helpers.test.ts`
 
 **Interfaces:**
+
 - Consumes: なし（最初のタスク）
 - Produces: `@hono/zod-validator@^0.9.0` がインストールされた状態。peer が `zod ^3.25.0 || ^4.0.0` になり、Task 2 の zod 4 昇格が peer 衝突なしに行える
 
 - [ ] **Step 1: 変更前のベースラインを取る**
 
 Run:
+
 ```bash
 pnpm exec vitest run src/app/api/media-upload/route.test.ts worker/handlers/images/helpers.test.ts
 ```
+
 Expected: PASS（現状の緑を記録する。ここが赤なら本計画とは無関係の既存不具合なので、先に報告して停止すること）
 
 - [ ] **Step 2: バージョンを上げる**
 
 Run:
+
 ```bash
 pnpm add @hono/zod-validator@^0.9.0
 ```
@@ -81,19 +86,23 @@ pnpm add @hono/zod-validator@^0.9.0
 - [ ] **Step 3: peer が zod 4 を受け入れることを確認**
 
 Run:
+
 ```bash
 pnpm why zod | head -20
 node -e "console.log(require('./node_modules/@hono/zod-validator/package.json').peerDependencies)"
 ```
+
 Expected: `{ hono: '>=4.11.2', zod: '^3.25.0 || ^4.0.0' }` が出力される
 
 - [ ] **Step 4: 挙動不変を確認**
 
 Run:
+
 ```bash
 pnpm exec vitest run src/app/api/media-upload/route.test.ts worker/handlers/images/helpers.test.ts
 pnpm lint && pnpm typecheck
 ```
+
 Expected: すべて PASS（Step 1 と同じ結果）
 
 ---
@@ -103,16 +112,19 @@ Expected: すべて PASS（Step 1 と同じ結果）
 MCP には一切触らない。zod 単独の破壊があればここで顕在化させる。
 
 **Files:**
+
 - Modify: `package.json`（`"zod": "^3.25.76"` → `"^4.2.0"`）
 - Test: `src/lib/contact/schema.test.ts`, `src/lib/cursor/protocol.test.ts`, `src/app/api/media-upload/route.test.ts`, `worker/handlers/images/helpers.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 1 の `@hono/zod-validator@^0.9.0`
 - Produces: `zod@^4.2.0`。v2 SDK が要求する zod 4 環境が整う
 
 - [ ] **Step 1: バージョンを上げる**
 
 Run:
+
 ```bash
 pnpm add zod@^4.2.0
 ```
@@ -120,12 +132,15 @@ pnpm add zod@^4.2.0
 - [ ] **Step 2: 型を通す**
 
 Run:
+
 ```bash
 pnpm typecheck
 ```
+
 Expected: エラーなし。
 
 もしエラーが出た場合の既知の対処（実測で不要と判明しているが、環境差で出た場合のみ適用）:
+
 - `z.string().email({ message })` が型エラー → `z.email({ message })` に置換（`src/lib/contact/schema.ts:5`）
 - `error.flatten()` が型エラー → `z.flattenError(error)` に置換（`src/app/(site)/contact/_actions/submit-contact.ts:45`）
 
@@ -134,25 +149,31 @@ Expected: エラーなし。
 - [ ] **Step 3: zod を使う全テストを走らせる**
 
 Run:
+
 ```bash
 pnpm exec vitest run src/lib/contact/schema.test.ts src/lib/cursor/protocol.test.ts src/app/api/media-upload/route.test.ts worker/handlers/images/helpers.test.ts
 ```
+
 Expected: PASS
 
 - [ ] **Step 4: 全テストを走らせる**
 
 Run:
+
 ```bash
 pnpm test
 ```
+
 Expected: PASS。MCP 系テスト（`src/lib/mcp/**`）もこの時点ではまだ v1 SDK のまま緑であること
 
 - [ ] **Step 5: lint / typecheck**
 
 Run:
+
 ```bash
 pnpm lint && pnpm typecheck
 ```
+
 Expected: PASS
 
 ---
@@ -160,6 +181,7 @@ Expected: PASS
 ### Task 3: MCP SDK を v2 パッケージへ差し替える
 
 **Files:**
+
 - Modify: `package.json`（`@modelcontextprotocol/sdk` を削除し `@modelcontextprotocol/server@^2.0.0` を追加）
 - Modify: `src/app/api/mcp/route.ts:4-5`
 - Modify: `src/app/api/mcp/route.test.ts:19,25`
@@ -168,6 +190,7 @@ Expected: PASS
 - Test: `src/app/api/mcp/route.test.ts`, `src/lib/mcp/tools/tools.test.ts`, `src/lib/mcp/tools/legal/legal.test.ts`
 
 **Interfaces:**
+
 - Consumes: Task 2 の `zod@^4.2.0`
 - Produces: `McpServer` と `WebStandardStreamableHTTPServerTransport` が `@modelcontextprotocol/server`（サブパスなしのメイン export）から供給される状態。`registerTool` / `server.connect` / `transport.handleRequest` の呼び出し形は変更しない
 
@@ -176,6 +199,7 @@ Expected: PASS
 `src/app/api/mcp/route.test.ts` の 19 行目と 25 行目、2 つの `vi.mock` の対象パスを 1 つに統合する。
 
 変更前（19-31 行目、2 ブロック）:
+
 ```ts
 vi.mock('@modelcontextprotocol/sdk/server/mcp.js', () => ({
   McpServer: class {
@@ -193,6 +217,7 @@ vi.mock('@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js', () => (
 ```
 
 変更後（v2 は両方ともメイン export なので 1 ブロックに統合する）:
+
 ```ts
 vi.mock('@modelcontextprotocol/server', () => ({
   McpServer: class {
@@ -210,14 +235,17 @@ vi.mock('@modelcontextprotocol/server', () => ({
 - [ ] **Step 2: テストを走らせて失敗することを確認**
 
 Run:
+
 ```bash
 pnpm exec vitest run src/app/api/mcp/route.test.ts
 ```
+
 Expected: FAIL（`@modelcontextprotocol/server` が未インストールのため解決できない旨のエラー）
 
 - [ ] **Step 3: パッケージを差し替える**
 
 Run:
+
 ```bash
 pnpm remove @modelcontextprotocol/sdk
 pnpm add @modelcontextprotocol/server@^2.0.0
@@ -228,12 +256,14 @@ pnpm add @modelcontextprotocol/server@^2.0.0
 `src/app/api/mcp/route.ts:4-5` — 2 行を 1 行にまとめる。
 
 変更前:
+
 ```ts
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 ```
 
 変更後:
+
 ```ts
 import { McpServer, WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/server';
 ```
@@ -241,11 +271,13 @@ import { McpServer, WebStandardStreamableHTTPServerTransport } from '@modelconte
 `src/lib/mcp/tools/index.ts:35` と `src/lib/mcp/tools/legal/index.ts:17` — 型 import を書き換える。
 
 変更前:
+
 ```ts
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 ```
 
 変更後:
+
 ```ts
 import type { McpServer } from '@modelcontextprotocol/server';
 ```
@@ -255,25 +287,31 @@ import type { McpServer } from '@modelcontextprotocol/server';
 - [ ] **Step 5: テストが通ることを確認**
 
 Run:
+
 ```bash
 pnpm exec vitest run src/app/api/mcp/route.test.ts src/lib/mcp/tools/tools.test.ts src/lib/mcp/tools/legal/legal.test.ts
 ```
+
 Expected: PASS
 
 - [ ] **Step 6: 残存参照がないことを確認**
 
 Run:
+
 ```bash
 grep -rn "@modelcontextprotocol/sdk" src worker package.json
 ```
+
 Expected: 出力なし（1 件でも残っていたら書き換え漏れ）
 
 - [ ] **Step 7: 全テスト + lint + typecheck**
 
 Run:
+
 ```bash
 pnpm test && pnpm lint && pnpm typecheck
 ```
+
 Expected: PASS
 
 ---
@@ -287,10 +325,12 @@ Expected: PASS
 未検証項目だった「`validators/cf-worker` への差し替えが必要か」も、このテストで判明する。
 
 **Files:**
+
 - Create: `worker/mcp-v2-runtime.test.ts`
 - Test: 同上
 
 **Interfaces:**
+
 - Consumes: Task 3 の `@modelcontextprotocol/server@^2.0.0`
 - Produces: workerd 上で `McpServer` + `WebStandardStreamableHTTPServerTransport` が `tools/list` を返せることを保証する回帰テスト
 
@@ -349,18 +389,20 @@ describe('MCP v2 SDK on workerd', () => {
 - [ ] **Step 2: 走らせて結果を確認**
 
 Run:
+
 ```bash
 pnpm exec vitest run worker/mcp-v2-runtime.test.ts
 ```
 
 分岐:
+
 - **PASS** → `validators/cf-worker` への差し替えは不要。Step 3 を飛ばして Step 4 へ
 - **FAIL**（`new Function` / `eval` / CSP 由来のエラー、あるいはハング）→ Step 3 を実施
 
 - [ ] **Step 3: (Step 2 が FAIL の場合のみ) Workers 向け validator に差し替える**
 
 SDK の型定義によれば `jsonSchemaValidator` の既定値は
-*"Runtime-selected validator (AJV-backed on Node.js, `@cfworker/json-schema`-backed on browser/workerd runtimes)"*
+_"Runtime-selected validator (AJV-backed on Node.js, `@cfworker/json-schema`-backed on browser/workerd runtimes)"_
 ＝ **workerd は SDK 側が自動判別する**ため、通常この Step は不要（Step 2 は PASS するはず）。
 自動判別が効かなかった場合のみ、`McpServer` の第 2 引数（`ServerOptions`）で明示注入する。
 
@@ -379,9 +421,11 @@ const server = new McpServer(
 - [ ] **Step 4: 全テスト + lint + typecheck**
 
 Run:
+
 ```bash
 pnpm test && pnpm lint && pnpm typecheck
 ```
+
 Expected: PASS
 
 ---
@@ -391,40 +435,49 @@ Expected: PASS
 v2 はステートレス化に伴い `Mcp-Method` / `Mcp-Name` ヘッダが増える。うちのセキュリティ境界（`worker/routes/mcp-guard.ts` の外部遮断、`worker/worker.ts` の `apiRoute: '/mcp'` 判定）がこれに影響を受けないことを確認する。
 
 **Files:**
+
 - Test: `worker/app.test.ts`, `worker/routes/mcp-guard.test.ts`
 - Modify: なし（想定。影響が出た場合のみ該当ファイル）
 
 **Interfaces:**
+
 - Consumes: Task 4 までの全変更
 - Produces: レビュー可能な差分
 
 - [ ] **Step 1: ガード境界のテストを走らせる**
 
 Run:
+
 ```bash
 pnpm exec vitest run worker/app.test.ts worker/routes/mcp-guard.test.ts
 ```
+
 Expected: PASS。`/api/mcp` が外部から 404 で遮断され続けていること（ガードの登録順序がセキュリティ境界そのものであるため、ここが赤なら移行を止めて報告すること）
 
 - [ ] **Step 2: 本番相当ビルドが通ることを確認**
 
 Run:
+
 ```bash
 pnpm build
 ```
+
 Expected: 成功。v2 SDK が OpenNext のバンドルに乗ることを確認する（`worker/**` の vitest は workerd だが、Next 側のバンドル経路は別）
 
 - [ ] **Step 3: 最終の全体検証**
 
 Run:
+
 ```bash
 pnpm test && pnpm lint && pnpm typecheck
 ```
+
 Expected: すべて PASS
 
 - [ ] **Step 4: difit でレビュー依頼**
 
 Run:
+
 ```bash
 pnpm difit
 ```

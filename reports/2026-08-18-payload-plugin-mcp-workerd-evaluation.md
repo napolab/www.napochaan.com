@@ -23,11 +23,11 @@ compatibility_flags = ["nodejs_compat"]
 
 ## 結果
 
-| 段階 | 結果 | 備考 |
-| --- | --- | --- |
-| バンドル (`wrangler deploy --dry-run`) | ✅ | 2,323 KiB / gzip 459 KiB。`redis` `http` `net` は nodejs_compat の polyfill に解決される |
-| 起動 (module evaluation) | ✅ | ハンドラ内生成なら通る |
-| リクエスト処理 (`initialize`) | ❌ | **ハング**。7ms で workerd が打ち切り 500 |
+| 段階                                   | 結果 | 備考                                                                                     |
+| -------------------------------------- | ---- | ---------------------------------------------------------------------------------------- |
+| バンドル (`wrangler deploy --dry-run`) | ✅   | 2,323 KiB / gzip 459 KiB。`redis` `http` `net` は nodejs_compat の polyfill に解決される |
+| 起動 (module evaluation)               | ✅   | ハンドラ内生成なら通る                                                                   |
+| リクエスト処理 (`initialize`)          | ❌   | **ハング**。7ms で workerd が打ち切り 500                                                |
 
 ```
 [wrangler:info] POST /   404 Not Found (16ms)     ← ルーティングは生きている
@@ -52,7 +52,7 @@ assert  async_hooks  events  http  net  stream  redis
 
 本リポジトリの自前実装が `server/webStandardStreamableHttp.js`
 (Web 標準 Request/Response ベース)を直接使っているのは、まさにこれを避けるため。
-plugin 側に `withRestoredWebGlobals`(*"Restores globals replaced by @hono/node-server"*
+plugin 側に `withRestoredWebGlobals`(_"Restores globals replaced by @hono/node-server"_
 と書かれ、`globalThis.Request/Response` を書き戻すヘルパ)が存在すること自体が、
 Node サーバ前提の設計であることを示している。
 
