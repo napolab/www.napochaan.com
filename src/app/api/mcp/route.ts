@@ -2,6 +2,7 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { editorConfigFactory } from '@payloadcms/richtext-lexical';
 
 import { McpServer, WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/server';
+import { CfWorkerJsonSchemaValidator } from '@modelcontextprotocol/server/validators/cf-worker';
 
 import { createMarkdownCodec } from '@lib/mcp/markdown';
 import { registerBlogTools } from '@lib/mcp/tools';
@@ -56,7 +57,20 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   // 元は SDK v1(@modelcontextprotocol/sdk 1.26+)で確認した制約だが、v2
   // (@modelcontextprotocol/server 2.0.0)でも同じ。実挙動は workerd 上の
   // worker/mcp-v2-runtime.test.ts が毎回この形で組み直して固定している。
-  const server = new McpServer({ name: 'napochaan-blog', version: '1.0.0' });
+  // jsonSchemaValidator を明示注入する理由: SDK の既定バリデータは実行時のランタイム判定では
+  // なく、`@modelcontextprotocol/server` の `"./_shims"` エントリの **ビルド時 export condition**
+  // (`workerd` | `browser` | `node` | `default`=node)で選ばれる。Next の webpack ビルドは
+  // `node` を解決するため、無指定だと本番バンドルには Ajv(`AjvJsonSchemaValidator`)が入る。
+  // Ajv はスキーマのコンパイルに `new Function(...)` を使うが、workerd はコード生成を禁止して
+  // おり(`EvalError: Code generation from strings disallowed`)、Ajv 経路のツールを呼んだ瞬間に
+  // 本番で 500 になる。`worker/mcp-v2-runtime.test.ts` はこの分岐を検知できない —
+  // vitest の workers pool(`@cloudflare/vitest-pool-workers`)は `workerd` condition を解決する
+  // ため、同じコードでもテストでは自動的に `@cfworker/json-schema` ベースの Workers 版が選ばれて
+  // しまい、Next ビルドで実際に何が入るかとは無関係にグリーンになる。
+  // ここで明示的に Workers 版を注入すれば、ビルドツールの export condition 解決に依存せず
+  // Node/Workers 双方で同じバリデータが使われる(`@cfworker/json-schema` はこのパッケージに
+  // 同梱済みなので依存追加は不要)。
+  const server = new McpServer({ name: 'napochaan-blog', version: '1.0.0' }, { jsonSchemaValidator: new CfWorkerJsonSchemaValidator() });
   registerBlogTools(server, {
     payload,
     user,
