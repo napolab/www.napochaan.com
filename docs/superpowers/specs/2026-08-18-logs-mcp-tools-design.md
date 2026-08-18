@@ -57,8 +57,19 @@ export const LOG_META_OPTIONS = [
 `satisfies readonly Log['meta'][]` により、`payload-types.ts` の再生成で union が
 変わった瞬間にコンパイルエラーになる。MCP 側は `z.enum(LOG_META_OPTIONS)`。
 
-`.claude/rules/cross-module-sync-test.md` の方針に従い、collection の `options` と
-`LOG_META_OPTIONS` の一致をテストで表明し、同ルールの「Known Sync Pairs」表にも追記する。
+collection 側の `options` は `LOG_META_OPTIONS.map((value) => ({ label: value, value }))`
+で**この配列から導出する**(`.claude/rules/cross-module-sync-test.md` が言う「2 つの
+値をハンドで同期し続ける」状況にそもそもならない)。そのため同ルールが求める
+「両方を import して 1:1 を assert するクロスモジュールテスト」は不要と判断し、
+追加しなかった。ソースが 1 つしかない以上、drift は構造的に起こり得ない。
+
+代わりに `src/collections/fields/log-meta/log-meta.test.ts` の colocated テストが
+`LOG_META_OPTIONS` の 8 個の値そのものを固定する。型(`Log['meta']`)は
+`payload-types.ts` の再生成で一緒に変わってしまうため「うっかり表記を変えた」を
+型では検出できない — 例えば `'DJ/VJ'` を `'DJ / VJ'` のように書き換えても
+`satisfies readonly Log['meta'][]` は通ってしまう。この値は既存 DB 行の `meta`
+カラムとバイト一致していないと年表の表示が壊れるため、リテラルを直接ピン留めする
+必要がある。
 
 ### `delete_log` は `id` のみ(title 照合なし)
 
@@ -97,10 +108,10 @@ src/lib/mcp/tools/logs/
 └── logs.test.ts
 ```
 
-- `src/collections/logs.ts` — `LOG_META_OPTIONS` を export し、`options` をそこから組む
+- `src/collections/fields/log-meta` — `LOG_META_OPTIONS` を export する依存ゼロの葉モジュール
+- `src/collections/logs.ts` — `LOG_META_OPTIONS.map(...)` から `options` を組む(import のみ)
 - `src/app/api/mcp/route.ts` — `registerLogTools(server, { payload, user })` を 1 行追加。
   **codec は渡さない**(richText なし)
-- `.claude/rules/cross-module-sync-test.md` — Known Sync Pairs 表に 1 行追記
 
 `LogToolDeps` は `{ payload: Payload; user: User }` のみ。blog の `BlogToolDeps` が持つ
 `codec` / `signingSecret` / `siteBaseUrl` はいずれも不要。
@@ -135,10 +146,11 @@ src/lib/mcp/tools/logs/
 - `date` の不正形式(`2026/10/24`, `10-24`, 実在しない `2026-02-30`)
 - 存在しない `id`(`update_log` / `publish_log` / `delete_log` すべて)
 
-同期テスト:
+同期は保証しない、値は固定する:
 
-- `LOG_META_OPTIONS` と collection の `options` の `value` 列が 1:1 で一致すること
-  (両方を import して assert する — 片側のハードコードでは drift を検出できない)
+- collection の `options` は `LOG_META_OPTIONS` から `.map()` で導出するため、両者の
+  同期を assert するテストは不要(上の「決定事項と根拠」参照)
+- 代わりに `log-meta.test.ts` が `LOG_META_OPTIONS` の 8 個の値そのものをピン留めする
 
 ## 範囲外
 
