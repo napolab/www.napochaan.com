@@ -59,6 +59,33 @@ List pages paginate via `/blog/page/[num]` routes, NOT `?page=N`. Reading `searc
 
 `next build` prerenders CMS pages EMPTY (payload bindings are inert at build). `scripts/bust-isr-cache.mjs` — run at the tail of `deploy:staging` / `deploy:production` — is the ONLY mechanism that flushes that empty snapshot now that there is no hourly self-heal. Keep its tag list in sync with the wiring table above.
 
+## Never read runtime `env` from a prerendered page
+
+`getCloudflareContext().env` resolves on whatever machine renders the page. During
+`next build` that is the CI runner, where `.github/actions/setup` seeds `.dev.vars`
+from `.dev.vars.example`. A statically prerendered page therefore bakes those
+placeholder values into its HTML and keeps serving them for `s-maxage=31536000` —
+with no revalidate window and no `bust-isr-cache.mjs` entry, forever.
+
+This shipped: `/contact` served `turnstileSiteKey: "dev-placeholder"` in production,
+Turnstile answered `400` on the bogus key, its widget fell back to the error card
+(the stray "Troubleshoot" link), and the submit button stayed permanently disabled.
+
+Any page whose **render** reads `env` — or any other deploy/request-time value — must
+opt out of static prerendering:
+
+```ts
+// The page reads TURNSTILE_SITE_KEY from the Cloudflare env at render time.
+export const dynamic = 'force-dynamic';
+```
+
+A genuine dynamic API works too, and is why `/oauth/authorize` was never affected: it
+awaits `searchParams`, so Next never prerenders it. Route handlers and Server Actions
+always run per request and are safe.
+
+Verify with the build output — the route must print `ƒ (Dynamic)`, and must be absent
+from `.next/prerender-manifest.json`.
+
 ## Anti-patterns
 
 ```ts

@@ -19,6 +19,13 @@ const contactDescription = 'お問い合わせ — フォーム、または各�
 // was missing.
 export const generateMetadata = (): Metadata => resolveSectionMetadata({ docTitle: 'contact', description: contactDescription, path: '/contact' });
 
+// ContactFormLoader reads TURNSTILE_SITE_KEY from the Cloudflare env. A static
+// prerender resolves that env on the BUILD machine — where CI seeds .dev.vars from
+// .dev.vars.example — so `dev-placeholder` gets frozen into the cached HTML, and the
+// page has neither a time-based revalidate nor a bust-isr-cache entry to heal it.
+// The page holds no CMS data, so rendering per request costs little.
+export const dynamic = 'force-dynamic';
+
 const ContactPage = () => {
   return (
     <div className={s.grid}>
