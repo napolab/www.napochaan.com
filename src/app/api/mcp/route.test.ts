@@ -16,13 +16,11 @@ vi.mock('@payloadcms/richtext-lexical', () => ({
   CodeBlock: () => ({ slug: 'Code', fields: [] }),
   lexicalEditor: () => ({}),
 }));
-vi.mock('@modelcontextprotocol/sdk/server/mcp.js', () => ({
+vi.mock('@modelcontextprotocol/server', () => ({
   McpServer: class {
     registerTool(): void {}
     async connect(): Promise<void> {}
   },
-}));
-vi.mock('@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js', () => ({
   WebStandardStreamableHTTPServerTransport: class {
     async handleRequest(): Promise<Response> {
       return new Response('{}', { status: 200 });

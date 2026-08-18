@@ -32,7 +32,7 @@ import type { MarkdownCodec } from '../markdown';
 import type { ImageNode, ImageRef, InlineNode } from '../markdown/image-ref';
 import type { MediaHit } from './raw-ref-hints';
 import type { ToolResult } from './shared/tool-result';
-import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import type { McpServer } from '@modelcontextprotocol/server';
 import type { Result, ResultAsync } from 'neverthrow';
 import type { Blog, User } from '@payload-types';
 import type { Payload } from 'payload';

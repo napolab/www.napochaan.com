@@ -1,8 +1,7 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { editorConfigFactory } from '@payloadcms/richtext-lexical';
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
+import { McpServer, WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/server';
 
 import { createMarkdownCodec } from '@lib/mcp/markdown';
 import { registerBlogTools } from '@lib/mcp/tools';
