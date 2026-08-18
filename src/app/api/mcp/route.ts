@@ -7,6 +7,7 @@ import { CfWorkerJsonSchemaValidator } from '@modelcontextprotocol/server/valida
 import { createMarkdownCodec } from '@lib/mcp/markdown';
 import { registerBlogTools } from '@lib/mcp/tools';
 import { registerLegalTools } from '@lib/mcp/tools/legal';
+import { registerLogTools } from '@lib/mcp/tools/logs';
 import { blogEditorFeatures } from '@lib/payload/editor-features';
 import { getPayloadClient } from '@lib/payload/client';
 
@@ -79,6 +80,8 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
     siteBaseUrl: process.env.BASE_URL ?? 'http://localhost:3000',
   });
   registerLegalTools(server, { payload, user, codec: createMarkdownCodec<LegalDocument['body']>(editorConfig) });
+  // logs は richText を持たないので codec は渡さない。
+  registerLogTools(server, { payload, user });
 
   const transport = new WebStandardStreamableHTTPServerTransport({
     sessionIdGenerator: undefined, // stateless モード
