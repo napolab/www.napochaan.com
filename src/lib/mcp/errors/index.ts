@@ -16,6 +16,11 @@ export class PostNotFoundError extends Error {
   override name = 'PostNotFoundError' as const;
 }
 
+// 指定 id の log(年表の手動エントリ)が見つからない。
+export class LogNotFoundError extends Error {
+  override name = 'LogNotFoundError' as const;
+}
+
 // 指定 id の media が見つからない。thumbnail / image-row cell の両方で使うため、
 // メッセージは呼び出し側が渡す(文言がユースケースごとに異なるため)。
 export class MediaNotFoundError extends Error {
@@ -95,6 +100,7 @@ export const formatPayloadValidationError = (error: ValidationError): string => 
 export type McpToolError =
   | InvalidInputError
   | PostNotFoundError
+  | LogNotFoundError
   | MediaNotFoundError
   | UnsupportedBlockError
   | BodyValidationError

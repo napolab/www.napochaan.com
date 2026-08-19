@@ -1,5 +1,6 @@
 import { CACHE_TAGS } from '@utils/cache-tags';
 
+import { LOG_META_OPTIONS } from './fields/log-meta';
 import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
@@ -46,16 +47,9 @@ export const Logs = {
       // Stored verbatim and rendered as the timeline's type label, so each
       // `value` IS the on-screen text. Existing rows hold DJ / VJ / DJ/VJ, so
       // those values must stay byte-identical; the rest are new roles.
-      options: [
-        { label: 'DJ', value: 'DJ' },
-        { label: 'VJ', value: 'VJ' },
-        { label: 'DJ/VJ', value: 'DJ/VJ' },
-        { label: 'Support', value: 'Support' },
-        { label: 'Dev', value: 'Dev' },
-        { label: 'Flyer', value: 'Flyer' },
-        { label: 'Talk', value: 'Talk' },
-        { label: 'Video', value: 'Video' },
-      ],
+      // 正準値は ./fields/log-meta。MCP の create_log / update_log も同じ配列から
+      // z.enum を組む。ここで導出しているのでリテラルの二重管理は発生しない。
+      options: LOG_META_OPTIONS.map((value) => ({ label: value, value })),
       admin: { description: '年表に表示する種別ラベル。' },
     },
     { name: 'url', label: '外部リンク', type: 'text', admin: { description: '設定するとタイトルがこの URL へのリンクになります。' } },
