@@ -20,6 +20,9 @@ jobs:
     if: github.event_name == 'push'
     name: deploy staging
     runs-on: ubuntu-latest
+    # 実績は 4 分前後。ジョブ既定の 360 分だと、ハングしたデプロイが
+    # concurrency group を掴んだまま後続を止め続ける。
+    timeout-minutes: 30
     environment: staging
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -38,6 +41,10 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     name: deploy production
     runs-on: ubuntu-latest
+    # timeout-minutes は意図的に付けていない。required reviewers の承認待ち時間が
+    # ジョブのタイムアウトに算入されるかを確認できておらず、算入されるなら
+    # 「承認待ちのまま自動キャンセル」になってしまうため。
+    # 承認ゲートの無い staging では付けている。挙動を確認できたらここにも入れること。
     # Environment 保護ルール（required reviewers）でデプロイ前に承認を要求する
     environment: production
     env:
