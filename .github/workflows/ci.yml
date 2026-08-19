@@ -16,6 +16,9 @@ jobs:
   quality:
     name: lint & typecheck
     runs-on: ubuntu-latest
+    # 実績は 40s 前後。ジョブ既定の 360 分だと、ネットワーク起因のハングを
+    # 6 時間放置して runner を占有し続ける。
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -28,10 +31,28 @@ jobs:
   test:
     name: vitest (browser + unit + workers)
     runs-on: ubuntu-latest
+    # 実績は 1m30s 前後(chromium のダウンロード込み)。
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       # The `browser` vitest project drives headless chromium via Playwright.
+      #
+      # `timeout` でラップしているのは、このステップが 2026-08-19 に 2 回連続で
+      # ハングしたため(1 回目 25 分、再実行後も 10 分以上、いずれも `pnpm test` に
+      # 到達せず)。ハングは exit code を返さないのでリトライループでは拾えない —
+      # `timeout` で失敗に変換して初めて次の試行に進める。
+      # step の timeout-minutes は全リトライを含む上限なので、5 分 × 3 回 + 待ちを賄う値にする。
       - name: Install Playwright chromium
-        run: pnpm exec playwright install --with-deps chromium
+        timeout-minutes: 18
+        run: |
+          for attempt in 1 2 3; do
+            if timeout 300 pnpm exec playwright install --with-deps chromium; then
+              exit 0
+            fi
+            echo "::warning::playwright install attempt ${attempt} failed or timed out"
+            sleep 15
+          done
+          echo "::error::playwright install failed after 3 attempts"
+          exit 1
       - run: pnpm test
