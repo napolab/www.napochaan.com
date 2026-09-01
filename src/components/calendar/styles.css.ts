@@ -18,6 +18,10 @@ export const heading = css({
   fontFamily: 'mono',
   fontVariationSettings: '"wght" 600',
   fontSize: 'sm',
+  '&[data-size="full"]': {
+    fontSize: 'lg',
+    letterSpacing: 'wide',
+  },
 });
 
 export const navButton = css({
@@ -33,6 +37,10 @@ export const navButton = css({
     opacity: '[0.35]',
     cursor: 'default',
   },
+  '&[data-size="full"]': {
+    fontSize: 'xl',
+    paddingX: '3',
+  },
 });
 
 export const headerCell = css({
@@ -41,6 +49,10 @@ export const headerCell = css({
   fontWeight: 'normal',
   color: 'fg.muted',
   paddingBottom: '1',
+  '&[data-size="full"]': {
+    fontSize: 'sm',
+    paddingBottom: '2',
+  },
 });
 
 // セル下端のドットは ::after で描く（装飾グリフは CSS で描く — JSX に直書きしない）。
@@ -79,6 +91,18 @@ export const cell = css({
   '&[data-tone="accent"]': {
     _after: {
       bg: 'accent.solid',
+    },
+  },
+  // 単体ページ用。セルを広げて日付を読み物サイズにし、ドットも 1px 太らせる。
+  '&[data-size="full"]': {
+    width: '12',
+    height: '12',
+    fontSize: 'sm',
+    _after: {
+      bottom: '[5px]',
+      left: '[calc(50% - 3px)]',
+      width: '[6px]',
+      height: '[6px]',
     },
   },
 });
