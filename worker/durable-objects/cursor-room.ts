@@ -42,9 +42,9 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     }
   }
 
-  #broadcastToPath(path: string, message: string, exclude?: WebSocket): void {
+  #broadcastToPath(path: string, message: string, excludes?: ReadonlySet<WebSocket>): void {
     for (const ws of this.ctx.getWebSockets()) {
-      if (exclude !== undefined && ws === exclude) continue;
+      if (excludes?.has(ws) === true) continue;
       if (this.#attachmentOf(ws).path !== path) continue;
       this.#send(ws, message);
     }
@@ -52,10 +52,10 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
 
   // Presence is keyed by uid (identity), NOT by socket: one visitor can hold several sockets (tabs),
   // all sharing the same IP-derived uid. Count distinct uids so multi-tab sessions count as one.
-  #countOnPath(path: string, exclude?: WebSocket): number {
+  #countOnPath(path: string, excludes?: ReadonlySet<WebSocket>): number {
     const uids = new Set<string>();
     for (const ws of this.ctx.getWebSockets()) {
-      if (ws === exclude) continue;
+      if (excludes?.has(ws) === true) continue;
       const att = this.#attachmentOf(ws);
       if (att.path === path) uids.add(att.uid);
     }
@@ -63,12 +63,13 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     return uids.size;
   }
 
-  // True if another socket (≠ exclude) for the same uid is on `path`. Used so join fires only on a
+  // True if a socket NOT in `excludes` for the same uid is on `path`. Used so join fires only on a
   // uid's first arrival and leave only on its last departure (otherwise closing one tab evicts the
-  // visitor's cursor for everyone while another tab is still open).
-  #hasUidOnPath(path: string, uid: string, exclude: WebSocket): boolean {
+  // visitor's cursor for everyone while another tab is still open). `excludes` is the socket(s) being
+  // removed — one on a clean close, the whole dead set on a heartbeat reap.
+  #hasUidOnPath(path: string, uid: string, excludes: ReadonlySet<WebSocket>): boolean {
     for (const ws of this.ctx.getWebSockets()) {
-      if (ws === exclude) continue;
+      if (excludes.has(ws)) continue;
       const att = this.#attachmentOf(ws);
       if (att.path === path && att.uid === uid) return true;
     }
@@ -76,9 +77,9 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     return false;
   }
 
-  #broadcastCount(path: string, exclude?: WebSocket): void {
-    const message = JSON.stringify({ t: 'count', n: this.#countOnPath(path, exclude) } satisfies ServerMessage);
-    this.#broadcastToPath(path, message, exclude);
+  #broadcastCount(path: string, excludes?: ReadonlySet<WebSocket>): void {
+    const message = JSON.stringify({ t: 'count', n: this.#countOnPath(path, excludes) } satisfies ServerMessage);
+    this.#broadcastToPath(path, message, excludes);
   }
 
   // Apply the page carried by a message: if it differs from the socket's current page, move the
@@ -92,17 +93,18 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     // Move this socket onto the new page first so the counts below place it correctly.
     ws.serializeAttachment({ ...att, path: nextPath } satisfies CursorAttachment);
 
+    const self = new Set([ws]);
     if (prevPath !== undefined) {
       // Leave the old page only when this uid's LAST socket leaves it (multi-tab keeps the cursor).
-      if (!this.#hasUidOnPath(prevPath, att.uid, ws)) {
-        this.#broadcastToPath(prevPath, JSON.stringify({ t: 'leave', id } satisfies ServerMessage), ws);
+      if (!this.#hasUidOnPath(prevPath, att.uid, self)) {
+        this.#broadcastToPath(prevPath, JSON.stringify({ t: 'leave', id } satisfies ServerMessage), self);
       }
       this.#broadcastCount(prevPath);
     }
 
     // Always announce arrival — peers key cursors by id, so a same-uid second tab just re-asserts the
     // same cursor (no duplicate). Suppressing it would hide same-uid tabs from each other.
-    this.#broadcastToPath(nextPath, JSON.stringify({ t: 'join', id, color, label } satisfies ServerMessage), ws);
+    this.#broadcastToPath(nextPath, JSON.stringify({ t: 'join', id, color, label } satisfies ServerMessage), self);
     // Replay existing peers (deduped by uid) so this socket sees who's already here.
     const replayed = new Set<string>();
     for (const peer of this.ctx.getWebSockets()) {
@@ -121,7 +123,7 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     const now = Date.now();
     if (now - (att.lastMove ?? 0) < MOVE_BROADCAST_INTERVAL_MS) return;
     ws.serializeAttachment({ ...att, lastMove: now } satisfies CursorAttachment);
-    this.#broadcastToPath(path, JSON.stringify({ t: 'move', id: att.uid, x, y } satisfies ServerMessage), ws);
+    this.#broadcastToPath(path, JSON.stringify({ t: 'move', id: att.uid, x, y } satisfies ServerMessage), new Set([ws]));
   }
 
   override webSocketMessage(ws: WebSocket, message: string | ArrayBuffer): void {
@@ -140,14 +142,59 @@ export class CursorRoom extends BroadcastMessage<CursorBindings & Env> {
     const att = this.#attachmentOf(ws);
     const path = att.path;
     if (path !== undefined) {
+      const self = new Set([ws]);
       // Emit leave only when this uid's last socket on the page is closing (keep the cursor alive
       // while another tab of the same visitor remains).
-      if (!this.#hasUidOnPath(path, att.uid, ws)) {
+      if (!this.#hasUidOnPath(path, att.uid, self)) {
         const { id } = deriveIdentity(att.uid);
-        this.#broadcastToPath(path, JSON.stringify({ t: 'leave', id } satisfies ServerMessage), ws);
+        this.#broadcastToPath(path, JSON.stringify({ t: 'leave', id } satisfies ServerMessage), self);
       }
-      this.#broadcastCount(path, ws);
+      this.#broadcastCount(path, self);
     }
     super.webSocketClose(ws, code, reason, wasClean);
+  }
+
+  // durabcast's base alarm() reaps sockets that stopped pinging (abrupt disconnect) by calling
+  // ws.close() — which does NOT invoke our webSocketClose, so leave/count would never fire for them.
+  // We ONLY add the missing presence notify and then hand back to super.alarm(): closing the dead
+  // sockets and re-arming the heartbeat (setAlarm(+INTERVAL)) stay 100% owned by durabcast — we never
+  // call setAlarm ourselves. The AUTO_CLOSE guard mirrors the base's own reaping condition, so when
+  // auto-close is off we touch nothing and just delegate (no leave for a socket super won't close).
+  // `dead` is computed from the same source (this.sessions) and predicate (isAliveSocket) the base
+  // uses, so our notify set and super's close set always agree.
+  override async alarm(): Promise<void> {
+    if (!this.AUTO_CLOSE) {
+      await super.alarm();
+
+      return;
+    }
+    const dead = new Set([...this.sessions].filter((ws) => !this.isAliveSocket(ws)));
+    this.#notifyEvicted(dead);
+    await super.alarm();
+  }
+
+  // Batch equivalent of webSocketClose for heartbeat-reaped sockets. The dead are still in
+  // getWebSockets() here (super hasn't closed them yet), so every survivor check and count EXCLUDES
+  // the dead set — making the result independent of ws.close() timing.
+  #notifyEvicted(dead: ReadonlySet<WebSocket>): void {
+    if (dead.size === 0) return;
+    const seenLeave = new Set<string>();
+    const affectedPaths = new Set<string>();
+    for (const ws of dead) {
+      const att = this.#attachmentOf(ws);
+      const path = att.path;
+      if (path === undefined) continue;
+      affectedPaths.add(path);
+      const key = `${path} ${att.uid}`;
+      if (seenLeave.has(key)) continue;
+      seenLeave.add(key);
+      // Leave only when no SURVIVING socket holds the same (path, uid).
+      if (this.#hasUidOnPath(path, att.uid, dead)) continue;
+      const { id } = deriveIdentity(att.uid);
+      this.#broadcastToPath(path, JSON.stringify({ t: 'leave', id } satisfies ServerMessage), dead);
+    }
+    for (const path of affectedPaths) {
+      this.#broadcastCount(path, dead);
+    }
   }
 }
