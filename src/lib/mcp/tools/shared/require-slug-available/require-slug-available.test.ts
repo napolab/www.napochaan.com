@@ -30,6 +30,18 @@ describe('requireSlugAvailable', () => {
     expect(message).toContain('update_legal_document');
   });
 
+  it('works collection でも slug の重複を回復ヒントで弾く', async () => {
+    const { find, payload } = makePayload([{ id: 1 }]);
+
+    const result = await requireSlugAvailable(payload, 'works', 'my-work', 'update_work');
+
+    expect(result.isErr()).toBe(true);
+    const message = result.isErr() ? result.error.message : '';
+    expect(message).toContain('my-work');
+    expect(message).toContain('update_work');
+    expect(find).toHaveBeenCalledWith(expect.objectContaining({ collection: 'works' }));
+  });
+
   it('overrideAccess:true / draft:true で slug 存在を確認する(access/status を無視)', async () => {
     const { find, payload } = makePayload([]);
 

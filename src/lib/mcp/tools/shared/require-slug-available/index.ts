@@ -7,7 +7,7 @@ import type { ResultAsync } from 'neverthrow';
 import type { Payload } from 'payload';
 
 // MCP から create できる、slug を持つ collection。
-type SluggedCollection = 'blog' | 'legal-documents';
+type SluggedCollection = 'blog' | 'legal-documents' | 'works';
 
 // create 前の重複 slug チェック。DB の unique 制約に触れる前に回復ヒントで弾く
 // (.claude/rules/mcp-write-strict.md: opaque な DB エラーになる前に actionable な hint へ)。

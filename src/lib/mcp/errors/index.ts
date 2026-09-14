@@ -21,6 +21,11 @@ export class LogNotFoundError extends Error {
   override name = 'LogNotFoundError' as const;
 }
 
+// 指定 id/slug の work(制作物)が見つからない。
+export class WorkNotFoundError extends Error {
+  override name = 'WorkNotFoundError' as const;
+}
+
 // 指定 id の media が見つからない。thumbnail / image-row cell の両方で使うため、
 // メッセージは呼び出し側が渡す(文言がユースケースごとに異なるため)。
 export class MediaNotFoundError extends Error {
@@ -101,6 +106,7 @@ export type McpToolError =
   | InvalidInputError
   | PostNotFoundError
   | LogNotFoundError
+  | WorkNotFoundError
   | MediaNotFoundError
   | UnsupportedBlockError
   | BodyValidationError
