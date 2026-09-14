@@ -40,7 +40,8 @@ const transformChildren = (children: unknown, siteBaseUrl: string): unknown => {
 
 // Lexical tree を再帰的に歩き、link/autolink ノードの newTab を URL から常に再導出する。
 // update_post の round-trip でも毎回適用される（「常に再導出」 — spec の承認済み決定）。
-export const applyLinkNewTabPolicy = (body: Blog['body'], siteBaseUrl: string): Blog['body'] => ({
+// body 型はジェネリクス（blog / works で同じ lexical 形の body を共有するため、渡した型のまま返す）。
+export const applyLinkNewTabPolicy = <TBody extends Blog['body']>(body: TBody, siteBaseUrl: string): TBody => ({
   ...body,
   root: { ...body.root, children: body.root.children.map((node) => transformNode(node, siteBaseUrl)) },
 });
