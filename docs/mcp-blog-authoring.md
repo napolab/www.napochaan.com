@@ -59,6 +59,20 @@ Settings → Connectors → Add custom connector → URL に `https://napochaan.
 - image-row を含む既存記事も `get_post` で本文(フェンス込みの Markdown)を取得でき、`update_post` で編集できる(`bodyEditable: true` が返る)。
 - フェンス内は「ちょうど2行」の `![media:<id>](caption)` のみ許可。それ以外の行数や、存在しない media id を指定すると `create_post` / `update_post` がエラーを返す。
 
+## works 入稿
+
+`/works` に載る制作物(`works` collection)も MCP から入稿できる。ツールは `list_works` / `get_work` / `create_work` / `update_work` / `publish_work` の 5 つ(削除ツールは無い — ポートフォリオの誤削除を避けるため、削除は admin UI で行う)。
+
+1. (任意)`upload_media` でサムネイル・本文画像を登録し、`id` を控える
+2. `create_work`(常に draft。`slug` は blog と同じ規則、`type` は `production` / `talk` / `support`、`date` は `YYYY-MM-DD` 必須)
+3. admin UI の Live Preview で目視確認(`adminURL` が返る)
+4. `publish_work`(最新 draft の全フィールドを再送して公開。`/works/<slug>` の URL が返る)
+
+- `thumbnailMediaID` は任意。未設定なら詳細ページにプレースホルダが出る。`update_work` で `null` を渡すと外せる
+- `url` を設定すると、一覧・年表のリンク先がサイト内の詳細ページではなくその外部 URL になる。`update_work` で `null` を渡すと外せる(`description` も同様)
+- `bodyMarkdown` は任意。書き方(`![media:<id>](alt)`、image-row フェンス、table、newTab ポリシー)は blog の `create_post` / `update_post` と完全に同じ。本文未設定の work は `get_work` が `bodyMarkdown: ""` を返す
+- `update_work` は指定したフィールドだけを draft version として保存する。公開版への反映は `publish_work` が必要
+
 ## トークン失効(漏洩時)
 
 grant と access token は KV(`OAUTH_KV`)に別キーで保存されている。`@cloudflare/workers-oauth-provider` の request-time 検証は `token:<userId>:<grantId>:<tokenId>` のみを読む(`grant:` キーは再照会しない)ため、**grant キーを消すだけでは既発行の access token は無効化されない** — TTL(1 時間)が切れるまで使え続ける。grant キーと対応する token キーの両方を削除すること。
