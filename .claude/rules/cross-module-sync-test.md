@@ -24,5 +24,6 @@ Some values must stay literal for tooling (e.g. dynamic `import('@shikijs/langs/
 | --- | --- |
 | `CODE_LANGUAGES` (src/blocks/code) ↔ Shiki `PRELOADED_LANGUAGE_KEYS` (rich-text code highlighter) | `src/blocks/code/code.test.ts` |
 | `NodeTypes` union (rich-text converters) ↔ `renderBlock` branches (src/utils/lexical/to-markdown) | mirrored by hand — add branches to both when adding a block |
+| `WORK_TYPE_OPTIONS` (src/collections/fields/work-type) ↔ `type` select options in `Works` (src/collections/works.ts) | `src/lib/mcp/tools/works/works.test.ts` |
 
 Add new pairs to this table when you introduce one.

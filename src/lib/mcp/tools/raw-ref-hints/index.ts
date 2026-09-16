@@ -5,8 +5,8 @@ import { runPlugins } from '@utils/run-plugins';
 import type { ImageNode } from '../../markdown/image-ref';
 import type { Plugin } from '@utils/run-plugins';
 
-// filename → media doc の対応表 1 件分(tools/index.ts の FindMediaByFilename が返す形と同じ)。
-// tools/index.ts はこれをここから import する(旧: tools/index.ts にローカル定義)。
+// filename → media doc の対応表 1 件分(tools/shared/body-pipeline の FindMediaByFilename が返す形と同じ)。
+// body-pipeline はこれをここから import する(旧: tools/index.ts にローカル定義)。
 export type MediaHit = { id: number; alt: string };
 
 type HintPlugin = Plugin<ImageNode, string>;

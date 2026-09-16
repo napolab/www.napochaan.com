@@ -1,6 +1,7 @@
 import { CACHE_TAGS } from '@utils/cache-tags';
 
 import { slugField } from './fields/slug';
+import { WORK_TYPE_LABELS, WORK_TYPE_OPTIONS } from './fields/work-type';
 import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
@@ -43,11 +44,7 @@ export const Works = {
       label: '種別',
       type: 'select',
       required: true,
-      options: [
-        { label: '制作', value: 'production' },
-        { label: '登壇', value: 'talk' },
-        { label: '制作協力', value: 'support' },
-      ],
+      options: WORK_TYPE_OPTIONS.map((value) => ({ label: WORK_TYPE_LABELS[value], value })),
       admin: { position: 'sidebar' },
     },
     {
