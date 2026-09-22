@@ -35,6 +35,8 @@ jobs:
       # worker deploy の前に D1 スキーマを反映（remote binding 経由）
       - run: pnpm deploy:database:staging
       # opennext build → deploy → ISR cache bust（1スクリプトに同梱）
+      # Workers Cache warm-up は stg.napochaan.com が Cloudflare Access 配下のため未対応
+      # （未認証 curl は Access ログインへ 302 するので CI から warm できない）
       - run: pnpm deploy:staging
 
   production:
@@ -55,4 +57,5 @@ jobs:
       - uses: ./.github/actions/setup
       - run: pnpm cf:types
       - run: pnpm deploy:database:production
+      # opennext build → deploy → ISR cache bust → Workers Cache warm-up（sitemap 全 URL + feeds）
       - run: pnpm deploy:production

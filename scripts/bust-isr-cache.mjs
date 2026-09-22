@@ -18,6 +18,10 @@
 // Runs automatically at the tail of `deploy:staging`. Keep `tags` in sync with
 // CACHE_TAGS (src/utils/cache-tags) and the ISR routes whose afterChange hooks
 // revalidate paths (src/collections/*, src/globals/profile.ts).
+//
+// On production, `warm-cache.mjs` runs immediately after this script, so the
+// pages it just marked stale get regenerated and land in Workers Cache before
+// real visitors arrive instead of each paying the regeneration cost cold.
 
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
