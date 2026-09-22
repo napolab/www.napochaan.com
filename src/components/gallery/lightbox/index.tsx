@@ -39,6 +39,7 @@ export const Lightbox = ({ src, alt, width, height, triggerClassName, children }
                   alt={alt}
                   width={width}
                   height={height}
+                  sizes="88vw"
                   className={styles.modalImage}
                   style={imageStyle}
                   placeholder="blur"

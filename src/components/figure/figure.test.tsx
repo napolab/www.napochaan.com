@@ -60,4 +60,31 @@ describe('Figure', () => {
     await page.getByRole('button', { name: 'a' }).click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
   });
+
+  it('passes a content-column sizes attribute by default', async () => {
+    const screen = await render(<Figure src="/a.jpg" alt="a" width={1600} height={900} />);
+    const img = screen.container.querySelector('[data-testid="next-image"]');
+    expect(img?.getAttribute('data-sizes')).toBe('(min-width: 1180px) 1180px, 100vw');
+  });
+
+  it('caps sizes at the intrinsic width for fit="intrinsic" when narrower than the 85% column cap', async () => {
+    const screen = await render(<Figure src="/a.jpg" alt="a" width={400} height={300} variant="cover" fit="intrinsic" />);
+    const img = screen.container.querySelector('[data-testid="next-image"]');
+    expect(img?.getAttribute('data-sizes')).toBe('(min-width: 1180px) 400px, min(400px, 85vw)');
+  });
+
+  // The intrinsic frame renders at `min(var(--figure-width), 85%)` of the content
+  // column (styles.css.ts), so a source wider than 1180 * 0.85 ≈ 1003px never
+  // actually renders at its own width — the sizes attribute must cap there too.
+  it('caps sizes at the 85% column cap for fit="intrinsic" when the source is wider than the cap', async () => {
+    const screen = await render(<Figure src="/a.jpg" alt="a" width={2400} height={1600} variant="cover" fit="intrinsic" />);
+    const img = screen.container.querySelector('[data-testid="next-image"]');
+    expect(img?.getAttribute('data-sizes')).toBe('(min-width: 1180px) 1003px, min(2400px, 85vw)');
+  });
+
+  it('lets a caller override sizes', async () => {
+    const screen = await render(<Figure src="/a.jpg" alt="a" width={1600} height={900} sizes="50vw" />);
+    const img = screen.container.querySelector('[data-testid="next-image"]');
+    expect(img?.getAttribute('data-sizes')).toBe('50vw');
+  });
 });

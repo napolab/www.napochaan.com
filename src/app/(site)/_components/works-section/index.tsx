@@ -34,6 +34,7 @@ const toRows = (works: readonly WorkRow[]): Record<string, ReactNode>[] =>
           alt={work.title}
           width={work.thumbnail.width}
           height={work.thumbnail.height}
+          sizes="40px"
           className={styles.thumb}
           placeholder="blur"
           blurDataURL={formatBlurURL(work.thumbnail.src, { blur: 20 })}

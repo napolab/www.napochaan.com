@@ -6,6 +6,7 @@ import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
 import { Lightbox } from './lightbox';
+import { gallerySizes } from './sizes';
 import * as styles from './styles.css';
 
 import type { CSSProperties } from 'react';
@@ -42,6 +43,7 @@ const GalleryCell = ({ item }: { item: GalleryItem }) => {
           alt={item.alt}
           width={item.width}
           height={item.height}
+          sizes={gallerySizes(item.area)}
           className={styles.gridImage}
           placeholder="blur"
           blurDataURL={formatBlurURL(item.src, { blur: 10, width: 32, quality: 30 })}

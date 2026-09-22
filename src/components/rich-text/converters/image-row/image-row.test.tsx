@@ -71,6 +71,20 @@ describe('imageRowBlockConverters image-row', () => {
     expect(container.querySelectorAll('img')).toHaveLength(1);
   });
 
+  // The row is 85% of the content column (1180 * 0.85 / 2 ≈ 500 per cell above
+  // the container-query breakpoint), and the 480px `sizes` breakpoint used to be
+  // a raw px value even though the row's own two-column layout is a CONTAINER
+  // query firing at ~565px viewport (see styles.css.ts), not a 480px one.
+  it('passes a sizes attribute derived from the content column and the container breakpoint', async () => {
+    const { container } = await render(<>{renderImageRow([cell('a.png', 'alt a'), cell('b.png', 'alt b')])}</>);
+
+    const images = container.querySelectorAll('[data-testid="next-image"]');
+    expect(images).toHaveLength(2);
+    for (const img of images) {
+      expect(img.getAttribute('data-sizes')).toBe('(min-width: 1388px) 500px, (min-width: 565px) 42vw, 66vw');
+    }
+  });
+
   it('renders nothing when cells is not an array', async () => {
     const converter = imageRowBlockConverters['image-row'];
     if (typeof converter !== 'function') throw new Error('image-row converter must be a function');

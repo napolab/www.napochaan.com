@@ -2,13 +2,14 @@ import { Lightbox } from '@components/gallery/lightbox';
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
+import { resolveSizes } from './sizes';
 import * as styles from './styles.css';
 
 import type { ComponentPropsWithoutRef, CSSProperties } from 'react';
 
 type ImageProps = ComponentPropsWithoutRef<typeof Image>;
 
-type Props = {
+export type Props = {
   src: string;
   alt: string;
   width: number;
@@ -32,6 +33,11 @@ type Props = {
   // the richtext upload converter — the detail-hero usage leaves it false so the
   // hero stays non-interactive.
   zoomable?: boolean;
+  // `sizes` for the responsive candidate selection. Defaults to the site content
+  // column (100vw up to the 1180px cap); intrinsic fit caps at min(source width,
+  // 85% of that column) since the frame (styles.css.ts) never renders it larger
+  // than that. See sizes.ts.
+  sizes?: string;
 };
 
 // Cover-variant backdrop source: a tiny, heavily-blurred copy of the same image,
@@ -41,9 +47,9 @@ const backdropStyle = (src: string): CSSProperties => ({ '--figure-backdrop': `u
 // Intrinsic fit caps the frame at the source's real width via this CSS var; fill leaves it unset.
 const figureWidthStyle = (fit: Props['fit'], width: number): CSSProperties | undefined => (fit === 'intrinsic' ? ({ '--figure-width': `${width}px` } as CSSProperties) : undefined);
 
-export const Figure = ({ src, alt, width, height, caption, placeholder, blurDataURL, variant = 'plain', fit = 'fill', zoomable = false }: Props) => {
+export const Figure = ({ src, alt, width, height, caption, placeholder, blurDataURL, variant = 'plain', fit = 'fill', zoomable = false, sizes }: Props) => {
   const captionClassName = variant === 'cover' ? styles.tag : styles.caption;
-  const image = <Image src={src} alt={alt} width={width} height={height} placeholder={placeholder} blurDataURL={blurDataURL} className={styles.image} />;
+  const image = <Image src={src} alt={alt} width={width} height={height} sizes={resolveSizes(fit, width, sizes)} placeholder={placeholder} blurDataURL={blurDataURL} className={styles.image} />;
 
   return (
     <figure className={styles.root} data-variant={variant} data-fit={fit} style={figureWidthStyle(fit, width)}>

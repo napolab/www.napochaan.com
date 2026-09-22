@@ -40,5 +40,6 @@ describe('WorksArchive', () => {
     const img = container.querySelector('img');
     expect(img).not.toBeNull();
     expect(img?.getAttribute('alt')).toBe('thumbed');
+    expect(img?.getAttribute('data-sizes')).toBe('64px');
   });
 });

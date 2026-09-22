@@ -41,6 +41,7 @@ const RelatedItem = ({ work }: { work: RelatedWork }) => {
             alt={work.title}
             width={thumbnail.width}
             height={thumbnail.height}
+            sizes="64px"
             className={s.thumb}
             placeholder="blur"
             blurDataURL={formatBlurURL(thumbnail.src, { blur: 20 })}
