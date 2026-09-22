@@ -40,20 +40,38 @@
 // short floor the prompt reads as a quick glitch-flash rather than a full sentence —
 // a deliberate trade. Bots skip the overlay, so this never affects audit first paint.
 //
+// Returning visitors skip the aesthetic floor entirely: every successful human boot
+// stamps `localStorage[BOOT_SEEN_KEY]` with the current time, and a load within
+// BOOT_SEEN_TTL_MS (7 days) of that stamp runs with a 0 ms floor — boot drops the
+// moment Web Font Loader reports wf-active/wf-inactive, which by then resolves in
+// tens of ms because the kit is served from HTTP cache. The overlay still covers
+// first paint (it is SSR'd, see above), so this never reintroduces FOUT — it only
+// shortens how long an already-cached, already-fonted repeat load keeps showing the
+// overlay. Storage access is wrapped in try/catch: private mode or disabled storage
+// silently falls back to the normal 1 s floor instead of throwing.
+//
 // Bots (crawlers, Lighthouse, PageSpeed, headless) get boot REMOVED synchronously
 // here, before first paint. boot is SSR'd for everyone (UA-independent, to keep the
 // markup ISR/statically cacheable — a per-UA server branch would force dynamic
 // rendering), so the bot exemption has to happen client-side, but synchronously in
 // <head> it still lands before paint: an auditor/crawler never sees the overlay and
 // measures the real content's first paint. The branded boot is for humans only.
+export const BOOT_SEEN_KEY = 'napochaan:boot-seen';
+export const BOOT_SEEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
 const script = `(function(d) {
   var config = { kitId: 'vmz7pfu', scriptTimeout: 3000, async: true },
       h = d.documentElement,
+      SEEN_KEY = '${BOOT_SEEN_KEY}',
+      SEEN_TTL = ${BOOT_SEEN_TTL_MS},
+      seen = false,
       BOOT_MIN_MS = 1000,
       BOT = /bot|crawl|spider|lighthouse|headlesschrome|pagespeed|gtmetrix|slurp/i.test(navigator.userAgent),
       t0 = Date.now(),
       t = setTimeout(function () { h.className = h.className.replace(/\\bwf-loading\\b/g, "") + " wf-inactive"; }, config.scriptTimeout),
       tk = d.createElement("script"), f = false, s = d.getElementsByTagName("script")[0], a;
+  try { seen = Date.now() - parseInt(localStorage.getItem(SEEN_KEY) || '0', 10) < SEEN_TTL; } catch (e) {}
+  if (seen) BOOT_MIN_MS = 0;
   if (BOT) h.className = h.className.replace(/\\bboot\\b/g, "");
   requestAnimationFrame(function () { t0 = Date.now(); });
   var obs = new MutationObserver(function () {
@@ -64,6 +82,7 @@ const script = `(function(d) {
         var left = BOOT_MIN_MS - (Date.now() - t0);
         if (left > 0) { setTimeout(done, left); return; }
         h.className = h.className.replace(/\\bboot\\b/g, "");
+        if (!BOT) { try { localStorage.setItem(SEEN_KEY, String(Date.now())); } catch (e) {} }
       };
       setTimeout(done, Math.max(0, BOOT_MIN_MS - (Date.now() - t0)));
     }
