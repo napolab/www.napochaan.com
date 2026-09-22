@@ -12,7 +12,12 @@
 // bust-isr-cache.mjs. It is intentionally best-effort: a slow or failing
 // individual URL should not fail the deploy, so this only exits non-zero
 // when the sitemap itself cannot be fetched (a strong signal the deploy is
-// broken).
+// broken). Even that is reported as a GitHub Actions warning annotation
+// rather than a failing step: by the time this runs the Worker is already
+// deployed and the ISR cache already busted, so a red job would misreport a
+// successful deploy. (First production run: the GitHub runner's requests were
+// answered 403 by the zone's bot protection, while the same requests from a
+// residential IP pass — the block is IP/ASN based, not User-Agent based.)
 
 import { buildWarmTargets } from './warm-cache/targets.mjs';
 
@@ -38,18 +43,26 @@ const attemptsLimit = parsePositiveInt(process.env.WARM_ATTEMPTS, 3);
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// `::warning::` is the GitHub Actions annotation syntax: it surfaces in the run
+// summary without failing the step. Harmless noise when run outside Actions.
+const warn = (message) => {
+  console.error(`::warning::[warm-cache] ${message}`);
+  console.error(`[warm-cache] ${message}`);
+};
+
+/** Fetch the sitemap; `undefined` means it could not be fetched (already reported). */
 const fetchSitemap = async () => {
   const sitemapUrl = `${baseUrl}/sitemap.xml`;
   try {
     const response = await fetch(sitemapUrl, { headers: { 'User-Agent': USER_AGENT } });
     if (!response.ok) {
-      console.error(`[warm-cache] sitemap fetch failed: ${response.status} ${sitemapUrl}`);
-      process.exit(1);
+      warn(`sitemap fetch failed: ${response.status} ${sitemapUrl} — skipping warm-up (cf-mitigated=${response.headers.get('cf-mitigated') ?? '-'})`);
+      return undefined;
     }
     return await response.text();
   } catch (error) {
-    console.error(`[warm-cache] sitemap fetch failed: ${error} ${sitemapUrl}`);
-    process.exit(1);
+    warn(`sitemap fetch failed: ${error} ${sitemapUrl} — skipping warm-up`);
+    return undefined;
   }
 };
 
@@ -104,6 +117,7 @@ const warmAll = async (urls) => {
 
 const main = async () => {
   const sitemapXml = await fetchSitemap();
+  if (sitemapXml === undefined) return;
   const targets = buildWarmTargets(baseUrl, sitemapXml);
 
   console.log(`[warm-cache] baseUrl=${baseUrl} targets=${targets.length} concurrency=${concurrency}`);
@@ -115,6 +129,7 @@ const main = async () => {
   const okCount = results.filter((result) => result.ok).length;
   const failedCount = results.length - okCount;
   console.log(`[warm-cache] warmed ${okCount}/${results.length} (${failedCount} failed) in ${elapsedSeconds}s`);
+  if (failedCount > 0) warn(`${failedCount} URL(s) could not be warmed; the next visitor regenerates them`);
 };
 
 try {
