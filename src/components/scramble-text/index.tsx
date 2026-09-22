@@ -1,12 +1,10 @@
 'use client';
 
-import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import { useEffect, useRef } from 'react';
 
 import { useBootReady } from '@components/boot-status';
+import { usePrefersReducedMotion } from '@hooks/use-prefers-reduced-motion';
+import { loadGsap } from '@utils/gsap';
 import { prefersReducedMotion } from '@utils/prefers-reduced-motion';
 
 import { clsx } from '@utils/clsx';
@@ -14,8 +12,6 @@ import { clsx } from '@utils/clsx';
 import * as styles from './styles.css';
 
 import type { ReactNode } from 'react';
-
-gsap.registerPlugin(ScrambleTextPlugin, ScrollTrigger);
 
 // Desktop hover starts here (768px = the `desktop` breakpoint). Below it there is
 // no hover, so the decode is triggered once when the text scrolls into view.
@@ -83,83 +79,107 @@ export const ScrambleText = (props: Props) => {
   const host = props.trigger === 'group' ? props.host : null;
 
   const bootReady = useBootReady();
+  // Effective reduced-motion (OS setting + the header motion toggle). Checked
+  // BEFORE loadGsap() below so the gsap chunk is never imported at all for a
+  // reduced-motion visitor — not merely no-op'd after loading.
+  const reduced = usePrefersReducedMotion();
 
-  useGSAP(
-    () => {
-      // The raw decode tween body. revealDelay holds a short full scramble before
-      // decoding; low speed keeps the glyph refresh chunky (digital); tweenLength
-      // off since the text length never changes. data-scrambling clips the churning
-      // fill to the ghost-reserved box for the decode (see styles) so a multi-line
-      // title keeps wrapping, dropping on complete to settle into the resolved wrap.
-      const runDecode = (duration: number) => {
-        if (prefersReducedMotion()) return;
-        const fill = fillRef.current;
-        if (fill === null) return;
-        gsap.to(fill, {
-          duration,
-          ease: 'none',
-          scrambleText: { text: children, chars: CHARS, speed: 0.5, revealDelay: 0.1, tweenLength: false },
-          onStart: () => fill.setAttribute('data-scrambling', 'true'),
-          onComplete: () => fill.removeAttribute('data-scrambling'),
-          onInterrupt: () => fill.removeAttribute('data-scrambling'),
-        });
-      };
+  useEffect(() => {
+    // USEEFFECT_JUSTIFICATION: imperative gsap context + matchMedia/ScrollTrigger
+    // setup on DOM refs (hover/scroll-into-view decode), loaded lazily (dynamic
+    // import) after mount.
+    if (reduced) return;
+    const state: { cancelled: boolean; revert?: () => void } = { cancelled: false };
+    const run = async () => {
+      try {
+        const { gsap, ScrollTrigger } = await loadGsap();
+        if (state.cancelled || rootRef.current === null) return;
+        const ctx = gsap.context(() => {
+          // The raw decode tween body. revealDelay holds a short full scramble before
+          // decoding; low speed keeps the glyph refresh chunky (digital); tweenLength
+          // off since the text length never changes. data-scrambling clips the churning
+          // fill to the ghost-reserved box for the decode (see styles) so a multi-line
+          // title keeps wrapping, dropping on complete to settle into the resolved wrap.
+          const runDecode = (duration: number) => {
+            if (prefersReducedMotion()) return;
+            const fill = fillRef.current;
+            if (fill === null) return;
+            gsap.to(fill, {
+              duration,
+              ease: 'none',
+              scrambleText: { text: children, chars: CHARS, speed: 0.5, revealDelay: 0.1, tweenLength: false },
+              onStart: () => fill.setAttribute('data-scrambling', 'true'),
+              onComplete: () => fill.removeAttribute('data-scrambling'),
+              onInterrupt: () => fill.removeAttribute('data-scrambling'),
+            });
+          };
 
-      const mm = gsap.matchMedia();
+          const mm = gsap.matchMedia();
 
-      // decode is wrapped by each branch's OWN contextSafe — the matchMedia
-      // condition context, never the outer useGSAP context. This matters because
-      // the MOBILE ScrollTrigger fires onEnter synchronously during create (when
-      // the text is already in view), i.e. while the conditional context is gsap's
-      // active context. A decode owned by the outer context would be cross-linked
-      // into the conditional context there (gsap runs `prev.data.push(self)`),
-      // forming a U⇄C cycle that makes the unmount-time revert() recurse forever in
-      // Context.getTweens (the "Maximum call stack size exceeded" on navigation).
-      // Owning decode on the active conditional context keeps self === active, so
-      // there is no cross-link and no cycle.
+          // decode is wrapped by each branch's OWN contextSafe — the matchMedia
+          // condition context, never the outer useGSAP context. This matters because
+          // the MOBILE ScrollTrigger fires onEnter synchronously during create (when
+          // the text is already in view), i.e. while the conditional context is gsap's
+          // active context. A decode owned by the outer context would be cross-linked
+          // into the conditional context there (gsap runs `prev.data.push(self)`),
+          // forming a U⇄C cycle that makes the unmount-time revert() recurse forever in
+          // Context.getTweens (the "Maximum call stack size exceeded" on navigation).
+          // Owning decode on the active conditional context keeps self === active, so
+          // there is no cross-link and no cycle.
 
-      // Desktop: decode on hover of the trigger host (the text itself for 'self',
-      // a larger card for 'group'). Skip taps — touch fires a compatibility
-      // pointerenter right before navigating, flashing the scramble for a frame.
-      mm.add(DESKTOP, (_ctx, contextSafe) => {
-        if (contextSafe === undefined) return;
-        const decode = contextSafe(runDecode);
-        const target = props.trigger === 'group' ? props.host : rootRef.current;
-        if (target === null) return;
-        const onPointerEnter = (event: PointerEvent) => {
-          if (event.pointerType === 'touch') return;
-          decode(DURATION);
-        };
-        target.addEventListener('pointerenter', onPointerEnter);
-        return () => target.removeEventListener('pointerenter', onPointerEnter);
-      });
+          // Desktop: decode on hover of the trigger host (the text itself for 'self',
+          // a larger card for 'group'). Skip taps — touch fires a compatibility
+          // pointerenter right before navigating, flashing the scramble for a frame.
+          mm.add(DESKTOP, (_ctx, contextSafe) => {
+            if (contextSafe === undefined) return;
+            const decode = contextSafe(runDecode);
+            const target = props.trigger === 'group' ? props.host : rootRef.current;
+            if (target === null) return;
+            const onPointerEnter = (event: PointerEvent) => {
+              if (event.pointerType === 'touch') return;
+              decode(DURATION);
+            };
+            target.addEventListener('pointerenter', onPointerEnter);
+            return () => target.removeEventListener('pointerenter', onPointerEnter);
+          });
 
-      // Mobile/tablet: no hover — decode once when the text scrolls into view.
-      mm.add(MOBILE, (_ctx, contextSafe) => {
-        if (contextSafe === undefined) return;
-        if (!bootReady) return; // wait for the boot overlay to lift before the in-view decode
-        const decode = contextSafe(runDecode);
-        const trigger = rootRef.current;
-        if (trigger === null) return;
-        const st = ScrollTrigger.create({ trigger, start: 'top 90%', once: true, onEnter: () => decode(MOBILE_DURATION) });
-        // Resizing up to desktop reverts this branch's decode tween. ScrambleTextPlugin's
-        // revert does NOT restore the original text — it leaves the fill frozen on a
-        // mid-scramble frame (e.g. `8/41/`) — and the desktop branch only binds a hover
-        // listener, so it never re-renders; React won't reconcile a text node GSAP mutated
-        // imperatively either, so the nav stays unreadable glyphs (also a WCAG fail). Heal
-        // the resting text on teardown: this returned cleanup runs in Context.kill AFTER the
-        // tween revert (gsap-core invokes the `_r` callbacks last), so it deterministically wins.
-        return () => {
-          st.kill();
-          const fill = fillRef.current;
-          if (fill === null) return;
-          fill.removeAttribute('data-scrambling');
-          fill.textContent = children;
-        };
-      });
-    },
-    { scope: rootRef, dependencies: [children, host, bootReady] },
-  );
+          // Mobile/tablet: no hover — decode once when the text scrolls into view.
+          mm.add(MOBILE, (_ctx, contextSafe) => {
+            if (contextSafe === undefined) return;
+            if (!bootReady) return; // wait for the boot overlay to lift before the in-view decode
+            const decode = contextSafe(runDecode);
+            const trigger = rootRef.current;
+            if (trigger === null) return;
+            const st = ScrollTrigger.create({ trigger, start: 'top 90%', once: true, onEnter: () => decode(MOBILE_DURATION) });
+            // Resizing up to desktop reverts this branch's decode tween. ScrambleTextPlugin's
+            // revert does NOT restore the original text — it leaves the fill frozen on a
+            // mid-scramble frame (e.g. `8/41/`) — and the desktop branch only binds a hover
+            // listener, so it never re-renders; React won't reconcile a text node GSAP mutated
+            // imperatively either, so the nav stays unreadable glyphs (also a WCAG fail). Heal
+            // the resting text on teardown: this returned cleanup runs in Context.kill AFTER the
+            // tween revert (gsap-core invokes the `_r` callbacks last), so it deterministically wins.
+            return () => {
+              st.kill();
+              const fill = fillRef.current;
+              if (fill === null) return;
+              fill.removeAttribute('data-scrambling');
+              fill.textContent = children;
+            };
+          });
+        }, rootRef);
+        state.revert = () => ctx.revert();
+      } catch {
+        // The scramble is decorative — a failed chunk load (e.g. a stale client
+        // after a redeploy) degrades to static text. Nothing to recover.
+      }
+    };
+    void run();
+
+    return () => {
+      state.cancelled = true;
+      state.revert?.();
+    };
+  }, [children, host, bootReady, reduced]);
 
   return (
     <span ref={rootRef} className={clsx(styles.root, className)} data-clamp={clamp || undefined} data-truncate={truncate || undefined}>

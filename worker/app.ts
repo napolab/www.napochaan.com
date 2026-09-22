@@ -2,6 +2,7 @@ import { cache } from 'hono/cache';
 import { createFactory } from 'hono/factory';
 
 import { imageHandlers } from './handlers/images';
+import { cacheControlHeaders } from './middleware/cache-control';
 import { weakenETag } from './middleware/weaken-etag';
 import { cursorRoutes } from './routes/cursors';
 import { mcpGuardRoutes } from './routes/mcp-guard';
@@ -19,11 +20,14 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
 
   app
     .use('*', weakenETag())
+    .use('*', cacheControlHeaders())
     .get(
       '/_next/image',
       cache({
         cacheName: 'opennextjs-cloudflare-images',
-        cacheControl: 'public, max-age=3600, must-revalidate',
+        // Workers Cache serves hits without invoking the Worker; drop must-revalidate
+        // so stale-while-revalidate applies. Media changes purge everything.
+        cacheControl: 'public, max-age=86400, stale-while-revalidate=604800',
         vary: ['Accept', 'Accept-Encoding'],
       }),
       ...imageHandlers,

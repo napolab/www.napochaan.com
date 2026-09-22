@@ -48,4 +48,10 @@ describe('Gallery', () => {
 
     await expect.element(page.getByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('sizes each cell by its grid area', async () => {
+    const screen = await render(<Gallery items={[{ id: 'w', src: '/w.jpg', alt: 'w', width: 1600, height: 900, area: 'wide' }]} />);
+    const img = screen.container.querySelector('[data-testid="next-image"]');
+    expect(img?.getAttribute('data-sizes')).toBe('(min-width: 1180px) 787px, 67vw');
+  });
 });

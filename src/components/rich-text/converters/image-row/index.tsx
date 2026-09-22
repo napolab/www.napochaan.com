@@ -49,6 +49,12 @@ const cellFigure = (image: PopulatedImage, caption: unknown, key: number): React
       caption={captionOf(caption, image.alt)}
       variant="cover"
       zoomable
+      // The row is 85% of the 1180px content column, so each cell above that
+      // breakpoint is half of that: 1180 * 0.85 / 2 ≈ 500px. Below it the cells
+      // share the row once the row's OWN container (not the viewport) clears the
+      // 480px container query in styles.css.ts — since the row is 85% of the
+      // viewport-ish column, that fires at roughly 480 / 0.85 ≈ 565px viewport.
+      sizes="(min-width: 1388px) 500px, (min-width: 565px) 42vw, 66vw"
       placeholder="blur"
       blurDataURL={formatBlurURL(image.url, { blur: 20 })}
     />

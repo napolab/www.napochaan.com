@@ -1,8 +1,21 @@
 import { render } from 'vitest-browser-react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
+import { MotionProvider } from '@components/motion-provider';
+
 import { ScrambleText } from './index';
+
+// vi.mock is hoisted above every import, so the spy must be built inside
+// vi.hoisted or the factory would read `loadGsap` before initialisation. The spy
+// delegates to the real implementation so the existing behaviour tests below
+// keep working — only the reduced-motion test cares about call count.
+const { loadGsap } = vi.hoisted(() => ({ loadGsap: vi.fn() }));
+vi.mock('@utils/gsap', async () => {
+  const actual = await vi.importActual<typeof import('@utils/gsap')>('@utils/gsap');
+  loadGsap.mockImplementation(actual.loadGsap);
+  return { loadGsap };
+});
 
 describe('ScrambleText', () => {
   it('renders the text at rest (scramble only fires on hover)', async () => {
@@ -101,5 +114,21 @@ describe('ScrambleText', () => {
       window.removeEventListener('unhandledrejection', onRejection);
       window.matchMedia = original;
     }
+  });
+
+  // Spec §4: under reduced motion the gsap import itself must be skipped, not
+  // merely no-op'd after loading — the effect returns before loadGsap() is
+  // ever called, so neither the desktop hover branch nor the mobile
+  // ScrollTrigger branch can bind.
+  it('never imports gsap when reduced motion is on', async () => {
+    loadGsap.mockClear();
+    await render(
+      <MotionProvider reduced>
+        <ScrambleText>archive</ScrambleText>
+      </MotionProvider>,
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(loadGsap).not.toHaveBeenCalled();
   });
 });

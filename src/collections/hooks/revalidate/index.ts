@@ -1,5 +1,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 
+import { purgeWorkersCache } from './purge-workers-cache';
+
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from 'payload';
 
 // Read the optional draft status off any document. Status-less collections yield undefined.
@@ -23,6 +25,7 @@ const dispatch = (req: PayloadRequest, tags: readonly string[]): void => {
       // swallowing is safe. The `disableRevalidate` context flag is the explicit opt-out.
     }
   }
+  purgeWorkersCache();
 };
 
 // Bust one path-keyed HTML entry. A dynamic pattern path (`/blog/[slug]`) must be
@@ -49,6 +52,7 @@ const dispatchTagsAndPaths = (req: PayloadRequest, tags: readonly string[], path
     // Outside a request context (CLI seed/migrate). Those writes surface on the next
     // build/request, so swallowing is safe. `disableRevalidate` is the explicit opt-out.
   }
+  purgeWorkersCache();
 };
 
 /** Safely bust a fixed set of cache tags + ISR paths. Swallows the
@@ -62,6 +66,7 @@ export const revalidateTagsAndPaths = (tags: readonly string[], paths: readonly 
   } catch {
     // Outside a request context (CLI). Safe to swallow.
   }
+  purgeWorkersCache();
 };
 
 type RevalidateHooks = { afterChange: CollectionAfterChangeHook; afterDelete: CollectionAfterDeleteHook };

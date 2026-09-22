@@ -29,5 +29,6 @@ describe('RelatedWorks', () => {
 
     const img = container.querySelector('img');
     expect(img?.getAttribute('alt')).toBe('night graphics');
+    expect(img?.getAttribute('data-sizes')).toBe('64px');
   });
 });
