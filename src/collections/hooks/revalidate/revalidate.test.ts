@@ -2,13 +2,16 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createPublishedTagAndPathRevalidateHooks, createPublishedTagRevalidateHooks, createTagRevalidateHooks, isPublished, isPublishedChange, revalidateTagsAndPaths } from '.';
+import { purgeWorkersCache } from './purge-workers-cache';
 
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from 'payload';
 
 vi.mock('next/cache', () => ({ revalidateTag: vi.fn(), revalidatePath: vi.fn() }));
+vi.mock('./purge-workers-cache', () => ({ purgeWorkersCache: vi.fn() }));
 
 const revalidateTagMock = vi.mocked(revalidateTag);
 const revalidatePathMock = vi.mocked(revalidatePath);
+const purgeWorkersCacheMock = vi.mocked(purgeWorkersCache);
 
 // Minimal PayloadRequest stand-in: the hooks only read `req.context`.
 const makeReq = (context: Record<string, unknown> = {}): PayloadRequest => ({ context }) as unknown as PayloadRequest;
@@ -19,6 +22,7 @@ type DeleteArgs = Parameters<CollectionAfterDeleteHook>[0];
 beforeEach(() => {
   revalidateTagMock.mockReset();
   revalidatePathMock.mockReset();
+  purgeWorkersCacheMock.mockReset();
 });
 
 describe('isPublished', () => {
@@ -67,6 +71,18 @@ describe('createTagRevalidateHooks', () => {
     hooks.afterDelete({ doc: { id: 1 }, req: makeReq() } as unknown as DeleteArgs);
 
     expect(revalidateTagMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('purges the Workers Cache whenever tags are dispatched', () => {
+    const hooks = createTagRevalidateHooks(['news']);
+    hooks.afterChange({ doc: {}, req: makeReq() } as unknown as ChangeArgs);
+    expect(purgeWorkersCacheMock).toHaveBeenCalledOnce();
+  });
+
+  it('respects disableRevalidate for the purge too', () => {
+    const hooks = createTagRevalidateHooks(['news']);
+    hooks.afterChange({ doc: {}, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
+    expect(purgeWorkersCacheMock).not.toHaveBeenCalled();
   });
 });
 
@@ -163,6 +179,18 @@ describe('createPublishedTagAndPathRevalidateHooks', () => {
 
     expect(() => hooks.afterChange({ doc: { id: 1, slug: 'my-post', _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs)).not.toThrow();
   });
+
+  it('purges the Workers Cache on a published change', () => {
+    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog']);
+    hooks.afterChange({ doc: { id: 1, _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
+    expect(purgeWorkersCacheMock).toHaveBeenCalledOnce();
+  });
+
+  it('respects disableRevalidate for the purge too', () => {
+    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog']);
+    hooks.afterChange({ doc: { id: 1, _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
+    expect(purgeWorkersCacheMock).not.toHaveBeenCalled();
+  });
 });
 
 describe('revalidateTagsAndPaths', () => {
@@ -173,6 +201,11 @@ describe('revalidateTagsAndPaths', () => {
     expect(revalidatePathMock).toHaveBeenCalledWith('/');
     expect(revalidatePathMock).toHaveBeenCalledWith('/works');
     expect(revalidatePathMock).toHaveBeenCalledWith('/works/[slug]', 'page');
+  });
+
+  it('purges the Workers Cache', () => {
+    revalidateTagsAndPaths(['works'], ['/']);
+    expect(purgeWorkersCacheMock).toHaveBeenCalledOnce();
   });
 
   it('does not throw when the revalidators throw (CLI context)', () => {

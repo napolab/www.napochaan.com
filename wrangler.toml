@@ -91,6 +91,12 @@ BASE_URL = "https://stg.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
 
+# Workers Cache: HITs are served from the edge without invoking the Worker. Every
+# CMS write purges everything (src/collections/hooks/revalidate/purge-workers-cache).
+# Staging first; production gets its own block once staging verification passes.
+[env.staging.cache]
+enabled = true
+
 [[env.staging.routes]]
 pattern = "stg.napochaan.com"
 custom_domain = true

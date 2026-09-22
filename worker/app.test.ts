@@ -43,4 +43,25 @@ describe('createWorkerApp', () => {
     expect(response.headers.get('ETag')).toBe('W/"abc123"');
     expect(await response.text()).toBe('html');
   });
+
+  it('stamps a public policy on header-less feed responses from the mounted handler', async () => {
+    const handlerFetch = vi.fn(async () => new Response('<rss/>'));
+    const app = createWorkerApp(handlerFetch);
+    const response = await app.request('/blog/rss.xml');
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600, stale-while-revalidate=86400');
+  });
+
+  it('keeps Next.js private policies untouched', async () => {
+    const handlerFetch = vi.fn(async () => new Response('form', { headers: { 'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate' } }));
+    const app = createWorkerApp(handlerFetch);
+    const response = await app.request('/contact');
+    expect(response.headers.get('Cache-Control')).toBe('private, no-cache, no-store, max-age=0, must-revalidate');
+  });
+
+  it('denies Workers Cache storage for header-less JSON 200s from the Payload REST API', async () => {
+    const handlerFetch = vi.fn(async () => new Response('{"user":null}', { headers: { 'Content-Type': 'application/json' } }));
+    const app = createWorkerApp(handlerFetch);
+    const response = await app.request('/api/users/me');
+    expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+  });
 });
