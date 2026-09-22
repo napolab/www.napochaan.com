@@ -202,20 +202,23 @@ describe('CursorRoom', () => {
     const bSeen: string[] = [];
     b.addEventListener('message', (e) => bSeen.push(`${e.data}`));
 
+    const moves = () => bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move');
+
     // Three moves back-to-back within the 100ms window collapse to one broadcast.
     a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.1, y: 0.1 }));
     a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.2, y: 0.2 }));
     a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.3, y: 0.3 }));
+    // The first move broadcasts immediately; wait for it to arrive (positive check polls)…
+    await expect.poll(moves, POLL).toHaveLength(1);
+    // …then give the throttle window time to prove the other two were collapsed (negative check settles).
     await settle();
-
-    const firstWindow = bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move');
-    expect(firstWindow).toHaveLength(1);
+    expect(moves()).toHaveLength(1);
 
     // A 4th move past the throttle window broadcasts again.
     await wait(150);
     a.send(JSON.stringify({ t: 'move', path: '/x', x: 0.4, y: 0.4 }));
 
-    await expect.poll(() => bSeen.map((s) => JSON.parse(s)).filter((m) => m.t === 'move'), POLL).toHaveLength(2);
+    await expect.poll(moves, POLL).toHaveLength(2);
   });
 
   it('counts presence per page', async () => {
