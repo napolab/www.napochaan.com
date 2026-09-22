@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore, type Rea
 
 import { usePersistent } from '@hooks/use-persistent';
 import { toNormalized, type Rect } from '@lib/cursor/coordinate';
-import { createVisitorPointerApp } from '@lib/cursor/visitor-pointer-app';
+import { createLazyVisitorPointerApp } from '@lib/cursor/lazy-visitor-pointer-app';
 import { defineCache } from '@utils/define-cache';
 
 import { CursorLayer } from './cursor-layer';
@@ -29,7 +29,7 @@ const readRect = (el: HTMLElement | null): Rect | null => {
 
 export const CursorPresence = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
-  const app = useMemo(() => createVisitorPointerApp(), []);
+  const app = useMemo(() => createLazyVisitorPointerApp(), []);
 
   const [enabled, setEnabled] = usePersistent(STORAGE_KEY, true);
   const enabledRef = useRef(enabled);
