@@ -2,8 +2,15 @@ import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
 import { withPayload } from '@payloadcms/next/withPayload';
 import type { NextConfig } from 'next';
 
+import { applyClientAliases, TURBOPACK_RESOLVE_ALIAS } from './src/config/client-aliases';
+
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  images: {
+    // 3840 is only useful for full-bleed art on a 4K display; every image here sits
+    // in the ≤1180px content column, so the largest 2× candidate is 2048.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+  },
   // The client-side Router Cache reuses already-visited RSC entries on soft
   // navigation (and back/forward) WITHOUT refetching — and server-side
   // `revalidateTag` never evicts it. So a long-open tab keeps serving the RSC it
@@ -44,6 +51,7 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   turbopack: {
+    resolveAlias: TURBOPACK_RESOLVE_ALIAS,
     rules: {
       '*.svg': {
         loaders: [
@@ -61,7 +69,8 @@ const nextConfig: NextConfig = {
       },
     },
   },
-  webpack: (config) => {
+  webpack: (config, { isServer }) => {
+    applyClientAliases(config, isServer);
     config.module.rules.push({
       test: /\.svg$/,
       use: [
