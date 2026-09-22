@@ -157,6 +157,13 @@ BASE_URL = "https://napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in production (set via `wrangler secret put CURSOR_SALT --env production`).
 
+# Workers Cache: HITs are served from the edge without invoking the Worker. Every
+# CMS write purges everything (src/collections/hooks/revalidate/purge-workers-cache).
+# Verified on staging first (PR #45); production HTML does not depend on the
+# Sec-CH-Prefers-Color-Scheme hint the zone advertises, so the Vary split is harmless.
+[env.production.cache]
+enabled = true
+
 [[env.production.routes]]
 pattern = "napochaan.com"
 custom_domain = true
