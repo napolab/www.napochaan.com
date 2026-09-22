@@ -54,7 +54,6 @@ export default defineConfig({
             'react-aria-components',
             'vitest-browser-react',
             '@internationalized/date',
-            '@gsap/react',
             'gsap',
             'gsap/ScrambleTextPlugin',
             'gsap/ScrollToPlugin',

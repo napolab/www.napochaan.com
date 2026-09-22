@@ -1,17 +1,14 @@
 'use client';
 
-import { useRef } from 'react';
-import gsap from 'gsap';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
+import { useEffect, useRef } from 'react';
 
 import { usePrefersReducedMotion } from '@hooks/use-prefers-reduced-motion';
+import { loadGsap } from '@utils/gsap';
 
 import { wrap } from './band-scroll';
 import * as styles from './styles.css';
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+import type { GsapBundle } from '@utils/gsap';
 
 const DEFAULT_TEXT = 'NAPOCHAAN · DJ × VJ · GRAPHIC × DIGITAL · SINCE 2020 · ';
 const REPEAT_COUNT = 20;
@@ -21,6 +18,8 @@ const VEL_DECAY = 0.9; // scroll-velocity boost decays back to the base drift
 const FRAME_MS = 1000 / 60;
 const GRID = 24; // Game-of-Life cell size; snap scroll to its multiples on rest
 const SNAP_DELAY = 140;
+
+type Tween = ReturnType<GsapBundle['gsap']['to']>;
 
 type Props = {
   text?: string;
@@ -35,99 +34,117 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
   const trackRightRef = useRef<HTMLDivElement>(null);
 
   // Effective reduced-motion (OS setting + the header motion toggle). Listed as a
-  // dependency so useGSAP reverts and re-runs when it flips — replacing the old
+  // dependency so the effect reverts and re-runs when it flips — replacing the old
   // gsap.matchMedia(OS-only) gate so the toggle can stop / resume the band too.
   const reduced = usePrefersReducedMotion();
 
-  useGSAP(
-    () => {
-      if (reduced) return;
+  useEffect(() => {
+    // USEEFFECT_JUSTIFICATION: imperative gsap ticker + ScrollTrigger driving a
+    // rAF-style drift/snap loop on DOM refs, loaded lazily (dynamic import)
+    // after mount.
+    if (reduced) return;
 
-      const topTrack = trackTopRef.current;
-      const bottomTrack = trackBottomRef.current;
-      const leftTrack = trackLeftRef.current;
-      const rightTrack = trackRightRef.current;
+    const state: { cancelled: boolean; cleanup?: () => void } = { cancelled: false };
+    const run = async () => {
+      try {
+        const { gsap, ScrollTrigger } = await loadGsap();
+        if (state.cancelled) return;
 
-      if (!topTrack || !bottomTrack || !leftTrack || !rightTrack) return;
+        const topTrack = trackTopRef.current;
+        const bottomTrack = trackBottomRef.current;
+        const leftTrack = trackLeftRef.current;
+        const rightTrack = trackRightRef.current;
 
-      const topHalf = topTrack.scrollWidth / 2;
-      const leftHalf = leftTrack.scrollHeight / 2;
+        if (!topTrack || !bottomTrack || !leftTrack || !rightTrack) return;
 
-      // pos accumulates a constant drift plus a decaying scroll-velocity boost.
-      // We render with gsap.set + wrap each frame (instant) so the duplicated
-      // track loops seamlessly — no smoothing across the wrap boundary, so the
-      // text never scrolls out and shows a blank gap before looping.
-      const pos = { top: 0, bottom: 0, left: 0, right: 0 };
-      const boost = { value: 0 };
+        const topHalf = topTrack.scrollWidth / 2;
+        const leftHalf = leftTrack.scrollHeight / 2;
 
-      const trigger = ScrollTrigger.create({
-        onUpdate: (self) => {
-          boost.value = self.getVelocity() * VELOCITY_SCALE;
-        },
-      });
+        // pos accumulates a constant drift plus a decaying scroll-velocity boost.
+        // We render with gsap.set + wrap each frame (instant) so the duplicated
+        // track loops seamlessly — no smoothing across the wrap boundary, so the
+        // text never scrolls out and shows a blank gap before looping.
+        const pos = { top: 0, bottom: 0, left: 0, right: 0 };
+        const boost = { value: 0 };
 
-      const tick = (_time: number, deltaMs: number) => {
-        const step = (BASE_DRIFT + boost.value) * (deltaMs / FRAME_MS);
-        boost.value *= VEL_DECAY;
-        // Clockwise rotation around the frame: top ← / right ↑ / bottom → / left ↓
-        pos.top = wrap(pos.top - step, topHalf);
-        pos.bottom = wrap(pos.bottom + step, topHalf);
-        pos.left = wrap(pos.left + step, leftHalf);
-        pos.right = wrap(pos.right - step, leftHalf);
-        gsap.set(topTrack, { x: pos.top });
-        gsap.set(bottomTrack, { x: pos.bottom });
-        gsap.set(leftTrack, { y: pos.left });
-        gsap.set(rightTrack, { y: pos.right });
-      };
-      gsap.ticker.add(tick);
+        const trigger = ScrollTrigger.create({
+          onUpdate: (self) => {
+            boost.value = self.getVelocity() * VELOCITY_SCALE;
+          },
+        });
 
-      // Snap the page scroll to the Game-of-Life 24px grid once scrolling rests,
-      // so the scrolling content grid lines up with the fixed living grid. The
-      // snap is interruptible: any real user input (wheel/touch/key) kills an
-      // in-flight snap and defers the next one, so it never fights the user.
-      const snap = { timer: undefined as ReturnType<typeof setTimeout> | undefined, tween: undefined as gsap.core.Tween | undefined };
+        const tick = (_time: number, deltaMs: number) => {
+          const step = (BASE_DRIFT + boost.value) * (deltaMs / FRAME_MS);
+          boost.value *= VEL_DECAY;
+          // Clockwise rotation around the frame: top ← / right ↑ / bottom → / left ↓
+          pos.top = wrap(pos.top - step, topHalf);
+          pos.bottom = wrap(pos.bottom + step, topHalf);
+          pos.left = wrap(pos.left + step, leftHalf);
+          pos.right = wrap(pos.right - step, leftHalf);
+          gsap.set(topTrack, { x: pos.top });
+          gsap.set(bottomTrack, { x: pos.bottom });
+          gsap.set(leftTrack, { y: pos.left });
+          gsap.set(rightTrack, { y: pos.right });
+        };
+        gsap.ticker.add(tick);
 
-      const cancelSnap = () => {
-        snap.tween?.kill();
-        snap.tween = undefined;
-        clearTimeout(snap.timer);
-      };
+        // Snap the page scroll to the Game-of-Life 24px grid once scrolling rests,
+        // so the scrolling content grid lines up with the fixed living grid. The
+        // snap is interruptible: any real user input (wheel/touch/key) kills an
+        // in-flight snap and defers the next one, so it never fights the user.
+        const snap = { timer: undefined as ReturnType<typeof setTimeout> | undefined, tween: undefined as Tween | undefined };
 
-      const onScroll = () => {
-        clearTimeout(snap.timer);
-        snap.timer = setTimeout(() => {
-          const y = window.scrollY;
-          const target = Math.round(y / GRID) * GRID;
-          if (Math.abs(target - y) > 0.5) {
-            snap.tween = gsap.to(window, {
-              duration: 0.3,
-              ease: 'power2.out',
-              scrollTo: target,
-              onComplete: () => {
-                snap.tween = undefined;
-              },
-            });
-          }
-        }, SNAP_DELAY);
-      };
+        const cancelSnap = () => {
+          snap.tween?.kill();
+          snap.tween = undefined;
+          clearTimeout(snap.timer);
+        };
 
-      window.addEventListener('scroll', onScroll, { passive: true });
-      window.addEventListener('wheel', cancelSnap, { passive: true });
-      window.addEventListener('touchstart', cancelSnap, { passive: true });
-      window.addEventListener('keydown', cancelSnap);
+        const onScroll = () => {
+          clearTimeout(snap.timer);
+          snap.timer = setTimeout(() => {
+            const y = window.scrollY;
+            const target = Math.round(y / GRID) * GRID;
+            if (Math.abs(target - y) > 0.5) {
+              snap.tween = gsap.to(window, {
+                duration: 0.3,
+                ease: 'power2.out',
+                scrollTo: target,
+                onComplete: () => {
+                  snap.tween = undefined;
+                },
+              });
+            }
+          }, SNAP_DELAY);
+        };
 
-      return () => {
-        gsap.ticker.remove(tick);
-        window.removeEventListener('scroll', onScroll);
-        window.removeEventListener('wheel', cancelSnap);
-        window.removeEventListener('touchstart', cancelSnap);
-        window.removeEventListener('keydown', cancelSnap);
-        cancelSnap();
-        trigger.kill();
-      };
-    },
-    { dependencies: [reduced], revertOnUpdate: true },
-  );
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('wheel', cancelSnap, { passive: true });
+        window.addEventListener('touchstart', cancelSnap, { passive: true });
+        window.addEventListener('keydown', cancelSnap);
+
+        state.cleanup = () => {
+          gsap.ticker.remove(tick);
+          window.removeEventListener('scroll', onScroll);
+          window.removeEventListener('wheel', cancelSnap);
+          window.removeEventListener('touchstart', cancelSnap);
+          window.removeEventListener('keydown', cancelSnap);
+          cancelSnap();
+          trigger.kill();
+        };
+      } catch {
+        // The band is decorative — a failed chunk load (e.g. a stale client
+        // after a redeploy) degrades to a static (non-drifting) band. Nothing
+        // to recover.
+      }
+    };
+    void run();
+
+    return () => {
+      state.cancelled = true;
+      state.cleanup?.();
+    };
+  }, [reduced]);
 
   return (
     <>
