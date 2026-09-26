@@ -82,6 +82,10 @@ if (d1 === undefined || r2 === undefined) {
 // the same resolved binding (ESM single evaluation) — no second getPlatformProxy.
 export const r2Bucket = r2;
 
+// Same idea for D1: `migrate:check-drift` probes `sqlite_master` for the
+// `payload_migrations` table (a fresh DB has none) before querying it.
+export const d1Database = d1;
+
 // PAYLOAD_SECRET signs auth tokens, so it MUST be a real secret at runtime.
 // Single source = the Cloudflare env: `getPlatformProxy` / `getCloudflareContext`
 // reads `.dev.vars` for both `next dev` and the Payload CLI (migrate/seed), and the
@@ -193,5 +197,7 @@ export default buildConfig({
     { scriptPath: path.resolve(dirname, 'seed', 'export.ts'), key: 'seed:export' },
     { scriptPath: path.resolve(dirname, 'seed', 'import.ts'), key: 'seed:import' },
     { scriptPath: path.resolve(dirname, 'seed', 'import-prod.ts'), key: 'seed:import:prod' },
+    // Fails (exit 1) when D1 has applied migrations missing from migrations/ — see docs/migration-rollback.md.
+    { scriptPath: path.resolve(dirname, 'migrate-drift', 'check-drift.ts'), key: 'migrate:check-drift' },
   ],
 });
