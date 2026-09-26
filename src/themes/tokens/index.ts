@@ -157,9 +157,11 @@ export const tokens = defineTokens({
     // config-mono-vf's exact line box — kills the font-swap CLS (SysBar reflow).
     mono: { value: '"config-mono-vf", "config-mono-vf Fallback", ui-monospace, "Cascadia Code", monospace' },
     // Zen Kaku Gothic New (Google Fonts, via next/font) — used for long content
-    // detail titles (works / news / blog). Only weight 500 is loaded (see
-    // themes/fonts.ts); TITLE_JP_VAR is the shared CSS variable name, kept in
-    // sync with the next/font call there (see themes/font-vars.ts).
+    // detail titles (works / news / blog), rendered only by TightPageHeader
+    // (src/components/page-header/tight.tsx). Only weight 500 is loaded (see
+    // themes/fonts-title.ts, isolated from themes/fonts.ts so its CSS is not
+    // shipped to every page); TITLE_JP_VAR is the shared CSS variable name, kept
+    // in sync with the next/font call there (see themes/font-vars.ts).
     titleJP: { value: `var(${TITLE_JP_VAR}), sans-serif` },
   },
 

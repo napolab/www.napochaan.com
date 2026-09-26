@@ -9,7 +9,7 @@ import { adjacentWorks } from '../../_lib/adjacent-works';
 import { relatedWorks } from '../../_lib/related-works';
 
 import { LivePreviewListener } from '@components/live-preview';
-import { PageHeader } from '@components/page-header';
+import { TightPageHeader } from '@components/page-header/tight';
 import { findWorkDraftById, findWorksList } from '@lib/payload/works';
 import { absoluteUrl } from '@utils/site-url';
 
@@ -48,7 +48,7 @@ const WorkPreviewPage = async ({ params }: Props) => {
     // Renders inside the works segment's shared `<main>` (see `works/layout.tsx`).
     <>
       <LivePreviewListener />
-      <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
+      <TightPageHeader title={work.title} breadcrumbs={crumbs} />
       <WorkDetail work={work} url={absoluteUrl(`/works/${id}`)} />
       {related.length > 0 ? (
         <>
