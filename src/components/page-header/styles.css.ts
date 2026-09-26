@@ -27,7 +27,7 @@ export const kicker = css({
 // grow from h2 to h1, outranking the global `h1` element styles so font/tracking
 // are reliable. Index labels (works / news / blog / colophon) use the loud
 // digibop display face — short English words carry it. Long content titles opt
-// into the Ryo Gothic PlusN Japanese face via `titleTracking="tight"` (digibop
+// into the Zen Kaku Gothic New Japanese face via `titleTracking="tight"` (digibop
 // renders long mixed-script titles poorly): medium weight, no caps, natural
 // tracking so Japanese glyphs breathe. The mono uppercase kicker/breadcrumb
 // chrome stays put, letting the humanist title read as "content" against the frame.
@@ -39,7 +39,7 @@ export const title = css({
   textTransform: 'uppercase',
   letterSpacing: 'tighter',
   fontSize: { base: 'h2', desktop: 'h1' },
-  '&[data-tracking="tight"]': { fontFamily: 'ryoGothic', fontWeight: 'medium', textTransform: 'none', letterSpacing: 'tight' },
+  '&[data-tracking="tight"]': { fontFamily: 'titleJP', fontWeight: 'medium', textTransform: 'none', letterSpacing: 'tight' },
 });
 
 // Markdown-style blockquote lead: accent bar on the left, indented, medium weight.
