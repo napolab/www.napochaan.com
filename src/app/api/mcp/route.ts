@@ -6,13 +6,12 @@ import { CfWorkerJsonSchemaValidator } from '@modelcontextprotocol/server/valida
 
 import { createMarkdownCodec } from '@lib/mcp/markdown';
 import { registerBlogTools } from '@lib/mcp/tools';
-import { registerLegalTools } from '@lib/mcp/tools/legal';
 import { registerLogTools } from '@lib/mcp/tools/logs';
 import { registerWorkTools } from '@lib/mcp/tools/works';
 import { blogEditorFeatures } from '@lib/payload/editor-features';
 import { getPayloadClient } from '@lib/payload/client';
 
-import type { Blog, LegalDocument, Work } from '@payload-types';
+import type { Blog, Work } from '@payload-types';
 
 // Pair: worker/worker.ts の mcpAPIHandler が OAuth 検証後にこのヘッダーを付けて
 // in-process forward する。外部からの /api/mcp は Hono 層(mcp-guard, worker/app.ts。
@@ -80,7 +79,6 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
     signingSecret: env.PAYLOAD_SECRET,
     siteBaseUrl: process.env.BASE_URL ?? 'http://localhost:3000',
   });
-  registerLegalTools(server, { payload, user, codec: createMarkdownCodec<LegalDocument['body']>(editorConfig) });
   // logs は richText を持たないので codec は渡さない。
   registerLogTools(server, { payload, user });
   // works の本文は blog と同じ editor features で書かれるため、同じ editorConfig から codec を組む

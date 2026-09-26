@@ -22,12 +22,12 @@ describe('requireSlugAvailable', () => {
   it('slug が既に使われていたら slug と更新 tool 名を含む回復ヒントで err', async () => {
     const { payload } = makePayload([{ id: 1 }]);
 
-    const result = await requireSlugAvailable(payload, 'legal-documents', 'terms', 'update_legal_document');
+    const result = await requireSlugAvailable(payload, 'blog', 'taken-slug', 'update_post');
 
     expect(result.isErr()).toBe(true);
     const message = result.isErr() ? result.error.message : '';
-    expect(message).toContain('terms');
-    expect(message).toContain('update_legal_document');
+    expect(message).toContain('taken-slug');
+    expect(message).toContain('update_post');
   });
 
   it('works collection でも slug の重複を回復ヒントで弾く', async () => {

@@ -47,7 +47,7 @@ const TYPE_HELP = `種別。${WORK_TYPE_OPTIONS.map((value) => `${value} = ${WOR
 const URL_HELP = '外部リンク。設定すると /works 一覧や年表のリンク先がサイト内の詳細ページではなくこの URL になる';
 
 // write path は strict。変換せず reject し、LLM が 1 回のリトライで自己修正できるヒントを返す
-// (.claude/rules/mcp-write-strict.md)。logs / legal と同じ validator 合成。
+// (.claude/rules/mcp-write-strict.md)。logs と同じ validator 合成。
 
 // 1. 形式 — YYYY-MM-DD かどうか。
 const requireDayFormat: Validator<string, McpToolError> = {

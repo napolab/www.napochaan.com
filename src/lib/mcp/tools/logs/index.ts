@@ -19,7 +19,7 @@ import type { Log, User } from '@payload-types';
 import type { ResultAsync } from 'neverthrow';
 import type { Payload, Where } from 'payload';
 
-// logs は richText を持たないフラットな collection なので、blog/legal が必要とする
+// logs は richText を持たないフラットな collection なので、blog/works が必要とする
 // MarkdownCodec は渡さない。deps は payload と user だけ。
 export type LogToolDeps = {
   payload: Payload;
