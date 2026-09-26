@@ -8,7 +8,7 @@ import * as s from '../../[slug]/styles.css';
 import { adjacentPosts } from '../../_lib/adjacent-posts';
 
 import { LivePreviewListener } from '@components/live-preview';
-import { PageHeader } from '@components/page-header';
+import { TightPageHeader } from '@components/page-header/tight';
 import { RichText } from '@components/rich-text';
 import { extractHeadings } from '@components/rich-text/toc';
 import { findBlogDraftById, findBlogList } from '@lib/payload/blog';
@@ -48,7 +48,7 @@ const BlogPreviewPage = async ({ params }: Props) => {
   return (
     <>
       <LivePreviewListener />
-      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} titleTracking="tight" />
+      <TightPageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} />
       {post.thumbnail === undefined ? null : <BlogHero thumbnail={post.thumbnail} title={post.title} caption={`blog / ${formattedDate}`} />}
       <div className={s.layout}>
         <div className={s.tocCol}>

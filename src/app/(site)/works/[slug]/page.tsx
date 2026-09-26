@@ -9,7 +9,7 @@ import * as s from './styles.css';
 
 import { findWorkBySlug, findWorksList } from '@lib/payload/works';
 
-import { PageHeader } from '@components/page-header';
+import { TightPageHeader } from '@components/page-header/tight';
 import { ShareBar } from '@components/share-bar';
 import { absoluteUrl } from '@utils/site-url';
 import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
@@ -66,7 +66,7 @@ const WorkDetailPage = async ({ params }: Props) => {
   // Renders inside the works segment's shared `<main>` (see `works/layout.tsx`).
   return (
     <>
-      <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
+      <TightPageHeader title={work.title} breadcrumbs={crumbs} />
       <WorkDetail work={work} url={absoluteUrl(`/works/${slug}`)} />
       {related.length > 0 ? (
         <>
