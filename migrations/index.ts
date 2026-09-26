@@ -8,6 +8,7 @@ import * as migration_20260612_205858_blog_thumbnail from './20260612_205858_blo
 import * as migration_20260613_200316_add_slug from './20260613_200316_add_slug';
 import * as migration_20260720_121330_legal_documents from './20260720_121330_legal_documents';
 import * as migration_20260720_155000_legal_documents_autosave from './20260720_155000_legal_documents_autosave';
+import * as migration_20260926_170706_remove_legal_documents from './20260926_170706_remove_legal_documents';
 
 export const migrations = [
   {
@@ -53,11 +54,16 @@ export const migrations = [
   {
     up: migration_20260720_121330_legal_documents.up,
     down: migration_20260720_121330_legal_documents.down,
-    name: '20260720_121330_legal_documents'
+    name: '20260720_121330_legal_documents',
   },
   {
     up: migration_20260720_155000_legal_documents_autosave.up,
     down: migration_20260720_155000_legal_documents_autosave.down,
-    name: '20260720_155000_legal_documents_autosave'
+    name: '20260720_155000_legal_documents_autosave',
+  },
+  {
+    up: migration_20260926_170706_remove_legal_documents.up,
+    down: migration_20260926_170706_remove_legal_documents.down,
+    name: '20260926_170706_remove_legal_documents'
   },
 ];

@@ -38,7 +38,6 @@ If a new page renders external (non-CMS) data or time-dependent output (`dayjs()
 - `works` → tag `works`, paths `/`, `/works`, `/works/page/[num]`, `/log`, `/works/[slug]`
 - `gallery` → tag `gallery`, paths `/`, `/gallery`
 - `logs` → tag `logs`, paths `/`, `/log`
-- `legal-documents` → tag `legal-documents`, path `/legal/[slug]`
 - `media` → tags `news`/`works`/`gallery`/`blog`, all their list + `page/[num]` + `[slug]` pattern paths
 - `profile` (global) → tag `profile`, path `/about`
 

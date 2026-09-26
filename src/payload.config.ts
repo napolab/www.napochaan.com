@@ -12,7 +12,6 @@ import { buildConfig } from 'payload';
 import { blogEditorFeatures } from './lib/payload/editor-features';
 import { Blog } from './collections/blog';
 import { Gallery } from './collections/gallery';
-import { LegalDocuments } from './collections/legal-documents';
 import { Logs } from './collections/logs';
 import { Media } from './collections/media';
 import { News } from './collections/news';
@@ -139,13 +138,8 @@ export default buildConfig({
           previewSecret: cfEnv.PREVIEW_SECRET ?? '',
           buildPath: () => '/log/preview',
         }),
-        draftPreviewRoute({
-          slug: 'legal-documents',
-          previewSecret: cfEnv.PREVIEW_SECRET ?? '',
-          buildPath: (data) => `/legal/preview/${data.id}`,
-        }),
       ]),
-      collections: ['news', 'works', 'blog', 'gallery', 'logs', 'legal-documents'],
+      collections: ['news', 'works', 'blog', 'gallery', 'logs'],
     },
     get autoLogin() {
       if (process.env.NODE_ENV !== 'development') return false;
@@ -159,7 +153,7 @@ export default buildConfig({
   },
   cors: [serverURL],
   csrf: [serverURL],
-  collections: [Users, Media, News, Works, Blog, Gallery, Logs, LegalDocuments],
+  collections: [Users, Media, News, Works, Blog, Gallery, Logs],
   globals: [Profile],
   editor: lexicalEditor({ features: blogEditorFeatures }),
   secret,
