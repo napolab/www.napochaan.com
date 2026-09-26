@@ -32,6 +32,10 @@ jobs:
       - uses: ./.github/actions/setup
       # next build / opennext build が CloudflareEnv 型を解決できるよう再生成
       - run: pnpm cf:types
+      # migrate の前に、D1 に適用済みなのにコードから消えたマイグレーション（revert 等）を検出して止める。
+      # payload migrate はローカルのファイルしか見ないので、放置すると食い違ったコードが黙ってデプロイされる。
+      # 失敗時の復旧手順は docs/migration-rollback.md
+      - run: pnpm deploy:database:check:staging
       # worker deploy の前に D1 スキーマを反映（remote binding 経由）
       - run: pnpm deploy:database:staging
       # opennext build → deploy → ISR cache bust（1スクリプトに同梱）
@@ -56,6 +60,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: pnpm cf:types
+      # revert で孤立したマイグレーションがあれば migrate / deploy の前に止める（staging と同じ理由）
+      - run: pnpm deploy:database:check:production
       - run: pnpm deploy:database:production
       # opennext build → deploy → ISR cache bust → Workers Cache warm-up（sitemap 全 URL + feeds）
       - run: pnpm deploy:production

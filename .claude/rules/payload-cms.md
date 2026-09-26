@@ -160,3 +160,12 @@ These files are managed by Payload — do NOT edit manually:
 - `migrations/*.ts` (repo root)
 
 These files may not pass linter rules (filename casing, function style, etc.). This is expected.
+
+## Reverting / Rolling back Migrations
+
+`git revert` of a PR that added a migration does **not** roll back D1: `payload migrate` only walks local files (the applied row is silently skipped) and `payload migrate:down` needs the `down` fn from local files (`Migration X not found locally.`). Follow `docs/migration-rollback.md`:
+
+- Run `CLOUDFLARE_ENV=<env> pnpm payload migrate:status` → `migrate:down` from the **pre-revert commit** on staging/production **before** merging the revert (main auto-deploys staging). `migrate:down` rolls back the whole latest batch.
+- Prefer roll-forward (a new migration that undoes the change) over revert.
+- **Expand/contract for destructive migrations**: never put code removal and a DROP migration in the same PR. Ship the code-removal PR first (no migration, safe to revert), then the DROP-only migration PR. Data lost by a DROP is only recoverable via D1 Time Travel.
+- The deploy workflow runs `pnpm deploy:database:check:<env>` (`payload migrate:check-drift`) before migrating; it fails when D1 has applied migrations missing from `migrations/`. Resolve it per the runbook — never bypass it.
