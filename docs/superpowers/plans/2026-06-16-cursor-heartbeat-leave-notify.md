@@ -4,7 +4,7 @@
 
 **Goal:** When durabcast's heartbeat reaps an abruptly-disconnected cursor socket, broadcast the `leave` + `count` that `webSocketClose` would have sent, so ghost cursors no longer linger on peers' screens.
 
-**Architecture:** Override `alarm()` in `CursorRoom`. It computes the dead-socket set with the base's own `isAliveSocket` predicate, broadcasts presence `leave`/`count` for them (excluding the dead set so the timing of `ws.close()` is irrelevant), then delegates to `super.alarm()` which actually closes the sockets and re-arms the heartbeat. The three presence helpers are generalized from a single-socket exclude to a `ReadonlySet<WebSocket>` exclude so the same "last socket on a page" predicate serves both single-close and batch-reap.
+**Architecture:** Override `alarm()` in `CursorRoom`. It computes the dead-socket set with the base's own `isAliveSocket` predicate (over the base's own `this.sessions`), broadcasts presence `leave`/`count` for them (excluding the dead set so the timing of `ws.close()` is irrelevant), then delegates to `super.alarm()`. **durabcast's alarm is preserved, not replaced:** closing the dead sockets and re-arming the heartbeat (`setAlarm(+INTERVAL)`) remain entirely owned by the base — the override never calls `setAlarm`, and an `AUTO_CLOSE` guard makes it a no-op-plus-delegate whenever the base wouldn't reap. The three presence helpers are generalized from a single-socket exclude to a `ReadonlySet<WebSocket>` exclude so the same "last socket on a page" predicate serves both single-close and batch-reap.
 
 **Tech Stack:** Cloudflare Durable Objects, durabcast `BroadcastMessage`, `@cloudflare/vitest-pool-workers` (`cloudflare:test`: `runInDurableObject`, `runDurableObjectAlarm`), TypeScript (tsgo), oxlint/oxfmt.
 
@@ -254,8 +254,18 @@ Add these two methods inside the class (e.g. directly after `webSocketClose`):
 ```ts
   // durabcast's base alarm() reaps sockets that stopped pinging (abrupt disconnect) by calling
   // ws.close() — which does NOT invoke our webSocketClose, so leave/count would never fire for them.
-  // Notify presence for the dead set BEFORE super.alarm() closes them; super then closes + re-arms.
+  // We ONLY add the missing presence notify and then hand back to super.alarm(): closing the dead
+  // sockets and re-arming the heartbeat (setAlarm(+INTERVAL)) stay 100% owned by durabcast — we never
+  // call setAlarm ourselves. The AUTO_CLOSE guard mirrors the base's own reaping condition, so when
+  // auto-close is off we touch nothing and just delegate (no leave for a socket super won't close).
+  // `dead` is computed from the same source (this.sessions) and predicate (isAliveSocket) the base
+  // uses, so our notify set and super's close set always agree.
   override async alarm(): Promise<void> {
+    if (!this.AUTO_CLOSE) {
+      await super.alarm();
+
+      return;
+    }
     const dead = new Set([...this.sessions].filter((ws) => !this.isAliveSocket(ws)));
     this.#notifyEvicted(dead);
     await super.alarm();
@@ -401,7 +411,35 @@ it('emits nothing when the alarm runs with no dead sockets', async () => {
 });
 ```
 
-- [ ] **Step 3: Run the DO test file — verify all pass**
+- [ ] **Step 3: Add the "durabcast heartbeat is not broken — alarm re-arms after a reap" test**
+
+This is the explicit guard that our override does not break durabcast's own alarm: after reaping a dead socket while a peer remains, `super.alarm()` must have re-scheduled the heartbeat.
+
+```ts
+it('keeps durabcast heartbeat alive: re-arms the alarm after a reap while peers remain', async () => {
+  const room = 'reap-rearm';
+  const aUid = 'a1a1a1a1a1a1a1a1';
+  const bUid = 'b2b2b2b2b2b2b2b2';
+
+  const a = await connect(room, aUid);
+  const b = await connect(room, bUid);
+  nav(a, '/x');
+  nav(b, '/x');
+  await settle();
+
+  await killByUid(room, aUid);
+  const ran = await runDurableObjectAlarm(stubFor(room));
+  await settle();
+
+  expect(ran).toBe(true); // an alarm was scheduled and our override ran
+  // super.alarm() must have re-scheduled the heartbeat because b is still connected — proving the
+  // override did not break durabcast's alarm (we never call setAlarm ourselves).
+  const nextAlarm = await runInDurableObject(stubFor(room), (_instance, state) => state.storage.getAlarm());
+  expect(nextAlarm).not.toBeNull();
+});
+```
+
+- [ ] **Step 4: Run the DO test file — verify all pass**
 
 Run:
 
@@ -409,9 +447,9 @@ Run:
 pnpm exec vitest run --project workers worker/durable-objects/cursor-room.test.ts
 ```
 
-Expected: PASS — both new edge tests green alongside the rest.
+Expected: PASS — all three new edge tests green alongside the rest.
 
-- [ ] **Step 4: Lint + typecheck**
+- [ ] **Step 5: Lint + typecheck**
 
 Run:
 
@@ -421,11 +459,11 @@ pnpm lint && pnpm typecheck
 
 Expected: clean.
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 git add worker/durable-objects/cursor-room.test.ts
-git commit -m "test(cursor): cover same-uid survivor and no-dead reaper cases
+git commit -m "test(cursor): cover same-uid survivor, no-dead, and alarm re-arm cases
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 ```
@@ -449,5 +487,6 @@ Expected: PASS.
 - **`deserializeAttachment()` is `any`** in the test helper — `att.uid` / `att.connectedAt` access is fine without assertions (the existing tests access `JSON.parse(...)` results the same way).
 - **`runDurableObjectAlarm` returns `false` if no alarm is scheduled.** The base `createRoom` schedules one on the first connection, so it will run; you can ignore the return value (or `expect(await runDurableObjectAlarm(...)).toBe(true)` if you want an extra guard).
 - **Do not call `super.alarm()` before notifying** — once it closes the dead sockets you lose their attachments and the dead-set exclusion logic. Notify first, then `await super.alarm()`.
+- **Never break durabcast's alarm.** The override only _adds_ the presence notify; closing dead sockets and re-arming the heartbeat (`setAlarm`) stay with `super.alarm()`. Do NOT call `this.ctx.storage.setAlarm` / `deleteAlarm` yourself, and do NOT skip `super.alarm()`. The `AUTO_CLOSE` guard keeps the override consistent with the base: if auto-close is ever disabled, notify nothing and just delegate. Task 3 Step 3 asserts the alarm is re-armed after a reap to lock this in.
 - **`this.sessions`** (protected) and **`isAliveSocket`** (public) come from durabcast's `BroadcastMessage`; both are accessible from the subclass. Compute `dead` from `this.sessions` (the base reaps from the same Set) so the override and `super.alarm()` agree on which sockets are dead.
 - **No `let`, no `forEach`, no wrapper coercion** (project lint rules). Use `.filter`, `for...of`, and explicit `=== true` / `=== undefined` comparisons.
