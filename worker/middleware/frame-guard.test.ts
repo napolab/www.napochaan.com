@@ -4,12 +4,23 @@ import { describe, expect, it } from 'vitest';
 import { FRAME_ANCESTORS_NONE, frameGuardHeaders, isFrameGuardedPath, resolveCSP, X_FRAME_OPTIONS_DENY } from './frame-guard';
 
 describe('isFrameGuardedPath', () => {
-  it.each(['/oauth/authorize', '/oauth/authorize/', '/oauth/authorize/x'])('guards %s', (path) => {
+  it.each(['/oauth/authorize', '/oauth/authorize/', '/oauth/authorize/x', '/oauth/%61uthorize', '/oauth/authorize%2Fx'])('guards %s', (path) => {
     expect(isFrameGuardedPath(path)).toBe(true);
   });
 
   it.each(['/', '/admin', '/oauth/authorized', '/oauth/token', '/oauth'])('leaves %s alone', (path) => {
     expect(isFrameGuardedPath(path)).toBe(false);
+  });
+});
+
+describe('isFrameGuardedPath with malformed percent-encoding', () => {
+  it('does not throw and does not guard an unrelated malformed path', () => {
+    expect(() => isFrameGuardedPath('/x/%E0%A4%A')).not.toThrow();
+    expect(isFrameGuardedPath('/x/%E0%A4%A')).toBe(false);
+  });
+
+  it('still guards a malformed path whose raw pathname matches', () => {
+    expect(isFrameGuardedPath('/oauth/authorize/%E0%A4%A')).toBe(true);
   });
 });
 

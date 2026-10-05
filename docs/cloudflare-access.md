@@ -93,24 +93,27 @@ Zero Trust ダッシュボードで設定する。画面の操作順は Cloudfla
 
 stg の deploy 後、次を順に確かめる。
 
-**項目 3 / 6 / 7 の前提**: stg はホスト全体のアプリが `/api/*` にも `Cf-Access-Jwt-Assertion` header を付ける。strategy は header を優先し、header 由来は CSRF 検査も受けないため、このままでは cookie 経路は検証されない。3 / 6 / 7 は、`stg.napochaan.com/api*` に Bypass アプリを足した場合（下の「stg で cookie 経路を試す」）か prod でだけ意味を持つ。Bypass を採らない場合、この 3 項目は**最初の prod deploy で確認する**（項目 2〜3 の扱いと同じ）。
+**項目 3 / 6 / 7 の前提**: stg はホスト全体のアプリが `/api/*` にも `Cf-Access-Jwt-Assertion` header を付ける。strategy は header を優先し、header 由来は CSRF 検査も受けないため、このままでは cookie 経路は検証されない。3 / 6 / 7 と Live Preview の項目は、`stg.napochaan.com/api*` に Bypass アプリを足した場合（下の「stg で cookie 経路を試す」）か prod でだけ意味を持つ。Bypass を採らない場合、これらは**最初の prod deploy で確認する**（下の「stg で cookie 経路を試す」の末尾、および「5. prod へ反映」の引き継ぎ項目を参照）。
 
 - [ ] 1. stg にパス単位アプリ（`/admin*`, `/oauth/authorize*`）を作り、AUD を `[env.staging.vars]` に設定して deploy した
 - [ ] 2. `/admin` に入ると自動ログインされ、ログインフォームが出ない
 - [ ] 3. admin 内の操作（一覧・保存・画像アップロード）が cookie 経路で通る（Server Action による保存も含む）。**stg では `/api*` Bypass 追加後、または prod で確認**（上の前提を参照。Bypass 無しの stg では header 経路で通るだけで、cookie 経路の確認にならない）
 - [ ] 4. 未登録 email で入ると user が自動作成される
 - [ ] 5. ログアウトで Access のログアウト画面に遷移し、再度 `/admin` に行くと Access のログインを求められる
-- [ ] 6. 別 origin からの POST が拒否される（401 / 403）。**stg では `/api*` Bypass 追加後、または prod で確認**。Bypass 無しの stg では `/api/*` に Access が header を付けるので、このリクエストは拒否されず通ってしまう（header 由来は CSRF 検査の対象外。バグではない）。`CF_Authorization` の JWT は、Access ログイン済みブラウザの DevTools → Application → Cookies からコピーする（詳しくは下の「AUD の実測記録」）:
+- [ ] 6. 別 origin からのリクエストで cookie 由来の認証が解決されない（`user: null`）。**stg では `/api*` Bypass 追加後、または prod で確認**。Bypass 無しの stg では `/api/*` に Access が header を付けるので、`user` が解決されて返ってしまう（header 由来は CSRF 検査の対象外。バグではない）。`CF_Authorization` の JWT は、Access ログイン済みブラウザの DevTools → Application → Cookies からコピーする（詳しくは下の「AUD の実測記録」）。probe には `GET /api/users/me` を使う（`POST /api/users/logout` は未認証だと 400 `No User` を返すだけで、CSRF で弾かれたのか判別できず誤解を招く）:
 
   ```bash
-  curl -i -X POST https://stg.napochaan.com/api/users/logout \
+  curl -i https://stg.napochaan.com/api/users/me \
     -H 'Origin: https://evil.example' \
     --cookie 'CF_Authorization=<自分の JWT>'
   ```
 
+  期待値は `{"user":null}`（`Origin` が `payload.config.csrf` に無いので cookie 由来の認証は user を解決しない）。比較用に、`payload.config.csrf` に含まれるサイト自身の origin（prod なら `https://napochaan.com`）を `Origin` に付けると `user` が返る。`Origin` も `Sec-Fetch-Site` も無い curl は、csrf が設定されている限り同様に拒否される。
+
   cookie 由来の認証は `Origin` が `payload.config.csrf`（`serverURL` を含む）に無いと user を解決しない。header（`Cf-Access-Jwt-Assertion`）由来は Access がエッジで付けたものなので CSRF 検査の対象外。
 
 - [ ] 7. JWT なしの `/api/users/me` が未認証になる（`user: null`）。**stg では `/api*` Bypass 追加後、または prod で確認**。Bypass 無しの stg では、`/api/users/me` は Access のログインへ redirect される（`user: null` の JSON は返らない）
+- [ ] 7a. Live Preview と下書きプレビュー（`/next/preview`）が、Access ログイン済みの編集者で表示できる（`CF_Authorization` cookie 経路を通る）。**stg では `/api*` Bypass 追加後、または prod で確認**（Bypass 無しの stg では header 経路で通るだけで、cookie 経路の確認にならない）
 - [ ] 8. MCP の `/oauth/authorize` が Access user で承認でき、claude.ai / Claude Code から MCP が使える（下の「MCP の確認」）
 - [ ] 9. どの AUD が JWT に入るかを記録した（下の「AUD の実測記録」）
 
@@ -165,7 +168,7 @@ prod は `/api/*` が Access アプリの外なので、admin の XHR には `Cf
 prod と同じ挙動を試したいときは、`stg.napochaan.com/api*` に **Bypass** ポリシーのアプリを足す。
 
 - 効果: `/api/*` に header が付かなくなり、prod と同じく cookie 経路で動く。
-- 代償: **stg の `/api/*` が Access なしで外から叩けるようになる**（prod と同じ公開範囲）。stg の API が公開されてよいかは本人が決める。採らない場合、cookie 経路は prod の初回 deploy で初めて通ることになるので、prod 側で手順 4 の 2〜3 を最初に確認する。
+- 代償: **stg の `/api/*` が Access なしで外から叩けるようになる**（prod と同じ公開範囲）。stg の API が公開されてよいかは本人が決める。採らない場合、cookie 経路は prod の初回 deploy で初めて通ることになるので、prod 側で手順 4 の項目 3 / 6 / 7 と Live Preview の項目（7a）を最初に確認する（「5. prod へ反映」に引き継ぎ項目がある）。
 
 ## 5. prod へ反映
 
@@ -176,6 +179,7 @@ prod 後の確認:
 - [ ] `https://napochaan.com/admin` で Access のログイン → 自動で admin に入る
 - [ ] `https://napochaan.com/oauth/authorize` で「{email} として許可する」が出る
 - [ ] 公開ページと `/api/media/file/*` が Access なしで見える
+- [ ] stg で `/api*` Bypass アプリを採らなかった場合は、cookie 経路の確認を引き継ぐ: 手順 4 の項目 3（admin 内の操作）/ 6（別 origin の probe）/ 7（JWT なしの `/api/users/me`）/ 7a（Live Preview と `/next/preview`）
 
 ## 切り戻し
 
@@ -185,6 +189,7 @@ prod 後の確認:
 - **migration は不要。** `disableLocalStrategy: { enableFields: true }` なので email / hash 列は schema に残ったまま（schema は dev と一致している）。
 - 自動作成した user は password を持たないので、そのままでは入れない。手順 1 で本人の user に password を設定しておくこと。
 - 設定ミスで admin に誰も入れなくなったときも、これで戻る。
+- **注意（CLI 経由で作った user）**: `CF_ACCESS_*` を wrangler の env に入れた後は、その env を向けた Payload CLI（`CLOUDFLARE_ENV=staging|production pnpm payload …`、seed スクリプトなど）も plugin を有効の状態で読み込み、local strategy が無効になる。この経路で作った user も password を持たない。通常の運用では問題にならず、切り戻しのときだけ効く（手順 1 の password 事前設定は、Access 有効化前に済ませる）。
 
 ## 注意
 

@@ -8,7 +8,19 @@ export const X_FRAME_OPTIONS_DENY = 'DENY';
 
 const GUARDED_PATH = '/oauth/authorize';
 
-export const isFrameGuardedPath = (pathname: string): boolean => pathname === GUARDED_PATH || pathname.startsWith(`${GUARDED_PATH}/`);
+const matchesGuardedPath = (pathname: string): boolean => pathname === GUARDED_PATH || pathname.startsWith(`${GUARDED_PATH}/`);
+
+// `/oauth/%61uthorize` のような percent-encoding でも Next 側は同じ route に解決するので、
+// 生の pathname と decode 後の両方で判定する。不正な %-列は decode できないので生の pathname だけを見る。
+const safeDecodePathname = (pathname: string): string => {
+  try {
+    return decodeURIComponent(pathname);
+  } catch {
+    return pathname;
+  }
+};
+
+export const isFrameGuardedPath = (pathname: string): boolean => matchesGuardedPath(pathname) || matchesGuardedPath(safeDecodePathname(pathname));
 
 const hasFrameAncestors = (csp: string): boolean => csp.split(';').some((directive) => directive.trim().toLowerCase().startsWith('frame-ancestors'));
 

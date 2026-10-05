@@ -68,6 +68,28 @@ describe('cloudflareAccessPlugin', () => {
     });
   });
 
+  test('treats a whitespace-only teamDomain as not configured', async () => {
+    const config = await cloudflareAccessPlugin({ teamDomain: '  ', aud: 'aud-1' })(baseConfig);
+
+    expect(collectionOf(config, 'users')?.auth).toEqual(true);
+    expect(config.admin?.components?.logout?.Button).toEqual({
+      path: ACCESS_LOGOUT_BUTTON_PATH,
+      clientProps: { accessLogout: false },
+    });
+  });
+
+  // 空白が残ったままだと JWKS URL の host が不正になり createAccessKeys が throw する。
+  // 有効化できていること自体が trim 済みの teamDomain が渡っている証拠になる。
+  test('trims the teamDomain before enabling', async () => {
+    const config = await cloudflareAccessPlugin({ teamDomain: ' napolab ', aud: 'aud-1' })(baseConfig);
+
+    expect(authOf(config, 'users')?.strategies?.at(-1)?.name).toBe('cloudflare-access');
+    expect(config.admin?.components?.logout?.Button).toEqual({
+      path: ACCESS_LOGOUT_BUTTON_PATH,
+      clientProps: { accessLogout: true },
+    });
+  });
+
   test('adds the strategy and disables local login when configured', async () => {
     const config = await cloudflareAccessPlugin(configured)(baseConfig);
     const auth = authOf(config, 'users');

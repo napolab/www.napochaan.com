@@ -22,10 +22,11 @@ type EnabledOptions = { teamDomain: string; aud: readonly string[] };
 
 const resolveEnabledOptions = (options: CloudflareAccessPluginOptions): EnabledOptions | undefined => {
   const aud = parseAudiences(options.aud);
-  if (options.teamDomain === undefined || options.teamDomain === '') return undefined;
+  const teamDomain = options.teamDomain?.trim();
+  if (teamDomain === undefined || teamDomain === '') return undefined;
   if (aud.length === 0) return undefined;
 
-  return { teamDomain: options.teamDomain, aud };
+  return { teamDomain, aud };
 };
 
 const isAuthCollection = (collection: CollectionConfig): boolean => collection.auth !== undefined && collection.auth !== false;
