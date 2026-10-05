@@ -31,3 +31,23 @@ export class ResolveUserError extends Error {
     super('Failed to resolve the Payload user for the Cloudflare Access identity', { cause });
   }
 }
+
+export class CrossSiteCookieRequest extends Error {
+  override readonly name = 'CrossSiteCookieRequest';
+
+  constructor() {
+    super('Cloudflare Access cookie was sent on a cross-site request');
+  }
+}
+
+export class AccessTargetCollectionNotFound extends Error {
+  override readonly name = 'AccessTargetCollectionNotFound';
+
+  constructor(readonly slug: string | undefined) {
+    super(
+      slug === undefined
+        ? 'Cloudflare Access is configured but no auth collection exists to attach it to. Set `admin.user` or pass `collection` to cloudflareAccessPlugin.'
+        : `Cloudflare Access is configured but "${slug}" is not an auth collection in the Payload config. Fix \`admin.user\` / the plugin \`collection\` option, or unset CF_ACCESS_TEAM_DOMAIN / CF_ACCESS_AUD to disable the plugin.`,
+    );
+  }
+}

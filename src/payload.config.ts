@@ -171,7 +171,7 @@ export default buildConfig({
     push: false,
   }),
   plugins: [
-    cloudflareAccessPlugin({ teamDomain: undefined, aud: undefined }),
+    cloudflareAccessPlugin({ teamDomain: cfEnv.CF_ACCESS_TEAM_DOMAIN, aud: cfEnv.CF_ACCESS_AUD }),
     r2Storage({
       bucket: r2,
       collections: {
