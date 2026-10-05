@@ -43,6 +43,7 @@
     "@internationalized/date": "^3.12.2",
     "@marsidev/react-turnstile": "^1.5.3",
     "@modelcontextprotocol/server": "^2.0.0",
+    "@napolab/payload-cloudflare-access": "workspace:*",
     "@opennextjs/cloudflare": "1.18.0",
     "@payloadcms/db-d1-sqlite": "3.84.1",
     "@payloadcms/live-preview-react": "3.84.1",

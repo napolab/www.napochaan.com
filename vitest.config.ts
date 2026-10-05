@@ -83,7 +83,7 @@ export default defineConfig({
         },
         test: {
           name: 'browser',
-          include: ['src/**/*.test.tsx'],
+          include: ['src/**/*.test.tsx', 'packages/*/src/**/*.test.tsx'],
           browser: {
             enabled: true,
             provider: playwright(),
@@ -100,7 +100,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['src/**/*.test.ts'],
+          include: ['src/**/*.test.ts', 'packages/*/src/**/*.test.ts'],
         },
       },
       {
