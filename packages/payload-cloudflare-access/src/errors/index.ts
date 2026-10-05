@@ -23,3 +23,11 @@ export class MissingAccessEmail extends AccessJWTError {
     super('Cloudflare Access JWT has no email claim');
   }
 }
+
+export class ResolveUserError extends Error {
+  override readonly name = 'ResolveUserError';
+
+  constructor(cause: unknown) {
+    super('Failed to resolve the Payload user for the Cloudflare Access identity', { cause });
+  }
+}
