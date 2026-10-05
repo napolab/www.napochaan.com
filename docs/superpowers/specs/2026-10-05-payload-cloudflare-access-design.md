@@ -90,9 +90,9 @@ export const extractAccessToken: (headers: Headers) => Result<AccessToken, Heade
 
 - 検証: `algorithms: ['RS256']`、`issuer`、`audience`、`exp` / `nbf`(jose 標準、`clockTolerance: 30` 秒)、`type === 'app'`、`email` は空でない string。
 - 時刻ずれの許容 30 秒、鍵ローテーション時の JWKS 再取得(知らない kid)、`crit` 拒否、aud の配列一致は `@hono/cloudflare-access@0.4.0` と同じ挙動。後者 3 つは jose の `jwtVerify` / `createRemoteJWKSet` が標準で行う。
-- service token の JWT(`email` なし / `common_name` のみ)は `MissingEmail` で拒否する。
+- service token の JWT(`email` なし / `common_name` のみ)は `MissingAccessEmail` で拒否する。
 - `extractAccessToken`(`src/token/`): トークンの取り出し元を prefix-match-processor の形の plugin にする。`headerTokenSource`(`Cf-Access-Jwt-Assertion`)と `cookieTokenSource`(`CF_Authorization`)をそれぞれ 1 ディレクトリに置き、`run(headers): Result<AccessToken, Headers>` で扱わないときは `err(headers)`。registry `[header, cookie]` を runner が先頭から試し、最初の `ok` を採用する。registry はパッケージ内部だけで持ち、plugin の options には出さない(必要になったら `tokenSources` を足す)。CSRF 検査は cookie source に同居させず strategy 側で掛ける(拒否を warn ログに残すため)。
-- エラーは class で表現する(`AccessJWTError` 系: `InvalidToken` / `WrongTokenType` / `MissingEmail`)。
+- エラーは class で表現する(`src/errors/`。`AccessJWTError` 系: `InvalidAccessToken`(jose の失敗を `cause` に保持)/ `WrongAccessTokenType` / `MissingAccessEmail`。ほかに `ResolveUserError` / `CrossSiteCookieRequest` / `AccessTargetCollectionNotFound`)。
 
 ### 4.3 `csrf/index.ts`
 
@@ -108,12 +108,19 @@ Payload 組み込みの cookie 抽出(`node_modules/payload/dist/auth/extractJWT
 ### 4.4 `resolve-user/index.ts`
 
 ```ts
-export const resolveAccessUser = (payload: Payload, identity: AccessIdentity): ResultAsync<User, ResolveUserError>;
+// Payload の find/create の doc は実行時に collection を持たないので外す。collection と _strategy は strategy が付ける
+export type AccessUser = Omit<TypedUser, 'collection'>;
+export type UserStore = {
+  findByEmail: (email: string) => Promise<AccessUser | undefined>;
+  create: (email: string) => Promise<AccessUser>;
+};
+export const createPayloadUserStore = (payload: Pick<Payload, 'find' | 'create'>, collection: CollectionSlug): UserStore;
+export const resolveAccessUser = (store: UserStore, identity: AccessIdentity): ResultAsync<AccessUser, ResolveUserError>;
 ```
 
-1. email を小文字化して `payload.find({ collection, where: { email: { equals } }, limit: 1, overrideAccess: true })`
-2. 見つからなければ `payload.create({ collection, data: { email }, overrideAccess: true })`(password なし。`enableFields` により email 列はある)
-3. create が unique 制約で失敗したら(同時の初回アクセス)もう一度 find する
+1. email を小文字化して `store.findByEmail`(= `payload.find({ collection, where: { email: { equals } }, limit: 1, depth: 0, overrideAccess: true })`)
+2. 見つからなければ `store.create`(= `payload.create({ collection, data: { email }, overrideAccess: true })`。password なし。`enableFields` により email 列はある)
+3. create が失敗したら(同時の初回アクセスで unique 制約に当たる)もう一度 find する。それでも無ければ create のエラーを `cause` にした `ResolveUserError`
 4. local API の `overrideAccess: true` を使うため、`users.access.create`(最初の 1 人だけ許可)はここでは効かない。意図した挙動であることをコメントで明記する
 
 ### 4.5 `strategy/index.ts`
@@ -121,21 +128,24 @@ export const resolveAccessUser = (payload: Payload, identity: AccessIdentity): R
 ```
 authenticate({ headers, payload })
   ├ extractAccessToken → err なら { user: null }(JWKS を取りに行かない: 匿名の /api/media 等)
-  ├ cookie 由来 → csrf 検査 NG なら { user: null } + warn
-  ├ verifyAccessJWT NG → { user: null } + 構造化 warn(throw しない: Payload が握りつぶすため)
+  ├ cookie 由来 → csrf 検査 NG なら { user: null } + warn(CrossSiteCookieRequest。JWKS は取りに行かない)
+  ├ verifyAccessJWT NG → { user: null } + 構造化 warn { err, source }(throw しない: Payload が握りつぶすため。生の JWT はログに出さない)
   ├ resolveAccessUser NG → { user: null } + error log
   └ { user: { ...doc, collection, _strategy: 'cloudflare-access' } }
 ```
+
+- `createAccessStrategy({ teamDomain, aud, collection, keys })` が `AuthStrategy` を返し、中身は `authenticateAccess(options, { headers, payload })`。`{ user: null }` は毎回新しく作る(module スコープに共有オブジェクトを置かない)。
 
 ### 4.6 `plugin/index.ts`
 
 ```ts
 type CloudflareAccessPluginOptions = {
-  teamDomain: string | undefined;
-  aud: string | undefined;
-  collection?: string; // default: config.admin.user
+  teamDomain: string | undefined; // trim して扱う
+  aud: string | undefined;        // カンマ区切り。parseAudiences で trim・空要素除去
+  collection?: string;            // 省略時: config.admin.user → 先頭の auth collection
 };
-export const cloudflareAccessPlugin = (options) => (config: Config): Config => ...
+export const parseAudiences = (raw: string | undefined): readonly string[];
+export const cloudflareAccessPlugin = (options: CloudflareAccessPluginOptions): Plugin;
 ```
 
 | 設定                             | env 未設定(local / build / CLI) | env 設定済み(stg / prod) |
@@ -148,11 +158,14 @@ export const cloudflareAccessPlugin = (options) => (config: Config): Config => .
 - **importMap に載るものは env で分岐させない。** `payload generate:importmap` と `next build` は `CF_ACCESS_*` が無い状態で config を評価する。env で登録を切り替えると、本番で importMap に無い component を参照して admin が壊れる。
 - ログアウトボタンの遷移先は `clientProps`(`{ accessLogout: boolean }`)で渡す。clientProps は importMap に影響しない。
 - users collection は配列の位置を保ったまま map で差し替える(payload-oauth2 のように末尾へ移動しない)。
-- `enabled` は `teamDomain` と `aud` が両方とも空でない string のとき。`NODE_ENV` では判定しない。
+- `enabled` は trim した `teamDomain` が空でなく、かつ `parseAudiences(aud)` が 1 件以上のとき。`NODE_ENV` では判定しない。片方だけ・空白だけの設定は黙って無効(password ログインのまま)。
+- enabled のとき、対象 collection を `options.collection` → `config.admin.user` → `config.collections` の先頭の auth collection の順に決める。見つからない・auth collection でない場合は config build 時に `AccessTargetCollectionNotFound` を throw する(env が揃っているのに黙って password ログインを残す fail-open を防ぐ)。env 未設定の build / CLI / importmap はこの判定に到達しない。
+- JWKS の key resolver(`createAccessKeys(teamDomain)`)は enabled のとき plugin のクロージャで 1 回だけ作り、strategy に渡す。
+- 対象 collection の既存 `auth` オプション(`cookies` など)と既存 `strategies` は保持し、strategy は末尾に追加する。`auth: true` は object に正規化する。
 
 ### 4.7 `client/logout-button/index.tsx`
 
-- `'use client'`。`accessLogout` が true なら `/cdn-cgi/access/logout` への Link、false なら Payload の既定 `LogoutButton`(`@payloadcms/ui`)をそのまま描画する。
+- `'use client'`。`accessLogout` が true なら react-aria-components の `Link`(`href="/cdn-cgi/access/logout"`、`aria-label="ログアウト"`、Payload の nav と同じ `className="nav__log-out"`、中身は `LogOutIcon`)、false なら Payload の既定 `Logout`(`@payloadcms/ui`)をそのまま描画する。
 - Access のログアウトは Access のセッション cookie を消す。Payload 側のセッションはそもそも無いので、これだけで完結する。
 
 ## 5. アプリ側の変更
@@ -174,8 +187,12 @@ plugins: [
 password ログインを無効化すると `payload.login` が Forbidden になり、MCP の認可が全滅する。② を実施するまでの間も動くように二経路にする。
 
 - page(RSC)で `payload.auth({ headers })` を呼ぶ
-  - user あり(Access 経由): 「{email} として承認」ボタンだけの form。action は `payload.auth({ headers: await headers() })` で user を取り直し、`completeAuthorization` する(form の値から user を受け取らない)
+  - user あり(Access 経由): 「{email} として許可する」ボタンだけの form(`AccessAuthorizeForm`)。action `authorizeWithAccess` は formData から `authRequestQuery` だけを読み、`payload.auth({ headers: await headers() })` で user を取り直して `completeAuthorization` する(form の値から user を受け取らない。node テストで固定)
   - user なし(local dev): 既存の email + password form のまま
+  - `payload.auth` が throw したら(D1 障害など)page は password form に倒す。merge 時点では Access 未有効で、今動いている同意画面を 500 にしないため。Access 有効時はこの form ではログインできないので bypass にはならない
+- 承認ボタンだけの同意画面は password という暗黙のガードを持たないので、次の 2 つで守る
+  - cross-site POST: Next の Server Actions の Origin / Host 検査(`serverActions.allowedOrigins` を広げない)
+  - clickjacking: worker の Hono middleware(`worker/middleware/frame-guard.ts`)で `/oauth/authorize`(パーセントデコード後のパスも)に `Content-Security-Policy: frame-ancestors 'none'` と `X-Frame-Options: DENY` を付ける
 - prod / stg の Access パス単位アプリに `/oauth/authorize*` を含める
 
 ### 5.3 wrangler / env
