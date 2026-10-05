@@ -7,6 +7,9 @@
     "./plugin": "./src/plugin/index.ts",
     "./client/logout-button": "./src/client/logout-button/index.tsx"
   },
+  "dependencies": {
+    "neverthrow": "^8.2.0"
+  },
   "devDependencies": {
     "monaco-editor": "^0.55.1",
     "typescript": "^5.0.0"
