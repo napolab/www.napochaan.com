@@ -37,6 +37,12 @@ export default defineConfig({
             // failing in-flight test imports. Stub it — data helpers are mocked
             // per-test, so the real client never runs. See src/__mocks__/payload-client.ts.
             '@lib/payload/client': path.resolve(__dirname, 'src/__mocks__/payload-client.ts'),
+            // `@payloadcms/ui` is a Payload admin bundle with Node-only deps; the
+            // dep scanner crawling it triggers mid-run reloads (same failure mode as
+            // above), and `vi.mock` does not stop the scan. Alias it to a stub that
+            // exposes only what packages/payload-cloudflare-access client components
+            // use. See src/__mocks__/payloadcms-ui.tsx.
+            '@payloadcms/ui': path.resolve(__dirname, 'src/__mocks__/payloadcms-ui.tsx'),
           },
         },
         // Pre-bundle every browser-test dependency up front. Otherwise Vite
@@ -83,7 +89,7 @@ export default defineConfig({
         },
         test: {
           name: 'browser',
-          include: ['src/**/*.test.tsx'],
+          include: ['src/**/*.test.tsx', 'packages/*/src/**/*.test.tsx'],
           browser: {
             enabled: true,
             provider: playwright(),
@@ -100,7 +106,7 @@ export default defineConfig({
         test: {
           name: 'unit',
           environment: 'node',
-          include: ['src/**/*.test.ts'],
+          include: ['src/**/*.test.ts', 'packages/*/src/**/*.test.ts'],
         },
       },
       {

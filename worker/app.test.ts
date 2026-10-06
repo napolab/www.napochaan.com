@@ -51,6 +51,22 @@ describe('createWorkerApp', () => {
     expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600, stale-while-revalidate=86400');
   });
 
+  it('forbids framing of the OAuth consent page served by the mounted handler', async () => {
+    const handlerFetch = vi.fn(async () => new Response('form'));
+    const app = createWorkerApp(handlerFetch);
+    const response = await app.request('/oauth/authorize?client_id=x');
+    expect(response.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'none'");
+    expect(response.headers.get('X-Frame-Options')).toBe('DENY');
+  });
+
+  it('allows only same-origin framing of the admin served by the mounted handler', async () => {
+    const handlerFetch = vi.fn(async () => new Response('admin'));
+    const app = createWorkerApp(handlerFetch);
+    const response = await app.request('/admin/collections/blog/1');
+    expect(response.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'self'");
+    expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+  });
+
   it('keeps Next.js private policies untouched', async () => {
     const handlerFetch = vi.fn(async () => new Response('form', { headers: { 'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate' } }));
     const app = createWorkerApp(handlerFetch);

@@ -1,6 +1,8 @@
 'use server';
 
+import { isCloudflareAccessUser } from '@napolab/payload-cloudflare-access/access-user';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { getOAuthHelpers } from '@lib/mcp/oauth';
@@ -18,6 +20,8 @@ const readField = (fd: FormData, key: string): string => {
 
 const credentialErrorMessage = 'メールアドレスまたはパスワードが正しくありません。';
 const authRequestErrorMessage = '認可リクエストの処理に失敗しました。MCP クライアントから接続をやり直してください。';
+const oauthUninitializedMessage = 'OAuth プロバイダが初期化されていません。デプロイ済みの worker 経由でアクセスしてください。';
+const accessSessionErrorMessage = 'Cloudflare Access のセッションが見つかりません。ページを再読み込みしてください。';
 
 type LoginOutcome = { redirectTo: string } | AuthorizeState;
 
@@ -84,10 +88,60 @@ export const authorize = async (prev: AuthorizeState, formData: FormData): Promi
   const { env } = await getCloudflareContext({ async: true });
   const helpers = getOAuthHelpers(env);
   if (helpers === undefined) {
-    return { status: 'error', message: 'OAuth プロバイダが初期化されていません。デプロイ済みの worker 経由でアクセスしてください。' };
+    return { status: 'error', message: oauthUninitializedMessage };
   }
 
   const outcome = await completeLogin(helpers, email, password, query);
+  if ('redirectTo' in outcome) redirect(outcome.redirectTo);
+
+  return outcome;
+};
+
+// Cloudflare Access 経由のリクエストから user を取り直す。form に載った user / email は
+// 信用せず、毎回 headers の Access JWT(cloudflare-access strategy)から導出する。
+// payload.auth は他の strategy(Access 無効時の password セッション = local-jwt など)の user も
+// 返すので、`_strategy === 'cloudflare-access'` の user だけを採る。それ以外は session エラー。
+// getPayloadClient は loginUser と同じ理由で動的 import。access-user は import を持たない module
+// なので静的 import してよい(strategy 本体は jose / payload を引くので、ここからは import しない)。
+const resolveAccessUser = async (): Promise<User | undefined> => {
+  try {
+    const { getPayloadClient } = await import('@lib/payload/client');
+    const payload = await getPayloadClient();
+    const { user } = await payload.auth({ headers: await headers() });
+    if (user === null || !isCloudflareAccessUser(user)) return undefined;
+
+    return user;
+  } catch (error) {
+    console.error('[oauth] payload auth failed', error);
+
+    return undefined;
+  }
+};
+
+// redirect() は try の外で呼ぶため、ここでは redirectTo を返すところまでを担う。
+const completeAccessAuthorization = async (helpers: OAuthHelpers, query: string): Promise<LoginOutcome> => {
+  const user = await resolveAccessUser();
+  if (user === undefined) return { status: 'error', message: accessSessionErrorMessage };
+
+  const authorized = await completeAuthRequest(helpers, user, query);
+  if (authorized === undefined) return { status: 'error', message: authRequestErrorMessage };
+
+  return authorized;
+};
+
+// 承認ボタンだけの action なので、パスワードという CSRF 防御が無い。クロスサイト防御は 2 段:
+// Next の Server Actions の Origin/Host 検査と、cloudflare-access strategy の CSRF 検査
+// (header 由来・cookie 由来とも、許可リスト外の Origin なら user を解決しない)。
+// serverActions.allowedOrigins を広げると前者が弱まるので注意。フレーム埋め込みは
+// worker/middleware/frame-guard.ts が塞ぐ。
+export const authorizeWithAccess = async (prev: AuthorizeState, formData: FormData): Promise<AuthorizeState> => {
+  const query = readField(formData, 'authRequestQuery');
+
+  const { env } = await getCloudflareContext({ async: true });
+  const helpers = getOAuthHelpers(env);
+  if (helpers === undefined) return { status: 'error', message: oauthUninitializedMessage };
+
+  const outcome = await completeAccessAuthorization(helpers, query);
   if ('redirectTo' in outcome) redirect(outcome.redirectTo);
 
   return outcome;

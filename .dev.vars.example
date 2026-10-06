@@ -9,3 +9,7 @@ CONTACT_TO_EMAIL=dev@example.com
 CONTACT_FROM_EMAIL=dev@example.com
 TURNSTILE_SECRET_KEY=dev-placeholder
 TURNSTILE_SITE_KEY=dev-placeholder
+
+# Cloudflare Access（Payload admin ログイン）。stg/prod は wrangler vars で設定。空なら plugin 無効で password ログイン。
+CF_ACCESS_TEAM_DOMAIN=
+CF_ACCESS_AUD=

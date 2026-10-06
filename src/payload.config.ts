@@ -2,6 +2,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { getCloudflareContext } from '@opennextjs/cloudflare';
+import { cloudflareAccessPlugin } from '@napolab/payload-cloudflare-access/plugin';
 import { sqliteD1Adapter } from '@payloadcms/db-d1-sqlite';
 import { seoPlugin } from '@payloadcms/plugin-seo';
 import { lexicalEditor } from '@payloadcms/richtext-lexical';
@@ -170,6 +171,7 @@ export default buildConfig({
     push: false,
   }),
   plugins: [
+    cloudflareAccessPlugin({ teamDomain: cfEnv.CF_ACCESS_TEAM_DOMAIN, aud: cfEnv.CF_ACCESS_AUD }),
     r2Storage({
       bucket: r2,
       collections: {

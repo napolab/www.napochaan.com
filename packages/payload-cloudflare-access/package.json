@@ -1,0 +1,25 @@
+{
+  "name": "@napolab/payload-cloudflare-access",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./plugin": "./src/plugin/index.ts",
+    "./access-user": "./src/access-user/index.ts",
+    "./client/logout-button": "./src/client/logout-button/index.tsx"
+  },
+  "dependencies": {
+    "jose": "^6.2.3",
+    "neverthrow": "^8.2.0"
+  },
+  "devDependencies": {
+    "monaco-editor": "^0.55.1",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@payloadcms/ui": "3.84.1",
+    "payload": "3.84.1",
+    "react": "^19.0.0",
+    "react-aria-components": "^1.17.0"
+  }
+}
