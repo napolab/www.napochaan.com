@@ -2,8 +2,10 @@ import { SignJWT, createLocalJWKSet, exportJWK, generateKeyPair } from 'jose';
 import type { JWK, JWTVerifyGetKey, KeyObject } from 'jose';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 
+import { ACCESS_STRATEGY_NAME } from '../access-user';
+import { CrossSiteAccessRequest } from '../errors';
 import { accessIssuer } from '../verify';
-import { ACCESS_STRATEGY_NAME, authenticateAccess, createAccessStrategy } from './index';
+import { authenticateAccess, createAccessStrategy } from './index';
 import type { AccessStrategyOptions, AuthenticatePayload } from './index';
 
 const TEAM = 'napolab';
@@ -102,7 +104,35 @@ describe('authenticateAccess', () => {
 
     expect(result).toEqual({ user: null });
     expect(payload.logger.warn).toHaveBeenCalledTimes(1);
+    expect(payload.logger.warn).toHaveBeenCalledWith({ err: expect.any(CrossSiteAccessRequest), source: 'cookie' }, 'Cloudflare Access authentication rejected');
     expect(keys).not.toHaveBeenCalled();
+  });
+
+  // Access は header をブラウザの CF_Authorization cookie から付けるので、header 由来でもクロスサイト要求を拒否する。
+  test.each<{ name: string; metadata: Record<string, string> }>([
+    { name: 'a cross-site Origin', metadata: { Origin: 'https://evil.example' } },
+    { name: 'a cross-site <img> subresource', metadata: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'image' } },
+  ])('rejects a header token on $name without resolving keys', async ({ metadata }) => {
+    const keys = vi.fn<JWTVerifyGetKey>(() => {
+      throw new Error('keys must not be resolved for a rejected header request');
+    });
+    const payload = createPayload();
+    const headers = new Headers({ 'Cf-Access-Jwt-Assertion': await sign(), ...metadata });
+
+    const result = await authenticateAccess(optionsWith(keys), { headers, payload });
+
+    expect(result).toEqual({ user: null });
+    expect(payload.logger.warn).toHaveBeenCalledTimes(1);
+    expect(payload.logger.warn).toHaveBeenCalledWith({ err: expect.any(CrossSiteAccessRequest), source: 'header' }, 'Cloudflare Access authentication rejected');
+    expect(keys).not.toHaveBeenCalled();
+  });
+
+  test('authenticates a header token on a top-level cross-site navigation (Access login landing)', async () => {
+    const headers = new Headers({ 'Cf-Access-Jwt-Assertion': await sign(), 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Dest': 'document' });
+
+    const result = await authenticateAccess(optionsWith(), { headers, payload: createPayload() });
+
+    expect(result.user?.email).toBe(EMAIL);
   });
 
   test('returns null for an invalid token without throwing', async () => {

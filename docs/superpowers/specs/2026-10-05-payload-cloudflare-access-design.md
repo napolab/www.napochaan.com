@@ -48,9 +48,11 @@ browser ─▶ worker(Hono) ─▶ Next ─▶ Payload ─▶ strategy "cloudfla
                      各モジュールは src/<name>/index.ts、テストは src/<name>/<name>.test.ts
                      ├─ verify/          JWT → { email }        (Payload 非依存)
                      ├─ token/           取り出し元 plugin(header-source / cookie-source)+ runner
-                     ├─ csrf/            cookie 由来の Origin / Sec-Fetch-Site 検査
+                     ├─ csrf/            header / cookie それぞれの Origin / Sec-Fetch-* 検査
                      ├─ resolve-user/    email → user(自動作成)
+                     ├─ access-user/     ACCESS_STRATEGY_NAME と isCloudflareAccessUser(import を持たない)
                      ├─ strategy/        上記を合成した AuthStrategy
+                     ├─ team-domain/     CF_ACCESS_TEAM_DOMAIN の正規化と検証
                      ├─ plugin/          cloudflareAccessPlugin(options)(config) => config
                      ├─ errors/          エラー class
                      └─ client/logout-button/
@@ -68,6 +70,7 @@ browser ─▶ worker(Hono) ─▶ Next ─▶ Payload ─▶ strategy "cloudfla
   - `name: "@napolab/payload-cloudflare-access"`, `private: true`, `type: "module"`
   - `exports` は subpath でモジュールを直接公開する(no-barrel: `index.ts` の re-export は作らない)
     - `"./plugin"` → `./src/plugin/index.ts`(アプリが使う)
+    - `"./access-user"` → `./src/access-user/index.ts`(`/oauth/authorize` の page と `'use server'` action が使う。import を持たない module なので、strategy の依存(jose / payload)を action のバンドルに巻き込まない)
     - `"./client/logout-button"` → `./src/client/logout-button/index.tsx`(importMap が参照する)
   - `dependencies`: `jose`。`peerDependencies`: `payload`, `react`, `@payloadcms/ui`
 - アプリ側: `pnpm add @napolab/payload-cloudflare-access@workspace:*`、`next.config.ts` の `transpilePackages` に追加。
@@ -92,18 +95,37 @@ export const extractAccessToken: (headers: Headers) => Result<AccessToken, Heade
 - 時刻ずれの許容 30 秒、鍵ローテーション時の JWKS 再取得(知らない kid)、`crit` 拒否、aud の配列一致は `@hono/cloudflare-access@0.4.0` と同じ挙動。後者 3 つは jose の `jwtVerify` / `createRemoteJWKSet` が標準で行う。
 - service token の JWT(`email` なし / `common_name` のみ)は `MissingAccessEmail` で拒否する。
 - `extractAccessToken`(`src/token/`): トークンの取り出し元を prefix-match-processor の形の plugin にする。`headerTokenSource`(`Cf-Access-Jwt-Assertion`)と `cookieTokenSource`(`CF_Authorization`)をそれぞれ 1 ディレクトリに置き、`run(headers): Result<AccessToken, Headers>` で扱わないときは `err(headers)`。registry `[header, cookie]` を runner が先頭から試し、最初の `ok` を採用する。registry はパッケージ内部だけで持ち、plugin の options には出さない(必要になったら `tokenSources` を足す)。CSRF 検査は cookie source に同居させず strategy 側で掛ける(拒否を warn ログに残すため)。
-- エラーは class で表現する(`src/errors/`。`AccessJWTError` 系: `InvalidAccessToken`(jose の失敗を `cause` に保持)/ `WrongAccessTokenType` / `MissingAccessEmail`。ほかに `ResolveUserError` / `CrossSiteCookieRequest` / `AccessTargetCollectionNotFound`)。
+- エラーは class で表現する(`src/errors/`。`AccessJWTError` 系: `InvalidAccessToken`(jose の失敗を `cause` に保持)/ `WrongAccessTokenType` / `MissingAccessEmail`。ほかに `ResolveUserError` / `CrossSiteAccessRequest`(header 由来・cookie 由来の CSRF 拒否を共通で表す)/ `AccessTargetCollectionNotFound` / `InvalidAccessTeamDomain`)。
 
 ### 4.3 `csrf/index.ts`
 
-Payload 組み込みの cookie 抽出(`node_modules/payload/dist/auth/extractJWT.js` の `cookie`)は method を見ず、cookie 由来なら常に次の判定をする。custom strategy にはこの検査が無いため、**同じ判定をそのまま再現する**(plan 作成時に 3.84.1 の dist で確認済み)。
+header 由来・cookie 由来の**両方**を検査する(method は問わない)。`Cf-Access-Jwt-Assertion` header は Access がエッジで付けるが、その元はブラウザが自動で送る `CF_Authorization` cookie なので、クロスサイトの要求にも header が乗ってくる(stg のホスト全体アプリなら `/api/*` へのクロスサイト multipart POST、prod なら `/admin*` のサブリソース読み込み)。経路ごとに正規の要求の形が違うので、判定は 2 つに分ける。許可リストはどちらも `payload.config.csrf`(sanitize 済みで `serverURL` を含む)を使う。plugin に serverURL を渡す必要はない。
 
-- 条件: `source === 'cookie'`(method は問わない。header 由来は Access がエッジで付けたものなので検査しない)
+`isAllowedCookieRequest(headers, csrf)`: Payload 組み込みの cookie 抽出(`node_modules/payload/dist/auth/extractJWT.js` の `cookie`)は method を見ず、cookie 由来なら常に次の判定をする。custom strategy にはこの検査が無いため、**同じ判定をそのまま再現する**(plan 作成時に 3.84.1 の dist で確認済み)。
+
 - `Origin` がある → `payload.config.csrf` が空、または `csrf` に含まれていれば許可
 - `Origin` が無い → `csrf` が空、または `Sec-Fetch-Site` が `same-origin` / `same-site` / `none` なら許可
 - それ以外(cross-site・ヘッダー欠落の非ブラウザ)は拒否
-- 許可リストは `payload.config.csrf`(sanitize 済みで `serverURL` を含む)を使う。plugin に serverURL を渡す必要はない
-- cookie の SameSite 属性には依存しない
+
+`isAllowedHeaderRequest(headers, csrf)`: cookie の表をそのまま使うと正規の経路が落ちる。Access のログイン後に `/admin*` へ戻る着地と、claude.ai から開く `/oauth/authorize` は、どちらも **Origin の無いクロスサイトのトップレベル GET** だから。
+
+- `Origin` がある(`"null"` も含む) → `csrf` が空、または `csrf` に含まれていれば許可
+- `Origin` が無く、`Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest` が `document` 以外(img / iframe / script / fetch などのサブリソース) → 拒否
+- それ以外 → 許可(トップレベル遷移、Origin を付けない同一 origin の GET、fetch metadata を送らない非ブラウザ)
+
+| 正規 / 攻撃の経路                                    | 要求の形                                         | 判定 |
+| ---------------------------------------------------- | ------------------------------------------------ | ---- |
+| Access ログイン後の `/admin*` への着地               | GET, cross-site, Dest `document`, Origin なし    | 許可 |
+| claude.ai のポップアップで開く `/oauth/authorize`    | GET, cross-site, Dest `document`, Origin なし    | 許可 |
+| admin の同一 origin XHR(GET)                         | same-origin, Origin なし                         | 許可 |
+| admin の同一 origin XHR(POST / PATCH)、Server Action | Origin = serverURL                               | 許可 |
+| 有効な JWT を付けた curl                             | Origin も fetch metadata も無い                  | 許可 |
+| クロスサイトの form / fetch POST                     | Origin = 攻撃者の origin                         | 拒否 |
+| クロスサイトの `<img>` / `<iframe>`                  | cross-site, Dest `image` / `iframe`, Origin なし | 拒否 |
+
+- 多層防御として Access アプリの cookie の SameSite を Lax にする(runbook)。Lax でもトップレベル GET には cookie が付くので、Access の redirect と claude.ai のポップアップは動く。strategy の判定はこの設定に依存しない。
+- **残るリスク(対処しない)**: クロスサイトのトップレベル GET は許可するので、`/admin/collections/<autosave を持つ collection>/create` への遷移を踏ませると空の下書きが 1 件できる(Payload の Document view は GET で下書きを作る)。データの漏洩・改変は無い。
+- **残るリスク(対処しない)**: fetch metadata を送らないブラウザ(Safari 16.4 未満など)は、クロスサイトの `<img>` などの GET を `Origin` も `Sec-Fetch-*` も無しで送るので、許可の分岐に入る(非ブラウザの curl と区別できない)。GET に限られ、上の空の下書きと同じ種類のリスク。POST などは `Origin` が付くので拒否される。
 
 ### 4.4 `resolve-user/index.ts`
 
@@ -128,7 +150,8 @@ export const resolveAccessUser = (store: UserStore, identity: AccessIdentity): R
 ```
 authenticate({ headers, payload })
   ├ extractAccessToken → err なら { user: null }(JWKS を取りに行かない: 匿名の /api/media 等)
-  ├ cookie 由来 → csrf 検査 NG なら { user: null } + warn(CrossSiteCookieRequest。JWKS は取りに行かない)
+  ├ csrf 検査 NG(header 由来 → isAllowedHeaderRequest / cookie 由来 → isAllowedCookieRequest)
+  │   → { user: null } + 構造化 warn { err: CrossSiteAccessRequest, source }(JWKS は取りに行かない)
   ├ verifyAccessJWT NG → { user: null } + 構造化 warn { err, source }(throw しない: Payload が握りつぶすため。生の JWT はログに出さない)
   ├ resolveAccessUser NG → { user: null } + error log
   └ { user: { ...doc, collection, _strategy: 'cloudflare-access' } }
@@ -140,7 +163,7 @@ authenticate({ headers, payload })
 
 ```ts
 type CloudflareAccessPluginOptions = {
-  teamDomain: string | undefined; // trim して扱う
+  teamDomain: string | undefined; // normalizeTeamDomain で team 名に正規化する(下記)
   aud: string | undefined;        // カンマ区切り。parseAudiences で trim・空要素除去
   collection?: string;            // 省略時: config.admin.user → 先頭の auth collection
 };
@@ -158,7 +181,8 @@ export const cloudflareAccessPlugin = (options: CloudflareAccessPluginOptions): 
 - **importMap に載るものは env で分岐させない。** `payload generate:importmap` と `next build` は `CF_ACCESS_*` が無い状態で config を評価する。env で登録を切り替えると、本番で importMap に無い component を参照して admin が壊れる。
 - ログアウトボタンの遷移先は `clientProps`(`{ accessLogout: boolean }`)で渡す。clientProps は importMap に影響しない。
 - users collection は配列の位置を保ったまま map で差し替える(payload-oauth2 のように末尾へ移動しない)。
-- `enabled` は trim した `teamDomain` が空でなく、かつ `parseAudiences(aud)` が 1 件以上のとき。`NODE_ENV` では判定しない。片方だけ・空白だけの設定は黙って無効(password ログインのまま)。
+- `enabled` は正規化した `teamDomain` が空でなく、かつ `parseAudiences(aud)` が 1 件以上のとき。`NODE_ENV` では判定しない。片方だけ・空白だけの設定は黙って無効(password ログインのまま)。
+- `teamDomain` の正規化(`src/team-domain/`): trim → 小文字化 → 先頭の `https://` / `http://` を除く → 末尾の `/` を除く → 末尾の `.cloudflareaccess.com` を除く → `^[a-z0-9-]+$` に一致しなければ config build 時に `InvalidAccessTeamDomain`(元の値と期待する形「`napolab` のような team 名だけ」をメッセージに出す)を throw する。`napolab` / `https://napolab.cloudflareaccess.com/` などはすべて `napolab` になる。誤った team で有効化すると issuer / JWKS URL が食い違い、password ログインも無効なので誰も admin に入れない(不正な文字は `new URL` が config 評価中に throw する)。検証するのは有効化するとき(trim 後の `teamDomain` が空でなく、かつ `parseAudiences(aud)` が 1 件以上)だけ。どちらかが空なら、`teamDomain` が不正でも throw せず無効にする。team 名は Access アプリを作って AUD が出る前に設定するのが普通で、無効な間の typo で config 評価(Payload を使う全ページと deploy の Payload CLI)を落とさないため。
 - enabled のとき、対象 collection を `options.collection` → `config.admin.user` → `config.collections` の先頭の auth collection の順に決める。見つからない・auth collection でない場合は config build 時に `AccessTargetCollectionNotFound` を throw する(env が揃っているのに黙って password ログインを残す fail-open を防ぐ)。env 未設定の build / CLI / importmap はこの判定に到達しない。
 - JWKS の key resolver(`createAccessKeys(teamDomain)`)は enabled のとき plugin のクロージャで 1 回だけ作り、strategy に渡す。
 - 対象 collection の既存 `auth` オプション(`cookies` など)と既存 `strategies` は保持し、strategy は末尾に追加する。`auth: true` は object に正規化する。
@@ -187,12 +211,15 @@ plugins: [
 password ログインを無効化すると `payload.login` が Forbidden になり、MCP の認可が全滅する。② を実施するまでの間も動くように二経路にする。
 
 - page(RSC)で `payload.auth({ headers })` を呼ぶ
-  - user あり(Access 経由): 「{email} として許可する」ボタンだけの form(`AccessAuthorizeForm`)。action `authorizeWithAccess` は formData から `authRequestQuery` だけを読み、`payload.auth({ headers: await headers() })` で user を取り直して `completeAuthorization` する(form の値から user を受け取らない。node テストで固定)
-  - user なし(local dev): 既存の email + password form のまま
+  - Access の user(`isCloudflareAccessUser(user)` = `user._strategy === 'cloudflare-access'`): 「{email} として許可する」ボタンだけの form(`AccessAuthorizeForm`)。action `authorizeWithAccess` は formData から `authRequestQuery` だけを読み、`payload.auth({ headers: await headers() })` で user を取り直し、同じく `_strategy === 'cloudflare-access'` のときだけ `completeAuthorization` する(form の値から user を受け取らない。node テストで固定)
+  - user なし(local dev)、または他の strategy の user(Access 無効時の password セッション = `local-jwt` など): 既存の email + password form のまま。action も session エラーを返す。`payload.auth` は登録済みのどの strategy の user でも返すので、user の有無だけで判定すると password セッションでワンクリック承認が通ってしまう
   - `payload.auth` が throw したら(D1 障害など)page は password form に倒す。merge 時点では Access 未有効で、今動いている同意画面を 500 にしないため。Access 有効時はこの form ではログインできないので bypass にはならない
 - 承認ボタンだけの同意画面は password という暗黙のガードを持たないので、次の 2 つで守る
   - cross-site POST: Next の Server Actions の Origin / Host 検査(`serverActions.allowedOrigins` を広げない)
-  - clickjacking: worker の Hono middleware(`worker/middleware/frame-guard.ts`)で `/oauth/authorize`(パーセントデコード後のパスも)に `Content-Security-Policy: frame-ancestors 'none'` と `X-Frame-Options: DENY` を付ける
+  - cross-site な要求全般: strategy の CSRF 検査(§4.3。header 由来も対象)
+  - clickjacking: worker の Hono middleware(`worker/middleware/frame-guard.ts`)がパスごとの表でフレーム埋め込みを禁止する。照合はパーセントデコード後のパスに対して、完全一致か `<path>/` 始まりだけ(`/administrator` や `/oauth/authorizeX` は対象外)。上流の CSP に `frame-ancestors` が無いときだけ末尾に足す
+    - `/oauth/authorize` → `Content-Security-Policy: frame-ancestors 'none'` + `X-Frame-Options: DENY`(パスは `worker/oauth-endpoints.ts` で OAuthProvider の `authorizeEndpoint` と共有)
+    - `/admin` → `frame-ancestors 'self'` + `X-Frame-Options: SAMEORIGIN`。Access が有効だと admin はクロスサイトの iframe の中でも認証済みで描画されるため。Live Preview が iframe に入れるのは `/next/preview` → サイト側の preview ページで、admin 自身を埋め込む画面は無い
 - prod / stg の Access パス単位アプリに `/oauth/authorize*` を含める
 
 ### 5.3 wrangler / env
@@ -213,16 +240,17 @@ password ログインを無効化すると `payload.login` が Forbidden にな�
 
 テストは `packages/payload-cloudflare-access` 内で、モジュールのディレクトリに `<name>.test.ts(x)` として置く(例: `src/verify/index.ts` と `src/verify/verify.test.ts`)。鍵はテスト内で生成した RS256 鍵ペア + `createLocalJWKSet` を使い、ネットワークに出ない。
 
-| 対象                 | ケース                                                                                                                                                      |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `extractAccessToken` | header のみ / cookie のみ / 両方(header を優先) / どちらも無い / 他の cookie と混在                                                                         |
-| `verifyAccessJWT`    | 正常 / 期限切れ / aud 不一致 / iss 不一致 / 署名改ざん / alg 違い / `type` が app 以外 / email なし(service token)                                          |
-| `csrf`               | header 由来は検査しない / cookie + Origin 一致・不一致 / Origin 無し + Sec-Fetch-Site(same-origin・same-site・none・cross-site・欠落) / csrf 空なら常に許可 |
-| `resolveAccessUser`  | 既存 user / 新規作成 / 大文字小文字の正規化 / create 衝突 → 再 find                                                                                         |
-| `strategy`           | トークン無しで JWKS を呼ばない / 各失敗で `{ user: null }` かつ throw しない / 成功時の `collection` と `_strategy`                                         |
-| `plugin`             | env 無し: strategies・disableLocalStrategy が変わらず、logout component は登録される / env あり: 両方が設定される / collection の配列位置が変わらない       |
-| `logout-button`      | `accessLogout` で描画が切り替わる(browser mode, `.test.tsx`)                                                                                                |
-| `/oauth/authorize`   | Access user あり → 承認ボタン、無し → password form                                                                                                         |
+| 対象                 | ケース                                                                                                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `extractAccessToken` | header のみ / cookie のみ / 両方(header を優先) / どちらも無い / 他の cookie と混在                                                                                                   |
+| `verifyAccessJWT`    | 正常 / 期限切れ / aud 不一致 / iss 不一致 / 署名改ざん / alg 違い / `type` が app 以外 / email なし(service token)                                                                    |
+| `csrf`               | cookie: Origin 一致・不一致 / Origin 無し + Sec-Fetch-Site(same-origin・same-site・none・cross-site・欠落) / csrf 空なら常に許可。header: §4.3 の表の各経路 / Origin `null` / csrf 空 |
+| `resolveAccessUser`  | 既存 user / 新規作成 / 大文字小文字の正規化 / create 衝突 → 再 find                                                                                                                   |
+| `strategy`           | トークン無しで JWKS を呼ばない / 各失敗で `{ user: null }` かつ throw しない / header・cookie とも cross-site は JWKS を呼ばずに拒否 / 成功時の `collection` と `_strategy`           |
+| `team-domain`        | 一般的な書き方を team 名に正規化 / 不正な値は `InvalidAccessTeamDomain` / 空は無効                                                                                                    |
+| `plugin`             | env 無し: strategies・disableLocalStrategy が変わらず、logout component は登録される / env あり: 両方が設定される / collection の配列位置が変わらない                                 |
+| `logout-button`      | `accessLogout` で描画が切り替わる(browser mode, `.test.tsx`)                                                                                                                          |
+| `/oauth/authorize`   | Access user あり → 承認ボタン、無し → password form / action は `local-jwt` の user を session エラーにする                                                                           |
 
 ## 7. 実装の最初のタスク(土台の検証)
 
@@ -243,17 +271,20 @@ password ログインを無効化すると `payload.login` が Forbidden にな�
 3. admin 内の操作(一覧・保存・画像アップロード)が cookie 経路で通ること
 4. 未登録 email で入ると user が作成されること
 5. ログアウトで Access のログアウト画面に遷移し、再度 `/admin` に行くと Access のログインを求められること
-6. 別 origin からの POST(`curl -H 'Origin: https://evil.example' --cookie CF_Authorization=...`)が 401/403 になること
+6. 別 origin からの要求(`curl -H 'Origin: https://evil.example' --cookie CF_Authorization=...`)で user が解決されないこと(header 由来・cookie 由来とも)
 7. JWT なしの `/api/users/me` が未認証になること
 8. MCP の `/oauth/authorize` が Access user で承認でき、claude.ai / Claude Code から MCP が使えること
 9. どの AUD が JWT に入るかを記録する
 
 ## 9. リスク
 
-| リスク                                                                                          | 対応                                                                                                    |
-| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Access の設定ミスで admin に誰も入れない                                                        | env を消して deploy すれば password ログインに戻る。事前に本人の user に password を設定しておく        |
-| 4 種類のローダー(Next / Payload CLI / vitest / tsgo)のどれかがワークスペースの `.ts` を読めない | 7 章で最初に検証。ダメなら tsdown                                                                       |
-| Payload の cookie CSRF 判定が将来のバージョンで変わる                                           | `csrf/index.ts` のテストに Payload 3.84.1 の判定表を固定し、upgrade 時に `extractJWT.js` と突き合わせる |
-| Access JWT の `exp` が admin に伝わらず期限切れ警告が出ない                                     | 許容する(Access のセッション切れは Access 側でログインし直しになる)                                     |
-| JWKS の取得失敗(Cloudflare 側の障害)                                                            | `{ user: null }` + error log。admin に入れないが、データは壊れない                                      |
+| リスク                                                                                           | 対応                                                                                                                                                                                                                                                     |
+| ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Access の設定ミスで admin に誰も入れない                                                         | env を消して deploy すれば password ログインに戻る。事前に本人の user に password を設定しておく                                                                                                                                                         |
+| 4 種類のローダー(Next / Payload CLI / vitest / tsgo)のどれかがワークスペースの `.ts` を読めない  | 7 章で最初に検証。ダメなら tsdown                                                                                                                                                                                                                        |
+| Payload の cookie CSRF 判定が将来のバージョンで変わる                                            | `csrf/index.ts` のテストに Payload 3.84.1 の判定表を固定し、upgrade 時に `extractJWT.js` と突き合わせる                                                                                                                                                  |
+| Access JWT の `exp` が admin に伝わらず期限切れ警告が出ない                                      | 許容する(Access のセッション切れは Access 側でログインし直しになる)                                                                                                                                                                                      |
+| JWKS の取得失敗(Cloudflare 側の障害)                                                             | `{ user: null }` + error log。admin に入れないが、データは壊れない                                                                                                                                                                                       |
+| `CF_ACCESS_TEAM_DOMAIN` の書き間違い(issuer / JWKS URL が食い違って全員締め出し)                 | 一般的な書き方は正規化し、有効化するとき(aud もあるとき)に team 名にならない値は config 評価で `InvalidAccessTeamDomain` を投げる(aud が空の間は無効のまま throw しない)。deploy 前に気づけるとは限らないので、certs URL を curl で必ず確かめる(runbook) |
+| クロスサイトのトップレベル GET で `/admin/collections/<autosave collection>/create` を踏まされる | 空の下書きが 1 件できる(Payload の Document view が GET で作る)。漏洩・改変は無いので許容する(§4.3)                                                                                                                                                      |
+| fetch metadata を送らないブラウザ(Safari 16.4 未満など)のクロスサイト GET サブリソース           | `Origin` も `Sec-Fetch-*` も無いので header 由来の判定で許可される。GET だけなので空の下書きと同じ種類のリスクとして許容する(§4.3)                                                                                                                       |

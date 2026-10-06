@@ -24,10 +24,17 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
 | あり                    | あり                                     | 有効（strategy 追加 + password ログイン無効） |
 | あり                    | 未設定 / 空 / 空白だけ（`,` だけも含む） | **黙って無効**（password ログインのまま）     |
 | 未設定 / 空             | あり                                     | **黙って無効**（password ログインのまま）     |
+| team 名にならない値     | あり                                     | config の評価時に `InvalidAccessTeamDomain`   |
 
-- `NODE_ENV` では判定しない。片方だけ・空白だけでも例外は出ず、ログにも出ない。有効化したつもりで無効のままになっていないか、検証（手順 4）で必ず確かめる。
+- `NODE_ENV` では判定しない。片方だけ・空白だけでも例外は出ず、ログにも出ない（例外は、両方そろって有効化するときに `CF_ACCESS_TEAM_DOMAIN` が team 名にならない場合だけ。下記）。有効化したつもりで無効のままになっていないか、検証（手順 4）で必ず確かめる。
 - `CF_ACCESS_AUD` は**カンマ区切りで複数指定できる**（各要素は trim され、空要素は捨てられる）。JWT の `aud` がどれか 1 つに一致すれば通る。stg はホスト全体のアプリとパス単位のアプリの 2 つ、prod はパス単位の 1 つ。
-- `CF_ACCESS_TEAM_DOMAIN` は team 名だけ。`https://<team>.cloudflareaccess.com` の `<team>` 部分を入れる（`https://` や `.cloudflareaccess.com` は付けない）。
+- `CF_ACCESS_TEAM_DOMAIN` は team 名だけ（`napolab` のように、`https://<team>.cloudflareaccess.com` の `<team>` 部分）を入れる。よくある書き方は team 名に正規化される（大文字、`https://` / `http://`、末尾の `/`、`.cloudflareaccess.com` 付き。`https://napolab.cloudflareaccess.com/` も `napolab` になる）。正規化しても `^[a-z0-9-]+$` にならない値（空白入り、別ドメインなど）は、`CF_ACCESS_AUD` もそろって有効化するときに Payload config の評価で `InvalidAccessTeamDomain` を投げる。`CF_ACCESS_AUD` が空の間は検証せず黙って無効のまま（team 名は Access アプリを作って AUD が出る前に入れるのが普通なので、その間の typo でサイトを落とさない）。有効化のときに落ちると Payload を使う全ページが 500 になる。`next build` は `CF_ACCESS_*` 無しで config を評価するので build では気づけない。deploy workflow の `deploy:database:check:<env>`（`CLOUDFLARE_ENV` 付きの Payload CLI）が deploy 前に config を評価するので、そこで気づける**かもしれない**が、その step が job を失敗させるかは確かめていない（Payload の bin は失敗しても exit 0 のことがある）。黙って通すと issuer / JWKS URL が食い違い、password ログインも無効なので誰も admin に入れなくなるため、意図して fail-loud にしている。
+- **deploy 前に必ず team 名を確かめる**。上のとおり deploy 前に気づけるとは限らず、有効化された経路（JWT の検証）も deploy 前にどこでも実行されないので、team の certs URL が 200 を返すことを先に手で確かめる（存在しない team は 404 になる）:
+
+  ```bash
+  curl -s -o /dev/null -w '%{http_code}\n' https://<team>.cloudflareaccess.com/cdn-cgi/access/certs   # 200 になること
+  ```
+
 - `admin.components.logout.Button` は env に関わらず常に登録される（importMap に載るものを env で分岐させないため）。env が揃っているときだけ遷移先が `/cdn-cgi/access/logout` になる。
 
 ## 1. 事前準備: 本人の user に password を設定する（切り戻し用）
@@ -52,7 +59,8 @@ Zero Trust ダッシュボードで設定する。画面の操作順は Cloudfla
 
 3. **ポリシー**: Allow、include は**本人の email のみ**。
 4. **stg はホスト全体のアプリが既にある**。それを消さず、パス単位のアプリと共存させる。このとき JWT の `aud` がどちらのアプリのものになるかが request ごとに変わりうるので、AUD は 2 つとも控える（手順 3）。
-5. **Cookie Path Attribute は OFF のまま**にする（既定）。ON にすると `/admin*` 以外の path に `CF_Authorization` cookie が届かなくなり、admin の XHR（`/api/*`）が認証できなくなる（[Authorization cookie](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/#cookie-path-attribute)）。
+5. **Cookie の SameSite を Lax にする**（各アプリの設定 → Cookie settings。多層防御）。Lax でもトップレベルの GET 遷移には cookie が付くので、Access ログイン後の redirect と claude.ai から開く `/oauth/authorize` のポップアップは動く。クロスサイトの POST やサブリソース（img / iframe / fetch）には cookie が付かなくなる。strategy 自体も header 由来・cookie 由来ともクロスサイト要求を拒否するので、これに依存はしない。
+6. **Cookie Path Attribute は OFF のまま**にする（既定）。ON にすると `/admin*` 以外の path に `CF_Authorization` cookie が届かなくなり、admin の XHR（`/api/*`）が認証できなくなる（[Authorization cookie](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/#cookie-path-attribute)）。
 
 ## 3. AUD を控えて wrangler vars に反映する
 
@@ -93,14 +101,14 @@ Zero Trust ダッシュボードで設定する。画面の操作順は Cloudfla
 
 stg の deploy 後、次を順に確かめる。
 
-**項目 3 / 6 / 7 の前提**: stg はホスト全体のアプリが `/api/*` にも `Cf-Access-Jwt-Assertion` header を付ける。strategy は header を優先し、header 由来は CSRF 検査も受けないため、このままでは cookie 経路は検証されない。3 / 6 / 7 と Live Preview の項目は、`stg.napochaan.com/api*` に Bypass アプリを足した場合（下の「stg で cookie 経路を試す」）か prod でだけ意味を持つ。Bypass を採らない場合、これらは**最初の prod deploy で確認する**（下の「stg で cookie 経路を試す」の末尾、および「5. prod へ反映」の引き継ぎ項目を参照）。
+**項目 3 / 7 / 7a の前提**: stg はホスト全体のアプリが `/api/*` にも `Cf-Access-Jwt-Assertion` header を付ける。strategy は header を優先するため、このままでは cookie 経路は検証されない。3 / 7 / 7a は、`stg.napochaan.com/api*` に Bypass アプリを足した場合（下の「stg で cookie 経路を試す」）か prod でだけ意味を持つ。Bypass を採らない場合、これらは**最初の prod deploy で確認する**（下の「stg で cookie 経路を試す」の末尾、および「5. prod へ反映」の引き継ぎ項目を参照）。項目 6（別 origin の probe）は header 由来も CSRF 検査を受けるので、Bypass 無しの stg でも `{"user":null}` を期待値として確認できる（header 由来の判定の確認。cookie 由来の判定は Bypass 追加後か prod で確認する）。
 
 - [ ] 1. stg にパス単位アプリ（`/admin*`, `/oauth/authorize*`）を作り、AUD を `[env.staging.vars]` に設定して deploy した
 - [ ] 2. `/admin` に入ると自動ログインされ、ログインフォームが出ない
 - [ ] 3. admin 内の操作（一覧・保存・画像アップロード）が cookie 経路で通る（Server Action による保存も含む）。**stg では `/api*` Bypass 追加後、または prod で確認**（上の前提を参照。Bypass 無しの stg では header 経路で通るだけで、cookie 経路の確認にならない）
 - [ ] 4. 未登録 email で入ると user が自動作成される
 - [ ] 5. ログアウトで Access のログアウト画面に遷移し、再度 `/admin` に行くと Access のログインを求められる
-- [ ] 6. 別 origin からのリクエストで cookie 由来の認証が解決されない（`user: null`）。**stg では `/api*` Bypass 追加後、または prod で確認**。Bypass 無しの stg では `/api/*` に Access が header を付けるので、`user` が解決されて返ってしまう（header 由来は CSRF 検査の対象外。バグではない）。`CF_Authorization` の JWT は、Access ログイン済みブラウザの DevTools → Application → Cookies からコピーする（詳しくは下の「AUD の実測記録」）。probe には `GET /api/users/me` を使う（`POST /api/users/logout` は未認証だと 400 `No User` を返すだけで、CSRF で弾かれたのか判別できず誤解を招く）:
+- [ ] 6. 別 origin からのリクエストで認証が解決されない（`user: null`）。Bypass 無しの stg では `/api/*` に Access が header を付けるので header 由来の判定、Bypass 有りの stg と prod では cookie 由来の判定を通るが、どちらも `Origin` が `payload.config.csrf` に無ければ user を解決しない。`CF_Authorization` の JWT は、Access ログイン済みブラウザの DevTools → Application → Cookies からコピーする（詳しくは下の「AUD の実測記録」）。probe には `GET /api/users/me` を使う（`POST /api/users/logout` は未認証だと 400 `No User` を返すだけで、CSRF で弾かれたのか判別できず誤解を招く）:
 
   ```bash
   curl -i https://stg.napochaan.com/api/users/me \
@@ -108,9 +116,11 @@ stg の deploy 後、次を順に確かめる。
     --cookie 'CF_Authorization=<自分の JWT>'
   ```
 
-  期待値は `{"user":null}`（`Origin` が `payload.config.csrf` に無いので cookie 由来の認証は user を解決しない）。比較用に、`payload.config.csrf` に含まれるサイト自身の origin（prod なら `https://napochaan.com`）を `Origin` に付けると `user` が返る。`Origin` も `Sec-Fetch-Site` も無い curl は、csrf が設定されている限り同様に拒否される。
+  期待値は `{"user":null}`（`Origin` が `payload.config.csrf` に無いので、header 由来でも cookie 由来でも user を解決しない）。`wrangler tail` には `Cloudflare Access authentication rejected` の warn が `CrossSiteAccessRequest` と `source`（`header` / `cookie`）付きで出る。比較用に、`payload.config.csrf` に含まれるサイト自身の origin（stg なら `https://stg.napochaan.com`）を `Origin` に付けると `user` が返る。
 
-  cookie 由来の認証は `Origin` が `payload.config.csrf`（`serverURL` を含む）に無いと user を解決しない。header（`Cf-Access-Jwt-Assertion`）由来は Access がエッジで付けたものなので CSRF 検査の対象外。
+  `Origin` が無いときの扱いは経路で違う（`packages/payload-cloudflare-access/src/csrf/index.ts`）。
+  - cookie 由来（Bypass 有りの stg / prod の `/api/*`）: `Sec-Fetch-Site` が `same-origin` / `same-site` / `none` でなければ拒否。`Origin` も `Sec-Fetch-Site` も無い curl も拒否される。
+  - header 由来（Bypass 無しの stg、`/admin*`、`/oauth/authorize*`）: `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest` が `document` 以外（img / iframe / fetch など）だけを拒否する。Access ログイン後の着地や claude.ai からのポップアップは Origin の無いクロスサイトのトップレベル GET なので、これを通すため。fetch metadata の無い curl は通る（`user` が返る）。サブリソースの拒否を見るなら `-H 'Sec-Fetch-Site: cross-site' -H 'Sec-Fetch-Dest: image'` を付けて `{"user":null}` になることを確かめる。
 
 - [ ] 7. JWT なしの `/api/users/me` が未認証になる（`user: null`）。**stg では `/api*` Bypass 追加後、または prod で確認**。Bypass 無しの stg では、`/api/users/me` は Access のログインへ redirect される（`user: null` の JSON は返らない）
 - [ ] 7a. Live Preview と下書きプレビュー（`/next/preview`）が、Access ログイン済みの編集者で表示できる（`CF_Authorization` cookie 経路を通る）。**stg では `/api*` Bypass 追加後、または prod で確認**（Bypass 無しの stg では header 経路で通るだけで、cookie 経路の確認にならない）
@@ -126,20 +136,25 @@ stg の deploy 後、次を順に確かめる。
 
   実測結果（検証時に追記）:
 
-- [ ] **`/oauth/authorize` が iframe に入らない**: 次の 2 つのヘッダーが付いている（`worker/middleware/frame-guard.ts`）。
+- [ ] **`/oauth/authorize` と `/admin*` が別 origin の iframe に入らない**: 次のヘッダーが付いている（`worker/middleware/frame-guard.ts`）。
 
   ```bash
   curl -sI 'https://stg.napochaan.com/oauth/authorize' | grep -i -E 'content-security-policy|x-frame-options'
+  curl -sI 'https://stg.napochaan.com/admin' | grep -i -E 'content-security-policy|x-frame-options'
   ```
 
-  - `Content-Security-Policy: frame-ancestors 'none'`（上流の CSP が既にあれば、`frame-ancestors` が無いときだけ末尾に足される）
-  - `X-Frame-Options: DENY`
+  | パス                                          | `Content-Security-Policy` | `X-Frame-Options` |
+  | --------------------------------------------- | ------------------------- | ----------------- |
+  | `/oauth/authorize`（配下も）                  | `frame-ancestors 'none'`  | `DENY`            |
+  | `/admin`（配下も。`/administrator` は対象外） | `frame-ancestors 'self'`  | `SAMEORIGIN`      |
+
+  上流の CSP が既にあれば、`frame-ancestors` が無いときだけ末尾に足される。`/admin` を `'self'` にしているのは、Access が有効だと admin がクロスサイトの iframe の中でも認証済みで描画されるため（Live Preview が iframe に入れるのはサイト側の `/next/preview` で、admin 自身ではない）。
 
   Access 越しだと `curl` は Access のログイン画面に飛ばされる。その場合は、ログイン済みブラウザの DevTools（Network）で応答ヘッダーを見る。
 
 ### MCP の確認
 
-Access 経由（user が解決できたとき）の `/oauth/authorize` は、email + password フォームではなく **「{email} として許可する」ボタンだけ**が出る。user は form の値ではなく action 側で headers から取り直している。
+Access 経由（cloudflare-access strategy で user が解決できたとき）の `/oauth/authorize` は、email + password フォームではなく **「{email} として許可する」ボタンだけ**が出る。user は form の値ではなく action 側で headers から取り直している。ボタンだけのフォームは **Access で認証された user（`_strategy === 'cloudflare-access'`）に限る**。Access が無効な環境で password ログインのセッション（`local-jwt`）を持っていても password フォームが出て、action もその user では承認しない。
 
 - [ ] `/oauth/authorize` で「{email} として許可する」ボタンのみが表示され、password 入力欄が無い
 - [ ] 承認後、claude.ai のコネクタ / Claude Code から MCP のツールが使える
@@ -198,6 +213,8 @@ prod 後の確認:
 - **Access user が解決できないとき、Access 有効な環境（stg / prod）の `/oauth/authorize` は動かない password フォームを表示する。** 設定ミス（AUD 不一致、JWKS 取得失敗など）で user を解決できないと、`payload.auth` が user を返さず、local dev 用の email + password フォームに落ちる。ただし Access 有効な環境では `payload.login` が Forbidden なので、何を入力しても「メールアドレスまたはパスワードが正しくありません。」になる。この表示が出たら**まず `wrangler tail --env <env>` で strategy の warn を見る**（`Cloudflare Access authentication rejected`: token / CSRF / 検証の失敗、`Cloudflare Access user resolution failed`: users の検索・作成の失敗）。
 - **Access の env が設定されているのに対象の auth collection が無いと、config の build 時に `AccessTargetCollectionNotFound` で落ちる。** 黙って無効にすると password ログインが残る（fail-open）ので、これは意図した fail-loud。対象は `collection` option → `admin.user` → 最初の auth collection の順で決まる。
 - **ログアウトは `/cdn-cgi/access/logout`。** Access のセッション cookie を消す。Payload 側のセッション（`local-jwt`）はそもそも無いので、これだけで完結する。全 Access アプリのセッションが失効する（アプリ単位のログアウトは不可）。
+- **クロスサイトのトップレベル GET は通す（残るリスク）。** Access ログイン後の着地と claude.ai のポップアップを通すため、header 由来の Origin 無しのトップレベル遷移は CSRF 検査で拒否しない。そのため、別サイトから `/admin/collections/<autosave を持つ collection>/create` へのリンクを踏まされると、空の下書きが 1 件できる（Payload の Document view は GET で下書きを作る）。データの漏洩・改変は無いので許容している。見覚えの無い空の下書きがあれば消してよい。
+  - 同じ種類の残りとして、fetch metadata を送らない古いブラウザ（Safari 16.4 未満など）は、クロスサイトの `<img>` などの GET を `Origin` も `Sec-Fetch-*` も無しで送るので、拒否されずに通る（判定上は curl と区別できない）。GET だけなので影響は上と同じ範囲に留まる。POST などは `Origin` が付くので拒否される。
 - **`Cf-Access-Authenticated-User-Email` ヘッダーは信用しない。** 実装も読んでいない。Access を通らない経路では誰でも付けられる。JWT の署名・`iss`・`aud` を検証した email だけを使う。
 - `workers_dev` / `preview_urls` は全 env で false。Access を迂回する入口は無い。将来有効にするとその hostname は Access アプリの外になる。
 - セッションはリクエストごと。Payload の JWT cookie は発行されず、admin の各リクエストで Access JWT の検証と users の検索が走る。Access の `exp` は admin に伝わらないので、期限切れ警告モーダルは出ない。

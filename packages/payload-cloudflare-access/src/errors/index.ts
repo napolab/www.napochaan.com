@@ -32,11 +32,12 @@ export class ResolveUserError extends Error {
   }
 }
 
-export class CrossSiteCookieRequest extends Error {
-  override readonly name = 'CrossSiteCookieRequest';
+// header 由来も cookie 由来も同じ class で表す。どちらだったかは strategy の warn ログの `source` に出る。
+export class CrossSiteAccessRequest extends Error {
+  override readonly name = 'CrossSiteAccessRequest';
 
   constructor() {
-    super('Cloudflare Access cookie was sent on a cross-site request');
+    super('Cloudflare Access token was sent on a cross-site request');
   }
 }
 
@@ -48,6 +49,16 @@ export class AccessTargetCollectionNotFound extends Error {
       slug === undefined
         ? 'Cloudflare Access is configured but no auth collection exists to attach it to. Set `admin.user` or pass `collection` to cloudflareAccessPlugin.'
         : `Cloudflare Access is configured but "${slug}" is not an auth collection in the Payload config. Fix \`admin.user\` / the plugin \`collection\` option, or unset CF_ACCESS_TEAM_DOMAIN / CF_ACCESS_AUD to disable the plugin.`,
+    );
+  }
+}
+
+export class InvalidAccessTeamDomain extends Error {
+  override readonly name = 'InvalidAccessTeamDomain';
+
+  constructor(readonly raw: string) {
+    super(
+      `CF_ACCESS_TEAM_DOMAIN "${raw}" is not a Cloudflare Access team name. Set the team name only, like \`napolab\` (from https://napolab.cloudflareaccess.com), or unset CF_ACCESS_TEAM_DOMAIN / CF_ACCESS_AUD to disable the plugin.`,
     );
   }
 }

@@ -1,19 +1,18 @@
 import { errAsync, okAsync } from 'neverthrow';
 import type { ResultAsync } from 'neverthrow';
 
-import { isAllowedCookieRequest } from '../csrf';
-import { CrossSiteCookieRequest, ResolveUserError } from '../errors';
+import { ACCESS_STRATEGY_NAME } from '../access-user';
+import { isAllowedCookieRequest, isAllowedHeaderRequest } from '../csrf';
+import { CrossSiteAccessRequest, ResolveUserError } from '../errors';
 import type { AccessJWTError } from '../errors';
 import { createPayloadUserStore, resolveAccessUser } from '../resolve-user';
 import type { AccessUser } from '../resolve-user';
 import { extractAccessToken } from '../token';
-import type { AccessToken } from '../token/types';
+import type { AccessToken, AccessTokenSourceName } from '../token/types';
 import { verifyAccessJWT } from '../verify';
 
 import type { JWTVerifyGetKey } from 'jose';
 import type { AuthStrategy, AuthStrategyResult, Payload, TypedUser } from 'payload';
-
-export const ACCESS_STRATEGY_NAME = 'cloudflare-access';
 
 export type AccessStrategyOptions = {
   teamDomain: string;
@@ -27,16 +26,22 @@ export type AuthenticatePayload = Pick<Payload, 'find' | 'create' | 'config' | '
 
 type AuthenticateArgs = { headers: Headers; payload: AuthenticatePayload };
 
-type AccessFailure = CrossSiteCookieRequest | AccessJWTError | ResolveUserError;
+type AccessFailure = CrossSiteAccessRequest | AccessJWTError | ResolveUserError;
 
 const noUser = (): AuthStrategyResult => ({ user: null });
 
-// Cookie は同一サイトの XHR / 遷移でしか受け付けない(ブラウザが自動で付けるので CSRF 対策が要る)。header は対象外。
-const requireSafeOrigin = (accessToken: AccessToken, args: AuthenticateArgs): ResultAsync<AccessToken, CrossSiteCookieRequest> => {
-  if (accessToken.source === 'header') return okAsync(accessToken);
-  if (isAllowedCookieRequest(args.headers, args.payload.config.csrf)) return okAsync(accessToken);
+// header も cookie もブラウザが自動で送る CF_Authorization cookie が元なので、どちらにも CSRF 検査が要る。
+// 経路ごとに正規のリクエストの形が違うので判定は分ける(csrf/index.ts)。拒否したら JWKS は取りに行かない。
+const SAFE_ORIGIN_RULES = {
+  header: isAllowedHeaderRequest,
+  cookie: isAllowedCookieRequest,
+} as const satisfies Record<AccessTokenSourceName, (headers: Headers, csrf: readonly string[]) => boolean>;
 
-  return errAsync(new CrossSiteCookieRequest());
+const requireSafeOrigin = (accessToken: AccessToken, args: AuthenticateArgs): ResultAsync<AccessToken, CrossSiteAccessRequest> => {
+  const isAllowed = SAFE_ORIGIN_RULES[accessToken.source];
+  if (isAllowed(args.headers, args.payload.config.csrf)) return okAsync(accessToken);
+
+  return errAsync(new CrossSiteAccessRequest());
 };
 
 const authenticateToken = (options: AccessStrategyOptions, args: AuthenticateArgs, accessToken: AccessToken): ResultAsync<AccessUser, AccessFailure> =>

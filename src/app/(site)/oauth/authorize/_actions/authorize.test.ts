@@ -53,7 +53,7 @@ describe('authorizeWithAccess', () => {
   });
 
   test('derives the user from request headers, not form fields', async () => {
-    mocks.auth.mockResolvedValue({ user: { id: 7, email: 'napo@example.com' } });
+    mocks.auth.mockResolvedValue({ user: { id: 7, email: 'napo@example.com', _strategy: 'cloudflare-access' } });
     const formData = buildForm({ authRequestQuery: 'client_id=client-1', email: 'attacker@example.com', userId: '999' });
 
     await expect(authorizeWithAccess({ status: 'idle' }, formData)).rejects.toThrow(RedirectSignal);
@@ -71,6 +71,18 @@ describe('authorizeWithAccess', () => {
 
   test('returns the session error when no user', async () => {
     mocks.auth.mockResolvedValue({ user: null });
+
+    const state = await authorizeWithAccess({ status: 'idle' }, buildForm({ authRequestQuery: 'client_id=client-1' }));
+
+    expect(state).toEqual(sessionError);
+    expect(mocks.completeAuthorization).not.toHaveBeenCalled();
+    expect(mocks.redirect).not.toHaveBeenCalled();
+  });
+
+  // Access の plugin が無効な環境では payload.auth が password セッション(local-jwt)の user を返す。
+  // 承認ボタンだけの同意を通すのは Cloudflare Access strategy で認証された user に限る。
+  test('returns the session error for a user from another strategy (local-jwt)', async () => {
+    mocks.auth.mockResolvedValue({ user: { id: 7, email: 'napo@example.com', _strategy: 'local-jwt' } });
 
     const state = await authorizeWithAccess({ status: 'idle' }, buildForm({ authRequestQuery: 'client_id=client-1' }));
 

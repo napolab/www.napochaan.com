@@ -1,5 +1,6 @@
 import { AccessTargetCollectionNotFound } from '../errors';
 import { createAccessStrategy } from '../strategy';
+import { normalizeTeamDomain } from '../team-domain';
 import { createAccessKeys } from '../verify';
 
 import type { CollectionConfig, Config, Plugin, TypedUser } from 'payload';
@@ -20,11 +21,16 @@ export const parseAudiences = (raw: string | undefined): readonly string[] =>
 
 type EnabledOptions = { teamDomain: string; aud: readonly string[] };
 
+// 片方でも空なら無効(throw しない)。team 名は AUD より先に設定されるのが普通なので、無効な間の
+// typo で config 評価(= サイト全体と Payload CLI)を落とさない。teamDomain の検証は有効化する時だけで、
+// 不正な値は InvalidAccessTeamDomain を throw する(誤った team で有効化すると全員締め出しになる)。
 const resolveEnabledOptions = (options: CloudflareAccessPluginOptions): EnabledOptions | undefined => {
   const aud = parseAudiences(options.aud);
-  const teamDomain = options.teamDomain?.trim();
-  if (teamDomain === undefined || teamDomain === '') return undefined;
+  if ((options.teamDomain ?? '').trim() === '') return undefined;
   if (aud.length === 0) return undefined;
+
+  const teamDomain = normalizeTeamDomain(options.teamDomain);
+  if (teamDomain === undefined) return undefined;
 
   return { teamDomain, aud };
 };

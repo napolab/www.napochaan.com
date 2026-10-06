@@ -5,6 +5,7 @@
   "type": "module",
   "exports": {
     "./plugin": "./src/plugin/index.ts",
+    "./access-user": "./src/access-user/index.ts",
     "./client/logout-button": "./src/client/logout-button/index.tsx"
   },
   "dependencies": {

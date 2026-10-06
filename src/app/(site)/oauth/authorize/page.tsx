@@ -1,3 +1,4 @@
+import { isCloudflareAccessUser } from '@napolab/payload-cloudflare-access/access-user';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { headers } from 'next/headers';
 
@@ -44,16 +45,19 @@ const resolveClientName = async (helpers: OAuthHelpers, query: string): Promise<
   }
 };
 
-// Access 経由(/oauth/authorize* が Access app 配下)なら payload.auth が user を返す。
-// 返さない場合(ローカル dev など)は従来の email + password フォームに倒す。
+// Access 経由(/oauth/authorize* が Access app 配下)なら payload.auth が cloudflare-access strategy の
+// user(`_strategy === 'cloudflare-access'`)を返す。承認ボタンだけのフォームはその場合に限る。
+// それ以外(user なし、または Access 無効時の password セッション = local-jwt の user)は従来の
+// email + password フォームに倒す。
 // この page は Access 有効化より前に prod へ出るので、auth の throw で動いている同意画面を
 // 500 にしない。失敗時は password フォームに倒す(action 側の resolveAccessUser と同じ方針)。
 const resolveAccessEmail = async (): Promise<string | undefined> => {
   try {
     const payload = await getPayloadClient();
     const { user } = await payload.auth({ headers: await headers() });
+    if (user === null || !isCloudflareAccessUser(user)) return undefined;
 
-    return user?.email;
+    return user.email;
   } catch (error) {
     console.error('[oauth] payload auth failed', error);
 
