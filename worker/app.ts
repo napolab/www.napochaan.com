@@ -3,6 +3,7 @@ import { createFactory } from 'hono/factory';
 
 import { imageHandlers } from './handlers/images';
 import { cacheControlHeaders } from './middleware/cache-control';
+import { pathPolicy } from './middleware/path-policy';
 import { weakenETag } from './middleware/weaken-etag';
 import { cursorRoutes } from './routes/cursors';
 import { mcpGuardRoutes } from './routes/mcp-guard';
@@ -21,6 +22,9 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
   app
     .use('*', weakenETag())
     .use('*', cacheControlHeaders())
+    // 上の 2 つより内側に置く。302 は status が 200 でないので cacheControlHeaders が public を付けず、
+    // 自前の no-store のまま返る(Workers Cache にも保存されない)。
+    .use('*', pathPolicy())
     .get(
       '/_next/image',
       cache({
