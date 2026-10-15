@@ -51,20 +51,30 @@ describe('createWorkerApp', () => {
     expect(response.headers.get('Cache-Control')).toBe('public, max-age=3600, stale-while-revalidate=86400');
   });
 
-  it('forbids framing of the OAuth consent page served by the mounted handler', async () => {
-    const handlerFetch = vi.fn(async () => new Response('form'));
-    const app = createWorkerApp(handlerFetch);
-    const response = await app.request('/oauth/authorize?client_id=x');
-    expect(response.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'none'");
-    expect(response.headers.get('X-Frame-Options')).toBe('DENY');
-  });
-
   it('allows only same-origin framing of the admin served by the mounted handler', async () => {
     const handlerFetch = vi.fn(async () => new Response('admin'));
     const app = createWorkerApp(handlerFetch);
     const response = await app.request('/admin/collections/blog/1');
     expect(response.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'self'");
     expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+  });
+
+  it('sends a cross-site navigation into a deep admin page to /admin without calling the mounted handler', async () => {
+    const handlerFetch = vi.fn(async () => new Response('admin'));
+    const app = createWorkerApp(handlerFetch);
+    const response = await app.request('/admin/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' } });
+    expect(response.status).toBe(302);
+    expect(response.headers.get('Location')).toBe('/admin');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
+    expect(handlerFetch).not.toHaveBeenCalled();
+  });
+
+  it('lets a cross-site navigation land on /admin', async () => {
+    const handlerFetch = vi.fn(async () => new Response('admin'));
+    const app = createWorkerApp(handlerFetch);
+    const response = await app.request('/admin', { headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' } });
+    expect(response.status).toBe(200);
+    expect(handlerFetch).toHaveBeenCalledOnce();
   });
 
   it('keeps Next.js private policies untouched', async () => {

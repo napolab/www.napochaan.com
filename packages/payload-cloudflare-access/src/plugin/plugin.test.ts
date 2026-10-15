@@ -1,10 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
 import { InvalidAccessTeamDomain } from '../errors';
+import { rejectPasswordWrites } from '../password-guard';
 
 import { ACCESS_LOGOUT_BUTTON_PATH, cloudflareAccessPlugin, parseAudiences } from './index';
 
-import type { AuthStrategy, CollectionConfig, Config } from 'payload';
+import type { AuthStrategy, CollectionBeforeOperationHook, CollectionConfig, Config } from 'payload';
 
 const unusedDatabaseInit = (): never => {
   throw new Error('the database adapter is not used in plugin unit tests');
@@ -50,6 +51,7 @@ describe('cloudflareAccessPlugin', () => {
     const config = await cloudflareAccessPlugin({ teamDomain: undefined, aud: undefined })(baseConfig);
 
     expect(collectionOf(config, 'users')?.auth).toEqual(true);
+    expect(collectionOf(config, 'users')).not.toHaveProperty('hooks');
     expect(config.admin?.components?.logout?.Button).toEqual({
       path: ACCESS_LOGOUT_BUTTON_PATH,
       clientProps: { accessLogout: false },
@@ -126,6 +128,35 @@ describe('cloudflareAccessPlugin', () => {
       path: ACCESS_LOGOUT_BUTTON_PATH,
       clientProps: { accessLogout: true },
     });
+  });
+
+  // enableFields で hash 列を残しているので、Payload は update/create の data.password を hash して保存する。
+  // 保存されたパスワードは Access を外した瞬間に生きた資格情報になるので、書き込み自体を拒否する。
+  // beforeChange では遅い(updateDocument は field hook より前に data.password を取り出す)。
+  test('rejects password writes on the target collection when configured', async () => {
+    const config = await cloudflareAccessPlugin(configured)(baseConfig);
+
+    expect(collectionOf(config, 'users')?.hooks?.beforeOperation).toEqual([rejectPasswordWrites]);
+  });
+
+  test('puts the password guard before existing beforeOperation hooks and keeps other hooks', async () => {
+    const existing: CollectionBeforeOperationHook = () => undefined;
+    const afterChange = () => undefined;
+    const withHooks = { ...usersCollection, hooks: { beforeOperation: [existing], afterChange: [afterChange] } } satisfies CollectionConfig;
+
+    const config = await cloudflareAccessPlugin(configured)(configWith([withHooks]));
+    const hooks = collectionOf(config, 'users')?.hooks;
+
+    expect(hooks?.beforeOperation).toEqual([rejectPasswordWrites, existing]);
+    expect(hooks?.afterChange).toEqual([afterChange]);
+  });
+
+  test('does not add the password guard to other collections', async () => {
+    const admins = { slug: 'admins', auth: true, fields: [] } satisfies CollectionConfig;
+    const config = await cloudflareAccessPlugin({ ...configured, collection: 'admins' })(configWith([usersCollection, admins]));
+
+    expect(collectionOf(config, 'users')).not.toHaveProperty('hooks');
+    expect(collectionOf(config, 'admins')?.hooks?.beforeOperation).toEqual([rejectPasswordWrites]);
   });
 
   test('keeps existing strategies', async () => {

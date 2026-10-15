@@ -1,7 +1,6 @@
 import { errAsync, okAsync } from 'neverthrow';
 import type { ResultAsync } from 'neverthrow';
 
-import { ACCESS_STRATEGY_NAME } from '../access-user';
 import { isAllowedCookieRequest, isAllowedHeaderRequest } from '../csrf';
 import { CrossSiteAccessRequest, ResolveUserError } from '../errors';
 import type { AccessJWTError } from '../errors';
@@ -13,6 +12,9 @@ import { verifyAccessJWT } from '../verify';
 
 import type { JWTVerifyGetKey } from 'jose';
 import type { AuthStrategy, AuthStrategyResult, Payload, TypedUser } from 'payload';
+
+// Payload は認証した strategy の名前を実行時の user._strategy に入れる(local-jwt / api-key など)。
+export const ACCESS_STRATEGY_NAME = 'cloudflare-access';
 
 export type AccessStrategyOptions = {
   teamDomain: string;

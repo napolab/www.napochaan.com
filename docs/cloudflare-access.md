@@ -2,7 +2,9 @@
 
 Cloudflare Access を通過した人を、Access が発行した JWT の email で Payload admin にそのままログインさせる。plugin は `packages/payload-cloudflare-access`、設計は `docs/superpowers/specs/2026-10-05-payload-cloudflare-access-design.md`、調査は `reports/2026-10-05-payload-cloudflare-access-research.md` を参照。
 
-stg / prod で `CF_ACCESS_*` が揃ったときだけ有効になる。有効な間は email + password ログインが無効になり、**Access のポリシーが唯一の認可境界**になる（users に role は無い。ポリシーを通った人は全員 admin 権限を持つ）。
+stg / prod で `CF_ACCESS_*` が揃ったときだけ有効になる。有効な間は email + password ログインが無効になり、**Access のポリシーが唯一の認可境界**になる（users に role は無い。ポリシーを通った人は全員 admin 権限を持つ）。password の設定・変更も拒否される（下の「有効な間の password 書き込み拒否」）。
+
+MCP の OAuth 同意画面（`/oauth/authorize`）は Access 化しない。従来どおり email + password の同意画面のままなので、**Access を有効にした環境では MCP の同意ができなくなる**（password ログインが無効になるため）。`/mcp` を Access + MCP Server Portal に移す別サブプロジェクトが済むまでの制約（下の「MCP の同意画面」）。
 
 全ての `wrangler` / Payload CLI コマンドは account id が必要（無いと exit 13）:
 
@@ -39,7 +41,7 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
 
 ## 1. 事前準備: 本人の user に password を設定する（切り戻し用）
 
-Access で自動作成された user は password を持たない。切り戻したとき（下の「切り戻し」）に入れなくなるので、**Access を有効にする前に**、本人の user に password を設定しておく。
+Access で自動作成された user は password を持たない。切り戻したとき（下の「切り戻し」）に入れなくなるので、**Access を有効にする前に**、本人の user に password を設定しておく。有効にした後は password の書き込みが 403 で拒否されるので、後からは設定できない。
 
 1. 今の password ログインで admin に入る。
 2. Users から自分の user を開き、password を設定して保存する。
@@ -52,14 +54,16 @@ Zero Trust ダッシュボードで設定する。画面の操作順は Cloudfla
 1. **IdP**: 本人がログインできる IdP を登録する（One-time PIN でもよい）。ポリシーの email はこの IdP が返す email と一致させる。
 2. **self-hosted アプリ**を stg / prod それぞれに作る。パスはワイルドカードで指定する（[Application paths](https://developers.cloudflare.com/cloudflare-one/access-controls/policies/app-paths/)）。
 
-   | env  | 追加するパス                                                      |
-   | ---- | ----------------------------------------------------------------- |
-   | stg  | `stg.napochaan.com/admin*` / `stg.napochaan.com/oauth/authorize*` |
-   | prod | `napochaan.com/admin*` / `napochaan.com/oauth/authorize*`         |
+   | env  | 追加するパス               |
+   | ---- | -------------------------- |
+   | stg  | `stg.napochaan.com/admin*` |
+   | prod | `napochaan.com/admin*`     |
+
+   `/oauth/authorize*` は入れない（MCP の同意画面は password のまま。Access を通しても使い道が無い）。
 
 3. **ポリシー**: Allow、include は**本人の email のみ**。
 4. **stg はホスト全体のアプリが既にある**。それを消さず、パス単位のアプリと共存させる。このとき JWT の `aud` がどちらのアプリのものになるかが request ごとに変わりうるので、AUD は 2 つとも控える（手順 3）。
-5. **Cookie の SameSite を Lax にする**（各アプリの設定 → Cookie settings。多層防御）。Lax でもトップレベルの GET 遷移には cookie が付くので、Access ログイン後の redirect と claude.ai から開く `/oauth/authorize` のポップアップは動く。クロスサイトの POST やサブリソース（img / iframe / fetch）には cookie が付かなくなる。strategy 自体も header 由来・cookie 由来ともクロスサイト要求を拒否するので、これに依存はしない。
+5. **Cookie の SameSite を Lax にする**（各アプリの設定 → Cookie settings。多層防御）。Lax でもトップレベルの GET 遷移には cookie が付くので、Access ログイン後の redirect は動く。クロスサイトの POST やサブリソース（img / iframe / fetch）には cookie が付かなくなる。strategy 自体も header 由来・cookie 由来ともクロスサイト要求を拒否するので、これに依存はしない。
 6. **Cookie Path Attribute は OFF のまま**にする（既定）。ON にすると `/admin*` 以外の path に `CF_Authorization` cookie が届かなくなり、admin の XHR（`/api/*`）が認証できなくなる（[Authorization cookie](https://developers.cloudflare.com/cloudflare-one/access-controls/applications/http-apps/authorization-cookie/#cookie-path-attribute)）。
 
 ## 3. AUD を控えて wrangler vars に反映する
@@ -103,7 +107,7 @@ stg の deploy 後、次を順に確かめる。
 
 **項目 3 / 7 / 7a の前提**: stg はホスト全体のアプリが `/api/*` にも `Cf-Access-Jwt-Assertion` header を付ける。strategy は header を優先するため、このままでは cookie 経路は検証されない。3 / 7 / 7a は、`stg.napochaan.com/api*` に Bypass アプリを足した場合（下の「stg で cookie 経路を試す」）か prod でだけ意味を持つ。Bypass を採らない場合、これらは**最初の prod deploy で確認する**（下の「stg で cookie 経路を試す」の末尾、および「5. prod へ反映」の引き継ぎ項目を参照）。項目 6（別 origin の probe）は header 由来も CSRF 検査を受けるので、Bypass 無しの stg でも `{"user":null}` を期待値として確認できる（header 由来の判定の確認。cookie 由来の判定は Bypass 追加後か prod で確認する）。
 
-- [ ] 1. stg にパス単位アプリ（`/admin*`, `/oauth/authorize*`）を作り、AUD を `[env.staging.vars]` に設定して deploy した
+- [ ] 1. stg にパス単位アプリ（`/admin*`）を作り、AUD を `[env.staging.vars]` に設定して deploy した
 - [ ] 2. `/admin` に入ると自動ログインされ、ログインフォームが出ない
 - [ ] 3. admin 内の操作（一覧・保存・画像アップロード）が cookie 経路で通る（Server Action による保存も含む）。**stg では `/api*` Bypass 追加後、または prod で確認**（上の前提を参照。Bypass 無しの stg では header 経路で通るだけで、cookie 経路の確認にならない）
 - [ ] 4. 未登録 email で入ると user が自動作成される
@@ -120,11 +124,13 @@ stg の deploy 後、次を順に確かめる。
 
   `Origin` が無いときの扱いは経路で違う（`packages/payload-cloudflare-access/src/csrf/index.ts`）。
   - cookie 由来（Bypass 有りの stg / prod の `/api/*`）: `Sec-Fetch-Site` が `same-origin` / `same-site` / `none` でなければ拒否。`Origin` も `Sec-Fetch-Site` も無い curl も拒否される。
-  - header 由来（Bypass 無しの stg、`/admin*`、`/oauth/authorize*`）: `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest` が `document` 以外（img / iframe / fetch など）だけを拒否する。Access ログイン後の着地や claude.ai からのポップアップは Origin の無いクロスサイトのトップレベル GET なので、これを通すため。fetch metadata の無い curl は通る（`user` が返る）。サブリソースの拒否を見るなら `-H 'Sec-Fetch-Site: cross-site' -H 'Sec-Fetch-Dest: image'` を付けて `{"user":null}` になることを確かめる。
+  - header 由来（Bypass 無しの stg、`/admin*`）: `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest` が `document` 以外（img / iframe / fetch など）だけを拒否する。Access ログイン後の `/admin` への着地は Origin の無いクロスサイトのトップレベル GET なので、これを通すため。`/admin` より深いパスへのクロスサイト遷移は、Payload に届く前に worker が `/admin` へリダイレクトする（下の「クロスサイト遷移の `/admin` への着地」）。fetch metadata の無い curl は通る（`user` が返る）。サブリソースの拒否を見るなら `-H 'Sec-Fetch-Site: cross-site' -H 'Sec-Fetch-Dest: image'` を付けて `{"user":null}` になることを確かめる。
 
 - [ ] 7. JWT なしの `/api/users/me` が未認証になる（`user: null`）。**stg では `/api*` Bypass 追加後、または prod で確認**。Bypass 無しの stg では、`/api/users/me` は Access のログインへ redirect される（`user: null` の JSON は返らない）
 - [ ] 7a. Live Preview と下書きプレビュー（`/next/preview`）が、Access ログイン済みの編集者で表示できる（`CF_Authorization` cookie 経路を通る）。**stg では `/api*` Bypass 追加後、または prod で確認**（Bypass 無しの stg では header 経路で通るだけで、cookie 経路の確認にならない）
-- [ ] 8. MCP の `/oauth/authorize` が Access user で承認でき、claude.ai / Claude Code から MCP が使える（下の「MCP の確認」）
+- [ ] 8. `/oauth/authorize` に email + password の同意画面が出る（パス単位のアプリには入れていない。stg はホスト全体のアプリがあるので Access のログインは挟まる）。Access 有効な環境では承認できない（下の「MCP の同意画面」）
+- [ ] 8a. Access 有効な間、password の書き込みが 403 で拒否される（下の「有効な間の password 書き込み拒否」）
+- [ ] 8b. 別サイトから `/admin` より深いパスへのトップレベル遷移が `/admin` へリダイレクトされる（下の「クロスサイト遷移の `/admin` への着地」）
 - [ ] 9. どの AUD が JWT に入るかを記録した（下の「AUD の実測記録」）
 
 加えて次も確かめる。
@@ -136,28 +142,60 @@ stg の deploy 後、次を順に確かめる。
 
   実測結果（検証時に追記）:
 
-- [ ] **`/oauth/authorize` と `/admin*` が別 origin の iframe に入らない**: 次のヘッダーが付いている（`worker/middleware/frame-guard.ts`）。
+- [ ] **`/admin*` が別 origin の iframe に入らない**: 次のヘッダーが付いている（`worker/middleware/frame-guard.ts`）。
 
   ```bash
-  curl -sI 'https://stg.napochaan.com/oauth/authorize' | grep -i -E 'content-security-policy|x-frame-options'
   curl -sI 'https://stg.napochaan.com/admin' | grep -i -E 'content-security-policy|x-frame-options'
   ```
 
   | パス                                          | `Content-Security-Policy` | `X-Frame-Options` |
   | --------------------------------------------- | ------------------------- | ----------------- |
-  | `/oauth/authorize`（配下も）                  | `frame-ancestors 'none'`  | `DENY`            |
   | `/admin`（配下も。`/administrator` は対象外） | `frame-ancestors 'self'`  | `SAMEORIGIN`      |
 
   上流の CSP が既にあれば、`frame-ancestors` が無いときだけ末尾に足される。`/admin` を `'self'` にしているのは、Access が有効だと admin がクロスサイトの iframe の中でも認証済みで描画されるため（Live Preview が iframe に入れるのはサイト側の `/next/preview` で、admin 自身ではない）。
 
   Access 越しだと `curl` は Access のログイン画面に飛ばされる。その場合は、ログイン済みブラウザの DevTools（Network）で応答ヘッダーを見る。
 
-### MCP の確認
+### MCP の同意画面
 
-Access 経由（cloudflare-access strategy で user が解決できたとき）の `/oauth/authorize` は、email + password フォームではなく **「{email} として許可する」ボタンだけ**が出る。user は form の値ではなく action 側で headers から取り直している。ボタンだけのフォームは **Access で認証された user（`_strategy === 'cloudflare-access'`）に限る**。Access が無効な環境で password ログインのセッション（`local-jwt`）を持っていても password フォームが出て、action もその user では承認しない。
+`/oauth/authorize` は Access 化しない。どの環境でも email + password の同意画面（PR #53 より前と同じ）で、同意は `payload.login` を通る。Access が有効な環境では local strategy が無効なので `payload.login` が Forbidden になり、何を入力しても「メールアドレスまたはパスワードが正しくありません。」になる。つまり **Access を有効にした環境では、新しい MCP クライアントの同意（コネクタの追加・再接続）ができない**。発行済みの token は、同意を経ない token の更新が通る間は使える想定（未検証）。
 
-- [ ] `/oauth/authorize` で「{email} として許可する」ボタンのみが表示され、password 入力欄が無い
-- [ ] 承認後、claude.ai のコネクタ / Claude Code から MCP のツールが使える
+`/mcp` を Access + MCP Server Portal に移す別サブプロジェクト（調査は `reports/2026-10-05-mcp-portal-access-research.md`）が済むまでの制約として受け入れている。MCP の同意が必要になったら、その環境の Access を一時的に切り戻す（下の「切り戻し」）か、Access を有効にする前に同意を済ませておく。
+
+- [ ] `/oauth/authorize` に email + password の同意画面が出る（Access 有効な環境では承認できないことも確かめる）
+
+### 有効な間の password 書き込み拒否
+
+`disableLocalStrategy: { enableFields: true }` で hash 列を残しているので、何もしないと Payload は REST / local API の create / update に含まれる `password` を hash して保存する。保存された password は Access の範囲では使われないが、切り戻して local strategy が戻った瞬間に生きた資格情報になる。そこで plugin は、有効な間だけ対象の auth collection に `beforeOperation` hook を先頭に足し、`operation` が `create` / `update`（ID 指定・一括とも）で `data` に `password` キーがあれば（値に関係なく）拒否する（`packages/payload-cloudflare-access/src/password-guard/index.ts`）。field hook（`beforeChange`）で消すのでは遅い（Payload の `updateDocument` は field hook より前に `data.password` を取り出す）。`forgotPassword` / `resetPassword` は `disableLocalStrategy` の間 Payload 自身が Forbidden にする。
+
+- 応答は 403、message は `Cloudflare Access 有効時はパスワードを設定できません`。
+- `CLOUDFLARE_ENV` で Access 有効な env を向けた Payload CLI / seed にも効く。`pnpm seed:import`（`dev@napochaan.com` を password 付きで作る）はその env では失敗する。content だけなら `seed:import:prod` を使う（users に触れない）。
+- 確認（Access ログイン済みの JWT を使う。`<id>` は自分の user の id）:
+
+  ```bash
+  curl -i -X PATCH https://stg.napochaan.com/api/users/<id> \
+    -H 'Origin: https://stg.napochaan.com' -H 'Content-Type: application/json' \
+    --cookie 'CF_Authorization=<自分の JWT>' \
+    -d '{"password":"x"}'
+  ```
+
+  期待値は 403 と上の message。`password` を含まない更新（`{"name":"x"}`）は通る。
+
+### クロスサイト遷移の `/admin` への着地
+
+Access ログイン直後の着地は IdP 経由のリダイレクトの末尾なので、Origin の無いクロスサイトのトップレベル GET になる。strategy はこれを通す必要があるが、headers しか受け取らないのでパスを見られない。そこで worker（`worker/middleware/admin-landing.ts`）が、`GET` / `HEAD` で `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest: document` の要求のうち、パスが `/admin` より深い（`/admin/` で始まり、`/admin/` そのものではない。percent-encoding は decode して判定）ものを `302 Location: /admin`（`Cache-Control: no-store`）で返す。`/admin` と `/admin/` はそのまま通す。同一 origin / same-site / `none` / fetch metadata 無し、`GET` / `HEAD` 以外は触らない。
+
+- 別サイトのリンクから `/admin/collections/<autosave を持つ collection>/create` などを踏ませて、GET の描画で下書きや一覧の preference を書かせる経路を塞ぐため。
+- 代償: Access のログイン前に開いていた深いパス（ブックマークなど）は、ログイン後に `/admin` へ着地する。開き直せばよい。
+- 確認（Access ログイン済みの JWT を使う）:
+
+  ```bash
+  curl -sI https://stg.napochaan.com/admin/collections/blog \
+    -H 'Sec-Fetch-Site: cross-site' -H 'Sec-Fetch-Dest: document' \
+    --cookie 'CF_Authorization=<自分の JWT>' | grep -i -E '^(HTTP|location|cache-control)'
+  ```
+
+  期待値は `302` / `location: /admin` / `cache-control: no-store`。`Sec-Fetch-Site: same-origin` にすると 200 になる。
 
 ### AUD の実測記録
 
@@ -171,7 +209,6 @@ stg にはホスト全体のアプリとパス単位のアプリがある。ど�
 | リクエスト                           | token の経路（header / cookie） | JWT の `aud`（どのアプリか） |
 | ------------------------------------ | ------------------------------- | ---------------------------- |
 | `/admin` の画面遷移                  |                                 |                              |
-| `/oauth/authorize`                   |                                 |                              |
 | admin の XHR（`/api/users/me` など） |                                 |                              |
 | 公開ページ（`/`）                    |                                 |                              |
 | `/api/media/file/*`（公開画像）      |                                 |                              |
@@ -183,7 +220,7 @@ prod は `/api/*` が Access アプリの外なので、admin の XHR には `Cf
 prod と同じ挙動を試したいときは、`stg.napochaan.com/api*` に **Bypass** ポリシーのアプリを足す。
 
 - 効果: `/api/*` に header が付かなくなり、prod と同じく cookie 経路で動く。
-- 代償: **stg の `/api/*` が Access なしで外から叩けるようになる**（prod と同じ公開範囲）。stg の API が公開されてよいかは本人が決める。採らない場合、cookie 経路は prod の初回 deploy で初めて通ることになるので、prod 側で手順 4 の項目 3 / 6 / 7 と Live Preview の項目（7a）を最初に確認する（「5. prod へ反映」に引き継ぎ項目がある）。
+- 代償: **stg の `/api/*` が Access なしで外から叩けるようになる**。「prod と同じ公開範囲」と言えるのは、stg で plugin が有効（`CF_ACCESS_*` が揃っている）で、かつ stg に password を持つ user（`seed:import` が作る `dev@napochaan.com` など）が居ない間だけ。plugin が無効なら `/api/users/login` の password ログインが外から叩けるし、有効でも切り戻せば同じになる。stg の API が公開されてよいかは本人が決める。Bypass を足したら、切り戻しの最初に消す（下の「切り戻し」）。採らない場合、cookie 経路は prod の初回 deploy で初めて通ることになるので、prod 側で手順 4 の項目 3 / 6 / 7 と Live Preview の項目（7a）を最初に確認する（「5. prod へ反映」に引き継ぎ項目がある）。
 
 ## 5. prod へ反映
 
@@ -192,37 +229,39 @@ stg の検証が済んだら、手順 3 を `[env.production.vars]` で行って
 prod 後の確認:
 
 - [ ] `https://napochaan.com/admin` で Access のログイン → 自動で admin に入る
-- [ ] `https://napochaan.com/oauth/authorize` で「{email} として許可する」が出る
+- [ ] `https://napochaan.com/oauth/authorize` が Access のログインを挟まずに email + password の同意画面を出す（承認はできない。「MCP の同意画面」）
 - [ ] 公開ページと `/api/media/file/*` が Access なしで見える
 - [ ] stg で `/api*` Bypass アプリを採らなかった場合は、cookie 経路の確認を引き継ぐ: 手順 4 の項目 3（admin 内の操作）/ 6（別 origin の probe）/ 7（JWT なしの `/api/users/me`）/ 7a（Live Preview と `/next/preview`）
 
 ## 切り戻し
 
-`wrangler.toml` の `[env.<env>.vars]` から `CF_ACCESS_TEAM_DOMAIN` / `CF_ACCESS_AUD` を**消して** deploy する。
+1. stg.napochaan.com/api\* の Bypass アプリを追加していた場合は先に削除する（「stg で cookie 経路を試す」）。残したまま local strategy を戻すと、stg の password ログイン（`/api/users/login`）が Access なしで外から叩けるようになる。
+2. `wrangler.toml` の `[env.<env>.vars]` から `CF_ACCESS_TEAM_DOMAIN` / `CF_ACCESS_AUD` を**消して** deploy する。
 
 - plugin が無効に戻り、strategy が外れて `disableLocalStrategy` も外れる。email + password ログインが復活する。
 - **migration は不要。** `disableLocalStrategy: { enableFields: true }` なので email / hash 列は schema に残ったまま（schema は dev と一致している）。
 - 自動作成した user は password を持たないので、そのままでは入れない。手順 1 で本人の user に password を設定しておくこと。
 - 設定ミスで admin に誰も入れなくなったときも、これで戻る。
-- **注意（CLI 経由で作った user）**: `CF_ACCESS_*` を wrangler の env に入れた後は、その env を向けた Payload CLI（`CLOUDFLARE_ENV=staging|production pnpm payload …`、seed スクリプトなど）も plugin を有効の状態で読み込み、local strategy が無効になる。この経路で作った user も password を持たない。通常の運用では問題にならず、切り戻しのときだけ効く（手順 1 の password 事前設定は、Access 有効化前に済ませる）。
+- Access 有効な間は password の書き込みが拒否されるので、有効な間に新しく password を持った user は居ない（手順 1 で事前に設定した本人の user と、有効化より前から居た user だけ）。
+- **注意（CLI 経由で作った user）**: `CF_ACCESS_*` を wrangler の env に入れた後は、その env を向けた Payload CLI（`CLOUDFLARE_ENV=staging|production pnpm payload …`、seed スクリプトなど）も plugin を有効の状態で読み込み、local strategy が無効になる。この経路で作った user も password を持たない（`password` を渡すと 403 で拒否される）。通常の運用では問題にならず、切り戻しのときだけ効く（手順 1 の password 事前設定は、Access 有効化前に済ませる）。
 
 ## 注意
 
 - **`/api/*` を Access アプリに入れない。** `/api/media` は公開画像の配信（repo 内に約 30 箇所の参照がある）。`/api/mcp` は独自 OAuth。admin の XHR は `CF_Authorization` cookie で認証する。
 - **Worker 単位の Access（`ctx.access`）を使わない。** `[assets]` 付き Worker（OpenNext）には `ctx.access` が渡らない。また Worker 単位の Access は WebSocket upgrade を 403 にするので、`CURSOR_ROOM` が動かなくなる（[Workers: Cloudflare Access](https://developers.cloudflare.com/workers/configuration/cloudflare-access/)）。パス単位の self-hosted アプリ + アプリ内の JWT 検証にしている。
-- **Access user が解決できないとき、Access 有効な環境（stg / prod）の `/oauth/authorize` は動かない password フォームを表示する。** 設定ミス（AUD 不一致、JWKS 取得失敗など）で user を解決できないと、`payload.auth` が user を返さず、local dev 用の email + password フォームに落ちる。ただし Access 有効な環境では `payload.login` が Forbidden なので、何を入力しても「メールアドレスまたはパスワードが正しくありません。」になる。この表示が出たら**まず `wrangler tail --env <env>` で strategy の warn を見る**（`Cloudflare Access authentication rejected`: token / CSRF / 検証の失敗、`Cloudflare Access user resolution failed`: users の検索・作成の失敗）。
+- **Access 有効な環境（stg / prod）の `/oauth/authorize` は承認できない password フォームを表示する。** `payload.login` が Forbidden なので、何を入力しても「メールアドレスまたはパスワードが正しくありません。」になる。設定ミスではなく仕様（上の「MCP の同意画面」）。admin に入れない場合は**まず `wrangler tail --env <env>` で strategy の warn を見る**（`Cloudflare Access authentication rejected`: token / CSRF / 検証の失敗、`Cloudflare Access user resolution failed`: users の検索・作成の失敗）。
 - **Access の env が設定されているのに対象の auth collection が無いと、config の build 時に `AccessTargetCollectionNotFound` で落ちる。** 黙って無効にすると password ログインが残る（fail-open）ので、これは意図した fail-loud。対象は `collection` option → `admin.user` → 最初の auth collection の順で決まる。
 - **ログアウトは `/cdn-cgi/access/logout`。** Access のセッション cookie を消す。Payload 側のセッション（`local-jwt`）はそもそも無いので、これだけで完結する。全 Access アプリのセッションが失効する（アプリ単位のログアウトは不可）。
-- **クロスサイトのトップレベル GET は通す（残るリスク）。** Access ログイン後の着地と claude.ai のポップアップを通すため、header 由来の Origin 無しのトップレベル遷移は CSRF 検査で拒否しない。そのため、別サイトから `/admin/collections/<autosave を持つ collection>/create` へのリンクを踏まされると、空の下書きが 1 件できる（Payload の Document view は GET で下書きを作る）。データの漏洩・改変は無いので許容している。見覚えの無い空の下書きがあれば消してよい。
-  - 同じ種類の残りとして、fetch metadata を送らない古いブラウザ（Safari 16.4 未満など）は、クロスサイトの `<img>` などの GET を `Origin` も `Sec-Fetch-*` も無しで送るので、拒否されずに通る（判定上は curl と区別できない）。GET だけなので影響は上と同じ範囲に留まる。POST などは `Origin` が付くので拒否される。
+- **クロスサイトのトップレベル GET は `/admin` にだけ通す（残るリスク）。** Access ログイン後の着地を通すため、header 由来の Origin 無しのトップレベル遷移は CSRF 検査で拒否しない。`/admin` より深いパスへのクロスサイト遷移は worker が `/admin` へリダイレクトする（上の「クロスサイト遷移の `/admin` への着地」）ので、別サイトのリンクで `/admin/collections/<autosave を持つ collection>/create` を踏ませて空の下書きを作らせる（Payload の Document view は GET で下書きを作る）経路は塞いである。
+  - 残りとして、fetch metadata を送らない古いブラウザ（Safari 16.4 未満など）は、クロスサイトの遷移や `<img>` などの GET を `Origin` も `Sec-Fetch-*` も無しで送るので、worker のリダイレクトにも CSRF 検査にもかからずに通る（判定上は curl と区別できない）。この場合は上の空の下書きが 1 件できうる。データの漏洩・改変は無いので許容している。見覚えの無い空の下書きがあれば消してよい。POST などは `Origin` が付くので拒否される。
 - **`Cf-Access-Authenticated-User-Email` ヘッダーは信用しない。** 実装も読んでいない。Access を通らない経路では誰でも付けられる。JWT の署名・`iss`・`aud` を検証した email だけを使う。
 - `workers_dev` / `preview_urls` は全 env で false。Access を迂回する入口は無い。将来有効にするとその hostname は Access アプリの外になる。
 - セッションはリクエストごと。Payload の JWT cookie は発行されず、admin の各リクエストで Access JWT の検証と users の検索が走る。Access の `exp` は admin に伝わらないので、期限切れ警告モーダルは出ない。
-- MCP の Access 化（Managed OAuth / MCP Server Portal への移行）は**別サブプロジェクト**。調査は `reports/2026-10-05-mcp-portal-access-research.md`。この runbook の範囲では、MCP は従来の OAuth のまま、同意画面だけ Access user で通る。
+- MCP の Access 化（`/mcp` を Access + MCP Server Portal に移す）は**別サブプロジェクト**。調査は `reports/2026-10-05-mcp-portal-access-research.md`。この runbook の範囲では、MCP は従来の OAuth と password の同意画面のままで、Access を有効にした環境では同意ができない（上の「MCP の同意画面」）。
 
 ## ローカル開発
 
-`.dev.vars` の `CF_ACCESS_TEAM_DOMAIN=` / `CF_ACCESS_AUD=` は**空のまま**にする。plugin は無効で、従来どおり email + password ログイン（と `autoLogin.prefillOnly`）が使える。`/oauth/authorize` も password フォームのまま。
+`.dev.vars` の `CF_ACCESS_TEAM_DOMAIN=` / `CF_ACCESS_AUD=` は**空のまま**にする。plugin は無効で、従来どおり email + password ログイン（と `autoLogin.prefillOnly`）と `/oauth/authorize` の password での同意が使える。`pnpm seed:import` も password 付きの dev admin を作れる（plugin が有効だと password の書き込みが拒否されて失敗する）。
 
 `.dev.vars` にキーを追加・変更したら型を再生成する:
 

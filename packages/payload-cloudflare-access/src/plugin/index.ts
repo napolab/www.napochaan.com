@@ -1,4 +1,5 @@
 import { AccessTargetCollectionNotFound } from '../errors';
+import { rejectPasswordWrites } from '../password-guard';
 import { createAccessStrategy } from '../strategy';
 import { normalizeTeamDomain } from '../team-domain';
 import { createAccessKeys } from '../verify';
@@ -51,6 +52,11 @@ const withAccessAuth = (collection: CollectionConfig, strategy: ReturnType<typeo
       ...auth,
       strategies: [...(auth.strategies ?? []), strategy],
       disableLocalStrategy: { enableFields: true },
+    },
+    hooks: {
+      ...collection.hooks,
+      // 既存の beforeOperation より先に置く。後ろの hook が args を差し替えても拒否が先に効く。
+      beforeOperation: [rejectPasswordWrites, ...(collection.hooks?.beforeOperation ?? [])],
     },
   };
 };

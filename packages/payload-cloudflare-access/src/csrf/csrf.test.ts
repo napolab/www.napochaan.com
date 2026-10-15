@@ -41,18 +41,15 @@ describe('isAllowedCookieRequest', () => {
 });
 
 // Access は Cf-Access-Jwt-Assertion をブラウザの CF_Authorization cookie から付けるので、header 由来でも
-// クロスサイト要求に乗ってくる。ただし Access のログイン後の着地や claude.ai からの /oauth/authorize は
-// Origin の無いクロスサイトのトップレベル GET なので、cookie の判定表をそのまま使うと正規の経路が落ちる。
+// クロスサイト要求に乗ってくる。ただし Access のログイン後の /admin への着地は Origin の無いクロスサイトの
+// トップレベル GET なので、cookie の判定表をそのまま使うと正規の経路が落ちる(/admin より深いパスへの
+// クロスサイト遷移は worker/middleware/admin-landing.ts が /admin へ送る)。
 type HeaderCase = { flow: string; headers: Record<string, string> };
 
 describe('isAllowedHeaderRequest', () => {
   test.each<HeaderCase>([
     {
       flow: 'Access login callback landing on /admin (top-level cross-site GET)',
-      headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Dest': 'document' },
-    },
-    {
-      flow: 'claude.ai popup to /oauth/authorize (top-level cross-site GET)',
       headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Dest': 'document' },
     },
     { flow: 'admin same-origin XHR GET without Origin', headers: { 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Dest': 'empty' } },

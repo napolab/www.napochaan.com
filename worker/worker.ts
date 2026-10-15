@@ -4,7 +4,6 @@ import { OAuthProvider } from '@cloudflare/workers-oauth-provider';
 import handler from '../.open-next/worker.js';
 
 import { createWorkerApp, type MountedFetch } from './app';
-import { OAUTH_AUTHORIZE_PATH } from './oauth-endpoints';
 
 const app = createWorkerApp(handler.fetch as MountedFetch);
 
@@ -32,7 +31,7 @@ export default new OAuthProvider<Cloudflare.Env>({
   defaultHandler: {
     fetch: async (request: Request, env: Cloudflare.Env, ctx: ExecutionContext): Promise<Response> => app.fetch(request, env, ctx),
   },
-  authorizeEndpoint: OAUTH_AUTHORIZE_PATH,
+  authorizeEndpoint: '/oauth/authorize',
   tokenEndpoint: '/oauth/token',
   clientRegistrationEndpoint: '/oauth/register',
   scopesSupported: ['blog'],

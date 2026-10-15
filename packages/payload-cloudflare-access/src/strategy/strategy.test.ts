@@ -2,10 +2,9 @@ import { SignJWT, createLocalJWKSet, exportJWK, generateKeyPair } from 'jose';
 import type { JWK, JWTVerifyGetKey, KeyObject } from 'jose';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 
-import { ACCESS_STRATEGY_NAME } from '../access-user';
 import { CrossSiteAccessRequest } from '../errors';
 import { accessIssuer } from '../verify';
-import { authenticateAccess, createAccessStrategy } from './index';
+import { ACCESS_STRATEGY_NAME, authenticateAccess, createAccessStrategy } from './index';
 import type { AccessStrategyOptions, AuthenticatePayload } from './index';
 
 const TEAM = 'napolab';

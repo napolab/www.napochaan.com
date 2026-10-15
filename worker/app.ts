@@ -2,6 +2,7 @@ import { cache } from 'hono/cache';
 import { createFactory } from 'hono/factory';
 
 import { imageHandlers } from './handlers/images';
+import { adminCrossSiteLanding } from './middleware/admin-landing';
 import { cacheControlHeaders } from './middleware/cache-control';
 import { frameGuardHeaders } from './middleware/frame-guard';
 import { weakenETag } from './middleware/weaken-etag';
@@ -23,6 +24,9 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
     .use('*', weakenETag())
     .use('*', cacheControlHeaders())
     .use('*', frameGuardHeaders())
+    // 上の 3 つより内側に置く。302 は status が 200 でないので cacheControlHeaders が public を付けず、
+    // 自前の no-store のまま返る(Workers Cache にも保存されない)。
+    .use('*', adminCrossSiteLanding())
     .get(
       '/_next/image',
       cache({
