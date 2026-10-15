@@ -43,7 +43,7 @@ describe('isAllowedCookieRequest', () => {
 // Access は Cf-Access-Jwt-Assertion をブラウザの CF_Authorization cookie から付けるので、header 由来でも
 // クロスサイト要求に乗ってくる。ただし Access のログイン後の /admin への着地は Origin の無いクロスサイトの
 // トップレベル GET なので、cookie の判定表をそのまま使うと正規の経路が落ちる(/admin より深いパスへの
-// クロスサイト遷移は worker/middleware/admin-landing.ts が /admin へ送る)。
+// クロスサイト遷移は worker/middleware/path-policy/plugins/admin-landing/index.ts が /admin へ送る)。
 type HeaderCase = { flow: string; headers: Record<string, string> };
 
 describe('isAllowedHeaderRequest', () => {

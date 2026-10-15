@@ -24,7 +24,7 @@ export const isAllowedCookieRequest = (headers: Headers, csrf: readonly string[]
 // リダイレクトの末尾なので、Origin の無いクロスサイトのトップレベル GET になる。cookie の判定表
 // (Origin 無し + cross-site は拒否)を使うとログインが成立しないので、クロスサイトの document だけは通す。
 // この分岐が要るのは /admin への着地のためだけ。strategy は headers しか見られないので、それより深い
-// admin パスへのクロスサイト遷移は worker(worker/middleware/admin-landing.ts)が /admin へリダイレクトする。
+// admin パスへのクロスサイト遷移は worker(worker/middleware/path-policy/plugins/admin-landing/index.ts)が /admin へリダイレクトする。
 // - Origin がある("null" も含む) → csrf の許可リストで判定
 // - Origin が無いクロスサイトのサブリソース(img / iframe / script / fetch など、Dest が document 以外) → 拒否
 // - それ以外(トップレベル遷移、Origin を付けない同一 origin の GET、fetch metadata を送らない非ブラウザ) → 許可

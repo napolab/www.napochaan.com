@@ -142,7 +142,7 @@ stg の deploy 後、次を順に確かめる。
 
   実測結果（検証時に追記）:
 
-- [ ] **`/admin*` が別 origin の iframe に入らない**: 次のヘッダーが付いている（`worker/middleware/frame-guard.ts`）。
+- [ ] **`/admin*` が別 origin の iframe に入らない**: 次のヘッダーが付いている（`worker/middleware/path-policy/plugins/admin-frame/index.ts`）。
 
   ```bash
   curl -sI 'https://stg.napochaan.com/admin' | grep -i -E 'content-security-policy|x-frame-options'
@@ -183,7 +183,7 @@ stg の deploy 後、次を順に確かめる。
 
 ### クロスサイト遷移の `/admin` への着地
 
-Access ログイン直後の着地は IdP 経由のリダイレクトの末尾なので、Origin の無いクロスサイトのトップレベル GET になる。strategy はこれを通す必要があるが、headers しか受け取らないのでパスを見られない。そこで worker（`worker/middleware/admin-landing.ts`）が、`GET` / `HEAD` で `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest: document` の要求のうち、パスが `/admin` より深い（`/admin/` で始まり、`/admin/` そのものではない。percent-encoding は decode して判定）ものを `302 Location: /admin`（`Cache-Control: no-store`）で返す。`/admin` と `/admin/` はそのまま通す。同一 origin / same-site / `none` / fetch metadata 無し、`GET` / `HEAD` 以外は触らない。
+Access ログイン直後の着地は IdP 経由のリダイレクトの末尾なので、Origin の無いクロスサイトのトップレベル GET になる。strategy はこれを通す必要があるが、headers しか受け取らないのでパスを見られない。そこで worker（`worker/middleware/path-policy/plugins/admin-landing/index.ts`。`path-policy` の plugin）が、`GET` / `HEAD` で `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest: document` の要求のうち、パスが `/admin` より深い（`/admin/` で始まり、`/admin/` そのものではない。percent-encoding は decode して判定）ものを `302 Location: /admin`（`Cache-Control: no-store`）で返す。`/admin` と `/admin/` はそのまま通す。同一 origin / same-site / `none` / fetch metadata 無し、`GET` / `HEAD` 以外は触らない。
 
 - 別サイトのリンクから `/admin/collections/<autosave を持つ collection>/create` などを踏ませて、GET の描画で下書きや一覧の preference を書かせる経路を塞ぐため。
 - 代償: Access のログイン前に開いていた深いパス（ブックマークなど）は、ログイン後に `/admin` へ着地する。開き直せばよい。

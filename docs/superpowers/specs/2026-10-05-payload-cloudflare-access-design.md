@@ -44,7 +44,7 @@ Cloudflare Access を通過した人が、Access の発行した identity(email)
                        Cloudflare Access(パス単位アプリ: /admin*)
                                      │  JWT を Cf-Access-Jwt-Assertion header と
                                      │  CF_Authorization cookie で付与
-browser ─▶ worker(Hono: admin-landing / frame-guard) ─▶ Next ─▶ Payload ─▶ strategy "cloudflare-access"
+browser ─▶ worker(Hono: path-policy = admin-landing / admin-frame) ─▶ Next ─▶ Payload ─▶ strategy "cloudflare-access"
                                                  │
                      packages/payload-cloudflare-access
                      各モジュールは src/<name>/index.ts、テストは src/<name>/<name>.test.ts
@@ -215,10 +215,10 @@ plugins: [
 
 ### 5.2 worker の middleware(`worker/middleware/`)
 
-worker の Hono 合成(`worker/app.ts`)に 2 つ足す。どちらも OpenNext の mount より前、`weakenETag` → `cacheControlHeaders` → `frameGuardHeaders` → `adminCrossSiteLanding` の順。パスの照合はどちらもパーセントデコード後(`safe-decode-pathname.ts`。不正な %-列は生のまま判定)。
+worker の Hono 合成(`worker/app.ts`)に `pathPolicy()`(`worker/middleware/path-policy/`)を 1 つ足す。OpenNext の mount より前、`weakenETag` → `cacheControlHeaders` → `pathPolicy` の順。パスは middleware が 1 度だけパーセントデコードし(`safe-decode-pathname/`。不正な %-列は生のまま判定)、plugin の配列を先頭から照合して最初に match した action(redirect / frame)を採る(first match wins、`worker/lib/first-match-runner`)。具体的な plugin を先に置く(`admin-landing` → `admin-frame`)。redirect の 302 には frame ヘッダーを付けない(body が無いため)。
 
-- `frame-guard.ts`(clickjacking): `/admin`(完全一致か `/admin/` 始まり。`/administrator` は対象外)に `Content-Security-Policy: frame-ancestors 'self'` + `X-Frame-Options: SAMEORIGIN`。上流の CSP に `frame-ancestors` が無いときだけ末尾に足す。Access が有効だと admin はクロスサイトの iframe の中でも認証済みで描画されるため。Live Preview が iframe に入れるのは `/next/preview` → サイト側の preview ページで、admin 自身を埋め込む画面は無い。
-- `admin-landing.ts`(クロスサイト遷移の着地制限): `GET` / `HEAD` で `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest: document`、かつパスが `/admin/` で始まり `/admin/` そのものではない要求に `302 Location: /admin` + `Cache-Control: no-store` を返す(mount した handler は呼ばない)。`/admin` と `/admin/` は通す(Access ログイン後の着地先)。same-origin / same-site / `none` / fetch metadata 無し、`GET` / `HEAD` 以外は触らない。
+- `plugins/admin-frame`(clickjacking): `/admin`(完全一致か `/admin/` 始まり。`/administrator` は対象外)に `Content-Security-Policy: frame-ancestors 'self'` + `X-Frame-Options: SAMEORIGIN`。上流の CSP に `frame-ancestors` が無いときだけ末尾に足す。Access が有効だと admin はクロスサイトの iframe の中でも認証済みで描画されるため。Live Preview が iframe に入れるのは `/next/preview` → サイト側の preview ページで、admin 自身を埋め込む画面は無い。
+- `plugins/admin-landing`(クロスサイト遷移の着地制限): `GET` / `HEAD` で `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest: document`、かつパスが `/admin/` で始まり `/admin/` そのものではない要求に `302 Location: /admin` + `Cache-Control: no-store` を返す(mount した handler は呼ばない)。`/admin` と `/admin/` は通す(Access ログイン後の着地先)。same-origin / same-site / `none` / fetch metadata 無し、`GET` / `HEAD` 以外は触らない。
   - 理由: strategy は Access ログイン後の着地のためにクロスサイトの document を認証する(§4.3)が、headers しか受け取らずパスを見られない。着地先の制限は worker で掛ける。
   - 302 は fetch metadata 次第で変わるので保存させない。`cacheControlHeaders` は status 200 にしか public を付けないので `no-store` のまま返る(Workers Cache にも入らない)。
   - 代償: Access ログイン前に開いた深いパス(ブックマーク)は、ログイン後 `/admin` に着地する。
@@ -249,18 +249,18 @@ Access 化しない。PR #53 より前と同じ email + password の同意画面
 
 テストは `packages/payload-cloudflare-access` 内で、モジュールのディレクトリに `<name>.test.ts(x)` として置く(例: `src/verify/index.ts` と `src/verify/verify.test.ts`)。鍵はテスト内で生成した RS256 鍵ペア + `createLocalJWKSet` を使い、ネットワークに出ない。
 
-| 対象                 | ケース                                                                                                                                                                                                                  |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `extractAccessToken` | header のみ / cookie のみ / 両方(header を優先) / どちらも無い / 他の cookie と混在                                                                                                                                     |
-| `verifyAccessJWT`    | 正常 / 期限切れ / aud 不一致 / iss 不一致 / 署名改ざん / alg 違い / `type` が app 以外 / email なし(service token)                                                                                                      |
-| `csrf`               | cookie: Origin 一致・不一致 / Origin 無し + Sec-Fetch-Site(same-origin・same-site・none・cross-site・欠落) / csrf 空なら常に許可。header: §4.3 の表の各経路 / Origin `null` / csrf 空                                   |
-| `resolveAccessUser`  | 既存 user / 新規作成 / 大文字小文字の正規化 / create 衝突 → 再 find                                                                                                                                                     |
-| `strategy`           | トークン無しで JWKS を呼ばない / 各失敗で `{ user: null }` かつ throw しない / header・cookie とも cross-site は JWKS を呼ばずに拒否 / 成功時の `collection` と `_strategy`                                             |
-| `team-domain`        | 一般的な書き方を team 名に正規化 / 不正な値は `InvalidAccessTeamDomain` / 空は無効                                                                                                                                      |
-| `plugin`             | env 無し: strategies・disableLocalStrategy・hooks が変わらず、logout component は登録される / env あり: 両方が設定され、`beforeOperation` の先頭に password guard(既存 hook は保持) / collection の配列位置が変わらない |
-| `password-guard`     | create / update で `password` を持てば 403 の `PasswordWriteForbidden`(値は問わない・own property のみ) / `password` 無し・他の operation・data 無しは通す                                                              |
-| `worker/middleware`  | admin-landing: cross-site document の GET / HEAD で深い admin パス → 302 `/admin` + no-store、`/admin` `/admin/` と他の fetch metadata・method は通す、percent-encoding / frame-guard / `worker/app.test.ts` で合成順   |
-| `logout-button`      | `accessLogout` で描画が切り替わる(browser mode, `.test.tsx`)                                                                                                                                                            |
+| 対象                 | ケース                                                                                                                                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `extractAccessToken` | header のみ / cookie のみ / 両方(header を優先) / どちらも無い / 他の cookie と混在                                                                                                                                                          |
+| `verifyAccessJWT`    | 正常 / 期限切れ / aud 不一致 / iss 不一致 / 署名改ざん / alg 違い / `type` が app 以外 / email なし(service token)                                                                                                                           |
+| `csrf`               | cookie: Origin 一致・不一致 / Origin 無し + Sec-Fetch-Site(same-origin・same-site・none・cross-site・欠落) / csrf 空なら常に許可。header: §4.3 の表の各経路 / Origin `null` / csrf 空                                                        |
+| `resolveAccessUser`  | 既存 user / 新規作成 / 大文字小文字の正規化 / create 衝突 → 再 find                                                                                                                                                                          |
+| `strategy`           | トークン無しで JWKS を呼ばない / 各失敗で `{ user: null }` かつ throw しない / header・cookie とも cross-site は JWKS を呼ばずに拒否 / 成功時の `collection` と `_strategy`                                                                  |
+| `team-domain`        | 一般的な書き方を team 名に正規化 / 不正な値は `InvalidAccessTeamDomain` / 空は無効                                                                                                                                                           |
+| `plugin`             | env 無し: strategies・disableLocalStrategy・hooks が変わらず、logout component は登録される / env あり: 両方が設定され、`beforeOperation` の先頭に password guard(既存 hook は保持) / collection の配列位置が変わらない                      |
+| `password-guard`     | create / update で `password` を持てば 403 の `PasswordWriteForbidden`(値は問わない・own property のみ) / `password` 無し・他の operation・data 無しは通す                                                                                   |
+| `worker/middleware`  | admin-landing: cross-site document の GET / HEAD で深い admin パス → 302 `/admin` + no-store、`/admin` `/admin/` と他の fetch metadata・method は通す、percent-encoding / admin-frame / path-policy の優先順 / `worker/app.test.ts` で合成順 |
+| `logout-button`      | `accessLogout` で描画が切り替わる(browser mode, `.test.tsx`)                                                                                                                                                                                 |
 
 ## 7. 実装の最初のタスク(土台の検証)
 

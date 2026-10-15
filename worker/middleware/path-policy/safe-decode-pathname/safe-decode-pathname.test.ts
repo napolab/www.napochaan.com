@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { safeDecodePathname } from './safe-decode-pathname';
+import { safeDecodePathname } from './index';
 
 describe('safeDecodePathname', () => {
   it.each([
