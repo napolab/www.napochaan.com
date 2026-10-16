@@ -31,6 +31,7 @@ describe('buildSitemap', () => {
     expect(urls).toContain(`${baseUrl}/news`);
     expect(urls).toContain(`${baseUrl}/blog`);
     expect(urls).toContain(`${baseUrl}/log`);
+    expect(urls).toContain(`${baseUrl}/log/calendar`);
     expect(urls).toContain(`${baseUrl}/gallery`);
     expect(urls).toContain(`${baseUrl}/contact`);
     expect(urls).toContain(`${baseUrl}/colophon`);
@@ -80,7 +81,7 @@ describe('buildSitemap', () => {
 
   it('emits only the static pages when data is empty', () => {
     const entries = buildSitemap({ baseUrl, news: [], blog: [], works: [] });
-    expect(entries).toHaveLength(9);
+    expect(entries).toHaveLength(10);
     expect(entries.map((entry) => entry.url)).toContain(baseUrl);
   });
 });

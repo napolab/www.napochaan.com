@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
 
+import { LogPageHeader } from './_components/log-page-header';
 import { LogTimelineSection } from './_components/log-timeline-section';
 
 import { DecodingSkeleton } from '@components/decoding-skeleton';
@@ -25,9 +26,12 @@ export const generateMetadata = (): Metadata =>
   });
 
 const LogPage = () => (
-  <Suspense fallback={<DecodingSkeleton fill />}>
-    <LogTimelineSection />
-  </Suspense>
+  <>
+    <LogPageHeader />
+    <Suspense fallback={<DecodingSkeleton fill />}>
+      <LogTimelineSection />
+    </Suspense>
+  </>
 );
 
 export default LogPage;
