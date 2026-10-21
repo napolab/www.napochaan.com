@@ -1,30 +1,29 @@
 # MCP blog 入稿 — 接続・運用 runbook
 
-## 初回セットアップ
+## 認証の仕組み
 
-1. ~~KV namespace 作成~~ **完了(2026-07-16)**: `env.staging` = `385b19e3196d42408ea8466591d1ce8a` / `env.production` = `d19a648ce9224e16be0927ba5d594460` を `wrangler.toml` に反映済み。main(local dev)は miniflare シミュレーションで動くため実 namespace 不要 — placeholder のまま(default env は deploy しない)。
-2. staging へ deploy する(`staging-deploy-seed` skill の手順)。
-3. staging E2E(下記フローに準じる 10 項目: 401 + WWW-Authenticate 確認 → ヘッダー偽造遮断確認 → oauth-authorization-server メタデータ確認 → Claude Code 接続 → list_posts → upload_media/create_post の round-trip 確認 → publish_post の最新 draft 反映確認 → claude.ai Connectors 接続 → image-row block を含む記事の bodyEditable=true + フェンス込み bodyMarkdown 確認 → cursor WebSocket(/api/cursors)の upgrade(101)が OAuthProvider ラップ後も生きていることを確認)を実施する。
+MCP は Cloudflare Access の `/mcp` パス単位アプリ（Managed OAuth）と MCP Portal の後ろにある。自前の OAuth（OAuthProvider・`/oauth/authorize` の同意画面・`OAUTH_KV`）は廃止した。
 
-これらが完了するまで、以下の runbook は本番相当の動作確認が取れていない。
+- 認可は Access のポリシー `naporitan`（本人の email のみ）。`route.ts` が `Cf-Access-Jwt-Assertion` を `CF_ACCESS_TEAM_DOMAIN` + `CF_ACCESS_MCP_AUD` で検証し、email に一致する**既存の** Payload user を引く（作らない）。JWT 無し・不正・user 不在は 403、env 未設定は 500。
+- Access アプリ・Portal・vars の設定と有効化の手順は `docs/cloudflare-access.md` の「MCP（`/mcp` アプリと MCP Portal）」。
 
 ## エンドポイント
 
-- 本番: `https://napochaan.com/mcp`
-- staging: `https://stg.napochaan.com/mcp`(Cloudflare Access 配下のため要 Access 通過)
+- Portal: `mcp.napochaan.com`（server id は本番 `napochaan`、staging `napochaanstg`）
+- 本番の MCP 本体: `https://napochaan.com/mcp`（Access 配下。MCP クライアントから直接つながず、Portal 経由にする）
+- staging の MCP 本体: `https://stg.napochaan.com/mcp`（同上）
 
 ## クライアント接続
 
-### Claude Code
+### Claude Desktop(Portal 経由)
 
-    claude mcp add --transport http napochaan-blog https://napochaan.com/mcp
+Claude Desktop のコネクタに MCP Portal `mcp.napochaan.com` を追加する。認証は Portal の Managed OAuth（Dynamic Client Registration）で、同意は Access のログイン（GitHub-naporin0624）。Payload の email / password は使わない。
 
-初回ツール実行時にブラウザが開き、Payload の email/password でログイン → 許可。
+- 以前の直結コネクタ（`https://napochaan.com/mcp`）は外して、Portal 経由に付け直す。
+- 初回に Access のログイン画面が開く。ポリシー `naporitan` に入っている本人の email で通る。
+- server の登録と、管理者側の初回 OAuth（dashboard の「Save and connect server」）は本人の操作。
 
-### claude.ai(Web / モバイル)
-
-Settings → Connectors → Add custom connector → URL に `https://napochaan.com/mcp`。
-認証は OAuth(Dynamic Client Registration)で自動。ログイン画面は Payload アカウント。
+claude.ai の Web / モバイルの直結コネクタ(`https://napochaan.com/mcp` を直接追加する形)は、Access の DCR で callback を許可していないので使えない。Claude Code のように loopback の callback を使うクライアントは、DCR が localhost / loopback を許可しているので直結できる想定だが、未検証。
 
 ## 入稿ワークフロー
 
@@ -73,25 +72,15 @@ Settings → Connectors → Add custom connector → URL に `https://napochaan.
 - `bodyMarkdown` は任意。書き方(`![media:<id>](alt)`、image-row フェンス、table、newTab ポリシー)は blog の `create_post` / `update_post` と完全に同じ。本文未設定の work は `get_work` が `bodyMarkdown: ""` を返す
 - `update_work` は指定したフィールドだけを draft version として保存する。公開版への反映は `publish_work` が必要
 
-## トークン失効(漏洩時)
+## アクセス失効(漏洩時)
 
-grant と access token は KV(`OAUTH_KV`)に別キーで保存されている。`@cloudflare/workers-oauth-provider` の request-time 検証は `token:<userId>:<grantId>:<tokenId>` のみを読む(`grant:` キーは再照会しない)ため、**grant キーを消すだけでは既発行の access token は無効化されない** — TTL(1 時間)が切れるまで使え続ける。grant キーと対応する token キーの両方を削除すること。
+認可は Access 側にあるので、KV の grant / token を消す手順は無い（`OAUTH_KV` は廃止）。恒久的に効く順に:
 
-    export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
-    # 1. grant を一覧して対象の grantId を特定(userId は Payload users の id)
-    pnpm wrangler kv key list --binding OAUTH_KV --env production --prefix "grant:"
-    # 2. その grant にぶら下がる token キーを一覧
-    pnpm wrangler kv key list --binding OAUTH_KV --env production --prefix "token:<userId>:<grantId>:"
-    # 3. 2 で返った token キーをすべて削除
-    pnpm wrangler kv key delete --binding OAUTH_KV --env production "token:<userId>:<grantId>:<tokenId>"
-    # 4. grant キーを削除(refresh はこれで無効化される。以後の再発行を止める)
-    pnpm wrangler kv key delete --binding OAUTH_KV --env production "grant:<userId>:<grantId>"
-
-access token の TTL は 1 時間。token キーの削除漏れがあっても、その 1 時間が最悪の露出窓になる(refresh は grant 削除で止まるので、無限に使われ続けることはない)。
-
-全失効したい場合は `token:` / `grant:` prefix のキーを全削除。
+1. **ポリシーから外す**: 再利用ポリシー `naporitan` の include から email を外す。`naporitan` は `/admin*` と `/mcp` の両方の Access アプリが共有しているので、MCP と admin の認可が同時に変わる。
+2. **Access のセッションを失効させる**: Zero Trust ダッシュボードで該当 user の Access セッションを失効させる（画面名は Cloudflare 側の更新で変わる）。access token の TTL は 15 分、grant は 336 時間なので、失効させないと最大その間は使える。1 と合わせて行う。
+3. **（一時的な停止）Payload の user を消す**: `/mcp` は email で既存 user を引けないと 403 を返すので、JWT が生きていても即座に止まる。ただし恒久策ではない。admin の plugin は、Access を通った `/admin` への次回アクセスで user を自動作成し直すため（`docs/cloudflare-access.md`）、その後は `/mcp`（find のみ）も再び通る。MCP だけを止める独立のスイッチではない。
 
 ## 制約
 
 - image-row block は上記フェンス構文で Markdown 往復に対応済み。今後 image-row 以外の独自 block が追加された場合、対応済み block(`src/lib/mcp/markdown/index.ts` の `SUPPORTED_BLOCK_TYPES`)に含まれていなければその記事は MCP から本文更新不可(get_post が bodyEditable: false を返す)
-- `next dev`(localhost:3000)は worker シェルを経由しないため OAuth フローは動かない。動作確認は staging で行う
+- `next dev`(localhost:3000)は worker シェルを経由せず、`CF_ACCESS_MCP_AUD` も空なので `/api/mcp` は 500 になる。動作確認は staging で行う（Portal 経由）

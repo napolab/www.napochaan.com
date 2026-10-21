@@ -13,3 +13,5 @@ TURNSTILE_SITE_KEY=dev-placeholder
 # Cloudflare Access（Payload admin ログイン）。stg/prod は wrangler vars で設定。空なら plugin 無効で password ログイン。
 CF_ACCESS_TEAM_DOMAIN=
 CF_ACCESS_AUD=
+# MCP（/mcp アプリ）専用の AUD。admin 用の CF_ACCESS_AUD とは混ぜない。カンマ区切り可。空なら /mcp は 500（fail closed）。
+CF_ACCESS_MCP_AUD=
