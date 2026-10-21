@@ -13,12 +13,19 @@ export const isPublished = (doc: unknown): boolean => statusOf(doc) === 'publish
 /** Whether a change touches the published state — the doc is, or just was, published. */
 export const isPublishedChange = (doc: unknown, previousDoc: unknown): boolean => isPublished(doc) || isPublished(previousDoc);
 
+// Next 16 requires a cache-life profile on `revalidateTag`. `{ expire: 0 }` expires the
+// tag immediately — the same semantics the one-argument form had in Next 15. Do NOT use
+// 'max': that turns a CMS publish into stale-while-revalidate (the first request after
+// a publish still gets the old HTML/data), breaking the "publish is visible at once"
+// contract the D1 tag cache in open-next.config.ts is configured for.
+const IMMEDIATE_EXPIRY = { expire: 0 } as const;
+
 const dispatch = (req: PayloadRequest, tags: readonly string[]): void => {
   const context = req.context as { disableRevalidate?: boolean };
   if (context.disableRevalidate === true) return;
   for (const tag of tags) {
     try {
-      revalidateTag(tag);
+      revalidateTag(tag, IMMEDIATE_EXPIRY);
     } catch {
       // revalidateTag throws outside a Next request context (e.g. `payload migrate`/`seed`
       // CLI calling payload.create). Those writes surface on the next build/request, so
@@ -46,7 +53,7 @@ const dispatchTagsAndPaths = (req: PayloadRequest, tags: readonly string[], path
   const context = req.context as { disableRevalidate?: boolean };
   if (context.disableRevalidate === true) return;
   try {
-    for (const tag of tags) revalidateTag(tag);
+    for (const tag of tags) revalidateTag(tag, IMMEDIATE_EXPIRY);
     for (const path of paths) dispatchPath(path);
   } catch {
     // Outside a request context (CLI seed/migrate). Those writes surface on the next
@@ -61,7 +68,7 @@ const dispatchTagsAndPaths = (req: PayloadRequest, tags: readonly string[], path
  * data fans out to multiple consumers. */
 export const revalidateTagsAndPaths = (tags: readonly string[], paths: readonly string[]): void => {
   try {
-    for (const tag of tags) revalidateTag(tag);
+    for (const tag of tags) revalidateTag(tag, IMMEDIATE_EXPIRY);
     for (const path of paths) dispatchPath(path);
   } catch {
     // Outside a request context (CLI). Safe to swallow.

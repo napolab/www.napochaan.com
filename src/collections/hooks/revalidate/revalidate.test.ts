@@ -61,7 +61,7 @@ describe('createTagRevalidateHooks', () => {
     const doc = { id: 1 };
     const result = hooks.afterChange({ doc, req: makeReq() } as unknown as ChangeArgs);
 
-    expect(revalidateTagMock).toHaveBeenCalledWith('news');
+    expect(revalidateTagMock).toHaveBeenCalledWith('news', { expire: 0 });
     expect(revalidateTagMock).toHaveBeenCalledTimes(1);
     expect(result).toBe(doc);
   });
@@ -98,7 +98,7 @@ describe('createPublishedTagRevalidateHooks', () => {
     const hooks = createPublishedTagRevalidateHooks(['news']);
     hooks.afterChange({ doc: { _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
 
-    expect(revalidateTagMock).toHaveBeenCalledWith('news');
+    expect(revalidateTagMock).toHaveBeenCalledWith('news', { expire: 0 });
     expect(revalidateTagMock).toHaveBeenCalledTimes(1);
   });
 
@@ -124,7 +124,7 @@ describe('createPublishedTagAndPathRevalidateHooks', () => {
     const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog']);
     hooks.afterChange({ doc: { id: 1, _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
 
-    expect(revalidateTagMock).toHaveBeenCalledWith('blog');
+    expect(revalidateTagMock).toHaveBeenCalledWith('blog', { expire: 0 });
     expect(revalidateTagMock).toHaveBeenCalledTimes(1);
     expect(revalidatePathMock).toHaveBeenCalledWith('/');
     expect(revalidatePathMock).toHaveBeenCalledWith('/blog');
@@ -164,7 +164,7 @@ describe('createPublishedTagAndPathRevalidateHooks', () => {
     expect(revalidatePathMock).not.toHaveBeenCalled();
 
     hooks.afterDelete({ doc: { id: 7, slug: 'old-post', _status: 'published' }, req: makeReq() } as unknown as DeleteArgs);
-    expect(revalidateTagMock).toHaveBeenCalledWith('blog');
+    expect(revalidateTagMock).toHaveBeenCalledWith('blog', { expire: 0 });
     expect(revalidatePathMock).toHaveBeenCalledWith('/blog/[slug]', 'page');
   });
 
@@ -197,7 +197,7 @@ describe('revalidateTagsAndPaths', () => {
   it('busts literal paths as-is and dynamic pattern paths with type "page"', () => {
     revalidateTagsAndPaths(['works'], ['/', '/works', '/works/[slug]']);
 
-    expect(revalidateTagMock).toHaveBeenCalledWith('works');
+    expect(revalidateTagMock).toHaveBeenCalledWith('works', { expire: 0 });
     expect(revalidatePathMock).toHaveBeenCalledWith('/');
     expect(revalidatePathMock).toHaveBeenCalledWith('/works');
     expect(revalidatePathMock).toHaveBeenCalledWith('/works/[slug]', 'page');
