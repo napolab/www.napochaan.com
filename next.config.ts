@@ -12,16 +12,25 @@ const nextConfig: NextConfig = {
     // 3840 is only useful for full-bleed art on a 4K display; every image here sits
     // in the ≤1180px content column, so the largest 2× candidate is 2048.
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    // Next 16 defaults `qualities` to [75] and its optimizer rejects any other `q`
+    // with 400. `formatBlurURL` hand-builds `/_next/image?...&q=30|40` for blur
+    // placeholders and ambient backdrops, so allow those too. Production is
+    // unaffected either way (worker/handlers/images serves `/_next/image` via the
+    // IMAGES binding); this keeps `next dev` / `next start` rendering the blurs.
+    qualities: [30, 40, 75],
   },
   // The client-side Router Cache reuses already-visited RSC entries on soft
   // navigation (and back/forward) WITHOUT refetching — and server-side
   // `revalidateTag` never evicts it. So a long-open tab keeps serving the RSC it
   // cached earlier, showing an out-of-date version of a work until a hard reload
-  // discards the client cache. Setting both reuse windows to 0 marks every cached
-  // segment immediately stale, so each navigation re-pulls fresh RSC from the
-  // server. Trade-off: back/forward refetch instead of instant-reusing the cache.
+  // discards the client cache. Keep both reuse windows at their minimum so
+  // cached segments go stale quickly and navigation re-pulls fresh RSC from the
+  // server. Next 16 enforces `static >= 30` (it warns at build time and clamps a
+  // lower value to 30s at runtime), so prefetched static segments may be reused
+  // for up to 30s; `dynamic: 0` still marks dynamic segments stale immediately.
+  // Trade-off: back/forward refetch instead of instant-reusing the cache.
   experimental: {
-    staleTimes: { static: 0, dynamic: 0 },
+    staleTimes: { static: 30, dynamic: 0 },
   },
   serverExternalPackages: ['drizzle-kit', 'esbuild', 'esbuild-register'],
   redirects: async () => [
@@ -48,9 +57,6 @@ const nextConfig: NextConfig = {
   ],
   typescript: {
     ignoreBuildErrors: true,
-  },
-  eslint: {
-    ignoreDuringBuilds: true,
   },
   turbopack: {
     resolveAlias: TURBOPACK_RESOLVE_ALIAS,

@@ -63,7 +63,11 @@ const SiteLayout = async ({ children }: { children: ReactNode }) => {
     // suppressHydrationWarning: the inline loader mutates documentElement.className
     // before React hydrates, so the live <html> class legitimately differs from
     // this render. Scoped to <html>'s own attributes only.
-    <html lang="ja" className={`${fontVariables} wf-loading boot`} suppressHydrationWarning>
+    // data-scroll-behavior="smooth": global-css sets `html { scroll-behavior: smooth }`
+    // for in-page anchors. Next 16 no longer forces it to `auto` during route
+    // transitions unless this attribute is present, so it keeps navigations jumping
+    // straight to the top (the Next 15 behavior) instead of smooth-scrolling there.
+    <html lang="ja" className={`${fontVariables} wf-loading boot`} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/* Adobe Fonts (Typekit) async loader — non-blocking. Removes the SSR boot
             class once fonts resolve (or immediately for bots). No dynamic content. */}
