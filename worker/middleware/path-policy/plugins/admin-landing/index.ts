@@ -1,7 +1,7 @@
 import { when } from '../../../../lib/first-match-runner';
 import { allOf } from '../../../../lib/predicate';
 import { redirectTo } from '../../actions';
-import { isDescendantOf } from '../../predicates/path';
+import { isDescendantOf } from '../../../../lib/path-predicate';
 import { byPathname, isCrossSiteNavigation } from '../../predicates/request';
 
 import type { PathPolicyPlugin } from '../../types';
