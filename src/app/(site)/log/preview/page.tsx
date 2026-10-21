@@ -1,6 +1,7 @@
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
+import { LogPageHeader } from '../_components/log-page-header';
 import { LogTimeline } from '../_components/log-timeline';
 import { buildLogTimeline } from '../_lib/build-log-timeline';
 import { fetchExternalPosts } from '../_lib/fetch-external-posts';
@@ -32,6 +33,7 @@ const LogPreviewPage = async () => {
   return (
     <>
       <LivePreviewListener />
+      <LogPageHeader />
       <LogTimeline groups={groups} />
     </>
   );
