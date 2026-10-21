@@ -1,0 +1,20 @@
+/*
+ * Payload's admin CSS resets <button> per class only (`.popup-button-list__button` etc.), so a bare
+ * <button class="nav__log-out"> keeps the UA border and background. Strip only that, so it looks like
+ * Payload's own `<a class="nav__log-out">`. The form stays a plain block: it is the flex item of
+ * `.nav__controls`, so it still receives that container's `gap` and `> :first-child` margin.
+ */
+.form :global(.nav__log-out) {
+  display: flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: currentColor;
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Payload only styles `.nav__controls a:focus-visible`; give the button the same ring. */
+.form :global(.nav__log-out):focus-visible {
+  outline: var(--accessibility-outline);
+}

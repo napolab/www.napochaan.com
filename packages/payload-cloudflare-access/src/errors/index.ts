@@ -62,3 +62,13 @@ export class InvalidAccessTeamDomain extends Error {
     );
   }
 }
+
+export class AccessLogoutEndpointsDisabled extends Error {
+  override readonly name = 'AccessLogoutEndpointsDisabled';
+
+  constructor(readonly slug: string) {
+    super(
+      `Cloudflare Access is configured but "${slug}" sets \`endpoints: false\`, so the Access logout endpoint cannot be added (adding it would re-enable every default REST endpoint of the collection). Remove \`endpoints: false\` from "${slug}", or unset CF_ACCESS_TEAM_DOMAIN / CF_ACCESS_AUD to disable the plugin.`,
+    );
+  }
+}

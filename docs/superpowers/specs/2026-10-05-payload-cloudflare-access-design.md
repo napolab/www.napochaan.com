@@ -55,6 +55,7 @@ browser ─▶ worker(Hono: path-policy = admin-landing / admin-frame) ─▶ Ne
                      ├─ strategy/        上記を合成した AuthStrategy(ACCESS_STRATEGY_NAME もここ)
                      ├─ password-guard/  有効な間の password 書き込みを拒否する beforeOperation hook
                      ├─ team-domain/     CF_ACCESS_TEAM_DOMAIN の正規化と検証
+                     ├─ logout-endpoint/ Payload / draft mode の cookie を消して Access のログアウトへ 303 する collection endpoint
                      ├─ plugin/          cloudflareAccessPlugin(options)(config) => config
                      ├─ errors/          エラー class
                      └─ client/logout-button/
@@ -96,7 +97,7 @@ export const extractAccessToken: (headers: Headers) => Result<AccessToken, Heade
 - 時刻ずれの許容 30 秒、鍵ローテーション時の JWKS 再取得(知らない kid)、`crit` 拒否、aud の配列一致は `@hono/cloudflare-access@0.4.0` と同じ挙動。後者 3 つは jose の `jwtVerify` / `createRemoteJWKSet` が標準で行う。
 - service token の JWT(`email` なし / `common_name` のみ)は `MissingAccessEmail` で拒否する。
 - `extractAccessToken`(`src/token/`): トークンの取り出し元を prefix-match-processor の形の plugin にする。`headerTokenSource`(`Cf-Access-Jwt-Assertion`)と `cookieTokenSource`(`CF_Authorization`)をそれぞれ 1 ディレクトリに置き、`run(headers): Result<AccessToken, Headers>` で扱わないときは `err(headers)`。registry `[header, cookie]` を runner が先頭から試し、最初の `ok` を採用する。registry はパッケージ内部だけで持ち、plugin の options には出さない(必要になったら `tokenSources` を足す)。CSRF 検査は cookie source に同居させず strategy 側で掛ける(拒否を warn ログに残すため)。
-- エラーは class で表現する(`src/errors/`。`AccessJWTError` 系: `InvalidAccessToken`(jose の失敗を `cause` に保持)/ `WrongAccessTokenType` / `MissingAccessEmail`。ほかに `ResolveUserError` / `CrossSiteAccessRequest`(header 由来・cookie 由来の CSRF 拒否を共通で表す)/ `AccessTargetCollectionNotFound` / `InvalidAccessTeamDomain`)。
+- エラーは class で表現する(`src/errors/`。`AccessJWTError` 系: `InvalidAccessToken`(jose の失敗を `cause` に保持)/ `WrongAccessTokenType` / `MissingAccessEmail`。ほかに `ResolveUserError` / `CrossSiteAccessRequest`(header 由来・cookie 由来の CSRF 拒否を共通で表す)/ `AccessTargetCollectionNotFound` / `InvalidAccessTeamDomain` / `AccessLogoutEndpointsDisabled`)。
 
 ### 4.3 `csrf/index.ts`
 
@@ -171,16 +172,18 @@ export const parseAudiences = (raw: string | undefined): readonly string[];
 export const cloudflareAccessPlugin = (options: CloudflareAccessPluginOptions): Plugin;
 ```
 
-| 設定                             | env 未設定(local / build / CLI) | env 設定済み(stg / prod)      |
-| -------------------------------- | ------------------------------- | ----------------------------- |
-| `admin.components.logout.Button` | **常に登録**                    | 常に登録                      |
-| `auth.strategies` に追加         | しない                          | する                          |
-| `auth.disableLocalStrategy`      | 変更しない                      | `{ enableFields: true }`      |
-| `hooks.beforeOperation`          | 変更しない                      | 先頭に `rejectPasswordWrites` |
-| ログアウトボタンの遷移先         | Payload 既定の logout           | `/cdn-cgi/access/logout`      |
+| 設定                             | env 未設定(local / build / CLI) | env 設定済み(stg / prod)                      |
+| -------------------------------- | ------------------------------- | --------------------------------------------- |
+| `admin.components.logout.Button` | **常に登録**                    | 常に登録                                      |
+| `auth.strategies` に追加         | しない                          | する                                          |
+| `auth.disableLocalStrategy`      | 変更しない                      | `{ enableFields: true }`                      |
+| `hooks.beforeOperation`          | 変更しない                      | 先頭に `rejectPasswordWrites`                 |
+| 対象 collection の `endpoints`   | 変更しない                      | 末尾に `POST /access-logout`                  |
+| ログアウトボタン                 | Payload 既定の logout           | `/api/<slug>/access-logout` へ POST する form |
 
 - **importMap に載るものは env で分岐させない。** `payload generate:importmap` と `next build` は `CF_ACCESS_*` が無い状態で config を評価する。env で登録を切り替えると、本番で importMap に無い component を参照して admin が壊れる。
-- ログアウトボタンの遷移先は `clientProps`(`{ accessLogout: boolean }`)で渡す。clientProps は importMap に影響しない。
+- ログアウトボタンの送信先は `clientProps`(`{ accessLogoutAction: string | null }`)で渡す。enabled なら `` `${config.routes?.api ?? '/api'}/${target}${ACCESS_LOGOUT_ENDPOINT_PATH}` ``、無効なら `null`。clientProps は importMap に影響しない。
+- enabled のとき、対象 collection の `endpoints` の末尾に `createAccessLogoutEndpoint(target)`(§4.7)を足す。既存の endpoint は前に残す。`endpoints: false` なら config build 時に `AccessLogoutEndpointsDisabled` を throw する。足すと Payload の sanitize が `endpoints !== false` を見て既定の REST まで戻してしまう(`collections/config/sanitize.js`)ので、黙って足さない。
 - users collection は配列の位置を保ったまま map で差し替える(payload-oauth2 のように末尾へ移動しない)。
 - `enabled` は正規化した `teamDomain` が空でなく、かつ `parseAudiences(aud)` が 1 件以上のとき。`NODE_ENV` では判定しない。片方だけ・空白だけの設定は黙って無効(password ログインのまま)。
 - `teamDomain` の正規化(`src/team-domain/`): trim → 小文字化 → 先頭の `https://` / `http://` を除く → 末尾の `/` を除く → 末尾の `.cloudflareaccess.com` を除く → `^[a-z0-9-]+$` に一致しなければ config build 時に `InvalidAccessTeamDomain`(元の値と期待する形「`napolab` のような team 名だけ」をメッセージに出す)を throw する。`napolab` / `https://napolab.cloudflareaccess.com/` などはすべて `napolab` になる。誤った team で有効化すると issuer / JWKS URL が食い違い、password ログインも無効なので誰も admin に入れない(不正な文字は `new URL` が config 評価中に throw する)。検証するのは有効化するとき(trim 後の `teamDomain` が空でなく、かつ `parseAudiences(aud)` が 1 件以上)だけ。どちらかが空なら、`teamDomain` が不正でも throw せず無効にする。team 名は Access アプリを作って AUD が出る前に設定するのが普通で、無効な間の typo で config 評価(Payload を使う全ページと deploy の Payload CLI)を落とさないため。
@@ -194,10 +197,33 @@ export const cloudflareAccessPlugin = (options: CloudflareAccessPluginOptions): 
   - `PasswordWriteForbidden` は Payload の runtime に依存するので `errors/` ではなく `password-guard/` に置く(`errors/` は import を持たない module のまま。`verify` を workerd で読む `worker/access-verify-runtime.test.ts` が壊れないように)。
   - 副作用: Access 有効な env を向けた `pnpm seed:import`(password 付きの dev admin を作る)は失敗する。content だけなら `seed:import:prod`。
 
-### 4.7 `client/logout-button/index.tsx`
+### 4.7 `logout-endpoint/index.ts`
 
-- `'use client'`。`accessLogout` が true なら react-aria-components の `Link`(`href="/cdn-cgi/access/logout"`、`aria-label="ログアウト"`、Payload の nav と同じ `className="nav__log-out"`、中身は `LogOutIcon`)、false なら Payload の既定 `Logout`(`@payloadcms/ui`)をそのまま描画する。
-- Access のログアウトは Access のセッション cookie を消す。Payload 側のセッションはそもそも無いので、これだけで完結する。
+`/cdn-cgi/access/logout` は Access のセッション cookie しか消さない。次の 2 つがブラウザに残るので、同一 origin の endpoint で消してから Access のログアウトへ送る。
+
+- `<cookiePrefix>-token`(`payload-token`): Access の user にも `/api/<slug>/refresh-token` が発行する(Payload 3.84.1 `auth/operations/refresh.js` は `disableLocalStrategy` のとき session を見ずに署名して `setCookie: true` を返す)。`local-jwt` が登録されないので今は読まれないが、切り戻して local strategy が戻った瞬間に生きる。
+- `__prerender_bypass`(Next の draft mode): 残すと、ログアウト後もそのブラウザで preview ページが下書きを表示し続ける。
+
+```ts
+export const ACCESS_LOGOUT_ENDPOINT_PATH = '/access-logout';
+export const ACCESS_LOGOUT_PATH = '/cdn-cgi/access/logout';
+export const PRERENDER_BYPASS_COOKIE_NAME = '__prerender_bypass';
+export const createAccessLogoutEndpoint = (slug: TypedUser['collection']): Endpoint; // { path, method: 'post', handler }
+```
+
+- handler は小さい関数の合成: `toAccessLogoutContext(req, slug)`(headers / `payload.config.csrf` / `payload.config.cookiePrefix` / sanitize 済みの `payload.collections[slug].config.auth`)→ `respondToAccessLogout`。
+  - `isSameSiteLogout`: `isAllowedCookieRequest(headers, csrf)`(§4.3 の cookie の表)。通らなければ `403`(`Cache-Control: no-store`、`Set-Cookie` なし)。別サイトの form POST で本人をログアウトさせない。
+  - `expiredPayloadTokenCookie`: Payload の `generateExpiredPayloadCookie`(`payload/shared`)。名前は `cookiePrefix` から、Domain / SameSite / Secure は collection の `auth.cookies` から作る(発行時と違うと別の cookie として残る)。
+  - `expiredDraftModeCookie`: `__prerender_bypass=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; Max-Age=0; HttpOnly; Secure; SameSite=None`。名前は `next/dist/server/api-utils/index.js` の `COOKIE_NAME_PRERENDER_BYPASS`、属性は `next/dist/server/async-storage/draft-mode-provider.js` が本番で付けるものに合わせる。
+  - 成功時は `303 Location: /cdn-cgi/access/logout`、`Set-Cookie` を 2 本(`Headers.append`)、`Cache-Control: no-store`。
+- user が解決できたかは見ない(cookie を消すだけなので未ログインでも同じ応答でよい)。
+- path の一致: Payload 3.84.1 は collection の endpoints を利用者の分 → auth / upload / 既定(`/:id` など)の順に並べ(`collections/config/sanitize.js`)、`handleEndpoints` は先頭から method と path で `find` するので、`POST /access-logout` は既定の route より先に一致する。`handleEndpoints` は応答 headers を `new Headers(...)` で作り直すが、`Set-Cookie` は 2 本のまま残る(テストで固定)。
+
+### 4.8 `client/logout-button/index.tsx`
+
+- `'use client'`。props は `{ accessLogoutAction: string | null }`。`null` なら Payload の既定 `Logout`(`@payloadcms/ui`)をそのまま描画する。
+- それ以外は HTML だけで作る: `<form method="post" action={accessLogoutAction}>` の中に `<button type="submit" className="nav__log-out" aria-label={t('authentication:logOut')} title={t('authentication:logOut')}><LogOutIcon /></button>`(`t` は `@payloadcms/ui` の `useTranslation`。Payload の `Logout` と同じ label / icon / class)。
+- Payload の admin CSS は button を class ごとにしか reset しないので、素の `<button>` に残る UA の枠と背景を `styles.module.css` で消し、`.nav__controls a:focus-visible` と同じ focus ring を付ける。form は既定の block のままにして `.nav__controls` の flex item(`gap` と `> :first-child` の margin を受ける)にする。
 
 ## 5. アプリ側の変更
 
@@ -249,18 +275,19 @@ Access 化しない。PR #53 より前と同じ email + password の同意画面
 
 テストは `packages/payload-cloudflare-access` 内で、モジュールのディレクトリに `<name>.test.ts(x)` として置く(例: `src/verify/index.ts` と `src/verify/verify.test.ts`)。鍵はテスト内で生成した RS256 鍵ペア + `createLocalJWKSet` を使い、ネットワークに出ない。
 
-| 対象                 | ケース                                                                                                                                                                                                                                       |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `extractAccessToken` | header のみ / cookie のみ / 両方(header を優先) / どちらも無い / 他の cookie と混在                                                                                                                                                          |
-| `verifyAccessJWT`    | 正常 / 期限切れ / aud 不一致 / iss 不一致 / 署名改ざん / alg 違い / `type` が app 以外 / email なし(service token)                                                                                                                           |
-| `csrf`               | cookie: Origin 一致・不一致 / Origin 無し + Sec-Fetch-Site(same-origin・same-site・none・cross-site・欠落) / csrf 空なら常に許可。header: §4.3 の表の各経路 / Origin `null` / csrf 空                                                        |
-| `resolveAccessUser`  | 既存 user / 新規作成 / 大文字小文字の正規化 / create 衝突 → 再 find                                                                                                                                                                          |
-| `strategy`           | トークン無しで JWKS を呼ばない / 各失敗で `{ user: null }` かつ throw しない / header・cookie とも cross-site は JWKS を呼ばずに拒否 / 成功時の `collection` と `_strategy`                                                                  |
-| `team-domain`        | 一般的な書き方を team 名に正規化 / 不正な値は `InvalidAccessTeamDomain` / 空は無効                                                                                                                                                           |
-| `plugin`             | env 無し: strategies・disableLocalStrategy・hooks が変わらず、logout component は登録される / env あり: 両方が設定され、`beforeOperation` の先頭に password guard(既存 hook は保持) / collection の配列位置が変わらない                      |
-| `password-guard`     | create / update で `password` を持てば 403 の `PasswordWriteForbidden`(値は問わない・own property のみ) / `password` 無し・他の operation・data 無しは通す                                                                                   |
-| `worker/middleware`  | admin-landing: cross-site document の GET / HEAD で深い admin パス → 302 `/admin` + no-store、`/admin` `/admin/` と他の fetch metadata・method は通す、percent-encoding / admin-frame / path-policy の優先順 / `worker/app.test.ts` で合成順 |
-| `logout-button`      | `accessLogout` で描画が切り替わる(browser mode, `.test.tsx`)                                                                                                                                                                                 |
+| 対象                 | ケース                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `extractAccessToken` | header のみ / cookie のみ / 両方(header を優先) / どちらも無い / 他の cookie と混在                                                                                                                                                                                                                                                                                                                      |
+| `verifyAccessJWT`    | 正常 / 期限切れ / aud 不一致 / iss 不一致 / 署名改ざん / alg 違い / `type` が app 以外 / email なし(service token)                                                                                                                                                                                                                                                                                       |
+| `csrf`               | cookie: Origin 一致・不一致 / Origin 無し + Sec-Fetch-Site(same-origin・same-site・none・cross-site・欠落) / csrf 空なら常に許可。header: §4.3 の表の各経路 / Origin `null` / csrf 空                                                                                                                                                                                                                    |
+| `resolveAccessUser`  | 既存 user / 新規作成 / 大文字小文字の正規化 / create 衝突 → 再 find                                                                                                                                                                                                                                                                                                                                      |
+| `strategy`           | トークン無しで JWKS を呼ばない / 各失敗で `{ user: null }` かつ throw しない / header・cookie とも cross-site は JWKS を呼ばずに拒否 / 成功時の `collection` と `_strategy`                                                                                                                                                                                                                              |
+| `team-domain`        | 一般的な書き方を team 名に正規化 / 不正な値は `InvalidAccessTeamDomain` / 空は無効                                                                                                                                                                                                                                                                                                                       |
+| `plugin`             | env 無し: strategies・disableLocalStrategy・hooks・endpoints が変わらず、logout component は `accessLogoutAction: null` で登録される / env あり: 両方が設定され、`beforeOperation` の先頭に password guard(既存 hook は保持)、logout endpoint を末尾に追加(既存 endpoint は保持・`endpoints: false` は throw)、`accessLogoutAction` は `routes.api` と対象 slug から / collection の配列位置が変わらない |
+| `password-guard`     | create / update で `password` を持てば 403 の `PasswordWriteForbidden`(値は問わない・own property のみ) / `password` 無し・他の operation・data 無しは通す                                                                                                                                                                                                                                               |
+| `worker/middleware`  | admin-landing: cross-site document の GET / HEAD で深い admin パス → 302 `/admin` + no-store、`/admin` `/admin/` と他の fetch metadata・method は通す、percent-encoding / admin-frame / path-policy の優先順 / `worker/app.test.ts` で合成順                                                                                                                                                             |
+| `logout-endpoint`    | 303 + `Location` + 2 本の期限切れ cookie + no-store / cookie 名は `cookiePrefix`・Domain は `auth.cookies` から / `Headers` を作り直しても `Set-Cookie` が 2 本 / cross-site・別 Origin・`Origin: null` は 403 で `Set-Cookie` なし                                                                                                                                                                      |
+| `logout-button`      | action があれば POST form(method / action / button の accessible name / UA の枠が消える)、`null` なら Payload の `Logout`(browser mode, `.test.tsx`)                                                                                                                                                                                                                                                     |
 
 ## 7. 実装の最初のタスク(土台の検証)
 
@@ -280,7 +307,7 @@ Access 化しない。PR #53 より前と同じ email + password の同意画面
 2. `/admin` に入ると自動ログインされ、ログインフォームが出ないこと
 3. admin 内の操作(一覧・保存・画像アップロード)が cookie 経路で通ること
 4. 未登録 email で入ると user が作成されること
-5. ログアウトで Access のログアウト画面に遷移し、再度 `/admin` に行くと Access のログインを求められること
+5. ログアウトで `POST /api/users/access-logout` が `payload-token` と `__prerender_bypass` を消して Access のログアウト画面に 303 で遷移し、再度 `/admin` に行くと Access のログインを求められること(IdP のセッションが残っていると、ログイン画面を経ずに再ログインされることがある)。別 origin からの POST は 403 で cookie が変わらないこと
 6. 別 origin からの要求(`curl -H 'Origin: https://evil.example' --cookie CF_Authorization=...`)で user が解決されないこと(header 由来・cookie 由来とも)
 7. JWT なしの `/api/users/me` が未認証になること
 8. `/oauth/authorize` が password の同意画面を出すこと(Access 有効な環境では承認できない。§5.3)

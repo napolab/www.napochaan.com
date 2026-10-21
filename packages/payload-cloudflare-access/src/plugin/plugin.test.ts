@@ -1,11 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { InvalidAccessTeamDomain } from '../errors';
+import { AccessLogoutEndpointsDisabled, InvalidAccessTeamDomain } from '../errors';
+import { ACCESS_LOGOUT_ENDPOINT_PATH } from '../logout-endpoint';
 import { rejectPasswordWrites } from '../password-guard';
 
 import { ACCESS_LOGOUT_BUTTON_PATH, cloudflareAccessPlugin, parseAudiences } from './index';
 
-import type { AuthStrategy, CollectionBeforeOperationHook, CollectionConfig, Config } from 'payload';
+import type { AuthStrategy, CollectionBeforeOperationHook, CollectionConfig, Config, Endpoint } from 'payload';
 
 const unusedDatabaseInit = (): never => {
   throw new Error('the database adapter is not used in plugin unit tests');
@@ -54,7 +55,7 @@ describe('cloudflareAccessPlugin', () => {
     expect(collectionOf(config, 'users')).not.toHaveProperty('hooks');
     expect(config.admin?.components?.logout?.Button).toEqual({
       path: ACCESS_LOGOUT_BUTTON_PATH,
-      clientProps: { accessLogout: false },
+      clientProps: { accessLogoutAction: null },
     });
   });
 
@@ -68,7 +69,7 @@ describe('cloudflareAccessPlugin', () => {
     expect(collectionOf(config, 'users')?.auth).toEqual(true);
     expect(config.admin?.components?.logout?.Button).toEqual({
       path: ACCESS_LOGOUT_BUTTON_PATH,
-      clientProps: { accessLogout: false },
+      clientProps: { accessLogoutAction: null },
     });
   });
 
@@ -78,7 +79,7 @@ describe('cloudflareAccessPlugin', () => {
     expect(collectionOf(config, 'users')?.auth).toEqual(true);
     expect(config.admin?.components?.logout?.Button).toEqual({
       path: ACCESS_LOGOUT_BUTTON_PATH,
-      clientProps: { accessLogout: false },
+      clientProps: { accessLogoutAction: null },
     });
   });
 
@@ -89,7 +90,7 @@ describe('cloudflareAccessPlugin', () => {
     expect(authOf(config, 'users')?.strategies?.at(-1)?.name).toBe('cloudflare-access');
     expect(config.admin?.components?.logout?.Button).toEqual({
       path: ACCESS_LOGOUT_BUTTON_PATH,
-      clientProps: { accessLogout: true },
+      clientProps: { accessLogoutAction: '/api/users/access-logout' },
     });
   });
 
@@ -114,7 +115,7 @@ describe('cloudflareAccessPlugin', () => {
     expect(collectionOf(config, 'users')?.auth).toEqual(true);
     expect(config.admin?.components?.logout?.Button).toEqual({
       path: ACCESS_LOGOUT_BUTTON_PATH,
-      clientProps: { accessLogout: false },
+      clientProps: { accessLogoutAction: null },
     });
   });
 
@@ -126,7 +127,7 @@ describe('cloudflareAccessPlugin', () => {
     expect(auth?.disableLocalStrategy).toEqual({ enableFields: true });
     expect(config.admin?.components?.logout?.Button).toEqual({
       path: ACCESS_LOGOUT_BUTTON_PATH,
-      clientProps: { accessLogout: true },
+      clientProps: { accessLogoutAction: '/api/users/access-logout' },
     });
   });
 
@@ -244,7 +245,63 @@ describe('cloudflareAccessPlugin', () => {
     expect(config.admin?.components?.graphics).toEqual({ Logo: '/components/logo#Logo' });
     expect(config.admin?.components?.logout?.Button).toEqual({
       path: ACCESS_LOGOUT_BUTTON_PATH,
-      clientProps: { accessLogout: true },
+      clientProps: { accessLogoutAction: '/api/users/access-logout' },
+    });
+  });
+
+  describe('Access logout endpoint', () => {
+    const endpointsOf = (config: Config, slug: string) => {
+      const endpoints = collectionOf(config, slug)?.endpoints;
+      return endpoints === false ? undefined : endpoints;
+    };
+
+    const isAccessLogout = (endpoint: Omit<Endpoint, 'root'>): boolean => endpoint.path === ACCESS_LOGOUT_ENDPOINT_PATH && endpoint.method === 'post';
+
+    test('registers the logout endpoint on the target collection when configured', async () => {
+      const config = await cloudflareAccessPlugin(configured)(baseConfig);
+
+      expect(endpointsOf(config, 'users')?.filter(isAccessLogout)).toHaveLength(1);
+    });
+
+    test('does not register the logout endpoint when Access is not configured', async () => {
+      const config = await cloudflareAccessPlugin({ teamDomain: undefined, aud: undefined })(baseConfig);
+
+      expect(collectionOf(config, 'users')).not.toHaveProperty('endpoints');
+    });
+
+    test('keeps existing endpoints in front of the logout endpoint', async () => {
+      const existing = { path: '/custom', method: 'get', handler: () => new Response(null) } satisfies Omit<Endpoint, 'root'>;
+      const config = await cloudflareAccessPlugin(configured)(configWith([{ ...usersCollection, endpoints: [existing] }]));
+      const endpoints = endpointsOf(config, 'users');
+
+      expect(endpoints?.at(0)).toBe(existing);
+      expect(endpoints?.map(isAccessLogout)).toEqual([false, true]);
+    });
+
+    test('does not add the logout endpoint to other collections', async () => {
+      const config = await cloudflareAccessPlugin(configured)(configWith([mediaCollection, usersCollection]));
+
+      expect(collectionOf(config, 'media')).not.toHaveProperty('endpoints');
+    });
+
+    // 足すと、`false` で止めていた既定の REST まで Payload の sanitize が戻してしまう。
+    test('throws when the target collection disables its REST endpoints', async () => {
+      const plugin = cloudflareAccessPlugin(configured);
+
+      await expect(async () => plugin(configWith([{ ...usersCollection, endpoints: false }]))).rejects.toThrow(AccessLogoutEndpointsDisabled);
+    });
+
+    test('points the logout button at the target collection under routes.api', async () => {
+      const admins = { slug: 'admins', auth: true, fields: [] } satisfies CollectionConfig;
+      const config = await cloudflareAccessPlugin({ ...configured, collection: 'admins' })({
+        ...configWith([usersCollection, admins]),
+        routes: { api: '/cms-api' },
+      });
+
+      expect(config.admin?.components?.logout?.Button).toEqual({
+        path: ACCESS_LOGOUT_BUTTON_PATH,
+        clientProps: { accessLogoutAction: '/cms-api/admins/access-logout' },
+      });
     });
   });
 });

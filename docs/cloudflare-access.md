@@ -37,7 +37,7 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
   curl -s -o /dev/null -w '%{http_code}\n' https://<team>.cloudflareaccess.com/cdn-cgi/access/certs   # 200 になること
   ```
 
-- `admin.components.logout.Button` は env に関わらず常に登録される（importMap に載るものを env で分岐させないため）。env が揃っているときだけ遷移先が `/cdn-cgi/access/logout` になる。
+- `admin.components.logout.Button` は env に関わらず常に登録される（importMap に載るものを env で分岐させないため）。env が揃っているときだけ、ボタンが同一 origin の `POST /api/<slug>/access-logout` を送る form になり、cookie を消してから `/cdn-cgi/access/logout` へ移る（下の「注意」のログアウト）。
 
 ## 1. 事前準備: 本人の user に password を設定する（切り戻し用）
 
@@ -111,7 +111,9 @@ stg の deploy 後、次を順に確かめる。
 - [ ] 2. `/admin` に入ると自動ログインされ、ログインフォームが出ない
 - [ ] 3. admin 内の操作（一覧・保存・画像アップロード）が cookie 経路で通る（Server Action による保存も含む）。**stg では `/api*` Bypass 追加後、または prod で確認**（上の前提を参照。Bypass 無しの stg では header 経路で通るだけで、cookie 経路の確認にならない）
 - [ ] 4. 未登録 email で入ると user が自動作成される
-- [ ] 5. ログアウトで Access のログアウト画面に遷移し、再度 `/admin` に行くと Access のログインを求められる
+- [ ] 5. admin の nav のログアウトで Access のログアウト画面に遷移し（`POST /api/users/access-logout` → `303 Location: /cdn-cgi/access/logout`）、再度 `/admin` に行くと Access のログインを求められる。IdP のセッションが残っていると、ログイン画面を経ずにそのまま再ログインされることがある（IdP 側のログアウトは別）。
+  - DevTools → Network で `access-logout` の応答に `payload-token` と `__prerender_bypass` を消す `Set-Cookie` が 2 本あり、Application → Cookies からも両方が消えている（admin の Live Preview（`/next/preview` を経由して draft mode に入る）を開いてから試すと、`__prerender_bypass` がある状態から確かめられる。preview の URL を直接開くだけでは付かない）
+  - 別 origin からの POST は 403 で、`Set-Cookie` も `Location` も返らない。stg はホスト全体のアプリが `/api/*` も覆うので、`CF_Authorization` を付けないと Access のログインへのリダイレクトになり endpoint まで届かない（項目 6 と同じく JWT を DevTools からコピーする）: `curl -si -X POST -H 'Origin: https://evil.example' --cookie CF_Authorization=<JWT> https://stg.napochaan.com/api/users/access-logout`
 - [ ] 6. 別 origin からのリクエストで認証が解決されない（`user: null`）。Bypass 無しの stg では `/api/*` に Access が header を付けるので header 由来の判定、Bypass 有りの stg と prod では cookie 由来の判定を通るが、どちらも `Origin` が `payload.config.csrf` に無ければ user を解決しない。`CF_Authorization` の JWT は、Access ログイン済みブラウザの DevTools → Application → Cookies からコピーする（詳しくは下の「AUD の実測記録」）。probe には `GET /api/users/me` を使う（`POST /api/users/logout` は未認証だと 400 `No User` を返すだけで、CSRF で弾かれたのか判別できず誤解を招く）:
 
   ```bash
@@ -251,12 +253,17 @@ prod 後の確認:
 - **Worker 単位の Access（`ctx.access`）を使わない。** `[assets]` 付き Worker（OpenNext）には `ctx.access` が渡らない。また Worker 単位の Access は WebSocket upgrade を 403 にするので、`CURSOR_ROOM` が動かなくなる（[Workers: Cloudflare Access](https://developers.cloudflare.com/workers/configuration/cloudflare-access/)）。パス単位の self-hosted アプリ + アプリ内の JWT 検証にしている。
 - **Access 有効な環境（stg / prod）の `/oauth/authorize` は承認できない password フォームを表示する。** `payload.login` が Forbidden なので、何を入力しても「メールアドレスまたはパスワードが正しくありません。」になる。設定ミスではなく仕様（上の「MCP の同意画面」）。admin に入れない場合は**まず `wrangler tail --env <env>` で strategy の warn を見る**（`Cloudflare Access authentication rejected`: token / CSRF / 検証の失敗、`Cloudflare Access user resolution failed`: users の検索・作成の失敗）。
 - **Access の env が設定されているのに対象の auth collection が無いと、config の build 時に `AccessTargetCollectionNotFound` で落ちる。** 黙って無効にすると password ログインが残る（fail-open）ので、これは意図した fail-loud。対象は `collection` option → `admin.user` → 最初の auth collection の順で決まる。
-- **ログアウトは `/cdn-cgi/access/logout`。** Access のセッション cookie を消す。Payload 側のセッション（`local-jwt`）はそもそも無いので、これだけで完結する。全 Access アプリのセッションが失効する（アプリ単位のログアウトは不可）。
+- **ログアウトは `POST /api/<slug>/access-logout`（plugin が対象 collection に足す endpoint）を経て `/cdn-cgi/access/logout` へ。** `/cdn-cgi/access/logout` は Access のセッション cookie しか消さない。そのままだと次の 2 つがブラウザに残るので、endpoint が先に消してから `303` で Access のログアウトへ送る（`Cache-Control: no-store`）。
+  - `payload-token`（名前は `<cookiePrefix>-token`）: Access の user にも `/api/users/refresh-token` が発行する。`local-jwt` が登録されないので今は読まれないが、Access を外して切り戻した瞬間に生きる。Domain / SameSite / Secure は collection の `auth.cookies` に合わせる（Payload の `generateExpiredPayloadCookie`）。
+  - `__prerender_bypass`（Next の draft mode）: 残すと、ログアウト後もそのブラウザで preview ページが下書きを表示し続ける。Next が付けるのと同じ `Path=/; HttpOnly; Secure; SameSite=None` で消す。
+  - 別サイトの form POST で本人をログアウトさせないよう、cookie 経路と同じ CSRF 検査（`Origin` が `payload.config.csrf` に無い・`Sec-Fetch-Site: cross-site` なら拒否）を通らなければ 403 を返し、cookie には触れない。
+  - Access のログアウトは全 Access アプリのセッションを失効させる（アプリ単位のログアウトは不可）。IdP のセッションは残るので、次に `/admin` へ来たとき IdP がそのまま通して、ログイン画面を経ずに再ログインされることがある。
+  - 対象 collection が `endpoints: false` だと、config の build 時に `AccessLogoutEndpointsDisabled` で落ちる（endpoint を足すと Payload が既定の REST まで戻してしまうため。`AccessTargetCollectionNotFound` と同じ fail-loud）。
 - **クロスサイトのトップレベル GET は `/admin` にだけ通す（残るリスク）。** Access ログイン後の着地を通すため、header 由来の Origin 無しのトップレベル遷移は CSRF 検査で拒否しない。`/admin` より深いパスへのクロスサイト遷移は worker が `/admin` へリダイレクトする（上の「クロスサイト遷移の `/admin` への着地」）ので、別サイトのリンクで `/admin/collections/<autosave を持つ collection>/create` を踏ませて空の下書きを作らせる（Payload の Document view は GET で下書きを作る）経路は塞いである。
   - 残りとして、fetch metadata を送らない古いブラウザ（Safari 16.4 未満など）は、クロスサイトの遷移や `<img>` などの GET を `Origin` も `Sec-Fetch-*` も無しで送るので、worker のリダイレクトにも CSRF 検査にもかからずに通る（判定上は curl と区別できない）。この場合は上の空の下書きが 1 件できうる。データの漏洩・改変は無いので許容している。見覚えの無い空の下書きがあれば消してよい。POST などは `Origin` が付くので拒否される。
 - **`Cf-Access-Authenticated-User-Email` ヘッダーは信用しない。** 実装も読んでいない。Access を通らない経路では誰でも付けられる。JWT の署名・`iss`・`aud` を検証した email だけを使う。
 - `workers_dev` / `preview_urls` は全 env で false。Access を迂回する入口は無い。将来有効にするとその hostname は Access アプリの外になる。
-- セッションはリクエストごと。Payload の JWT cookie は発行されず、admin の各リクエストで Access JWT の検証と users の検索が走る。Access の `exp` は admin に伝わらないので、期限切れ警告モーダルは出ない。
+- セッションはリクエストごと。Payload の JWT cookie では認証しない（`local-jwt` が登録されないので、`/api/users/refresh-token` が発行する `payload-token` も読まれない）。admin の各リクエストで Access JWT の検証と users の検索が走る。Access の `exp` は admin に伝わらないので、期限切れ警告モーダルは出ない。
 - MCP の Access 化（`/mcp` を Access + MCP Server Portal に移す）は**別サブプロジェクト**。調査は `reports/2026-10-05-mcp-portal-access-research.md`。この runbook の範囲では、MCP は従来の OAuth と password の同意画面のままで、Access を有効にした環境では同意ができない（上の「MCP の同意画面」）。
 
 ## ローカル開発
