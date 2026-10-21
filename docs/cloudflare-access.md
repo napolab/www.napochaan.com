@@ -4,7 +4,7 @@ Cloudflare Access を通過した人を、Access が発行した JWT の email �
 
 stg / prod で `CF_ACCESS_*` が揃ったときだけ有効になる。有効な間は email + password ログインが無効になり、**Access のポリシーが唯一の認可境界**になる（users に role は無い。ポリシーを通った人は全員 admin 権限を持つ）。password の設定・変更も拒否される（下の「有効な間の password 書き込み拒否」）。
 
-MCP の OAuth 同意画面（`/oauth/authorize`）は Access 化しない。従来どおり email + password の同意画面のままなので、**Access を有効にした環境では MCP の同意ができなくなる**（password ログインが無効になるため）。`/mcp` を Access + MCP Server Portal に移す別サブプロジェクトが済むまでの制約（下の「MCP の同意画面」）。
+MCP（`/mcp`）はこの admin 用アプリとは**別の** Access アプリ（Managed OAuth）+ MCP Portal 経由で認証する。OAuth 同意画面（`/oauth/authorize`）と OAuthProvider は廃止した。設計は `docs/superpowers/specs/2026-10-22-mcp-access-portal-design.md`、手順は下の「MCP（`/mcp` アプリと MCP Portal）」。**この PR を merge してから本番 vars を deploy するまでは本番 deploy を凍結する**（同節）。
 
 全ての `wrangler` / Payload CLI コマンドは account id が必要（無いと exit 13）:
 
@@ -59,7 +59,7 @@ Zero Trust ダッシュボードで設定する。画面の操作順は Cloudfla
    | stg  | `stg.napochaan.com/admin*` |
    | prod | `napochaan.com/admin*`     |
 
-   `/oauth/authorize*` は入れない（MCP の同意画面は password のまま。Access を通しても使い道が無い）。
+   `/mcp` はこのアプリに入れない。別のパス単位アプリ（Managed OAuth ON）として作り、AUD も別にする（下の「MCP（`/mcp` アプリと MCP Portal）」）。
 
 3. **ポリシー**: Allow、include は**本人の email のみ**。
 4. **stg はホスト全体のアプリが既にある**。それを消さず、パス単位のアプリと共存させる。このとき JWT の `aud` がどちらのアプリのものになるかが request ごとに変わりうるので、AUD は 2 つとも控える（手順 3）。
@@ -130,7 +130,7 @@ stg の deploy 後、次を順に確かめる。
 
 - [ ] 7. JWT なしの `/api/users/me` が未認証になる（`user: null`）。**stg では `/api*` Bypass 追加後、または prod で確認**。Bypass 無しの stg では、`/api/users/me` は Access のログインへ redirect される（`user: null` の JSON は返らない）
 - [ ] 7a. Live Preview と下書きプレビュー（`/next/preview`）が、Access ログイン済みの編集者で表示できる（`CF_Authorization` cookie 経路を通る）。**stg では `/api*` Bypass 追加後、または prod で確認**（Bypass 無しの stg では header 経路で通るだけで、cookie 経路の確認にならない）
-- [ ] 8. `/oauth/authorize` に email + password の同意画面が出る（パス単位のアプリには入れていない。stg はホスト全体のアプリがあるので Access のログインは挟まる）。Access 有効な環境では承認できない（下の「MCP の同意画面」）
+- [ ] 8. `/mcp` の確認は下の「MCP（`/mcp` アプリと MCP Portal）」のチェックリストで行う（admin とは別アプリ・別 AUD）
 - [ ] 8a. Access 有効な間、password の書き込みが 403 で拒否される（下の「有効な間の password 書き込み拒否」）
 - [ ] 8b. 別サイトから `/admin` より深いパスへのトップレベル遷移が `/admin` へリダイレクトされる（下の「クロスサイト遷移の `/admin` への着地」）
 - [ ] 9. どの AUD が JWT に入るかを記録した（下の「AUD の実測記録」）
@@ -158,13 +158,69 @@ stg の deploy 後、次を順に確かめる。
 
   Access 越しだと `curl` は Access のログイン画面に飛ばされる。その場合は、ログイン済みブラウザの DevTools（Network）で応答ヘッダーを見る。
 
-### MCP の同意画面
+### MCP（`/mcp` アプリと MCP Portal）
 
-`/oauth/authorize` は Access 化しない。どの環境でも email + password の同意画面（PR #53 より前と同じ）で、同意は `payload.login` を通る。Access が有効な環境では local strategy が無効なので `payload.login` が Forbidden になり、何を入力しても「メールアドレスまたはパスワードが正しくありません。」になる。つまり **Access を有効にした環境では、新しい MCP クライアントの同意（コネクタの追加・再接続）ができない**。発行済みの token は、同意を経ない token の更新が通る間は使える想定（未検証）。
+```
+Claude Desktop ─▶ MCP Portal (mcp.napochaan.com)
+                   │ Access Managed OAuth（DCR。同意 = Access ログイン）
+                   ▼
+   <host>/mcp  ← Access パス単位アプリ（policy naporitan）
+                   │ Cf-Access-Jwt-Assertion を付けて origin へ
+                   ▼
+   worker /mcp ルート → pathname を /api/mcp に書き換えて forward
+                   ▼
+   src/app/api/mcp/route.ts
+     1. JWT を CF_ACCESS_TEAM_DOMAIN + CF_ACCESS_MCP_AUD で検証
+     2. email で既存 Payload user を find（作らない）
+```
 
-`/mcp` を Access + MCP Server Portal に移す別サブプロジェクト（調査は `reports/2026-10-05-mcp-portal-access-research.md`）が済むまでの制約として受け入れている。MCP の同意が必要になったら、その環境の Access を一時的に切り戻す（下の「切り戻し」）か、Access を有効にする前に同意を済ませておく。
+- 失敗時: JWT 無し・不正・user 不在は `403`、`CF_ACCESS_TEAM_DOMAIN` / `CF_ACCESS_MCP_AUD` 未設定は `500`（fail closed）。user の検索自体の失敗（D1 障害など）も `403` ではなく `500`。
+- 外部からの `/api/mcp` 直叩きは `mcp-guard` が 404 にする。`x-mcp-user-id` は廃止した。
+- **`CF_ACCESS_MCP_AUD` は MCP アプリ専用**（カンマ区切り可）。admin 用の `CF_ACCESS_AUD` と混ぜない。`CF_ACCESS_TEAM_DOMAIN` だけは admin と共用する。
+- MCP は admin の plugin が有効かどうかに関係なく動く。逆に、admin を password ログインに戻す目的で `CF_ACCESS_TEAM_DOMAIN` まで消すと `/mcp` が 500 になる（下の「切り戻し」）。
 
-- [ ] `/oauth/authorize` に email + password の同意画面が出る（Access 有効な環境では承認できないことも確かめる）
+#### Cloudflare 側の設定（stg / prod それぞれ）
+
+`cf` での書き込みは `CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72 pnpm dlx cf@latest --profile napochaan …` で、`--dry-run` → 確認 → 実行 → 再読み込みで確認。
+
+`/mcp` パス単位アプリ（stg は `stg.napochaan.com/mcp`、prod は `napochaan.com/mcp`）:
+
+- `type: self_hosted`、policy は再利用ポリシー `naporitan`（本人の email のみ allow、bypass 無し）、IdP は GitHub-naporin0624、`session_duration: 24h`、`http_only_cookie_attribute: true`、`app_launcher_visible: false`
+- Managed OAuth を ON: grant `336h` / access token `15m`
+- Dynamic Client Registration を許可し、`allowed_uris` は `https://mcp.napochaan.com/servers-callback` と dash の mcp-server oauth-callback（`https://dash.cloudflare.com/<account id>/one/access-controls/ai-controls/mcp-server/oauth-callback/*`）。localhost / loopback は許可
+- claude.ai 直結用の callback は入れない（Portal 経由のみ）
+
+MCP Portal `napochaan-mcp-portal`（`mcp.napochaan.com`）:
+
+- server id は prod が `napochaan`、stg が `napochaanstg`（アンダースコア無し）。`auth_type: oauth`（DCR）で登録し、Require user auth を ON
+- 管理者の初回 OAuth は dashboard の「Save and connect server」でしかできない（本人の操作）
+- API の PUT は `servers` 配列を**全体置換**する。追加するときは既存の server（`inbox` など）も含めて送るか、dashboard で足す
+
+#### 有効化の手順
+
+1. `/mcp` アプリを作り、AUD を控える。
+2. `wrangler.toml` の `[env.<env>.vars]` に `CF_ACCESS_MCP_AUD = "<MCP アプリの AUD>"` を足す（`CF_ACCESS_TEAM_DOMAIN` は admin の手順 3 で入っているもの）。値が確定するまで足さない。誤っていると全 MCP リクエストが 403 になる。
+3. Portal に server を登録して connect し、Claude Desktop から Portal 経由で接続する。
+4. prod は次項の凍結に従う。prod の `/mcp` アプリと vars（手順 1・2）が揃うまで本番を deploy しない。
+
+#### 本番 deploy の凍結
+
+OAuthProvider を消したコードは、本番の `/mcp` アプリと vars が揃う前に本番へ出すと本番 MCP が止まる。コードに旧経路の分岐は残していない。
+
+- **開始**: この PR（`feat/mcp-access-portal`）の merge。main への merge で stg は自動 deploy されるが、本番は手動 dispatch なので、dispatch しない限り出ない。
+- **解除**: 本番 vars（`CF_ACCESS_TEAM_DOMAIN` / `CF_ACCESS_AUD` / `CF_ACCESS_MCP_AUD`）を入れた PR を merge し、その状態で本番を deploy して、下の本番チェックが通ったとき。間に別件で本番を dispatch しない。
+
+#### チェックリスト
+
+- [ ] stg: JWT 無しの `POST https://stg.napochaan.com/mcp` が Access の `401` + `WWW-Authenticate: Bearer … resource_metadata=…` を返す
+- [ ] stg: `GET https://stg.napochaan.com/api/mcp`（外部から直叩き）が `404`。stg はホスト全体のアプリが `/api/*` も覆うので、Access 未ログインだと Access のログインへ 302 されて `mcp-guard` まで届かない。Access にログインした状態で確かめる（または prod で確かめる）
+- [ ] stg: Claude Desktop から Portal（`napochaanstg`）経由で `list_posts` / `get_post` / テスト下書きの `update_post` / `create_upload_url` → upload が通る
+- [ ] stg: origin に届く JWT の `aud` と `type` を実測した。`aud` が `CF_ACCESS_MCP_AUD` と違えば vars を直す（Portal に server を登録すると mcp 種別のアプリが別 AUD で自動作成される。どちらが届くかは未確認）。`type` が `app` でなければ verify の扱いを見直す
+- [ ] prod: `/mcp` アプリ作成・vars 反映・deploy の後、Portal の `napochaan` 経由で上と同じ操作が通る
+- [ ] prod: Claude Desktop の旧コネクタ（`napochaan.com/mcp` 直結）を外し、Portal 経由に付け直した
+- [ ] prod: 凍結を解除した
+
+安定後（別作業）に `OAUTH_KV` namespace 本体を削除する。binding はこの PR で外してあるが、切り戻し用に namespace は残している。
 
 ### 有効な間の password 書き込み拒否
 
@@ -231,14 +287,14 @@ stg の検証が済んだら、手順 3 を `[env.production.vars]` で行って
 prod 後の確認:
 
 - [ ] `https://napochaan.com/admin` で Access のログイン → 自動で admin に入る
-- [ ] `https://napochaan.com/oauth/authorize` が Access のログインを挟まずに email + password の同意画面を出す（承認はできない。「MCP の同意画面」）
+- [ ] `/mcp` は上の「MCP（`/mcp` アプリと MCP Portal）」のチェックリストで確かめる（本番 deploy の凍結を解除するのもそこ）
 - [ ] 公開ページと `/api/media/file/*` が Access なしで見える
 - [ ] stg で `/api*` Bypass アプリを採らなかった場合は、cookie 経路の確認を引き継ぐ: 手順 4 の項目 3（admin 内の操作）/ 6（別 origin の probe）/ 7（JWT なしの `/api/users/me`）/ 7a（Live Preview と `/next/preview`）
 
 ## 切り戻し
 
 1. stg.napochaan.com/api\* の Bypass アプリを追加していた場合は先に削除する（「stg で cookie 経路を試す」）。残したまま local strategy を戻すと、stg の password ログイン（`/api/users/login`）が Access なしで外から叩けるようになる。
-2. `wrangler.toml` の `[env.<env>.vars]` から `CF_ACCESS_TEAM_DOMAIN` / `CF_ACCESS_AUD` を**消して** deploy する。
+2. `wrangler.toml` の `[env.<env>.vars]` から `CF_ACCESS_AUD` を**消して** deploy する（`CF_ACCESS_TEAM_DOMAIN` は `/mcp` も使うので、MCP を生かすなら残す。plugin は `CF_ACCESS_AUD` が空なら無効になる）。
 
 - plugin が無効に戻り、strategy が外れて `disableLocalStrategy` も外れる。email + password ログインが復活する。
 - **migration は不要。** `disableLocalStrategy: { enableFields: true }` なので email / hash 列は schema に残ったまま（schema は dev と一致している）。
@@ -247,11 +303,13 @@ prod 後の確認:
 - Access 有効な間は password の書き込みが拒否されるので、有効な間に新しく password を持った user は居ない（手順 1 で事前に設定した本人の user と、有効化より前から居た user だけ）。
 - **注意（CLI 経由で作った user）**: `CF_ACCESS_*` を wrangler の env に入れた後は、その env を向けた Payload CLI（`CLOUDFLARE_ENV=staging|production pnpm payload …`、seed スクリプトなど）も plugin を有効の状態で読み込み、local strategy が無効になる。この経路で作った user も password を持たない（`password` を渡すと 403 で拒否される）。通常の運用では問題にならず、切り戻しのときだけ効く（手順 1 の password 事前設定は、Access 有効化前に済ませる）。
 
+**MCP の切り戻し**: `CF_ACCESS_*` を消しても MCP は元に戻らない（OAuthProvider はコードから消してある）。この PR のコードを revert し、`wrangler.toml` の `OAUTH_KV` binding（各 env。namespace 本体は残してある）を復活させて deploy する。旧経路に戻すなら `/mcp` の Access アプリも外す（残すと Access が先に認証を要求する）。この切り戻しは**未検証**。
+
 ## 注意
 
-- **`/api/*` を Access アプリに入れない。** `/api/media` は公開画像の配信（repo 内に約 30 箇所の参照がある）。`/api/mcp` は独自 OAuth。admin の XHR は `CF_Authorization` cookie で認証する。
+- **`/api/*` を Access アプリに入れない。** `/api/media` は公開画像の配信（repo 内に約 30 箇所の参照がある）。`/api/mcp` は外部から `mcp-guard` が 404 にし、MCP は `/mcp` の別アプリ（別 AUD）から worker が forward する。admin の XHR は `CF_Authorization` cookie で認証する。
 - **Worker 単位の Access（`ctx.access`）を使わない。** `[assets]` 付き Worker（OpenNext）には `ctx.access` が渡らない。また Worker 単位の Access は WebSocket upgrade を 403 にするので、`CURSOR_ROOM` が動かなくなる（[Workers: Cloudflare Access](https://developers.cloudflare.com/workers/configuration/cloudflare-access/)）。パス単位の self-hosted アプリ + アプリ内の JWT 検証にしている。
-- **Access 有効な環境（stg / prod）の `/oauth/authorize` は承認できない password フォームを表示する。** `payload.login` が Forbidden なので、何を入力しても「メールアドレスまたはパスワードが正しくありません。」になる。設定ミスではなく仕様（上の「MCP の同意画面」）。admin に入れない場合は**まず `wrangler tail --env <env>` で strategy の warn を見る**（`Cloudflare Access authentication rejected`: token / CSRF / 検証の失敗、`Cloudflare Access user resolution failed`: users の検索・作成の失敗）。
+- **admin に入れない場合は、まず `wrangler tail --env <env>` で strategy の warn を見る**（`Cloudflare Access authentication rejected`: token / CSRF / 検証の失敗、`Cloudflare Access user resolution failed`: users の検索・作成の失敗）。
 - **Access の env が設定されているのに対象の auth collection が無いと、config の build 時に `AccessTargetCollectionNotFound` で落ちる。** 黙って無効にすると password ログインが残る（fail-open）ので、これは意図した fail-loud。対象は `collection` option → `admin.user` → 最初の auth collection の順で決まる。
 - **ログアウトは `POST /api/<slug>/access-logout`（plugin が対象 collection に足す endpoint）を経て `/cdn-cgi/access/logout` へ。** `/cdn-cgi/access/logout` は Access のセッション cookie しか消さない。そのままだと次の 2 つがブラウザに残るので、endpoint が先に消してから `303` で Access のログアウトへ送る（`Cache-Control: no-store`）。
   - `payload-token`（名前は `<cookiePrefix>-token`）: Access の user にも `/api/users/refresh-token` が発行する。`local-jwt` が登録されないので今は読まれないが、Access を外して切り戻した瞬間に生きる。Domain / SameSite / Secure は collection の `auth.cookies` に合わせる（Payload の `generateExpiredPayloadCookie`）。
@@ -264,11 +322,11 @@ prod 後の確認:
 - **`Cf-Access-Authenticated-User-Email` ヘッダーは信用しない。** 実装も読んでいない。Access を通らない経路では誰でも付けられる。JWT の署名・`iss`・`aud` を検証した email だけを使う。
 - `workers_dev` / `preview_urls` は全 env で false。Access を迂回する入口は無い。将来有効にするとその hostname は Access アプリの外になる。
 - セッションはリクエストごと。Payload の JWT cookie では認証しない（`local-jwt` が登録されないので、`/api/users/refresh-token` が発行する `payload-token` も読まれない）。admin の各リクエストで Access JWT の検証と users の検索が走る。Access の `exp` は admin に伝わらないので、期限切れ警告モーダルは出ない。
-- MCP の Access 化（`/mcp` を Access + MCP Server Portal に移す）は**別サブプロジェクト**。調査は `reports/2026-10-05-mcp-portal-access-research.md`。この runbook の範囲では、MCP は従来の OAuth と password の同意画面のままで、Access を有効にした環境では同意ができない（上の「MCP の同意画面」）。
+- MCP は admin の plugin を通らない。`/mcp` は別アプリ・別 AUD で、`route.ts` が自分で JWT を検証し、既存 user を find するだけ（auto-create しない）。user が居なければ 403。
 
 ## ローカル開発
 
-`.dev.vars` の `CF_ACCESS_TEAM_DOMAIN=` / `CF_ACCESS_AUD=` は**空のまま**にする。plugin は無効で、従来どおり email + password ログイン（と `autoLogin.prefillOnly`）と `/oauth/authorize` の password での同意が使える。`pnpm seed:import` も password 付きの dev admin を作れる（plugin が有効だと password の書き込みが拒否されて失敗する）。
+`.dev.vars` の `CF_ACCESS_TEAM_DOMAIN=` / `CF_ACCESS_AUD=` / `CF_ACCESS_MCP_AUD=` は**空のまま**にする。plugin は無効で、従来どおり email + password ログイン（と `autoLogin.prefillOnly`）が使える。`pnpm seed:import` も password 付きの dev admin を作れる（plugin が有効だと password の書き込みが拒否されて失敗する）。`CF_ACCESS_MCP_AUD` が空だと `/api/mcp` は 500（fail closed）で、`next dev` は worker シェルを経由しないので、MCP の動作確認は stg で行う。
 
 `.dev.vars` にキーを追加・変更したら型を再生成する:
 

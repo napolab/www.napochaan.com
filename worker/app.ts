@@ -6,6 +6,7 @@ import { cacheControlHeaders } from './middleware/cache-control';
 import { pathPolicy } from './middleware/path-policy';
 import { weakenETag } from './middleware/weaken-etag';
 import { cursorRoutes } from './routes/cursors';
+import { createMCPRoutes } from './routes/mcp';
 import { mcpGuardRoutes } from './routes/mcp-guard';
 
 type HonoEnv = { Bindings: Cloudflare.Env };
@@ -13,8 +14,8 @@ type HonoEnv = { Bindings: Cloudflare.Env };
 export type MountedFetch = (request: Request, ...args: unknown[]) => Promise<Response>;
 
 // worker.ts と共有する Hono 合成。mcpGuardRoutes は mount より前に登録すること —
-// この順序が /api/mcp の外部遮断(セキュリティ境界)を成立させる。順序の回帰は
-// worker/app.test.ts が検出する。
+// この順序が /api/mcp の外部遮断(多層防御)を成立させる。/mcp の forward(createMCPRoutes)は
+// handlerFetch を直接呼ぶので guard に掛からない。順序の回帰は worker/app.test.ts が検出する。
 export const createWorkerApp = (handlerFetch: MountedFetch) => {
   const factory = createFactory<HonoEnv>();
   const app = factory.createApp();
@@ -37,6 +38,7 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
       ...imageHandlers,
     )
     .route('/', cursorRoutes)
+    .route('/', createMCPRoutes(handlerFetch))
     .route('/', mcpGuardRoutes)
     .mount('/', handlerFetch);
 

@@ -5,6 +5,11 @@
   "type": "module",
   "exports": {
     "./plugin": "./src/plugin/index.ts",
+    "./audiences": "./src/audiences/index.ts",
+    "./verify": "./src/verify/index.ts",
+    "./team-domain": "./src/team-domain/index.ts",
+    "./resolve-user": "./src/resolve-user/index.ts",
+    "./errors": "./src/errors/index.ts",
     "./client/logout-button": "./src/client/logout-button/index.tsx"
   },
   "dependencies": {

@@ -1,3 +1,4 @@
+import { parseAudiences } from '../audiences';
 import { AccessLogoutEndpointsDisabled, AccessTargetCollectionNotFound } from '../errors';
 import { ACCESS_LOGOUT_ENDPOINT_PATH, createAccessLogoutEndpoint } from '../logout-endpoint';
 import { rejectPasswordWrites } from '../password-guard';
@@ -14,12 +15,6 @@ export type CloudflareAccessPluginOptions = {
   aud: string | undefined;
   collection?: string;
 };
-
-export const parseAudiences = (raw: string | undefined): readonly string[] =>
-  (raw ?? '')
-    .split(',')
-    .map((audience) => audience.trim())
-    .filter((audience) => audience !== '');
 
 type EnabledOptions = { teamDomain: string; aud: readonly string[] };
 

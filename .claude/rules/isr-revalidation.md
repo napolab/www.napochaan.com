@@ -78,8 +78,8 @@ opt out of static prerendering:
 export const dynamic = 'force-dynamic';
 ```
 
-A genuine dynamic API works too, and is why `/oauth/authorize` was never affected: it
-awaits `searchParams`, so Next never prerenders it. Route handlers and Server Actions
+A genuine dynamic API works too: a page that awaits `searchParams` (or reads `cookies()` /
+`headers()`) is never prerendered by Next. Route handlers and Server Actions
 always run per request and are safe.
 
 Verify with the build output — the route must print `ƒ (Dynamic)`, and must be absent

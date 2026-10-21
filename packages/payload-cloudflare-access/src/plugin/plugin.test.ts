@@ -4,7 +4,7 @@ import { AccessLogoutEndpointsDisabled, InvalidAccessTeamDomain } from '../error
 import { ACCESS_LOGOUT_ENDPOINT_PATH } from '../logout-endpoint';
 import { rejectPasswordWrites } from '../password-guard';
 
-import { ACCESS_LOGOUT_BUTTON_PATH, cloudflareAccessPlugin, parseAudiences } from './index';
+import { ACCESS_LOGOUT_BUTTON_PATH, cloudflareAccessPlugin } from './index';
 
 import type { AuthStrategy, CollectionBeforeOperationHook, CollectionConfig, Config, Endpoint } from 'payload';
 
@@ -35,17 +35,6 @@ const authOf = (config: Config, slug: string) => {
   const auth = collectionOf(config, slug)?.auth;
   return typeof auth === 'object' ? auth : undefined;
 };
-
-describe('parseAudiences', () => {
-  test('parses a comma-separated aud', () => {
-    expect(parseAudiences('aud-1, aud-2,')).toEqual(['aud-1', 'aud-2']);
-  });
-
-  test('returns an empty list for undefined or blank input', () => {
-    expect(parseAudiences(undefined)).toEqual([]);
-    expect(parseAudiences(' , ')).toEqual([]);
-  });
-});
 
 describe('cloudflareAccessPlugin', () => {
   test('leaves auth untouched when Access is not configured', async () => {
