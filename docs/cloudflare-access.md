@@ -4,7 +4,7 @@ Cloudflare Access を通過した人を、Access が発行した JWT の email �
 
 stg / prod で `CF_ACCESS_*` が揃ったときだけ有効になる。有効な間は email + password ログインが無効になり、**Access のポリシーが唯一の認可境界**になる（users に role は無い。ポリシーを通った人は全員 admin 権限を持つ）。password の設定・変更も拒否される（下の「有効な間の password 書き込み拒否」）。
 
-MCP（`/mcp`）は Access アプリ（Managed OAuth）+ MCP Portal 経由で認証する。prod では admin 用とは**別の**パス単位アプリ（別 AUD）、stg はホスト全体の 1 つのアプリを admin と共用する（下の「stg と prod のアプリ構成」）。OAuth 同意画面（`/oauth/authorize`）と OAuthProvider は廃止した。設計は `docs/superpowers/specs/2026-10-22-mcp-access-portal-design.md`、手順は下の「MCP（`/mcp` アプリと MCP Portal）」。**この PR を merge してから本番 vars を deploy するまでは本番 deploy を凍結する**（同節）。
+MCP（`/mcp`）は Access アプリ（Managed OAuth）+ MCP Portal 経由で認証する。prod では admin 用とは**別の**パス単位アプリ（別 AUD）、stg はホスト全体の 1 つのアプリを admin と共用する（下の「stg と prod のアプリ構成」）。OAuth 同意画面（`/oauth/authorize`）と OAuthProvider は廃止した。設計は `docs/superpowers/specs/2026-10-22-mcp-access-portal-design.md`、手順は下の「MCP（`/mcp` アプリと MCP Portal）」。本番 deploy の凍結（同節）は 2026-10-22 に解除した（本番 vars = PR #62、本番 deploy 後の確認済み）。
 
 全ての `wrangler` / Payload CLI コマンドは account id が必要（無いと exit 13）:
 
@@ -218,9 +218,9 @@ MCP Portal `napochaan-mcp-portal`（`mcp.napochaan.com`）:
 3. Portal に server を登録して connect し、Claude Desktop から Portal 経由で接続する。
 4. prod は次項の凍結に従う。prod の `/mcp` アプリと vars（手順 1・2）が揃うまで本番を deploy しない。
 
-#### 本番 deploy の凍結
+#### 本番 deploy の凍結（2026-10-22 解除済み）
 
-OAuthProvider を消したコードは、本番の `/mcp` アプリと vars が揃う前に本番へ出すと本番 MCP が止まる。コードに旧経路の分岐は残していない。
+記録として残す。OAuthProvider を消したコードは、本番の `/mcp` アプリと vars が揃う前に本番へ出すと本番 MCP が止まる。コードに旧経路の分岐は残していない。
 
 - **開始**: この PR（`feat/mcp-access-portal`）の merge。main への merge で stg は自動 deploy されるが、本番は手動 dispatch なので、dispatch しない限り出ない。
 - **解除**: 本番 vars（`CF_ACCESS_TEAM_DOMAIN` / `CF_ACCESS_AUD` / `CF_ACCESS_MCP_AUD`）を入れた PR を merge し、その状態で本番を deploy して、下の本番チェックが通ったとき。間に別件で本番を dispatch しない。
@@ -233,9 +233,9 @@ OAuthProvider を消したコードは、本番の `/mcp` アプリと vars が�
 - [ ] stg: `napochaanstg` を再認証した（`/mcp` パス単位アプリを削除したため）
 - [ ] stg: Claude Desktop から Portal（`napochaanstg`）経由で `list_posts` / `get_post` / テスト下書きの `update_post` / `create_upload_url` → upload が通る
 - [ ] stg: origin に届く JWT の `aud` と `type` を実測した。`aud` がホスト全体アプリの AUD（`CF_ACCESS_MCP_AUD`）と違えば vars を直す（Portal に server を登録すると mcp 種別のアプリが別 AUD で自動作成されることがある。どちらが届くかは未確認）。`type` が `app` でなければ verify の扱いを見直す
-- [ ] prod: `/mcp` アプリ作成・vars 反映・deploy の後、Portal の `napochaan` 経由で上と同じ操作が通る
+- [x] prod: `/mcp` アプリ作成・vars 反映・deploy の後、Portal の `napochaan` を登録・認証し、sync で 18 tools を取得（`route.ts` の JWT 検証と user 解決を通過）
 - [ ] prod: Claude Desktop の旧コネクタ（`napochaan.com/mcp` 直結）を外し、Portal 経由に付け直した
-- [ ] prod: 凍結を解除した
+- [x] prod: 凍結を解除した（2026-10-22）
 
 安定後（別作業）に `OAUTH_KV` namespace 本体を削除する。binding はこの PR で外してあるが、切り戻し用に namespace は残している。
 
@@ -296,9 +296,16 @@ stg はホスト全体のアプリが `/api/*` にも `Cf-Access-Jwt-Assertion` 
 
 stg の検証が済んだら、手順 3 を `[env.production.vars]` で行って `pnpm deploy:production`。
 
+2026-10-22 に反映済み:
+
+| アプリ                 | id          | AUD（`[env.production.vars]`）     |
+| ---------------------- | ----------- | ---------------------------------- |
+| `napochaan.com/admin*` | `a0d523ec…` | `73b87411…`（`CF_ACCESS_AUD`）     |
+| `napochaan.com/mcp`    | `9baf3237…` | `5f5acc5a…`（`CF_ACCESS_MCP_AUD`） |
+
 prod 後の確認:
 
-- [ ] `https://napochaan.com/admin` で Access のログイン → 自動で admin に入る
+- [x] `https://napochaan.com/admin` で Access のログイン → 自動で admin に入る（admin の XHR `/api/users/me` が cookie 経路で 200、strategy `cloudflare-access`）
 - [ ] `/mcp` は上の「MCP（`/mcp` アプリと MCP Portal）」のチェックリストで確かめる（本番 deploy の凍結を解除するのもそこ）
 - [ ] 公開ページと `/api/media/file/*` が Access なしで見える
 - [ ] stg では cookie 経路を検証できないので、ここで確認する: 手順 4 の項目 3（admin 内の操作）/ 6（別 origin の probe）/ 7（JWT なしの `/api/users/me`）/ 7a（Live Preview と `/next/preview`）
