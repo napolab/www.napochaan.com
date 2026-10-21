@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { describe, expect, it } from 'vitest';
 
-import { cacheControlHeaders, MEDIA_POLICY, PRIVATE_POLICY, resolveCacheControl, TEXT_FEED_POLICY } from './cache-control';
+import { cacheControlHeaders, hasUpstreamCacheControl, isOK, isShareable, MEDIA_POLICY, PRIVATE_POLICY, resolveCacheControl, setsCookie, TEXT_FEED_POLICY } from './index';
 
 describe('resolveCacheControl', () => {
   it.each([
@@ -23,6 +23,36 @@ describe('resolveCacheControl', () => {
 
   it.each(['/', '/works', '/contact', '/admin', '/sitemap.xml', '/_next/image'])('leaves %s to the upstream policy', (path) => {
     expect(resolveCacheControl(path)).toBeUndefined();
+  });
+
+  // 生の pathname で判定する(percent-decode しない)。
+  it.each(['/%61pi/users/me', '/api%2Fmedia/file/a.jpg', '/blog/rss%2Exml'])('does not decode %s', (path) => {
+    expect(resolveCacheControl(path)).toBeUndefined();
+  });
+});
+
+describe('response predicates', () => {
+  it('isOK holds only for 200', () => {
+    expect(isOK(new Response('x'))).toBe(true);
+    expect(isOK(new Response('x', { status: 201 }))).toBe(false);
+    expect(isOK(new Response('x', { status: 404 }))).toBe(false);
+  });
+
+  it('hasUpstreamCacheControl holds when Cache-Control is set', () => {
+    expect(hasUpstreamCacheControl(new Response('x', { headers: { 'Cache-Control': 'no-store' } }))).toBe(true);
+    expect(hasUpstreamCacheControl(new Response('x'))).toBe(false);
+  });
+
+  it('setsCookie holds when Set-Cookie is set', () => {
+    expect(setsCookie(new Response('x', { headers: { 'Set-Cookie': 'a=b' } }))).toBe(true);
+    expect(setsCookie(new Response('x'))).toBe(false);
+  });
+
+  it('isShareable holds only for a bare 200', () => {
+    expect(isShareable(new Response('x'))).toBe(true);
+    expect(isShareable(new Response('x', { status: 404 }))).toBe(false);
+    expect(isShareable(new Response('x', { headers: { 'Cache-Control': 'no-store' } }))).toBe(false);
+    expect(isShareable(new Response('x', { headers: { 'Set-Cookie': 'a=b' } }))).toBe(false);
   });
 });
 

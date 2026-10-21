@@ -6,6 +6,8 @@ import { applyClientAliases, TURBOPACK_RESOLVE_ALIAS } from './src/config/client
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Workspace package exporting raw .ts/.tsx source (no build step): Next must transpile it.
+  transpilePackages: ['@napolab/payload-cloudflare-access'],
   images: {
     // 3840 is only useful for full-bleed art on a 4K display; every image here sits
     // in the ≤1180px content column, so the largest 2× candidate is 2048.
