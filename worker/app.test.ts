@@ -49,6 +49,29 @@ describe('createWorkerApp', () => {
     expect(response.headers.get('Cache-Control')).toBe('private, no-store');
   });
 
+  it('serves the MCP protected resource metadata before the mount when MCP Access is configured', async () => {
+    const handlerFetch = vi.fn(async () => new Response('next', { status: 404 }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('https://stg.napochaan.com/.well-known/oauth-protected-resource/mcp', {}, { CF_ACCESS_TEAM_DOMAIN: 'napochaan', CF_ACCESS_MCP_AUD: 'aud-1' });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=300');
+    expect(await response.json()).toEqual({ resource: 'https://stg.napochaan.com/mcp', authorization_servers: ['https://napochaan.cloudflareaccess.com'] });
+    expect(handlerFetch).not.toHaveBeenCalled();
+  });
+
+  it.each(['/.well-known/oauth-protected-resource/mcp', '/.well-known/oauth-authorization-server'])('falls through %s to the mounted handler when MCP Access is not configured', async (path) => {
+    const handlerFetch = vi.fn(async () => new Response('next', { status: 404 }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request(path, {}, { CF_ACCESS_TEAM_DOMAIN: 'napochaan' });
+
+    expect(response.status).toBe(404);
+    expect(await response.text()).toBe('next');
+    expect(handlerFetch).toHaveBeenCalledOnce();
+  });
+
   it('falls through unrelated paths to the mounted handler', async () => {
     const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
     const app = createWorkerApp(handlerFetch);
