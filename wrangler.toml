@@ -151,6 +151,11 @@ head_sampling_rate = 1
 BASE_URL = "https://napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in production (set via `wrangler secret put CURSOR_SALT --env production`).
+# Cloudflare Access (docs/cloudflare-access.md): separate path apps napochaan.com/admin* (admin)
+# and napochaan.com/mcp (MCP, Managed OAuth ON), each with its own AUD.
+CF_ACCESS_TEAM_DOMAIN = "napochaan"
+CF_ACCESS_AUD = "73b87411edfe8fc2670c4e0f271b11e7356d7e323f1a5ae67aa25c551027eabb"
+CF_ACCESS_MCP_AUD = "5f5acc5a1574fe21198b5cf57759e8d205054d1170c23cea292043cc9c941d6e"
 
 # Workers Cache: HITs are served from the edge without invoking the Worker. Every
 # CMS write purges everything (src/collections/hooks/revalidate/purge-workers-cache).
