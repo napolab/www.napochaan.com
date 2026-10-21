@@ -23,6 +23,32 @@ describe('createWorkerApp', () => {
     expect(handlerFetch).not.toHaveBeenCalled();
   });
 
+  it('forwards POST /mcp to the mounted handler as /api/mcp (the mcp route beats the guard)', async () => {
+    const captured: { request?: Request; body?: string } = {};
+    const handlerFetch = vi.fn(async (request: Request) => {
+      captured.request = request;
+      captured.body = await request.text();
+      return new Response('mcp', { status: 200 });
+    });
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('/mcp', { method: 'POST', headers: { 'Cf-Access-Jwt-Assertion': 'x' }, body: '{}' });
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe('mcp');
+    expect(handlerFetch).toHaveBeenCalledOnce();
+    expect(new URL(captured.request?.url ?? 'http://invalid').pathname).toBe('/api/mcp');
+    expect(captured.request?.headers.get('Cf-Access-Jwt-Assertion')).toBe('x');
+    expect(captured.body).toBe('{}');
+  });
+
+  it('denies Workers Cache storage for header-less 200s from /mcp', async () => {
+    const handlerFetch = vi.fn(async () => new Response('{}', { headers: { 'Content-Type': 'application/json' } }));
+    const app = createWorkerApp(handlerFetch);
+    const response = await app.request('/mcp', { method: 'POST', body: '{}' });
+    expect(response.headers.get('Cache-Control')).toBe('private, no-store');
+  });
+
   it('falls through unrelated paths to the mounted handler', async () => {
     const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
     const app = createWorkerApp(handlerFetch);

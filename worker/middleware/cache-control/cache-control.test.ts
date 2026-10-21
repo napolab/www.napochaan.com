@@ -16,12 +16,14 @@ describe('resolveCacheControl', () => {
     ['/api/users/me', PRIVATE_POLICY],
     ['/api/news', PRIVATE_POLICY],
     ['/api/mcp', PRIVATE_POLICY],
+    ['/mcp', PRIVATE_POLICY],
+    ['/mcp/x', PRIVATE_POLICY],
     ['/api/media/file/x.jpg', MEDIA_POLICY],
   ])('%s → %s', (path, expected) => {
     expect(resolveCacheControl(path)).toBe(expected);
   });
 
-  it.each(['/', '/works', '/contact', '/admin', '/sitemap.xml', '/_next/image'])('leaves %s to the upstream policy', (path) => {
+  it.each(['/', '/works', '/contact', '/admin', '/sitemap.xml', '/_next/image', '/mcpfoo'])('leaves %s to the upstream policy', (path) => {
     expect(resolveCacheControl(path)).toBeUndefined();
   });
 

@@ -3,6 +3,7 @@ import { createMiddleware } from 'hono/factory';
 import { createRunner } from '../../lib/first-match-runner';
 import { allOf, equals, not, on } from '../../lib/predicate';
 import { apiPlugin } from './plugins/api';
+import { mcpPlugin } from './plugins/mcp';
 import { mediaPlugin } from './plugins/media';
 import { textFeedPlugin } from './plugins/text-feed';
 
@@ -14,7 +15,8 @@ export { MEDIA_POLICY, PRIVATE_POLICY, TEXT_FEED_POLICY } from './policies';
 // 先頭から順に照合し、最初に match した plugin の policy を採る(first match wins)。
 // 具体的なものを先に置く: media(`/api/media/file/`)は api(`/api/`)の部分集合なので、
 // 後ろに置くと api に先に match して media が private, no-store になってしまう。
-const plugins = [mediaPlugin, apiPlugin, textFeedPlugin] as const;
+// mcp(`/mcp`)は api(`/api/`)と重ならないので順序は効かないが、同じ private 系として api の隣に置く。
+const plugins = [mediaPlugin, apiPlugin, mcpPlugin, textFeedPlugin] as const;
 
 const runPlugins = createRunner(plugins);
 

@@ -38,7 +38,6 @@
     "cf:types": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
-    "@cloudflare/workers-oauth-provider": "^0.8.1",
     "@hono/zod-validator": "^0.9.0",
     "@internationalized/date": "^3.12.2",
     "@marsidev/react-turnstile": "^1.5.3",
@@ -61,6 +60,7 @@
     "gsap": "^3.15.0",
     "hast-util-to-jsx-runtime": "^2.3.6",
     "hono": "^4.12.23",
+    "jose": "^6.2.3",
     "neverthrow": "^8.2.0",
     "next": "16.4.2",
     "payload": "3.91.0",

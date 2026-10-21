@@ -83,6 +83,37 @@ export class UnknownUploadUserError extends Error {
   override name = 'UnknownUploadUserError' as const;
 }
 
+// /api/mcp に Cloudflare Access の JWT(Cf-Access-Jwt-Assertion header)が無い、または空。
+// Access を経由せず origin に直接届いたリクエスト。src/lib/mcp/access-auth 専用。
+export class MissingAccessAssertion extends Error {
+  override name = 'MissingAccessAssertion' as const;
+
+  constructor() {
+    super('Cloudflare Access assertion header is missing');
+  }
+}
+
+// Access の JWT は正当だが、その email の Payload user が居ない。MCP からは user を作らない。
+// email はログに残さないため、メッセージにもフィールドにも持たせない(引数を取らない constructor)。
+export class MCPUserNotFound extends Error {
+  override name = 'MCPUserNotFound' as const;
+
+  constructor() {
+    super('No Payload user matches the Cloudflare Access identity');
+  }
+}
+
+// /api/mcp で、Access の JWT は正当だが user の検索(D1 / Payload の初期化)自体が reject した。
+// 認証失敗ではないので 403 に化けさせず、src/app/api/mcp/route.ts が 500 にする。
+// 生の例外は cause に残す(クエリ条件の email を含みうるので、ログには cause の class 名だけを出す)。
+export class MCPUserLookupFailed extends Error {
+  override name = 'MCPUserLookupFailed' as const;
+
+  constructor(cause: unknown) {
+    super('Looking up the Payload user for the Cloudflare Access identity failed', { cause });
+  }
+}
+
 // payload.* / codec.* が投げた例外を Result channel に折り込むラッパ。生の例外は
 // `cause` に載せる(ToolResult には決して漏らさない)。edge (toToolError) 側で
 // `cause instanceof ValidationError` ならフィールド単位の詳細メッセージを、
