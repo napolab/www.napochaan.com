@@ -237,7 +237,7 @@ MCP Portal `napochaan-mcp-portal`（`mcp.napochaan.com`）:
 - [ ] prod: Claude Desktop の旧コネクタ（`napochaan.com/mcp` 直結）を外し、Portal 経由に付け直した
 - [x] prod: 凍結を解除した（2026-10-22）
 
-安定後（別作業）に `OAUTH_KV` namespace 本体を削除する。binding はこの PR で外してあるが、切り戻し用に namespace は残している。
+`OAUTH_KV` は binding をこの PR で外し、namespace 本体（`napochaan-mcp-oauth-staging` / `napochaan-mcp-oauth-production`）も 2026-10-22 に削除した。
 
 ### 有効な間の password 書き込み拒否
 
@@ -321,7 +321,7 @@ prod 後の確認:
 - Access 有効な間は password の書き込みが拒否されるので、有効な間に新しく password を持った user は居ない（手順 1 で事前に設定した本人の user と、有効化より前から居た user だけ）。
 - **注意（CLI 経由で作った user）**: `CF_ACCESS_*` を wrangler の env に入れた後は、その env を向けた Payload CLI（`CLOUDFLARE_ENV=staging|production pnpm payload …`、seed スクリプトなど）も plugin を有効の状態で読み込み、local strategy が無効になる。この経路で作った user も password を持たない（`password` を渡すと 403 で拒否される）。通常の運用では問題にならず、切り戻しのときだけ効く（手順 1 の password 事前設定は、Access 有効化前に済ませる）。
 
-**MCP の切り戻し**: `CF_ACCESS_*` を消しても MCP は元に戻らない（OAuthProvider はコードから消してある）。この PR のコードを revert し、`wrangler.toml` の `OAUTH_KV` binding（各 env。namespace 本体は残してある）を復活させて deploy する。旧経路に戻すなら `/mcp` の Access アプリも外す（残すと Access が先に認証を要求する）。この切り戻しは**未検証**。
+**MCP の切り戻し**: `CF_ACCESS_*` を消しても MCP は元に戻らない（OAuthProvider はコードから消してある）。この PR のコードを revert し、KV namespace を作り直して（2026-10-22 に削除済み。旧 token / client 登録は失われているので、利用者は接続し直す）`wrangler.toml` の `OAUTH_KV` binding（各 env）に新しい id を入れて deploy する。旧経路に戻すなら `/mcp` の Access アプリも外す（残すと Access が先に認証を要求する）。この切り戻しは**未検証**。
 
 ## 注意
 
