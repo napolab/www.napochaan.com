@@ -1,6 +1,6 @@
 import { when } from '../../../../lib/first-match-runner';
 import { frameWith } from '../../actions';
-import { isWithinPath } from '../../predicates/path';
+import { isWithinPath } from '../../../../lib/path-predicate';
 import { byPathname } from '../../predicates/request';
 
 import type { FramePolicy, PathPolicyPlugin } from '../../types';

@@ -1,6 +1,34 @@
 import { describe, expect, it } from 'vitest';
 
-import { isDescendantOf, isExactPath, isWithinPath } from './index';
+import { hasPrefix, hasSuffix, isDescendantOf, isExactPath, isWithinPath } from './index';
+
+describe('hasPrefix', () => {
+  it('holds when the pathname starts with the prefix', () => {
+    expect(hasPrefix('/api/')('/api/users')).toBe(true);
+    expect(hasPrefix('/api/')('/api/')).toBe(true);
+  });
+
+  it('does not hold otherwise', () => {
+    expect(hasPrefix('/api/')('/api')).toBe(false);
+    expect(hasPrefix('/api/')('/x/api/')).toBe(false);
+  });
+
+  it('compares the raw pathname without decoding', () => {
+    expect(hasPrefix('/api/')('/%61pi/x')).toBe(false);
+  });
+});
+
+describe('hasSuffix', () => {
+  it('holds when the pathname ends with the suffix', () => {
+    expect(hasSuffix('.md')('/about.md')).toBe(true);
+    expect(hasSuffix('/rss.xml')('/blog/rss.xml')).toBe(true);
+  });
+
+  it('does not hold otherwise', () => {
+    expect(hasSuffix('.md')('/about.md/')).toBe(false);
+    expect(hasSuffix('/rss.xml')('/rss.xml.bak')).toBe(false);
+  });
+});
 
 describe('isExactPath', () => {
   it('holds only for the identical path', () => {
