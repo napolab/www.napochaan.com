@@ -84,11 +84,11 @@ BASE_URL = "https://stg.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
 # Cloudflare Access auto-login for the Payload admin (docs/cloudflare-access.md).
-# AUD = host-wide app (stg.napochaan.com) + path app (stg.napochaan.com/admin*).
 CF_ACCESS_TEAM_DOMAIN = "napochaan"
-CF_ACCESS_AUD = "98a71a2234abe4cb6d0b01125edc79f32e49d082cb42cdda611ad3e5ee445259,8c2707d79cc13217605d49cea42591ee9452130ebd6654c31ab6882d4baee070"
-# MCP-only AUD: the /mcp path app (stg.napochaan.com/mcp, Managed OAuth). Never mix with CF_ACCESS_AUD.
-CF_ACCESS_MCP_AUD = "7978a19e16c7220305b75a742e525b8d8520658770c470262180b4ae29c11a49"
+# stg is protected by ONE host-wide Access app (stg.napochaan.com, Managed OAuth ON, policy naporitan, no bypass),
+# so admin and /mcp share its AUD on stg. prod uses separate /admin* and /mcp path apps with distinct AUDs.
+CF_ACCESS_AUD = "98a71a2234abe4cb6d0b01125edc79f32e49d082cb42cdda611ad3e5ee445259"
+CF_ACCESS_MCP_AUD = "98a71a2234abe4cb6d0b01125edc79f32e49d082cb42cdda611ad3e5ee445259"
 
 # Workers Cache: HITs are served from the edge without invoking the Worker. Every
 # CMS write purges everything (src/collections/hooks/revalidate/purge-workers-cache).

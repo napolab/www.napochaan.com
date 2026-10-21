@@ -2,7 +2,7 @@
 
 ## 認証の仕組み
 
-MCP は Cloudflare Access の `/mcp` パス単位アプリ（Managed OAuth）と MCP Portal の後ろにある。自前の OAuth（OAuthProvider・`/oauth/authorize` の同意画面・`OAUTH_KV`）は廃止した。
+MCP は Cloudflare Access のアプリ（Managed OAuth。本番は `/mcp` のパス単位アプリ、staging は admin と共用のホスト全体アプリ）と MCP Portal の後ろにある。自前の OAuth（OAuthProvider・`/oauth/authorize` の同意画面・`OAUTH_KV`）は廃止した。
 
 - 認可は Access のポリシー `naporitan`（本人の email のみ）。`route.ts` が `Cf-Access-Jwt-Assertion` を `CF_ACCESS_TEAM_DOMAIN` + `CF_ACCESS_MCP_AUD` で検証し、email に一致する**既存の** Payload user を引く（作らない）。JWT 無し・不正・user 不在は 403、env 未設定は 500。
 - Access アプリ・Portal・vars の設定と有効化の手順は `docs/cloudflare-access.md` の「MCP（`/mcp` アプリと MCP Portal）」。
