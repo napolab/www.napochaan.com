@@ -7,6 +7,7 @@ import { pathPolicy } from './middleware/path-policy';
 import { weakenETag } from './middleware/weaken-etag';
 import { cursorRoutes } from './routes/cursors';
 import { createMCPRoutes } from './routes/mcp';
+import { createMCPOAuthMetadataRoutes } from './routes/mcp-oauth-metadata';
 import { mcpGuardRoutes } from './routes/mcp-guard';
 
 type HonoEnv = { Bindings: Cloudflare.Env };
@@ -38,6 +39,8 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
       ...imageHandlers,
     )
     .route('/', cursorRoutes)
+    // MCP Access が未設定なら next() で mount(Next の 404)に落ちる。
+    .route('/', createMCPOAuthMetadataRoutes())
     .route('/', createMCPRoutes(handlerFetch))
     .route('/', mcpGuardRoutes)
     .mount('/', handlerFetch);

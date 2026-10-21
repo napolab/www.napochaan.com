@@ -177,6 +177,7 @@ Claude Desktop ─▶ MCP Portal (mcp.napochaan.com)
 - 失敗時: JWT 無し・不正・user 不在は `403`、`CF_ACCESS_TEAM_DOMAIN` / `CF_ACCESS_MCP_AUD` 未設定は `500`（fail closed）。user の検索自体の失敗（D1 障害など）も `403` ではなく `500`。
 - 外部からの `/api/mcp` 直叩きは `mcp-guard` が 404 にする。`x-mcp-user-id` は廃止した。
 - **`CF_ACCESS_MCP_AUD` は MCP アプリ専用**（カンマ区切り可）。admin 用の `CF_ACCESS_AUD` と混ぜない。`CF_ACCESS_TEAM_DOMAIN` だけは admin と共用する。
+- **OAuth discovery は worker が返す**。`/mcp` はパス単位アプリなので、Access が返すのは `/.well-known/cloudflare-access-protected-resource/mcp` だけで、標準の `/.well-known/oauth-protected-resource/mcp`（RFC 9728）と `/.well-known/oauth-authorization-server`（RFC 8414）は origin に落ちる（ホスト単位アプリなら Access が 3 つとも返す）。Portal の DCR はこの標準 discovery を辿るので、404 だと「failed to register oauth client」になる。そこで `worker/routes/mcp-oauth-metadata` が、前者は `{ resource: "<origin>/mcp", authorization_servers: ["https://<team>.cloudflareaccess.com"] }` を、後者は team の AS metadata を書き換えずに中継して返す（`public, max-age=300`。上流の失敗は `502` + `no-store`）。`CF_ACCESS_TEAM_DOMAIN` と `CF_ACCESS_MCP_AUD` が揃っていないときは返さず、今まで通り 404。
 - MCP は admin の plugin が有効かどうかに関係なく動く。逆に、admin を password ログインに戻す目的で `CF_ACCESS_TEAM_DOMAIN` まで消すと `/mcp` が 500 になる（下の「切り戻し」）。
 
 #### Cloudflare 側の設定（stg / prod それぞれ）
