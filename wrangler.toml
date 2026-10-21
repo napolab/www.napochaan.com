@@ -90,6 +90,10 @@ head_sampling_rate = 1
 BASE_URL = "https://stg.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
+# Cloudflare Access auto-login for the Payload admin (docs/cloudflare-access.md).
+# AUD = host-wide app (stg.napochaan.com) + path app (stg.napochaan.com/admin*).
+CF_ACCESS_TEAM_DOMAIN = "napochaan"
+CF_ACCESS_AUD = "98a71a2234abe4cb6d0b01125edc79f32e49d082cb42cdda611ad3e5ee445259,8c2707d79cc13217605d49cea42591ee9452130ebd6654c31ab6882d4baee070"
 
 # Workers Cache: HITs are served from the edge without invoking the Worker. Every
 # CMS write purges everything (src/collections/hooks/revalidate/purge-workers-cache).
