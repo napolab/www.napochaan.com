@@ -34,8 +34,8 @@ import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 }
 import { NewsPinnedStrip as NewsPinnedStrip_c20510d69b5fc73b97d88be1637109f9 } from '../../../components/admin/news-pinned-strip'
 import { GalleryHomeBadgeCell as GalleryHomeBadgeCell_b3739aae5a48e01dfb5feb0c6a004e84 } from '../../../components/admin/gallery-home-badge'
 import { LogoutButton as LogoutButton_beb24510fc7e06dde615f2ef6a11d755 } from '@napolab/payload-cloudflare-access/client/logout-button'
-import { R2ClientUploadHandler as R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d } from '@payloadcms/storage-r2/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { R2ClientUploadHandler as R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d } from '@payloadcms/storage-r2/client'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -75,6 +75,6 @@ export const importMap = {
   "/components/admin/news-pinned-strip#NewsPinnedStrip": NewsPinnedStrip_c20510d69b5fc73b97d88be1637109f9,
   "/components/admin/gallery-home-badge#GalleryHomeBadgeCell": GalleryHomeBadgeCell_b3739aae5a48e01dfb5feb0c6a004e84,
   "@napolab/payload-cloudflare-access/client/logout-button#LogoutButton": LogoutButton_beb24510fc7e06dde615f2ef6a11d755,
-  "@payloadcms/storage-r2/client#R2ClientUploadHandler": R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d,
-  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@payloadcms/storage-r2/client#R2ClientUploadHandler": R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d
 }

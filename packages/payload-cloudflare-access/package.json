@@ -16,8 +16,8 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "@payloadcms/ui": "3.84.1",
-    "payload": "3.84.1",
+    "@payloadcms/ui": "3.91.0",
+    "payload": "3.91.0",
     "react": "^19.0.0",
     "react-aria-components": "^1.17.0"
   }
