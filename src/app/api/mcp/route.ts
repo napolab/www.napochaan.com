@@ -1,7 +1,7 @@
-import { createAccessKeys } from '@napolab/payload-cloudflare-access/verify';
-import { parseAudiences } from '@napolab/payload-cloudflare-access/audiences';
+import { createAccessKeys } from '@napolab/cloudflare-access-core/verify';
+import { parseAudiences } from '@napolab/cloudflare-access-core/audiences';
 import { createPayloadUserStore } from '@napolab/payload-cloudflare-access/resolve-user';
-import { normalizeTeamDomain } from '@napolab/payload-cloudflare-access/team-domain';
+import { normalizeTeamDomain } from '@napolab/cloudflare-access-core/team-domain';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { editorConfigFactory } from '@payloadcms/richtext-lexical';
 import { decodeJwt, errors as joseErrors } from 'jose';
@@ -54,7 +54,10 @@ const accessKeysFor = (teamDomain: string): JWTVerifyGetKey => {
 // 空白だけ(undefined)も、team 名にならない値(normalizeTeamDomain が throw)も「未設定」として扱う。
 const readTeamDomain = (env: MCPAccessEnv): string | undefined => Result.fromThrowable(normalizeTeamDomain, (cause) => cause)(env.CF_ACCESS_TEAM_DOMAIN).unwrapOr(undefined);
 
+// parseAudiences は string しか受けない。env 未設定(undefined)はここで「未設定」に倒す。
 const readMCPAudiences = (env: MCPAccessEnv): readonly string[] | undefined => {
+  if (env.CF_ACCESS_MCP_AUD === undefined) return undefined;
+
   const audiences = parseAudiences(env.CF_ACCESS_MCP_AUD);
   return audiences.length === 0 ? undefined : audiences;
 };

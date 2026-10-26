@@ -27,9 +27,12 @@ importers:
       '@modelcontextprotocol/server':
         specifier: ^2.0.0
         version: 2.0.0
+      '@napolab/cloudflare-access-core':
+        specifier: 0.0.0
+        version: 0.0.0
       '@napolab/payload-cloudflare-access':
-        specifier: workspace:*
-        version: link:packages/payload-cloudflare-access
+        specifier: 0.0.0
+        version: 0.0.0(@payloadcms/ui@3.91.0(@types/react@19.2.18)(monaco-editor@0.55.1)(next@16.4.2(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.77.4))(payload@3.91.0(graphql@16.14.1)(typescript@5.9.3))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@5.9.3))(payload@3.91.0(graphql@16.14.1)(typescript@5.9.3))(react@19.2.9)
       '@opennextjs/cloudflare':
         specifier: 1.20.12
         version: 1.20.12(next@16.4.2(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.77.4))(wrangler@4.151.3(@types/node@22.19.19))
@@ -169,37 +172,6 @@ importers:
       wrangler:
         specifier: ^4.151.3
         version: 4.151.3(@types/node@22.19.19)
-
-  packages/payload-cloudflare-access:
-    dependencies:
-      '@payloadcms/ui':
-        specifier: 3.91.0
-        version: 3.91.0(@types/react@19.2.18)(monaco-editor@0.55.1)(next@16.4.2(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.77.4))(payload@3.91.0(graphql@16.14.1)(typescript@5.9.3))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@5.9.3)
-      jose:
-        specifier: ^6.2.3
-        version: 6.2.3
-      neverthrow:
-        specifier: ^8.2.0
-        version: 8.2.0
-      payload:
-        specifier: 3.91.0
-        version: 3.91.0(graphql@16.14.1)(typescript@5.9.3)
-      react-aria-components:
-        specifier: ^1.17.0
-        version: 1.18.0(react-dom@19.2.9(react@19.2.9))(react@19.2.9)
-    devDependencies:
-      monaco-editor:
-        specifier: ^0.55.1
-        version: 0.55.1
-      react:
-        specifier: 19.2.9
-        version: 19.2.9
-      react-dom:
-        specifier: 19.2.9
-        version: 19.2.9(react@19.2.9)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
 
 packages:
 
@@ -2490,6 +2462,16 @@ packages:
     peerDependencies:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
+
+  '@napolab/cloudflare-access-core@0.0.0':
+    resolution: {integrity: sha512-JpbvadQWl8zpza6nHJvygdaAg6lBEuFfTe1WGeRYHxj1kuNjBxFsogJmFQFF/uvH8DjW5BUCo5BHEK7T6FSzBg==}
+
+  '@napolab/payload-cloudflare-access@0.0.0':
+    resolution: {integrity: sha512-bCdFYThOTCeMeQxOrhLpapqFkdDqB8gw/ex916i35WNbkM0vxmrktUuTSCLWkyRhx2HmEh535n4iQ/LVa96nLA==}
+    peerDependencies:
+      '@payloadcms/ui': ^3.91.0
+      payload: ^3.91.0
+      react: ^19.0.0
 
   '@next/env@15.5.19':
     resolution: {integrity: sha512-sWWluFvcv5v3Fxznmf2ZfjyoVQt/64oCnYqS90inQWGzMPK1VjvekPiz3OPHKmFT30EnHrjlbyaHLt3M0vWabw==}
@@ -8898,6 +8880,20 @@ snapshots:
       '@emnapi/runtime': 1.10.0
       '@tybys/wasm-util': 0.10.2
     optional: true
+
+  '@napolab/cloudflare-access-core@0.0.0':
+    dependencies:
+      jose: 6.2.3
+      neverthrow: 8.2.0
+
+  '@napolab/payload-cloudflare-access@0.0.0(@payloadcms/ui@3.91.0(@types/react@19.2.18)(monaco-editor@0.55.1)(next@16.4.2(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.77.4))(payload@3.91.0(graphql@16.14.1)(typescript@5.9.3))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@5.9.3))(payload@3.91.0(graphql@16.14.1)(typescript@5.9.3))(react@19.2.9)':
+    dependencies:
+      '@napolab/cloudflare-access-core': 0.0.0
+      '@payloadcms/ui': 3.91.0(@types/react@19.2.18)(monaco-editor@0.55.1)(next@16.4.2(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.77.4))(payload@3.91.0(graphql@16.14.1)(typescript@5.9.3))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@5.9.3)
+      jose: 6.2.3
+      neverthrow: 8.2.0
+      payload: 3.91.0(graphql@16.14.1)(typescript@5.9.3)
+      react: 19.2.9
 
   '@next/env@15.5.19': {}
 

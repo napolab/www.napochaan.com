@@ -1,5 +1,5 @@
-import { InvalidAccessToken, WrongAccessTokenType } from '@napolab/payload-cloudflare-access/errors';
-import { accessIssuer } from '@napolab/payload-cloudflare-access/verify';
+import { InvalidAccessToken, WrongAccessTokenType } from '@napolab/cloudflare-access-core/errors';
+import { accessIssuer } from '@napolab/cloudflare-access-core/verify';
 import { SignJWT, createLocalJWKSet, exportJWK, generateKeyPair } from 'jose';
 import type { CryptoKey, JWK, JWTPayload, JWTVerifyGetKey } from 'jose';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
@@ -9,7 +9,7 @@ import { MCPUserNotFound, MissingAccessAssertion } from '../errors';
 import { ACCESS_ASSERTION_HEADER, authenticateMCPRequest } from './index';
 
 import type { FindUserByEmail, MCPAccessConfig } from './index';
-import type { AccessUser } from '@napolab/payload-cloudflare-access/resolve-user';
+import type { AccessUser, UserStore } from '@napolab/payload-cloudflare-access/resolve-user';
 
 const TEAM = 'napochaan';
 const MCP_AUD = 'mcp-aud';
@@ -173,7 +173,7 @@ describe('authenticateMCPRequest', () => {
 
   it('fails with MCPUserNotFound when no user has the email, and never creates one', async () => {
     // route は createPayloadUserStore の store から findByEmail だけを渡す。同じ store の create が呼ばれないことを確かめる。
-    const store = { findByEmail: findReturning(undefined), create: vi.fn<(email: string) => Promise<AccessUser>>() };
+    const store = { findByEmail: findReturning(undefined), create: vi.fn<UserStore['create']>() };
     const token = await sign(keyring(), appClaims('stranger@example.com'));
 
     const result = await authenticateMCPRequest(withAssertion(token), configFor(keyring()), store.findByEmail);

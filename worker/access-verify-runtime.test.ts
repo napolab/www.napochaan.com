@@ -2,11 +2,11 @@ import { SignJWT, createLocalJWKSet, exportJWK, generateKeyPair } from 'jose';
 import type { JWK } from 'jose';
 import { describe, expect, it } from 'vitest';
 
-import { accessIssuer, verifyAccessJWT } from '../packages/payload-cloudflare-access/src/verify';
+import { accessIssuer, verifyAccessJWT } from '@napolab/cloudflare-access-core/verify';
 
-// 公開 export の無い verify を相対 import で直接叩く。jose 6 が workerd(WebCrypto)上で
-// 署名検証できることを実物で保証する。unit project(node)の verify.test.ts では
-// この層を守れない。消さないこと。
+// npm の @napolab/cloudflare-access-core(公開 dist)の verify を workerd 上で直接叩く。jose 6 が
+// workerd(WebCrypto)上で署名検証できることを実物で保証する。package 側(napolab/payload-plugins)の
+// node 上の verify.test.ts ではこの層を守れない。消さないこと。
 const TEAM = 'napolab';
 const KID = 'runtime-key';
 const TIMEOUT_MS = 10_000;

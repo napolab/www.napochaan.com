@@ -1,4 +1,4 @@
-import { accessIssuer } from '@napolab/payload-cloudflare-access/verify';
+import { accessIssuer } from '@napolab/cloudflare-access-core/verify';
 import { SignJWT } from 'jose';
 import type { JWTPayload } from 'jose';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -36,8 +36,8 @@ vi.mock('@lib/payload/client', () => ({
 vi.mock('@opennextjs/cloudflare', () => ({
   getCloudflareContext: mocks.getCloudflareContext,
 }));
-vi.mock('@napolab/payload-cloudflare-access/verify', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@napolab/payload-cloudflare-access/verify')>()),
+vi.mock('@napolab/cloudflare-access-core/verify', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@napolab/cloudflare-access-core/verify')>()),
   createAccessKeys: mocks.createAccessKeys,
 }));
 vi.mock('@payloadcms/richtext-lexical', () => ({
