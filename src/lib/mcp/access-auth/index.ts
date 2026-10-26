@@ -1,11 +1,11 @@
-import { verifyAccessJWT } from '@napolab/payload-cloudflare-access/verify';
+import { verifyAccessJWT } from '@napolab/cloudflare-access-core/verify';
 import { err, errAsync, ok, okAsync, ResultAsync } from 'neverthrow';
 
 import { MCPUserNotFound, MissingAccessAssertion } from '../errors';
 
-import type { AccessJWTError } from '@napolab/payload-cloudflare-access/errors';
+import type { AccessJWTError } from '@napolab/cloudflare-access-core/errors';
 import type { AccessUser } from '@napolab/payload-cloudflare-access/resolve-user';
-import type { AccessIdentity } from '@napolab/payload-cloudflare-access/verify';
+import type { AccessIdentity } from '@napolab/cloudflare-access-core/verify';
 import type { JWTVerifyGetKey } from 'jose';
 import type { Result } from 'neverthrow';
 

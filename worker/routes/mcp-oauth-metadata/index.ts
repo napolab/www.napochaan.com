@@ -1,6 +1,6 @@
-import { parseAudiences } from '@napolab/payload-cloudflare-access/audiences';
-import { normalizeTeamDomain } from '@napolab/payload-cloudflare-access/team-domain';
-import { accessIssuer } from '@napolab/payload-cloudflare-access/verify';
+import { parseAudiences } from '@napolab/cloudflare-access-core/audiences';
+import { normalizeTeamDomain } from '@napolab/cloudflare-access-core/team-domain';
+import { accessIssuer } from '@napolab/cloudflare-access-core/verify';
 import { createFactory } from 'hono/factory';
 import { err, ok, Result, ResultAsync } from 'neverthrow';
 
@@ -54,7 +54,8 @@ export type AuthorizationServerMetadataError = AuthorizationServerUnreachable | 
 // 空白だけ(undefined)も、team 名にならない値(normalizeTeamDomain が throw)も「未設定」として扱う。
 const readTeamDomain = (env: MCPAccessEnv): string | undefined => Result.fromThrowable(normalizeTeamDomain, (cause) => cause)(env.CF_ACCESS_TEAM_DOMAIN).unwrapOr(undefined);
 
-const hasMCPAudiences = (env: MCPAccessEnv): boolean => parseAudiences(env.CF_ACCESS_MCP_AUD).length > 0;
+// parseAudiences は string しか受けない。env 未設定(undefined)は AUD 無しとして扱う。
+const hasMCPAudiences = (env: MCPAccessEnv): boolean => env.CF_ACCESS_MCP_AUD !== undefined && parseAudiences(env.CF_ACCESS_MCP_AUD).length > 0;
 
 // /mcp の検証(src/app/api/mcp/route.ts)が成立する設定のときだけ issuer を返す。
 // それ以外は undefined = discovery を出さない(出すと動かない OAuth フローにクライアントを誘い込む)。

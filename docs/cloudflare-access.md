@@ -1,6 +1,6 @@
 # Cloudflare Access による Payload admin 自動ログイン runbook
 
-Cloudflare Access を通過した人を、Access が発行した JWT の email で Payload admin にそのままログインさせる。plugin は `packages/payload-cloudflare-access`、設計は `docs/superpowers/specs/2026-10-05-payload-cloudflare-access-design.md`、調査は `reports/2026-10-05-payload-cloudflare-access-research.md` を参照。
+Cloudflare Access を通過した人を、Access が発行した JWT の email で Payload admin にそのままログインさせる。plugin は npm の `@napolab/payload-cloudflare-access`(Payload 側: plugin / strategy / resolve-user / logout / password-guard / ログアウトボタン)と `@napolab/cloudflare-access-core`(Payload 非依存: JWT 検証 / AUD / team 名 / token 取り出し / CSRF)で、`package.json` で完全固定(`^` なし)している。ソースは別 repo [`napolab/payload-plugins`](https://github.com/napolab/payload-plugins)(2026-10-26 に `packages/payload-cloudflare-access` から切り出した)。設計は `docs/superpowers/specs/2026-10-05-payload-cloudflare-access-design.md`、調査は `reports/2026-10-05-payload-cloudflare-access-research.md` を参照。
 
 stg / prod で `CF_ACCESS_*` が揃ったときだけ有効になる。有効な間は email + password ログインが無効になり、**Access のポリシーが唯一の認可境界**になる（users に role は無い。ポリシーを通った人は全員 admin 権限を持つ）。password の設定・変更も拒否される（下の「有効な間の password 書き込み拒否」）。
 
@@ -31,7 +31,7 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
 
 ## 有効化の条件（先に読む）
 
-`src/payload.config.ts` が `cfEnv.CF_ACCESS_TEAM_DOMAIN` と `cfEnv.CF_ACCESS_AUD` を plugin に渡す。plugin は **両方が空でない**ときだけ有効になる（`packages/payload-cloudflare-access/src/plugin/index.ts`）。
+`src/payload.config.ts` が `cfEnv.CF_ACCESS_TEAM_DOMAIN` と `cfEnv.CF_ACCESS_AUD` を plugin に渡す。plugin は **両方が空でない**ときだけ有効になる（`napolab/payload-plugins` の `packages/payload-cloudflare-access/src/plugin/index.ts`）。
 
 | `CF_ACCESS_TEAM_DOMAIN` | `CF_ACCESS_AUD`                          | 結果                                          |
 | ----------------------- | ---------------------------------------- | --------------------------------------------- |
@@ -137,7 +137,7 @@ stg の deploy 後、次を順に確かめる。
 
   期待値は `{"user":null}`（`Origin` が `payload.config.csrf` に無いので、header 由来でも cookie 由来でも user を解決しない）。`wrangler tail` には `Cloudflare Access authentication rejected` の warn が `CrossSiteAccessRequest` と `source`（`header` / `cookie`）付きで出る。比較用に、`payload.config.csrf` に含まれるサイト自身の origin（stg なら `https://stg.napochaan.com`）を `Origin` に付けると `user` が返る。
 
-  `Origin` が無いときの扱いは経路で違う（`packages/payload-cloudflare-access/src/csrf/index.ts`）。
+  `Origin` が無いときの扱いは経路で違う（`napolab/payload-plugins` の `packages/cloudflare-access-core/src/csrf/index.ts`）。
   - cookie 由来（prod の `/api/*`）: `Sec-Fetch-Site` が `same-origin` / `same-site` / `none` でなければ拒否。`Origin` も `Sec-Fetch-Site` も無い curl も拒否される。
   - header 由来（stg の全パス、prod の `/admin*`）: `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest` が `document` 以外（img / iframe / fetch など）だけを拒否する。Access ログイン後の `/admin` への着地は Origin の無いクロスサイトのトップレベル GET なので、これを通すため。`/admin` より深いパスへのクロスサイト遷移は、Payload に届く前に worker が `/admin` へリダイレクトする（下の「クロスサイト遷移の `/admin` への着地」）。fetch metadata の無い curl は通る（`user` が返る）。サブリソースの拒否を見るなら `-H 'Sec-Fetch-Site: cross-site' -H 'Sec-Fetch-Dest: image'` を付けて `{"user":null}` になることを確かめる。
 
@@ -241,7 +241,7 @@ MCP Portal `napochaan-mcp-portal`（`mcp.napochaan.com`）:
 
 ### 有効な間の password 書き込み拒否
 
-`disableLocalStrategy: { enableFields: true }` で hash 列を残しているので、何もしないと Payload は REST / local API の create / update に含まれる `password` を hash して保存する。保存された password は Access の範囲では使われないが、切り戻して local strategy が戻った瞬間に生きた資格情報になる。そこで plugin は、有効な間だけ対象の auth collection に `beforeOperation` hook を先頭に足し、`operation` が `create` / `update`（ID 指定・一括とも）で `data` に `password` キーがあれば（値に関係なく）拒否する（`packages/payload-cloudflare-access/src/password-guard/index.ts`）。field hook（`beforeChange`）で消すのでは遅い（Payload の `updateDocument` は field hook より前に `data.password` を取り出す）。`forgotPassword` / `resetPassword` は `disableLocalStrategy` の間 Payload 自身が Forbidden にする。
+`disableLocalStrategy: { enableFields: true }` で hash 列を残しているので、何もしないと Payload は REST / local API の create / update に含まれる `password` を hash して保存する。保存された password は Access の範囲では使われないが、切り戻して local strategy が戻った瞬間に生きた資格情報になる。そこで plugin は、有効な間だけ対象の auth collection に `beforeOperation` hook を先頭に足し、`operation` が `create` / `update`（ID 指定・一括とも）で `data` に `password` キーがあれば（値に関係なく）拒否する（`napolab/payload-plugins` の `packages/payload-cloudflare-access/src/password-guard/index.ts`）。field hook（`beforeChange`）で消すのでは遅い（Payload の `updateDocument` は field hook より前に `data.password` を取り出す）。`forgotPassword` / `resetPassword` は `disableLocalStrategy` の間 Payload 自身が Forbidden にする。
 
 - 応答は 403、message は `Cloudflare Access 有効時はパスワードを設定できません`。
 - `CLOUDFLARE_ENV` で Access 有効な env を向けた Payload CLI / seed にも効く。`pnpm seed:import`（`dev@napochaan.com` を password 付きで作る）はその env では失敗する。content だけなら `seed:import:prod` を使う（users に触れない）。
