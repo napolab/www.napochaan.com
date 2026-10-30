@@ -40,7 +40,47 @@ const ALT_CLOSE_PAREN_MESSAGE = 'alt に半角の ")" は使えません。全�
 
 const validateUploadAlt = (alt: string): Result<string, InvalidInputError> => (isRoundTrippableAlt(alt) ? okResult(alt) : errResult(new InvalidInputError(ALT_CLOSE_PAREN_MESSAGE)));
 
-const toSummary = (doc: Blog) => ({
+// versions.drafts では required field も null のまま保存される(admin の新規作成画面が
+// 自動保存する空 draft は title/slug/excerpt/body 等がすべて null)。生成型 Blog は
+// non-null と宣言しているため、MCP の読み取り境界では実態に合わせて広げて受ける。
+type BlogDraftDoc = Omit<Blog, 'slug' | 'title' | 'thumbnail' | 'publishedAt' | 'excerpt' | 'body'> & {
+  slug: Blog['slug'] | null;
+  title: Blog['title'] | null;
+  thumbnail: Blog['thumbnail'] | null;
+  publishedAt: Blog['publishedAt'] | null;
+  excerpt: Blog['excerpt'] | null;
+  body: Blog['body'] | null;
+};
+
+type PublishableBlogFields = Pick<Blog, 'slug' | 'title' | 'thumbnail' | 'publishedAt' | 'excerpt' | 'body'>;
+
+// 公開に必要なフィールドと、未設定時に update_post で指定する引数名の対応(回復ヒント用)。
+const PUBLISH_REQUIRED_FIELDS = [
+  ['title', 'title'],
+  ['slug', 'slug'],
+  ['excerpt', 'excerpt'],
+  ['thumbnail', 'thumbnailMediaID'],
+  ['publishedAt', 'publishedAt'],
+  ['body', 'bodyMarkdown'],
+] as const satisfies readonly (readonly [keyof PublishableBlogFields, string])[];
+
+const buildMissingFieldsError = (doc: BlogDraftDoc): InvalidInputError => {
+  const missingParams = PUBLISH_REQUIRED_FIELDS.filter(([field]) => doc[field] === null).map(([, param]) => param);
+  const thumbnailNote = doc.thumbnail === null ? '(thumbnailMediaID は upload_media で作成した media の id)' : '';
+  return new InvalidInputError(
+    `公開に必要なフィールドが未設定のため公開できません(未設定: ${missingParams.join(', ')})。update_post で ${missingParams.join(' / ')} を指定してから publish_post を再実行してください${thumbnailNote}。admin UI で入力してもかまいません。`,
+  );
+};
+
+// 空 draft(BlogDraftDoc)は required field が null のまま。Payload に null を再送して
+// 不透明な ValidationError にする前に、未設定フィールドを回復ヒント付きで拒否する。
+const requirePublishableFields = (doc: BlogDraftDoc): Result<PublishableBlogFields, InvalidInputError> => {
+  const { slug, title, thumbnail, publishedAt, excerpt, body } = doc;
+  if (slug === null || title === null || thumbnail === null || publishedAt === null || excerpt === null || body === null) return errResult(buildMissingFieldsError(doc));
+  return okResult({ slug, title, thumbnail, publishedAt, excerpt, body });
+};
+
+const toSummary = (doc: BlogDraftDoc) => ({
   id: doc.id,
   slug: doc.slug,
   title: doc.title,
@@ -201,13 +241,14 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
   const { payload, user, codec, signingSecret, siteBaseUrl } = deps;
 
   // 本文パイプライン(検証 / alt 同期 / Lexical 往復 / newTab)は works と共用の shared モジュール。
-  // blog は body 必須なので buildBodyPayload / resolveNextBody には doc.body をそのまま渡す。
+  // blog の body は公開時には必須だが draft では null があり得る(BlogDraftDoc)ので、
+  // works と同じく `?? undefined` で境界を揃えてから buildBodyPayload / resolveNextBody に渡す。
   const { prepareBody, resolveNextBody, buildBodyPayload, verifyMediaExists } = createBodyPipeline({ payload, user, codec, siteBaseUrl });
 
   // depth: 0 で読む — 既定 depth だと body 内の upload node が media doc に populate
   // され、convertLexicalToMarkdown が生 URL(![alt](url))として書き出してしまう。
   // これだと再送/検証で raw ref 扱いされ、往復編集が壊れる(![media:<id>]() が欲しい)。
-  const findPost = (query: PostQuery): ResultAsync<Blog | null, PayloadOperationError> => {
+  const findPost = (query: PostQuery): ResultAsync<BlogDraftDoc | null, PayloadOperationError> => {
     switch (query.kind) {
       case 'id':
         return fromPromise(
@@ -226,7 +267,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
     }
   };
 
-  const buildGetPostPayload = (doc: Blog) => buildBodyPayload(doc.body).map((bodyPayload) => ({ ...toSummary(doc), ...bodyPayload }));
+  const buildGetPostPayload = (doc: BlogDraftDoc) => buildBodyPayload(doc.body ?? undefined).map((bodyPayload) => ({ ...toSummary(doc), ...bodyPayload }));
 
   return {
     listPosts: (input: { status?: 'draft' | 'published'; limit?: number }): Promise<ToolResult> =>
@@ -371,7 +412,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
       findPost({ kind: 'id', id: input.id })
         .andThen((current) => (current === null ? errAsync(new PostNotFoundError('記事が見つかりません。list_posts で id を確認してください。')) : okAsync(current)))
         .andThen((current) => verifyThumbnailIfProvided(verifyMediaExists, input.thumbnailMediaID).map(() => current))
-        .andThen((current) => resolveNextBody(input.bodyMarkdown, current.body))
+        .andThen((current) => resolveNextBody(input.bodyMarkdown, current.body ?? undefined))
         .andThen((nextBody) =>
           fromPromise(
             payload.update({
@@ -402,11 +443,9 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         .match(ok, toToolError),
 
     publishPost: (input: { id: number }): Promise<ToolResult> =>
-      fromPromise(
-        payload.findByID({ collection: 'blog', id: input.id, draft: true, disableErrors: true, overrideAccess: false, user, depth: 0 }),
-        (cause) => new PayloadOperationError('記事取得に失敗しました', { cause }),
-      )
+      findPost({ kind: 'id', id: input.id })
         .andThen((current) => (current === null ? errAsync(new PostNotFoundError('記事が見つかりません。list_posts で id を確認してください。')) : okAsync(current)))
+        .andThen(requirePublishableFields)
         .andThen((current) => {
           // draft-promotion: versions.drafts が有効なため update_post の変更は
           // versions テーブルに積まれる。ここで bare `_status` だけを update すると
