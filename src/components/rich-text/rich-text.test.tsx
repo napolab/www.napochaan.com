@@ -113,6 +113,15 @@ describe('RichText', () => {
     await expect.element(page.getByRole('button', { name: 'この見出しへのリンクをコピー' })).toBeInTheDocument();
   });
 
+  it('keeps an empty paragraph (blank line) as a visible line of space', async () => {
+    const { container } = await render(<RichText data={state([paragraph([text('前')]), paragraph([]), paragraph([text('後')])])} />);
+    const paragraphs = container.querySelectorAll('p');
+    expect(paragraphs).toHaveLength(3);
+    const blank = paragraphs[1];
+    expect(blank?.querySelector('br')).not.toBeNull();
+    expect(blank?.getBoundingClientRect().height).toBeGreaterThan(0);
+  });
+
   it('renders bold text with a <strong> element', async () => {
     render(
       <RichText
