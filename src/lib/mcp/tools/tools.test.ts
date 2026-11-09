@@ -26,6 +26,10 @@ const paragraphBody = (): Blog['body'] => ({ root: { type: 'root', children: [{ 
 
 const blockBody = (): Blog['body'] => ({ root: { type: 'root', children: [{ type: 'block', version: 2 }], direction: null, format: '', indent: 0, version: 1 } }) as Blog['body'];
 
+// admin の新規作成画面が自動保存する空 draft。versions.drafts では required field も
+// null のまま保存されるため、生成型(Blog)の non-null 宣言とは食い違う(本番 blog id=5 で観測)。
+const emptyDraftDoc = () => ({ id: 5, slug: null, title: null, excerpt: null, thumbnail: null, publishedAt: null, body: null, _status: 'draft' });
+
 const createDeps = () => {
   const payload = {
     // 既定は slug 未使用(requireSlugAvailable の重複チェックが通る)。個別テストは
@@ -575,6 +579,17 @@ describe('updatePost', () => {
     expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'media', id: 5, data: { alt: '新しい説明' } }));
     expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 4 }));
   });
+
+  it('writes the first body into an empty draft whose body is null', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue(emptyDraftDoc());
+    payload.update.mockResolvedValue({ id: 5, slug: null });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.updatePost({ id: 5, bodyMarkdown: '# first draft' });
+
+    expect(result.isError).toBeUndefined();
+    expect(payload.update).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', id: 5, data: expect.objectContaining({ body: expect.any(Object) }) }));
+  });
 });
 
 describe('publishPost', () => {
@@ -624,6 +639,33 @@ describe('publishPost', () => {
     expect(result.isError).toBe(true);
     expect(payload.update).not.toHaveBeenCalled();
   });
+
+  it('rejects an empty draft with a recovery hint naming every missing update_post argument', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue(emptyDraftDoc());
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.publishPost({ id: 5 });
+
+    expect(result.isError).toBe(true);
+    const text = result.content[0]?.text ?? '';
+    for (const param of ['title', 'slug', 'excerpt', 'thumbnailMediaID', 'publishedAt', 'bodyMarkdown', 'update_post']) {
+      expect(text).toContain(param);
+    }
+    expect(payload.update).not.toHaveBeenCalled();
+  });
+
+  it('names only the missing fields when a draft lacks just its body', async () => {
+    const { payload, deps } = createDeps();
+    payload.findByID.mockResolvedValue({ id: 3, slug: 'hello', title: 't', excerpt: 'e', thumbnail: 5, publishedAt: '2026-07-16', body: null });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.publishPost({ id: 3 });
+
+    expect(result.isError).toBe(true);
+    const text = result.content[0]?.text ?? '';
+    expect(text).toContain('bodyMarkdown');
+    expect(text).not.toContain('thumbnailMediaID');
+    expect(payload.update).not.toHaveBeenCalled();
+  });
 });
 
 describe('getPost', () => {
@@ -634,6 +676,18 @@ describe('getPost', () => {
     const result = await handlers.getPost({ id: 3 });
 
     expect(result.content[0]?.text).toContain('"bodyEditable": false');
+    expect(codec.toMarkdown).not.toHaveBeenCalled();
+  });
+
+  it('returns an empty, editable bodyMarkdown for an empty draft whose fields are all null', async () => {
+    const { payload, codec, deps } = createDeps();
+    payload.findByID.mockResolvedValue(emptyDraftDoc());
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.getPost({ id: 5 });
+
+    expect(result.isError).toBeUndefined();
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as Record<string, unknown>;
+    expect(parsed).toMatchObject({ id: 5, slug: null, title: null, excerpt: null, publishedAt: null, status: 'draft', bodyEditable: true, bodyMarkdown: '' });
     expect(codec.toMarkdown).not.toHaveBeenCalled();
   });
 
@@ -911,6 +965,17 @@ describe('listPosts', () => {
     await handlers.listPosts({});
 
     expect(payload.find).toHaveBeenCalledWith(expect.objectContaining({ collection: 'blog', draft: true, overrideAccess: false, user, sort: '-publishedAt' }));
+  });
+
+  // 修正ではなく現状挙動のピン留め: toSummary はフィールドを写すだけなので空 draft でも落ちない。
+  it('passes null title/slug/excerpt of an empty draft through to the summary', async () => {
+    const { payload, deps } = createDeps();
+    payload.find.mockResolvedValue({ docs: [emptyDraftDoc()] });
+    const handlers = createBlogToolHandlers(deps);
+    const result = await handlers.listPosts({});
+
+    expect(result.isError).toBeUndefined();
+    expect(JSON.parse(result.content[0]?.text ?? '[]')).toEqual([{ id: 5, slug: null, title: null, publishedAt: null, status: 'draft', excerpt: null }]);
   });
 });
 
