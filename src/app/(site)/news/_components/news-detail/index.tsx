@@ -2,7 +2,7 @@ import { NewsNav } from '../news-nav';
 
 import * as s from './styles.css';
 
-import { PageHeader } from '@components/page-header';
+import { TightPageHeader } from '@components/page-header/tight';
 import { QuoteShare } from '@components/quote-share';
 import { RichText } from '@components/rich-text';
 import { ShareBar } from '@components/share-bar';
@@ -34,7 +34,7 @@ export const NewsDetail = ({ item, prev, next }: Props) => {
   // and preview page to exactly one `<main>` / one `<h1>`.
   return (
     <>
-      <PageHeader title={item.title} breadcrumbs={crumbs} kicker={`// ${dayjs(item.date).tz('Asia/Tokyo').format('YYYY.MM.DD')} · ${item.category}`} titleTracking="tight" />
+      <TightPageHeader title={item.title} breadcrumbs={crumbs} kicker={`// ${dayjs(item.date).tz('Asia/Tokyo').format('YYYY.MM.DD')} · ${item.category}`} />
       <div className={s.body}>
         {item.body === undefined ? null : (
           <QuoteShare url={absoluteUrl(`/news/${item.slug}`)} title={item.title}>

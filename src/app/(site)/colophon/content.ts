@@ -96,6 +96,10 @@ export const colophon = {
       { name: 'Breadcrumbs', why: 'パンくず。いまどの階層にいるかを辿れるように。' },
       { name: 'FeedLink', why: 'RSS フィードへのリンク。一覧ページの PageHeader 直下に置いて、購読を促す。' },
       {
+        name: 'TightPageHeader',
+        why: 'PageHeader の専用入口。works / news / blog の詳細だけで使う和文タイトル用フォント(Zen Kaku Gothic New)をここに閉じ込めてて、このコンポーネントを import したページにしか font の CSS が届かない。だからこのカードを開いてる colophon 自身も、いま少しだけ重くなってるやつ。',
+      },
+      {
         name: 'Calendar',
         why: '読み取り専用の月めくりカレンダー。印のある日は下端にドットが灯って、accent はこれからの日。log では feed リンクの隣の popover の中身をやってる。',
       },

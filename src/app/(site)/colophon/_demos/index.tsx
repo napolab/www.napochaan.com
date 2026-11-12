@@ -15,6 +15,7 @@ import { formatBlurURL } from '@components/image/helper';
 import { Link } from '@components/link';
 import { DescriptionList, List } from '@components/list';
 import { Marquee } from '@components/marquee';
+import { TightPageHeader } from '@components/page-header/tight';
 import { Pagination } from '@components/pagination';
 import { PhrasedText } from '@components/phrased-text';
 import { QuoteShare } from '@components/quote-share';
@@ -242,6 +243,11 @@ export const demos: Record<ComponentName, ReactNode> = {
   FeedLink: (
     <NoAction>
       <FeedLink href="/news/rss.xml" label="サンプル RSS フィード" />
+    </NoAction>
+  ),
+  TightPageHeader: (
+    <NoAction>
+      <TightPageHeader title="night vol.13" breadcrumbs={breadcrumbItems} kicker="// 2024.03.15 · techno" />
     </NoAction>
   ),
   Calendar: <Calendar marks={calendarMarks} minDate="2026-06-01" maxDate="2026-07-31" label="活動カレンダー（サンプル）" />,

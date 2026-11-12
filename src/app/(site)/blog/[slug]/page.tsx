@@ -8,7 +8,7 @@ import * as s from './styles.css';
 
 import { findBlogBySlug, findBlogList } from '@lib/payload/blog';
 
-import { PageHeader } from '@components/page-header';
+import { TightPageHeader } from '@components/page-header/tight';
 import { QuoteShare } from '@components/quote-share';
 import { RichText } from '@components/rich-text';
 import { extractHeadings } from '@components/rich-text/toc';
@@ -70,7 +70,7 @@ const BlogDetailPage = async ({ params }: Props) => {
   // Renders inside the blog segment's shared `<main>` (see `blog/layout.tsx`).
   return (
     <>
-      <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} titleTracking="tight" />
+      <TightPageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} />
       {post.thumbnail === undefined ? null : <BlogHero thumbnail={post.thumbnail} title={post.title} caption={`blog / ${formattedDate}`} />}
       <div className={s.layout} data-toc-scope>
         <div className={s.tocCol}>
