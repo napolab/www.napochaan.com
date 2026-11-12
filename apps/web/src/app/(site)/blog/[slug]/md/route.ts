@@ -1,4 +1,4 @@
-import { findBlogBySlug } from '@lib/payload/blog';
+import { findBlogBySlug } from '@lib/cms/blog';
 import { markdownResponse, notFoundResponse } from '@utils/markdown/response';
 
 import { buildPostMarkdown } from '../../_lib/build-post-markdown';

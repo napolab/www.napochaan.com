@@ -30,13 +30,11 @@ export default defineConfig({
             // bundle makes Vite discover it mid-run and reload, failing in-flight
             // test imports. Stub it — these never run in browser tests.
             'next/cache': path.resolve(__dirname, 'src/__mocks__/next/cache.ts'),
-            // `@lib/payload/client` calls `getPayload({ config })` at module scope,
-            // dragging the whole payload package (+ every collection) into the
-            // browser bundle. optimizeDeps then crashes on Node-only deps (e.g.
-            // `file-type`) or keeps discovering payload deps mid-run and reloads,
-            // failing in-flight test imports. Stub it — data helpers are mocked
-            // per-test, so the real client never runs. See src/__mocks__/payload-client.ts.
-            '@lib/payload/client': path.resolve(__dirname, 'src/__mocks__/payload-client.ts'),
+            // `@lib/cms/client` reads the `CMS` Service Binding from the OpenNext
+            // Cloudflare context, which does not exist in the browser. Swap in a
+            // client over the cms Hono app with fixture services (data helpers are
+            // normally mocked per-test). See src/__mocks__/cms-client.ts.
+            '@lib/cms/client': path.resolve(__dirname, 'src/__mocks__/cms-client.ts'),
           },
         },
         // Pre-bundle every browser-test dependency up front. Otherwise Vite
@@ -75,7 +73,9 @@ export default defineConfig({
             'dayjs/plugin/timezone',
             'dayjs/plugin/customParseFormat',
             'durabcast/helpers/client',
+            'hono',
             'hono/client',
+            '@hono/zod-validator',
             'reconnecting-websocket',
             'fast-json-stable-stringify',
             'zod',

@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
@@ -10,7 +11,7 @@ import { relatedWorks } from '../../_lib/related-works';
 
 import { LivePreviewListener } from '@components/live-preview';
 import { PageHeader } from '@components/page-header';
-import { findWorkDraftById, findWorksList } from '@lib/payload/works';
+import { findWorkDraftById, findWorksList } from '@lib/cms/works';
 import { absoluteUrl } from '@utils/site-url';
 
 // Draft-only Live Preview route. Always dynamic — it must refetch the latest
@@ -35,8 +36,13 @@ const WorkPreviewPage = async ({ params }: Props) => {
   const { isEnabled } = await draftMode();
   if (!isEnabled) return notFound();
 
+  // The cms gates drafts on this secret (x-preview-secret). An unset secret
+  // could never pass the `/next/preview` handshake either, so treat it as 404.
+  const { env } = await getCloudflareContext({ async: true });
+  if (env.PREVIEW_SECRET === '') return notFound();
+
   const { id } = await params;
-  const work = await findWorkDraftById(id);
+  const work = await findWorkDraftById(id, env.PREVIEW_SECRET);
   if (work === undefined) return notFound();
 
   const works = await findWorksList();

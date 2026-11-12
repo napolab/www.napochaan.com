@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
@@ -7,7 +8,7 @@ import { FeedLink } from '@components/feed-link';
 import { GalleryArchive } from '@components/gallery-archive';
 import { LivePreviewListener } from '@components/live-preview';
 import { PageHeader } from '@components/page-header';
-import { findGalleryDraftList } from '@lib/payload/gallery';
+import { findGalleryDraftList } from '@lib/cms/gallery';
 
 // Draft-only Live Preview route. Always dynamic — it must refetch the latest
 // drafts on every request (autosave streams edits) and is never prerendered or
@@ -23,7 +24,12 @@ const GalleryPreviewPage = async () => {
   const { isEnabled } = await draftMode();
   if (!isEnabled) return notFound();
 
-  const galleryPhotos = await findGalleryDraftList();
+  // The cms gates drafts on this secret (x-preview-secret). An unset secret
+  // could never pass the `/next/preview` handshake either, so treat it as 404.
+  const { env } = await getCloudflareContext({ async: true });
+  if (env.PREVIEW_SECRET === '') return notFound();
+
+  const galleryPhotos = await findGalleryDraftList(env.PREVIEW_SECRET);
 
   return (
     <main id="main-content" className={s.main}>

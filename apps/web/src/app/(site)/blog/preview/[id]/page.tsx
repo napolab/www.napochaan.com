@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
@@ -11,7 +12,7 @@ import { LivePreviewListener } from '@components/live-preview';
 import { PageHeader } from '@components/page-header';
 import { RichText } from '@components/rich-text';
 import { extractHeadings } from '@components/rich-text/toc';
-import { findBlogDraftById, findBlogList } from '@lib/payload/blog';
+import { findBlogDraftById, findBlogList } from '@lib/cms/blog';
 import { dayjs } from '@utils/dayjs';
 
 // Draft-only Live Preview route. Always dynamic — it must refetch the latest
@@ -34,8 +35,13 @@ const BlogPreviewPage = async ({ params }: Props) => {
   const { isEnabled } = await draftMode();
   if (!isEnabled) return notFound();
 
+  // The cms gates drafts on this secret (x-preview-secret). An unset secret
+  // could never pass the `/next/preview` handshake either, so treat it as 404.
+  const { env } = await getCloudflareContext({ async: true });
+  if (env.PREVIEW_SECRET === '') return notFound();
+
   const { id } = await params;
-  const post = await findBlogDraftById(id);
+  const post = await findBlogDraftById(id, env.PREVIEW_SECRET);
   if (post === undefined) return notFound();
 
   const posts = await findBlogList();

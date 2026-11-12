@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { WorksArchive } from '../../../_components/works-archive';
 
 import { Pagination } from '@components/pagination';
-import { findWorksList } from '@lib/payload/works';
+import { findWorksList } from '@lib/cms/works';
 
 // Shared with the `/works/page/[num]` route's generateStaticParams.
 export const PAGE_SIZE = 50;

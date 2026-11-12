@@ -1,4 +1,4 @@
-import { findProfile } from '@lib/payload/profile';
+import { findProfile } from '@lib/cms/profile';
 import { markdownResponse } from '@utils/markdown/response';
 
 import { buildAboutMarkdown } from '../about/_lib/build-about-markdown';

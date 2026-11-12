@@ -1,5 +1,5 @@
 import { NewsSection } from '../../../_components/news-section';
-import { findLatestNews } from '@lib/payload/news';
+import { findLatestNews } from '@lib/cms/news';
 
 import type { NewsItem } from '../../../news/_lib/news-item';
 

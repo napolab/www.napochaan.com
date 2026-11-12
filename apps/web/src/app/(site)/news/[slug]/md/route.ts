@@ -1,4 +1,4 @@
-import { findNewsBySlug } from '@lib/payload/news';
+import { findNewsBySlug } from '@lib/cms/news';
 import { markdownResponse, notFoundResponse } from '@utils/markdown/response';
 
 import { buildNewsItemMarkdown } from '../../_lib/build-news-item-markdown';

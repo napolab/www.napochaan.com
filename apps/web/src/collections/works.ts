@@ -17,7 +17,7 @@ export const Works = {
   slug: 'works',
   labels: { singular: 'works', plural: 'works' },
   // Admin list orders by `date`, newest first. Public reads keep their own
-  // explicit date sort (see lib/payload/works).
+  // explicit date sort (see apps/cms/src/services/works).
   defaultSort: '-date',
   admin: {
     group: 'コンテンツ',

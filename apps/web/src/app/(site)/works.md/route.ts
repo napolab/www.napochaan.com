@@ -1,4 +1,4 @@
-import { findWorksList } from '@lib/payload/works';
+import { findWorksList } from '@lib/cms/works';
 import { markdownResponse } from '@utils/markdown/response';
 
 import { buildWorksIndexMarkdown } from '../works/_lib/build-works-index-markdown';

@@ -1,5 +1,5 @@
 import { WorksSection } from '../../../_components/works-section';
-import { findWorksList } from '@lib/payload/works';
+import { findWorksList } from '@lib/cms/works';
 
 export const WorksSectionLoader = async () => {
   const works = await findWorksList();

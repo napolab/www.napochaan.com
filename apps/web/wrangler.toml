@@ -44,6 +44,12 @@ bucket_name = "napochaan-cms-dev" # TODO: wrangler r2 bucket create napochaan-cm
 binding = "WORKER_SELF_REFERENCE"
 service = "napochaan-website"
 
+# CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
+[[services]]
+binding = "CMS"
+service = "napochaan-cms"
+entrypoint = "CMS"
+
 [[r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
 bucket_name = "napochaan-cache-dev" # TODO: wrangler r2 bucket create napochaan-cache-dev
@@ -120,6 +126,12 @@ remote = true
 binding = "WORKER_SELF_REFERENCE"
 service = "napochaan-website-staging"
 
+# CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
+[[env.staging.services]]
+binding = "CMS"
+service = "napochaan-cms-staging"
+entrypoint = "CMS"
+
 [[env.staging.r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"
 bucket_name = "napochaan-cache-staging" # TODO: wrangler r2 bucket create napochaan-cache-staging
@@ -184,6 +196,12 @@ remote = true
 [[env.production.services]]
 binding = "WORKER_SELF_REFERENCE"
 service = "napochaan-website-production"
+
+# CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
+[[env.production.services]]
+binding = "CMS"
+service = "napochaan-cms-production"
+entrypoint = "CMS"
 
 [[env.production.r2_buckets]]
 binding = "NEXT_INC_CACHE_R2_BUCKET"

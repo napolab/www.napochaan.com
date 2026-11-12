@@ -1,4 +1,4 @@
-import { findBlogList } from '@lib/payload/blog';
+import { findBlogList } from '@lib/cms/blog';
 import { createRssDocument } from '@utils/rss/create-rss-document';
 
 import type { ChannelData, ItemData } from '@utils/rss/types';
@@ -7,7 +7,7 @@ import type { ChannelData, ItemData } from '@utils/rss/types';
 // BASE_URL is unset (would bake in `http://localhost:3000`) and the build guard
 // returns [], so a prerendered feed leaks localhost with no items. Resolving
 // per-request reads the real host BASE_URL and published content at runtime; the
-// findBlogList() read stays cached via unstable_cache + revalidateTag('blog').
+// findBlogList() read goes to the cms over the CMS service binding.
 export const dynamic = 'force-dynamic';
 
 export const GET = async (): Promise<Response> => {

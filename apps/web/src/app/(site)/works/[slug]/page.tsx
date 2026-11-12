@@ -7,7 +7,7 @@ import { adjacentWorks } from '../_lib/adjacent-works';
 import { relatedWorks } from '../_lib/related-works';
 import * as s from './styles.css';
 
-import { findWorkBySlug, findWorksList } from '@lib/payload/works';
+import { findWorkBySlug, findWorksList } from '@lib/cms/works';
 
 import { PageHeader } from '@components/page-header';
 import { ShareBar } from '@components/share-bar';

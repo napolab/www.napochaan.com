@@ -2,8 +2,8 @@ import { LogTimeline } from '../log-timeline';
 import { buildLogTimeline } from '../../_lib/build-log-timeline';
 import { fetchExternalPosts } from '../../_lib/fetch-external-posts';
 
-import { findLogList } from '@lib/payload/logs';
-import { findWorksList } from '@lib/payload/works';
+import { findLogList } from '@lib/cms/logs';
+import { findWorksList } from '@lib/cms/works';
 import { dayjs } from '@utils/dayjs';
 
 export const LogTimelineSection = async () => {

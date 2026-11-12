@@ -1,6 +1,6 @@
 import { dayjs } from '@utils/dayjs';
-import { findLogList } from '@lib/payload/logs';
-import { findWorksList } from '@lib/payload/works';
+import { findLogList } from '@lib/cms/logs';
+import { findWorksList } from '@lib/cms/works';
 import { markdownResponse } from '@utils/markdown/response';
 
 import { buildLogMarkdown } from '../log/_lib/build-log-markdown';

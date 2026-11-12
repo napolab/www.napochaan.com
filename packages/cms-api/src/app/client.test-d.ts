@@ -11,7 +11,7 @@ it('infers public route response types', () => {
   expectTypeOf<InferResponseType<typeof client.blog.$get, 200>>().toEqualTypeOf<PostDTO[]>();
   expectTypeOf<InferResponseType<(typeof client.blog)[':slug']['$get'], 200>>().toEqualTypeOf<PostDTO>();
   expectTypeOf<InferResponseType<(typeof client.blog)[':slug']['$get'], 404>>().toEqualTypeOf<{ error: 'not_found' }>();
-  expectTypeOf<InferResponseType<typeof client.news.latest.$get, 200>>().toEqualTypeOf<NewsItemDTO[]>();
+  expectTypeOf<InferResponseType<typeof client.news.$get, 200>>().toEqualTypeOf<NewsItemDTO[]>();
   expectTypeOf<InferResponseType<(typeof client.works)[':slug']['$get'], 200>>().toEqualTypeOf<WorkRowDTO>();
   expectTypeOf<InferResponseType<typeof client.gallery.$get, 200>>().toEqualTypeOf<GalleryPhotoDTO[]>();
   expectTypeOf<InferResponseType<typeof client.profile.$get, 200>>().toEqualTypeOf<ProfileDTO>();

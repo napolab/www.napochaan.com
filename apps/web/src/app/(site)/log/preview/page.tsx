@@ -1,3 +1,4 @@
+import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 
@@ -6,8 +7,8 @@ import { buildLogTimeline } from '../_lib/build-log-timeline';
 import { fetchExternalPosts } from '../_lib/fetch-external-posts';
 
 import { LivePreviewListener } from '@components/live-preview';
-import { findLogDraftList } from '@lib/payload/logs';
-import { findWorksList } from '@lib/payload/works';
+import { findLogDraftList } from '@lib/cms/logs';
+import { findWorksList } from '@lib/cms/works';
 import { dayjs } from '@utils/dayjs';
 
 // Draft-only Live Preview route. Always dynamic — it must refetch the latest
@@ -23,9 +24,14 @@ const LogPreviewPage = async () => {
   const { isEnabled } = await draftMode();
   if (!isEnabled) return notFound();
 
+  // The cms gates drafts on this secret (x-preview-secret). An unset secret
+  // could never pass the `/next/preview` handshake either, so treat it as 404.
+  const { env } = await getCloudflareContext({ async: true });
+  if (env.PREVIEW_SECRET === '') return notFound();
+
   const works = await findWorksList();
   const posts = await fetchExternalPosts();
-  const logs = await findLogDraftList();
+  const logs = await findLogDraftList(env.PREVIEW_SECRET);
   const now = dayjs().tz('Asia/Tokyo').toISOString();
   const groups = buildLogTimeline(works, posts, now, logs);
 

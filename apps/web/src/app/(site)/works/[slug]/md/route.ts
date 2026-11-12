@@ -1,4 +1,4 @@
-import { findWorkBySlug } from '@lib/payload/works';
+import { findWorkBySlug } from '@lib/cms/works';
 import { markdownResponse, notFoundResponse } from '@utils/markdown/response';
 
 import { buildWorkMarkdown } from '../../_lib/build-work-markdown';

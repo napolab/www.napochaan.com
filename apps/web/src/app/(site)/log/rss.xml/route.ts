@@ -1,8 +1,8 @@
 import { buildLogTimeline } from '../_lib/build-log-timeline';
 import { fetchExternalPosts } from '../_lib/fetch-external-posts';
 
-import { findLogList } from '@lib/payload/logs';
-import { findWorksList } from '@lib/payload/works';
+import { findLogList } from '@lib/cms/logs';
+import { findWorksList } from '@lib/cms/works';
 import { createRssDocument } from '@utils/rss/create-rss-document';
 import { dayjs } from '@utils/dayjs';
 
@@ -13,7 +13,7 @@ import type { ChannelData, ItemData } from '@utils/rss/types';
 // BASE_URL is unset (would bake in `http://localhost:3000`) and the build guards
 // return [], so a prerendered feed leaks localhost with no items. Resolving
 // per-request reads the real host BASE_URL and rebuilds the timeline at runtime;
-// the contributing reads stay cached via unstable_cache + their revalidateTag hooks.
+// the contributing reads go to the cms over the CMS service binding.
 export const dynamic = 'force-dynamic';
 
 const linkOf = (entry: LogEntry, origin: string): string => {

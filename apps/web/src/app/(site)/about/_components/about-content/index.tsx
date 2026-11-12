@@ -8,7 +8,7 @@ import { Whoami } from '../whoami';
 import { ContactList } from '@components/contact-list';
 import { RichText } from '@components/rich-text';
 import { SectionHeading } from '@components/section-heading';
-import { findProfile } from '@lib/payload/profile';
+import { findProfile } from '@lib/cms/profile';
 
 import * as s from '../../styles.css';
 

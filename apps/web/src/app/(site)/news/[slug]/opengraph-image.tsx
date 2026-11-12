@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { isExternalNews } from '../_lib/is-external-news';
 
-import { findNewsBySlug } from '@lib/payload/news';
+import { findNewsBySlug } from '@lib/cms/news';
 
 import { dayjs } from '@utils/dayjs';
 import { loadOgAssets } from '@utils/og/load-og-assets';

@@ -2,8 +2,8 @@ import { LogSection } from '../../../_components/log-section';
 import { selectHomeLogTeaser } from '../../../_lib/select-home-log-teaser';
 import { buildLogTimeline } from '../../../log/_lib/build-log-timeline';
 import { fetchExternalPosts } from '../../../log/_lib/fetch-external-posts';
-import { findLogList } from '@lib/payload/logs';
-import { findWorksList } from '@lib/payload/works';
+import { findLogList } from '@lib/cms/logs';
+import { findWorksList } from '@lib/cms/works';
 import { dayjs } from '@utils/dayjs';
 
 // Number of log entries shown in the home teaser (upcoming-first, then recent).

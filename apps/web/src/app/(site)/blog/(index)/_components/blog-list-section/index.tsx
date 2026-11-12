@@ -4,7 +4,7 @@ import { PostList } from '../../../_components/post-list';
 
 import { Pagination } from '@components/pagination';
 import { dayjs } from '@utils/dayjs';
-import { findBlogList } from '@lib/payload/blog';
+import { findBlogList } from '@lib/cms/blog';
 
 // Shared with the `/blog/page/[num]` route's generateStaticParams.
 export const PAGE_SIZE = 10;

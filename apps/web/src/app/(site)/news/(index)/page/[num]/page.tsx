@@ -5,7 +5,7 @@ import { NewsListSection, PAGE_SIZE } from '../../_components/news-list-section'
 import { parsePageParam } from '../../../../_lib/parse-page-param';
 
 import { DecodingSkeleton } from '@components/decoding-skeleton';
-import { findNewsList } from '@lib/payload/news';
+import { findNewsList } from '@lib/cms/news';
 import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';

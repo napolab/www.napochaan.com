@@ -1,4 +1,4 @@
-import { findWorksList } from '@lib/payload/works';
+import { findWorksList } from '@lib/cms/works';
 import { createRssDocument } from '@utils/rss/create-rss-document';
 
 import type { WorkRow } from '../_lib/work-row';
@@ -8,7 +8,7 @@ import type { ChannelData, ItemData } from '@utils/rss/types';
 // BASE_URL is unset (would bake in `http://localhost:3000`) and the build guard
 // returns [], so a prerendered feed leaks localhost with no items. Resolving
 // per-request reads the real host BASE_URL and published content at runtime; the
-// findWorksList() read stays cached via unstable_cache + revalidateTag('works').
+// findWorksList() read goes to the cms over the CMS service binding.
 export const dynamic = 'force-dynamic';
 
 // Use the real date when available; fall back to Jan 1 of the year for year-only works.

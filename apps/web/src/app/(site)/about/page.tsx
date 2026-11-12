@@ -4,7 +4,7 @@ import { AboutContent } from './_components/about-content';
 
 import { DecodingSkeleton } from '@components/decoding-skeleton';
 import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
-import { findProfile } from '@lib/payload/profile';
+import { findProfile } from '@lib/cms/profile';
 
 import type { Metadata } from 'next';
 

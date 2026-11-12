@@ -1,5 +1,5 @@
 import { GalleryArchive } from '@components/gallery-archive';
-import { findGalleryList } from '@lib/payload/gallery';
+import { findGalleryList } from '@lib/cms/gallery';
 
 const GalleryArchiveLoader = async () => {
   const galleryPhotos = await findGalleryList();

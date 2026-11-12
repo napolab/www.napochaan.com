@@ -4,7 +4,7 @@ import { NewsArchive } from '../../../_components/news-archive';
 import { groupNewsByYearMonth } from '../../../_lib/group-by-year-month';
 
 import { Pagination } from '@components/pagination';
-import { findNewsList } from '@lib/payload/news';
+import { findNewsList } from '@lib/cms/news';
 
 // Shared with the `/news/page/[num]` route's generateStaticParams.
 export const PAGE_SIZE = 10;

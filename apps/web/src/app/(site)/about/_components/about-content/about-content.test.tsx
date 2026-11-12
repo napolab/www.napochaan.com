@@ -19,7 +19,7 @@ const fixture = {
   contacts: [{ label: 'Twitter(X)', handle: '@naporin24690', href: 'https://x.com/naporin24690' }],
 } satisfies Profile;
 
-vi.mock('@lib/payload/profile', () => ({
+vi.mock('@lib/cms/profile', () => ({
   findProfile: vi.fn(async () => fixture),
 }));
 

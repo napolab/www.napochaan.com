@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-import { findWorkBySlug } from '@lib/payload/works';
+import { findWorkBySlug } from '@lib/cms/works';
 
 import { loadOgAssets } from '@utils/og/load-og-assets';
 import { loadOgImage } from '@utils/og/load-og-image';

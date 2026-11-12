@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og';
 
-import { findBlogBySlug } from '@lib/payload/blog';
+import { findBlogBySlug } from '@lib/cms/blog';
 
 import { dayjs } from '@utils/dayjs';
 import { loadOgAssets } from '@utils/og/load-og-assets';

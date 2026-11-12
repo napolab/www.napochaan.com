@@ -5,7 +5,7 @@ import { WorksListSection, PAGE_SIZE } from '../../_components/works-list-sectio
 import { parsePageParam } from '../../../../_lib/parse-page-param';
 
 import { DecodingSkeleton } from '@components/decoding-skeleton';
-import { findWorksList } from '@lib/payload/works';
+import { findWorksList } from '@lib/cms/works';
 import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';

@@ -5,7 +5,7 @@ import { BlogListSection, PAGE_SIZE } from '../../_components/blog-list-section'
 import { parsePageParam } from '../../../../_lib/parse-page-param';
 
 import { DecodingSkeleton } from '@components/decoding-skeleton';
-import { findBlogList } from '@lib/payload/blog';
+import { findBlogList } from '@lib/cms/blog';
 import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';

@@ -61,25 +61,36 @@ describe('public routes', () => {
     expect(await found.json()).toEqual(await services.blog.bySlug('a'));
   });
 
-  it('GET /news/latest passes a validated limit', async () => {
+  it('GET /news?limit=3 calls latest(3)', async () => {
     const services = fakeServices();
-    const app = createApp(services);
-    const res = await app.request('/news/latest?limit=3');
+    const res = await createApp(services).request('/news?limit=3');
     expect(res.status).toBe(200);
     expect(services.news.latest).toHaveBeenCalledWith(3);
+    expect(services.news.list).not.toHaveBeenCalled();
   });
 
-  it.each(['0', '51', 'x', '1.5', ''])('GET /news/latest?limit=%s is 400', async (limit) => {
+  it('GET /news without limit calls list()', async () => {
     const services = fakeServices();
-    const res = await createApp(services).request(`/news/latest?limit=${limit}`);
-    expect(res.status).toBe(400);
+    const res = await createApp(services).request('/news');
+    expect(res.status).toBe(200);
+    expect(services.news.list).toHaveBeenCalled();
     expect(services.news.latest).not.toHaveBeenCalled();
   });
 
-  it('GET /news/latest is not shadowed by /news/:slug', async () => {
+  it.each(['0', '51', 'x', '1.5', ''])('GET /news?limit=%s is 400', async (limit) => {
     const services = fakeServices();
-    await createApp(services).request('/news/latest?limit=2');
-    expect(services.news.bySlug).not.toHaveBeenCalled();
+    const res = await createApp(services).request(`/news?limit=${limit}`);
+    expect(res.status).toBe(400);
+    expect(services.news.latest).not.toHaveBeenCalled();
+    expect(services.news.list).not.toHaveBeenCalled();
+  });
+
+  it('GET /news/latest is an ordinary slug lookup', async () => {
+    const services = fakeServices();
+    const res = await createApp(services).request('/news/latest');
+    expect(res.status).toBe(404);
+    expect(services.news.bySlug).toHaveBeenCalledWith('latest');
+    expect(services.news.latest).not.toHaveBeenCalled();
   });
 
   it('GET /news and /news/:slug', async () => {

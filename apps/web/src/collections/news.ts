@@ -20,7 +20,7 @@ export const News = {
   labels: { singular: 'news', plural: 'news' },
   // Default to newest-first so the admin list mirrors the public order (pinned
   // items still float to the top of the public feed via the explicit
-  // `['-pinned', '-publishedAt']` sort in lib/payload/news).
+  // `['-pinned', '-publishedAt']` sort in apps/cms/src/services/news).
   defaultSort: '-publishedAt',
   admin: {
     group: 'コンテンツ',
@@ -64,7 +64,7 @@ export const News = {
     {
       // Pinned items float to the top of the public feed (home teaser + /news),
       // ahead of the default newest-first date order. Among pinned items, newest
-      // date wins. See the `['-pinned', '-publishedAt']` sort in lib/payload/news.
+      // date wins. See the `['-pinned', '-publishedAt']` sort in apps/cms/src/services/news.
       name: 'pinned',
       label: 'ピン留め',
       type: 'checkbox',

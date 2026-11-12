@@ -2,8 +2,8 @@ import { collectLogDates } from '../../_lib/collect-log-dates';
 import { fetchExternalPosts } from '../../_lib/fetch-external-posts';
 import { LogCalendar } from '../log-calendar';
 
-import { findLogList } from '@lib/payload/logs';
-import { findWorksList } from '@lib/payload/works';
+import { findLogList } from '@lib/cms/logs';
+import { findWorksList } from '@lib/cms/works';
 import { dayjs } from '@utils/dayjs';
 
 import type { LogDateMark } from '../../_lib/collect-log-dates';
@@ -18,7 +18,7 @@ const toCalendarMark = (mark: LogDateMark): CalendarMark => ({
 
 const toCalendarMarks = (marks: readonly LogDateMark[]): CalendarMark[] => marks.map(toCalendarMark);
 
-// タイムラインと同じ 3 ソース（unstable_cache 済みなので page 側と実体は共有）を
+// タイムラインと同じ 3 ソース（cms の作品・ログと外部投稿）を
 // 集計してカレンダーに渡す。ISR(3600s) にそのまま乗る。
 export const LogCalendarSection = async () => {
   try {

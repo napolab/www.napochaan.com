@@ -1,5 +1,5 @@
 import { BlogIndex } from '../../../_components/blog-index';
-import { findBlogList } from '@lib/payload/blog';
+import { findBlogList } from '@lib/cms/blog';
 
 export const BlogIndexLoader = async () => {
   const blogPosts = await findBlogList();

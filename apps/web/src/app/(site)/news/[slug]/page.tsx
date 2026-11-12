@@ -4,7 +4,7 @@ import { NewsDetail } from '../_components/news-detail';
 import { adjacentNews } from '../_lib/adjacent-news';
 import { isExternalNews } from '../_lib/is-external-news';
 
-import { findNewsBySlug, findNewsList } from '@lib/payload/news';
+import { findNewsBySlug, findNewsList } from '@lib/cms/news';
 
 import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 

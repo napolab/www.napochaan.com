@@ -1,4 +1,4 @@
-import { findGalleryList } from '@lib/payload/gallery';
+import { findGalleryList } from '@lib/cms/gallery';
 import { createRssDocument } from '@utils/rss/create-rss-document';
 
 import type { GalleryPhoto } from '@components/gallery-archive';
@@ -8,7 +8,7 @@ import type { ChannelData, ItemData } from '@utils/rss/types';
 // BASE_URL is unset (would bake in `http://localhost:3000`) and the build guard
 // returns [], so a prerendered feed leaks localhost with no items. Resolving
 // per-request reads the real host BASE_URL and published content at runtime; the
-// findGalleryList() read stays cached via unstable_cache + revalidateTag('gallery').
+// findGalleryList() read goes to the cms over the CMS service binding.
 export const dynamic = 'force-dynamic';
 
 const absolutize = (src: string, origin: string): string => (src.startsWith('http') ? src : `${origin}${src}`);

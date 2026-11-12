@@ -6,7 +6,7 @@ import { Toc } from './_components/toc';
 import { adjacentPosts } from '../_lib/adjacent-posts';
 import * as s from './styles.css';
 
-import { findBlogBySlug, findBlogList } from '@lib/payload/blog';
+import { findBlogBySlug, findBlogList } from '@lib/cms/blog';
 
 import { PageHeader } from '@components/page-header';
 import { QuoteShare } from '@components/quote-share';
