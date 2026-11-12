@@ -1,4 +1,4 @@
-import { formatYouTubeEmbedMarkdown } from '../../../blocks/youtube-embed/markdown-format';
+import { formatYouTubeEmbedMarkdown } from '../../youtube-embed/markdown-format';
 import { fenceForCode } from '../../code-fence';
 
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
@@ -195,7 +195,7 @@ const renderImageRow = (fields: Record<string, unknown>, opts: LexicalToMarkdown
   return rendered.length === 0 ? undefined : rendered.join('\n');
 };
 
-// The premade `Code` block (src/blocks/code) stores the raw source in `code`
+// The premade `Code` block (apps/cms/src/blocks/code) stores the raw source in `code`
 // and the fence language key in `language` — emit a standard ```lang fence.
 // fenceForCode widens the fence when the code itself contains fence lines,
 // so the emitted markdown never terminates early.
@@ -207,7 +207,7 @@ const renderCodeBlock = (fields: Record<string, unknown>): string => {
   return `${fence}${lang}\n${code}\n${fence}`;
 };
 
-// The `youtube-embed` block (src/blocks/youtube-embed) stores a YouTube URL and
+// The `youtube-embed` block (apps/cms/src/blocks/youtube-embed) stores a YouTube URL and
 // an optional caption — emit the same standalone link line the MCP write path
 // accepts so round-trip through llms.txt is lossless. The emission format has a
 // single source of truth (formatYouTubeEmbedMarkdown) shared with jsx.export.

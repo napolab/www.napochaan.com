@@ -63,7 +63,7 @@ const cellFigure = (image: PopulatedImage, caption: unknown, key: number): React
 
 /**
  * Renders the `image-row` lexical block: exactly two cover images side by side
- * (`src/blocks/image-row` enforces minRows/maxRows = 2). Cells whose image is not
+ * (`apps/cms/src/blocks/image-row` enforces minRows/maxRows = 2). Cells whose image is not
  * a populated media object (numeric id / missing) are skipped. On a narrow
  * container the row scrolls horizontally; once wide enough the two cells share the
  * row evenly (see styles).

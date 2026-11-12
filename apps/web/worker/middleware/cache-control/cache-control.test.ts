@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { PAGE_CACHE_POLICIES } from '../../../src/utils/cache-control';
 import { cacheControlHeaders, hasUpstreamCacheControl, isOK, isPageCacheable, isShareable, resolveCacheControl, setsCookie } from './index';
-import { MEDIA_POLICY, PRIVATE_POLICY } from './policies';
+import { MEDIA_POLICY } from './policies';
 
 import type { CMSHealthVariables } from '../../lib/cms-health';
 
@@ -13,8 +13,6 @@ const NEXT_DYNAMIC_POLICY = 'private, no-cache, no-store, max-age=0, must-revali
 describe('resolveCacheControl', () => {
   it.each([
     ['/api/media/file/a.jpg', { kind: 'fill', policy: MEDIA_POLICY }],
-    ['/api/users/me', { kind: 'fill', policy: PRIVATE_POLICY }],
-    ['/api/cursors', { kind: 'fill', policy: PRIVATE_POLICY }],
     ['/_next/image', { kind: 'keep' }],
     ['/_next/static/chunks/a.js', { kind: 'keep' }],
     ['/blog/preview/1', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
@@ -24,8 +22,6 @@ describe('resolveCacheControl', () => {
     ['/log/preview', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/next/preview', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/next/exit-preview', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
-    ['/admin', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
-    ['/admin/collections/blog', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/', { kind: 'page', policy: PAGE_CACHE_POLICIES.timeSensitive }],
     ['/log', { kind: 'page', policy: PAGE_CACHE_POLICIES.timeSensitive }],
     ['/log.md', { kind: 'page', policy: PAGE_CACHE_POLICIES.timeSensitive }],
@@ -48,16 +44,14 @@ describe('resolveCacheControl', () => {
 
   // media は Workers Cache のキーと同じ生の pathname で判定する(decode しない)。
   it('matches media on the raw pathname only', () => {
-    expect(resolveCacheControl('/api/media/%66ile/a.jpg')).toEqual({ kind: 'fill', policy: PRIVATE_POLICY });
+    expect(resolveCacheControl('/api/media/%66ile/a.jpg')).toEqual({ kind: 'page', policy: PAGE_CACHE_POLICIES.cms });
   });
 
-  // Next は percent-encoded path を同じ route に解決する。private / no-store / time-sensitive の判定は
+  // Next は percent-encoded path を同じ route に解決する。no-store / time-sensitive の判定は
   // decode 後でも当たるようにして、encode で public な cms policy にすり抜けさせない。
   it.each([
-    ['/%61pi/users/me', { kind: 'fill', policy: PRIVATE_POLICY }],
-    ['/api%2Fmedia/file/a.jpg', { kind: 'fill', policy: PRIVATE_POLICY }],
     ['/blog/%70review/1', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
-    ['/%61dmin', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
+    ['/%6Eext/preview', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/%6Cog', { kind: 'page', policy: PAGE_CACHE_POLICIES.timeSensitive }],
   ])('classifies encoded %s by its decoded route', (path, expected) => {
     expect(resolveCacheControl(path)).toEqual(expected);

@@ -29,17 +29,6 @@ binding = "ASSETS"
 [images]
 binding = "IMAGES"
 
-# ===== Payload CMS =====
-
-[[d1_databases]]
-binding = "D1"
-database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cms-dev
-database_name = "napochaan-cms-dev"
-
-[[r2_buckets]]
-binding = "R2"
-bucket_name = "napochaan-cms-dev" # TODO: wrangler r2 bucket create napochaan-cms-dev
-
 # ===== Services =====
 
 # CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
@@ -81,11 +70,7 @@ BASE_URL = "https://stg.napochaan.com"
 CMS_ORIGIN = "https://cms-stg.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
-# Cloudflare Access auto-login for the Payload admin (docs/cloudflare-access.md).
-CF_ACCESS_TEAM_DOMAIN = "napochaan"
-# stg is protected by ONE host-wide Access app (stg.napochaan.com, Managed OAuth ON, policy naporitan, no bypass).
-# MCP moved to apps/cms (cms-stg.napochaan.com), so only the admin AUD remains here (until Task 11).
-CF_ACCESS_AUD = "98a71a2234abe4cb6d0b01125edc79f32e49d082cb42cdda611ad3e5ee445259"
+# PREVIEW_SECRET is a wrangler secret too and must equal the cms Worker's (Live Preview handshake, /next/preview).
 
 # Workers Cache: HITs are served from the edge without invoking the Worker. Every
 # CMS publish purges everything (cms → WEB.purge(), worker/entrypoint).
@@ -98,20 +83,6 @@ custom_domain = true
 
 [env.staging.images]
 binding = "IMAGES"
-
-[[env.staging.d1_databases]]
-binding = "D1"
-database_id = "7ff5a88d-f403-48eb-a640-21b53040dcfa"
-database_name = "napochaan-cms-staging"
-remote = true
-
-[[env.staging.r2_buckets]]
-binding = "R2"
-bucket_name = "napochaan-cms-staging"
-# `remote = true` mirrors the D1 binding: Payload CLI seed/export (getPlatformProxy
-# with experimental.remoteBindings) must hit the REAL staging bucket, not local
-# miniflare — otherwise media uploads land locally and the deployed worker 404s them.
-remote = true
 
 # CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
 [[env.staging.services]]
@@ -137,10 +108,7 @@ BASE_URL = "https://napochaan.com"
 CMS_ORIGIN = "https://cms.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in production (set via `wrangler secret put CURSOR_SALT --env production`).
-# Cloudflare Access (docs/cloudflare-access.md): path app napochaan.com/admin* (admin).
-# MCP moved to apps/cms (cms.napochaan.com); the napochaan.com/mcp path app is retired with the cutover.
-CF_ACCESS_TEAM_DOMAIN = "napochaan"
-CF_ACCESS_AUD = "73b87411edfe8fc2670c4e0f271b11e7356d7e323f1a5ae67aa25c551027eabb"
+# PREVIEW_SECRET is a wrangler secret too and must equal the cms Worker's (Live Preview handshake, /next/preview).
 
 # Workers Cache: HITs are served from the edge without invoking the Worker. Every
 # CMS publish purges everything (cms → WEB.purge(), worker/entrypoint).
@@ -156,18 +124,6 @@ custom_domain = true
 [env.production.images]
 binding = "IMAGES"
 
-[[env.production.d1_databases]]
-binding = "D1"
-database_id = "047f9f80-9805-468e-96d7-77cbcf86cf0d"
-database_name = "napochaan-cms-production"
-remote = true
-
-[[env.production.r2_buckets]]
-binding = "R2"
-bucket_name = "napochaan-cms-production"
-# See staging note: seed/export must hit the real bucket, not local miniflare.
-remote = true
-
 # CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
 [[env.production.services]]
 binding = "CMS"
@@ -181,7 +137,7 @@ class_name = "CursorRoom"
 # ===== Test Environment =====
 # Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
 # `compatibility_date`, and `compatibility_flags` from the top level. Bindings
-# (D1/R2/DO/services) are NOT inherited, keeping the worker test runtime minimal.
+# (DO/services/images) are NOT inherited, keeping the worker test runtime minimal.
 # `assets` IS inherited, so override it to a directory that exists at test time
 # (`.open-next/assets` is a build artifact that is absent during tests).
 [env.test]

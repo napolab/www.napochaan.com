@@ -2,11 +2,9 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { isAllowedPreviewPath } from './allowed-paths';
+import { matchesSecret } from '@utils/safe-equal';
 
-// An unset/empty configured secret must never authorize: otherwise
-// `?previewSecret=` would match it.
-const isValidSecret = (submitted: string | undefined, expected: string | undefined): boolean => expected !== undefined && expected !== '' && submitted === expected;
+import { isAllowedPreviewPath } from './allowed-paths';
 
 // Payload Live Preview handshake (official draft-mode pattern). The cms admin
 // iframe points here with `path` + `previewSecret`; this route verifies the
@@ -21,7 +19,7 @@ export const GET = async (req: Request): Promise<Response> => {
 
   const { env } = await getCloudflareContext({ async: true });
 
-  if (!isValidSecret(previewSecret, env.PREVIEW_SECRET)) {
+  if (!matchesSecret(previewSecret, env.PREVIEW_SECRET)) {
     return new Response('You are not allowed to preview this page', { status: 403 });
   }
 

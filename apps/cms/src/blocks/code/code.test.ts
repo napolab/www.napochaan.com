@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { PRELOADED_LANGUAGE_KEYS } from '../../components/rich-text/converters/code/highlighter';
+import { PRELOADED_LANGUAGE_KEYS as WEB_PRELOADED_LANGUAGE_KEYS } from '../../../../web/src/components/rich-text/converters/code/highlighter';
 
 import { CODE_LANGUAGES, Code } from '.';
 
@@ -21,6 +22,12 @@ describe('Code block definition', () => {
     // frontend highlighter(converters/code/highlighter)の preload セットと 1:1
     expect(languageOptionValues()).toEqual(Object.keys(CODE_LANGUAGES));
     expect(Object.keys(CODE_LANGUAGES)).toEqual([...PRELOADED_LANGUAGE_KEYS]);
+  });
+
+  it('offers exactly the language keys the public site (apps/web) highlights', () => {
+    // web が本番で記事を描画する highlighter。cms の preview 用 highlighter とは別 module なので
+    // workspace をまたいで直接 import して 1:1 を固定する(cross-module-sync-test)。
+    expect(Object.keys(CODE_LANGUAGES)).toEqual([...WEB_PRELOADED_LANGUAGE_KEYS]);
   });
 
   it('defaults the language to typescript', () => {

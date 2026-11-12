@@ -97,7 +97,7 @@ describe('lexicalToMarkdown: quote/code/table/hr', () => {
     expect(lexicalToMarkdown(body, opts)).toBe('> 一行目\n> 二行目');
   });
 
-  // The `Code` block (src/blocks/code) stores the raw source directly in
+  // The `Code` block (apps/cms/src/blocks/code) stores the raw source directly in
   // fields.code — newlines/tabs included — so no child-node folding is needed.
   it('renders Code blocks as fenced code with language', () => {
     const body = state({ type: 'block', fields: { blockType: 'Code', language: 'typescript', code: 'const a = 1;\nconst b = 2;' } });

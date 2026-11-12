@@ -15,15 +15,13 @@ describe('uncacheablePlugin', () => {
     '/log/preview',
     '/next/preview',
     '/next/exit-preview',
-    '/admin',
-    '/admin/collections/blog',
     '/blog/%70review/1',
-    '/%61dmin',
+    '/%6Eext/preview',
   ])('forces no-store on %s', (pathname) => {
     expect(uncacheablePlugin.run(pathname)._unsafeUnwrap()).toEqual(DENY);
   });
 
-  it.each(['/', '/blog', '/blog/a', '/blog/previewx', '/administrator', '/nextx', '/log'])('does not match %s', (pathname) => {
+  it.each(['/', '/blog', '/blog/a', '/blog/previewx', '/admin', '/administrator', '/nextx', '/log'])('does not match %s', (pathname) => {
     expect(uncacheablePlugin.run(pathname).isErr()).toBe(true);
   });
 });

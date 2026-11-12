@@ -1,4 +1,4 @@
-import { parseYouTubeVideoID } from '../../../../blocks/youtube-embed/parse-url';
+import { parseYouTubeVideoID } from '@utils/youtube-embed/parse-url';
 
 import * as styles from './styles.css';
 
@@ -17,7 +17,7 @@ const IFRAME_ALLOW = 'accelerometer; clipboard-write; encrypted-media; gyroscope
 const embedURL = (videoID: string): string => `${EMBED_ORIGIN}/${videoID}`;
 
 /**
- * Renders the `youtube-embed` lexical block (`src/blocks/youtube-embed`,
+ * Renders the `youtube-embed` lexical block (`apps/cms/src/blocks/youtube-embed`,
  * blockType 'youtube-embed'). The 11-char videoID is extracted from the
  * saved URL and rendered as a 16:9 privacy-enhanced YouTube iframe with an
  * optional `<figcaption>`. If the URL cannot be parsed (unlikely because the

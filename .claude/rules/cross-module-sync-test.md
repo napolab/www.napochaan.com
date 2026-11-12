@@ -22,11 +22,11 @@ Some values must stay literal for tooling (e.g. dynamic `import('@shikijs/langs/
 
 | Pair | Test |
 | --- | --- |
-| `CODE_LANGUAGES` (src/blocks/code) ↔ Shiki `PRELOADED_LANGUAGE_KEYS` (rich-text code highlighter) | `src/blocks/code/code.test.ts` |
-| `NodeTypes` union (rich-text converters) ↔ `renderBlock` branches (src/utils/lexical/to-markdown) | mirrored by hand — add branches to both when adding a block |
-| `WORK_TYPE_OPTIONS` (src/collections/fields/work-type) ↔ `type` select options in `Works` (src/collections/works.ts) | `src/lib/mcp/tools/works/works.test.ts` |
-| `CONTENT_MAX_WIDTH_PX` (src/themes/layout) ↔ site-shell `maxWidth` literal (src/components/site-shell/styles.css.ts) | `src/themes/layout.test.ts` |
-| `TITLE_JP_VAR` (src/themes/font-vars, imported directly by `titleJP` token) ↔ `variable` literal in `Zen_Kaku_Gothic_New(...)` (src/themes/fonts.ts — next/font requires a literal, can't import the constant) | `src/themes/font-vars.test.ts` (statically reads fonts.ts source; the module can't be imported under vitest — next/font/google is a build-time-only stub outside Next's compiler) |
-| `PREVIEW_ROOTS` (worker/middleware/path-policy/plugins/preview-frame) ↔ `PREVIEW_PATH_PREFIXES` (src/app/next/preview/allowed-paths) | `worker/middleware/path-policy/plugins/preview-frame/preview-frame.test.ts` |
+| `CODE_LANGUAGES` (apps/cms/src/blocks/code) ↔ Shiki `PRELOADED_LANGUAGE_KEYS` — both the cms preview highlighter (apps/cms/src/components/rich-text/converters/code/highlighter) and the public one (apps/web/src/components/rich-text/converters/code/highlighter) | `apps/cms/src/blocks/code/code.test.ts` (imports the web highlighter across workspaces by relative path) |
+| `NodeTypes` union (apps/web/src/components/rich-text/converters) ↔ `renderBlock` branches (apps/web/src/utils/lexical/to-markdown) | mirrored by hand — add branches to both when adding a block |
+| `WORK_TYPE_OPTIONS` (apps/cms/src/collections/fields/work-type) ↔ `type` select options in `Works` (apps/cms/src/collections/works.ts) | `apps/cms/src/lib/mcp/tools/works/works.test.ts` |
+| youtube-embed `parseYouTubeVideoID` / `formatYouTubeEmbedMarkdown` (apps/cms/src/blocks/youtube-embed/{parse-url,markdown-format}, write-side validate + MCP export) ↔ web copies (apps/web/src/utils/youtube-embed/{parse-url,markdown-format}, iframe render + llms.txt export) | `apps/web/src/utils/youtube-embed/youtube-embed-sync.test.ts` (imports the cms modules across workspaces, compares outputs on shared fixtures) |
+| `CONTENT_MAX_WIDTH_PX` (apps/web/src/themes/layout) ↔ site-shell `maxWidth` literal (apps/web/src/components/site-shell/styles.css.ts) | `apps/web/src/themes/layout.test.ts` |
+| `TITLE_JP_VAR` (apps/web/src/themes/font-vars, imported directly by `titleJP` token) ↔ `variable` literal in `Zen_Kaku_Gothic_New(...)` (apps/web/src/themes/fonts.ts — next/font requires a literal, can't import the constant) | `apps/web/src/themes/font-vars.test.ts` (statically reads fonts.ts source; the module can't be imported under vitest — next/font/google is a build-time-only stub outside Next's compiler) |
 
-Add new pairs to this table when you introduce one.
+Add new pairs to this table when you introduce one. When the two sides live in different workspaces (apps/web ↔ apps/cms), the test imports the other side by relative path (`../../../../cms/src/...`) — both apps' vitest/tsgo resolve it.

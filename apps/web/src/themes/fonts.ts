@@ -49,6 +49,3 @@ const zenKakuGothicNew = Zen_Kaku_Gothic_New({
 
 /** CSS class string to apply font variables to the root element */
 export const fontVariables = `${mplus1.variable} ${mplus1En.variable} ${zenKakuGothicNew.variable}`;
-
-// LINE Seed JP (admin-only, ~3MB) now lives in `fonts-admin.ts` so next/font does
-// not preload it on public routes — see that file's header for the why.

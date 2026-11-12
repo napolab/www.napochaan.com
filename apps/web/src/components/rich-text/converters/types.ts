@@ -2,7 +2,7 @@ import type { DefaultNodeTypes, SerializedBlockNode } from '@payloadcms/richtext
 
 /**
  * The serialized fields of the `image-row` lexical block (see
- * `src/blocks/image-row`). Payload only emits block field types into
+ * `apps/cms/src/blocks/image-row`). Payload only emits block field types into
  * `payload-types.ts` for blocks registered on a collection field — blocks that
  * live solely inside the lexical editor's `BlocksFeature` are not generated, so
  * the shape is declared here. `image` is `unknown` because Payload populates it
@@ -20,7 +20,7 @@ export type ImageRowBlock = {
 
 /**
  * The serialized fields of the premade `Code` lexical block (see
- * `src/blocks/code`). Like `ImageRowBlock`, the shape is hand-declared because
+ * `apps/cms/src/blocks/code`). Like `ImageRowBlock`, the shape is hand-declared because
  * editor-only blocks are not emitted into `payload-types.ts`. `code`/`language`
  * are optional defensively — the converter falls back to an empty string /
  * plain-text highlighting.
@@ -33,7 +33,7 @@ export type CodeBlock = {
 
 /**
  * The serialized fields of the `youtube-embed` lexical block (see
- * `src/blocks/youtube-embed`). Same rationale as the other in-editor block
+ * `apps/cms/src/blocks/youtube-embed`). Same rationale as the other in-editor block
  * shapes above: hand-declared because editor-only blocks are not emitted into
  * `payload-types.ts`. The write path validates that `url` is a parseable
  * YouTube URL; the converter defensively re-validates and skips render on

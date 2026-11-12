@@ -1,5 +1,4 @@
 import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
-import { withPayload } from '@payloadcms/next/withPayload';
 import type { NextConfig } from 'next';
 
 import { applyClientAliases, TURBOPACK_RESOLVE_ALIAS } from './src/config/client-aliases';
@@ -30,7 +29,6 @@ const nextConfig: NextConfig = {
   experimental: {
     staleTimes: { static: 30, dynamic: 0 },
   },
-  serverExternalPackages: ['drizzle-kit', 'esbuild', 'esbuild-register'],
   redirects: async () => [
     // The public route is /log (the CMS collection slug is `logs`, so /logs is a
     // natural guess). Exact match only — /log has no detail pages, so there is
@@ -95,7 +93,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPayload(nextConfig);
+export default nextConfig;
 
 // `initOpenNextCloudflareForDev` boots a miniflare instance so `getCloudflareContext`
 // works while running `next dev`. It must run ONLY in the dev server: during

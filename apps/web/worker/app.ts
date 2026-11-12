@@ -14,8 +14,7 @@ type HonoEnv = { Bindings: Cloudflare.Env; Variables: CMSHealthVariables };
 
 export type MountedFetch = (request: Request, ...args: unknown[]) => Promise<Response>;
 
-// worker.ts と共有する Hono 合成。MCP(/mcp・/api/mcp・OAuth discovery)と /api/media-upload は
-// apps/cms に移った(apps/cms/src/worker-app)。
+// worker.ts と共有する Hono 合成。web は表示専用で、CMS のデータは env.CMS(Hono RPC)経由で読む。
 export const createWorkerApp = (handlerFetch: MountedFetch) => {
   const factory = createFactory<HonoEnv>();
   const app = factory.createApp();

@@ -8,10 +8,9 @@ import { orDecoded } from '../../predicates';
 
 import type { CacheControlPlugin } from '../../types';
 
-// Draft previews render unpublished data under the draft-mode cookie, `/next/*` sets or
-// clears that cookie, and the Payload admin (until it leaves web) is per-user. None of
-// them may ever be stored, whatever their status or cookies.
-const UNCACHEABLE_ROOTS = [...PREVIEW_ROOTS, '/next', '/admin'] as const;
+// Draft previews render unpublished data under the draft-mode cookie and `/next/*` sets or
+// clears that cookie. Neither may ever be stored, whatever their status or cookies.
+const UNCACHEABLE_ROOTS = [...PREVIEW_ROOTS, '/next'] as const;
 
 const isUncacheablePath = orDecoded(anyOf(...UNCACHEABLE_ROOTS.map(isWithinPath)));
 

@@ -31,7 +31,8 @@ const CODE_THEME: ThemeRegistrationRaw = {
 
 // Preloaded language keys. Must stay 1:1 with BOTH the literal `import()` list in
 // `getHighlighter` below (dynamic import paths must stay literal for bundling) AND
-// the editor's language select (src/blocks/code CODE_LANGUAGES — asserted by its test).
+// the editor's language select (apps/cms/src/blocks/code CODE_LANGUAGES — asserted by
+// apps/cms/src/blocks/code/code.test.ts, which imports this module across workspaces).
 export const PRELOADED_LANGUAGE_KEYS = ['typescript', 'tsx', 'css', 'json', 'bash'] as const;
 
 // Module-level singleton: a Worker isolate initializes the highlighter once and

@@ -5,7 +5,7 @@ import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 import type { NodeTypes } from '../types';
 
 /**
- * Renders the premade `Code` lexical block (`src/blocks/code`, blockType
+ * Renders the premade `Code` lexical block (`apps/cms/src/blocks/code`, blockType
  * 'Code'): the raw `code` field is highlighted server-side by the Shiki
  * pipeline in ./code-block. An unknown / missing `language` falls back to
  * plain text inside the component, so it never throws.

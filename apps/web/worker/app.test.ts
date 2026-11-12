@@ -83,11 +83,4 @@ describe('createWorkerApp', () => {
     const response = await app.request('/contact', { method: 'POST' });
     expect(response.headers.get('Cache-Control')).toBe('private, no-cache, no-store, max-age=0, must-revalidate');
   });
-
-  it('denies Workers Cache storage for header-less JSON 200s from the Payload REST API', async () => {
-    const handlerFetch = vi.fn(async () => new Response('{"user":null}', { headers: { 'Content-Type': 'application/json' } }));
-    const app = createWorkerApp(handlerFetch);
-    const response = await app.request('/api/users/me');
-    expect(response.headers.get('Cache-Control')).toBe('private, no-store');
-  });
 });

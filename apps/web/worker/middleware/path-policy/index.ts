@@ -10,7 +10,6 @@ import type { Context } from 'hono';
 import type { Result } from 'neverthrow';
 
 // 先頭から順に照合し、最初に match した plugin の action を採る(first match wins)。
-// admin は apps/cms に移った(web 側の admin route は Task 11 で削除)ので admin 向け plugin は持たない。
 const plugins = [previewFramePlugin] as const;
 
 const runPlugins = createRunner(plugins);

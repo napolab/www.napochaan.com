@@ -17,7 +17,7 @@ const makeText = (text: string, format = 0) => ({
   version: 1,
 });
 
-// A premade `Code` lexical block node (src/blocks/code, blockType 'Code') —
+// A premade `Code` lexical block node (apps/cms/src/blocks/code, blockType 'Code') —
 // the raw source lives directly in fields.code and RichText's code block
 // converter re-highlights it with Shiki server-side.
 const makeCode = (language: string, code: string) => ({
@@ -44,7 +44,7 @@ const makeCell = (asset: { src: string; width: number; height: number }, alt: st
   caption,
 });
 
-// A `youtube-embed` lexical block node (src/blocks/youtube-embed, blockType
+// A `youtube-embed` lexical block node (apps/cms/src/blocks/youtube-embed, blockType
 // 'youtube-embed'). The converter parses the videoID at render time and drops
 // a privacy-enhanced (youtube-nocookie) 16:9 iframe with the caption as its
 // figcaption + iframe title.
