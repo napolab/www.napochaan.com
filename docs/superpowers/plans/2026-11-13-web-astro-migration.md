@@ -74,7 +74,14 @@ apps/web-astro/
   - `createAstroHandler = (astroFetch: MountedFetch) => (c: Context<AstroEnv>) => Promise<Response>` in `worker/handlers/astro` — same contract as `createNextHandler` (wrap `CMS` via `withTrackedCMS`, run inside `runWithRequestContext`, `settle` cacheable pages, set `cmsDegraded`)
 - Consumes: `withTrackedCMS`, `createCMSHealth`, `resolveCacheControl` (existing worker modules)
 
-- [ ] **Step 1:** Research and record in the commit body: how `@astrojs/cloudflare@14` exposes a fetch handler for a custom Worker entry (`@astrojs/cloudflare/handler` / `./hono` exports), what `wrangler.toml` `main` / `[assets]` must be, and whether `AsyncLocalStorage` (`node:async_hooks`, `nodejs_compat`) propagates into the Astro render.
+- [ ] **Step 1 (spike — stop and report if any check fails, the design depends on it):** Read the **installed** `node_modules/@astrojs/cloudflare/dist/{utils/handler,hono,entrypoints/server}.js` source (not release notes) and verify, under both `astro dev` and `astro build` + `wrangler dev`:
+  1. A custom `main` (`worker/worker.ts`) can mount Astro's fetch handler inside the Hono app, and static assets (`/_astro/*`, `public/*`) still resolve.
+  2. Page code reaches the **wrapped** `CMS` binding (ALS from `runWithRequestContext`, or whatever the adapter offers per request) — no path where Astro page code sees the raw binding.
+  3. `@astrojs/react` SSR of a React component **without** a `client:*` directive renders with no JS shipped (RSC-equivalent), and whether an **async** React component (`const X = async () => …`) renders under `@astrojs/react` (record yes/no; if no, Tasks 4–7 must hoist those CMS reads into `.astro` frontmatter and pass serializable props).
+  4. `transition:persist` on a `client:load` island keeps the same React root across a ClientRouter navigation.
+  Record the findings in `reports/2026-11-13-web-astro-spike.md` and the commit body.
+- Worker path policy (in this task, not Task 11): `/_astro/*` → keep/immutable (replacing the `/_next/static` rule; `/_next/image` stays), `/_actions/*` → uncacheable, plus any other Astro-internal route found in step 1. Update `worker/middleware/cache-control/plugins/next-internal` and `path-policy` accordingly with tests.
+- `wrangler.toml` migrations: keep tags v1 (DOQueueHandler created), v2 (CursorRoom), v3 (DOQueueHandler deleted) unchanged; only `CursorRoom` is exported. No new migration tag.
 - [ ] **Step 2: Failing tests**
   - `src/lib/request-context/request-context.test.ts`: `getRequestContext()` inside `runWithRequestContext(ctx, …)` returns `ctx`; outside throws the exact message; nested async (`await Promise.resolve()`) still sees `ctx`.
   - `worker/handlers/astro/astro.test.ts`: port `worker/handlers/next/next.test.ts` cases to `createAstroHandler`, plus `marks degraded when CMS fails inside Astro render` (fake astroFetch that calls `getCMSClient()` via request context → binding returns 500 → `c.get('cmsDegraded') === true`).
@@ -107,6 +114,15 @@ apps/web-astro/
 - [ ] **Step 4:** Run full test suite → all ported tests PASS (vitest config: drop `next/*` aliases, keep `@lib/cms/client` mock alias).
 - [ ] **Step 5:** lint + typecheck, commit `refactor(web-astro): port shared modules off Next APIs`.
 
+### Task 2.5: React context across islands
+
+Each Astro island is its own React root, so context providers that wrap the whole tree in `apps/web/src/app/(site)/layout.tsx` (ThemeProvider, BootStatusProvider, motion provider, RouterProvider) and the contexts in `src/components/{game-of-life/provider,cursor-presence/*-context,boot-status,canvas-resize}`, `src/hooks/use-prefers-reduced-motion` do **not** reach other islands.
+
+- [ ] Enumerate each context, its provider location and its consumers (write the table into `reports/2026-11-13-web-astro-spike.md`).
+- [ ] Per context decide: (a) consumers live inside one island → keep the provider inside that island; (b) consumers span islands → replace with a module-level store (`useSyncExternalStore`) so every root shares state; (c) RouterProvider → a tiny `withRouter` wrapper applied in every island that renders a `Link`.
+- [ ] Tests: for each (b) store, a test mounting two separate React roots and asserting they observe the same update.
+- [ ] lint/typecheck, commit `refactor(web-astro): share cross-island state via module stores`.
+
 ### Task 3: Site layout, SEO, persisted shell, ClientRouter, error pages
 
 **Files:**
@@ -118,9 +134,9 @@ apps/web-astro/
 **Interfaces:**
 - Produces:
   - `buildMetadata = (input: MetadataInput, origin: string) => ResolvedMetadata` — port of every `generateMetadata` / `metadata` export (title template `%s — napochaan`, default description `napochaan の個人サイト。`, `robots noindex,nofollow` unless `isProductionHost(origin)`, OG/Twitter fields, canonical).
-  - `site-layout.astro` props: `{ metadata: MetadataInput; bodyClass?: string }`; renders `<html lang="ja" class="… wf-loading boot">`, typekit + motion boot inline scripts with `is:inline` **and `data-astro-rerun` absent** so they run once, `<ClientRouter />`, `<SiteShell transition:persist="site-shell" client:load>` wrapping `<slot />`.
+  - `site-layout.astro` props: `{ metadata: MetadataInput; bodyClass?: string }`; renders `<html lang="ja" class="… wf-loading boot">`, typekit + motion boot inline scripts with `is:inline` **and `data-astro-rerun` absent** so they run once, `<ClientRouter />`. Persist goes on the **sibling islands** only (ambient backdrop, cursor presence, loading/boot overlay, site nav/header if stateful) — never on an element wrapping `<slot />`, otherwise `main` would never swap. The page content `<main>` is swapped on every navigation.
   - Theme color `oklch(0.490 0.287 266)`, viewport `width=device-width, initial-scale=1, viewport-fit=cover`.
-- [ ] **Step 1: Failing tests:** `build-metadata.test.ts` (non-prod origin → robots noindex; title template; canonical); `site-layout.test.ts` (rendered HTML has one `<h1>`-free shell, the two inline scripts once, `wf-loading boot` class); `persists shell islands across navigation` (navigate `/` → `/blog` via ClientRouter in browser mode against `astro preview`/dev: the cursor WebSocket instance and backdrop canvas element are the same object before/after, boot overlay not re-shown); `does not reuse cached documents on back navigation`.
+- [ ] **Step 1: Failing tests:** `build-metadata.test.ts` (non-prod origin → robots noindex; title template; canonical); `site-layout.test.ts` (rendered HTML has one `<h1>`-free shell, the two inline scripts once, `wf-loading boot` class); unit tests for the pieces (e.g. boot overlay script is a no-op when `boot` class already removed). Verify `persists shell islands across navigation` and `does not reuse cached documents on back navigation` manually with chrome-devtools MCP against `wrangler dev` (same backdrop canvas node & single WebSocket in the network panel across `/` → `/blog` → back; each navigation issues a document fetch); record the result in the spike report.
 - [ ] **Step 2:** Run → FAIL.
 - [ ] **Step 3:** Implement. Scroll on transition jumps to top (no smooth scroll) — keep current behavior. Disable View Transition animation under `prefers-reduced-motion`. 404/500 reuse `error-screen` component; 404 status preserved.
 - [ ] **Step 4:** Run → PASS; lint/typecheck; commit `feat(web-astro): site layout with persisted shell and ClientRouter`.
@@ -204,7 +220,7 @@ apps/web-astro/
 - [ ] **Step 1:** Rename; scripts: `dev: astro dev`, `build: astro build`, `deploy:*: astro build && wrangler deploy --env <env>`, keep `warm:cache`, `cf:types`, `test`, `lint`, `fmt`, `typecheck`.
 - [ ] **Step 2:** Docs/rules: CLAUDE.md setup rules "next.js, opennext, ISR" → "Astro (`@astrojs/cloudflare`) for web, Next.js + Payload for cms"; `next/image` rule → `src/components/image`; workers-cache.md references to OpenNext/`force-dynamic`/`/_next/static` updated to Astro equivalents (`/_astro/*` immutable); cross-module table row for `TITLE_JP_VAR` updated. Worker names and routes in wrangler unchanged so cms `WEB` binding still resolves.
 - [ ] **Step 3:** From repo root: `pnpm install && pnpm lint && pnpm typecheck && pnpm test && pnpm build` → all green. `grep -rn "opennext\|next/" apps/web` → no hits outside comments explaining history.
-- [ ] **Step 4:** Commit `refactor(web)!: replace Next.js web app with Astro`.
+- [ ] **Step 4:** Commit `refactor(web)!: replace Next.js web app with Astro` as a single separable commit (so it can be reverted alone). Do not deploy to staging from the branch; merging to main auto-deploys staging and production stays manual — say so in the PR.
 
 ### Task 12: PR
 
