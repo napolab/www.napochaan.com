@@ -4,6 +4,7 @@ import { createRunner } from '../../lib/first-match-runner';
 import { allOf, equals, isIn, not, on } from '../../lib/predicate';
 import { PAGE_CACHE_POLICIES } from '../../../src/utils/cache-control';
 import { KEEP } from './directives';
+import { apiPlugin } from './plugins/api';
 import { cmsPlugin } from './plugins/cms';
 import { mediaPlugin } from './plugins/media';
 import { nextInternalPlugin } from './plugins/next-internal';
@@ -17,7 +18,7 @@ import type { Context } from 'hono';
 
 // 先頭から順に照合し、最初に match した plugin の directive を採る(first match wins)。
 // 具体的なものを先に置く: uncacheable(`/log/preview`)と time-sensitive(`/log`)は cms(catch-all)より前。
-const plugins = [nextInternalPlugin, mediaPlugin, uncacheablePlugin, timeSensitivePlugin, cmsPlugin] as const;
+const plugins = [nextInternalPlugin, mediaPlugin, apiPlugin, uncacheablePlugin, timeSensitivePlugin, cmsPlugin] as const;
 
 const runPlugins = createRunner(plugins);
 

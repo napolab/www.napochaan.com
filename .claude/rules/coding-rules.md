@@ -12,14 +12,21 @@
 
 ## Development Scripts
 
-| Command          | Description                                         |
-| ---------------- | --------------------------------------------------- |
-| `pnpm dev`       | Start development server                            |
-| `pnpm build`     | Production build                                    |
-| `pnpm start`     | Start production server                             |
-| `pnpm lint`      | Run oxlint                                          |
-| `pnpm fmt`       | Format code (oxfmt + oxlint --fix)                  |
-| `pnpm typecheck` | Type check with `@typescript/native-preview` (tsgo) |
+Monorepo (pnpm workspaces: `apps/cms`, `apps/web`, `packages/cms-api`). Root scripts run recursively (`pnpm -r run …`) or delegate to a workspace.
+
+| Command                                   | Description                                                              |
+| ----------------------------------------- | ------------------------------------------------------------------------ |
+| `pnpm dev`                                | Start web dev server (`pnpm --filter web dev`). web reads the cms over `env.CMS`, so start cms first (below) |
+| `pnpm dev:cms`                            | cms admin dev server (`pnpm --filter cms dev`, port 3001). For web RPC, run `pnpm --filter cms dev:worker` (OpenNext build + `wrangler dev --port 8791`) first, then `pnpm dev`; pin `WRANGLER_REGISTRY_PATH` / `MINIFLARE_REGISTRY_PATH` per worktree |
+| `pnpm build`                              | Production build of web (`pnpm --filter web build`)                      |
+| `pnpm lint`                               | oxlint + oxfmt --check in every workspace                                |
+| `pnpm fmt`                                | Format code (oxfmt + oxlint --fix) in every workspace                    |
+| `pnpm typecheck`                          | Type check with `@typescript/native-preview` (tsgo) in every workspace   |
+| `pnpm test`                               | vitest in every workspace                                                |
+| `pnpm payload <cmd>`                      | `pnpm --filter cms payload <cmd>` (migrate / seed / generate:types …)    |
+| `pnpm deploy:staging` / `deploy:production` | cms then web (`--filter cms` then `--filter web`)                      |
+| `pnpm deploy:database:{staging,production}` | Apply migrations to D1 (cms)                                           |
+| `pnpm --filter <cms\|web> cf:types`       | Regenerate `cloudflare-env.d.ts` from wrangler config (needed before typecheck) |
 
 ## After Implementation
 

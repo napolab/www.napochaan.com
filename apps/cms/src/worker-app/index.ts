@@ -1,5 +1,6 @@
 import { createFactory } from 'hono/factory';
 
+import { adminLanding } from './admin-landing';
 import { createMCPRoutes } from '../worker-routes/mcp';
 import { mcpGuardRoutes } from '../worker-routes/mcp-guard';
 import { createMCPOAuthMetadataRoutes } from '../worker-routes/mcp-oauth-metadata';
@@ -20,6 +21,8 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
   const app = factory.createApp();
 
   app
+    // cross-site の深い /admin 遷移を /admin へ(Payload の GET 描画が書込みをするため)。mount より前。
+    .use('*', adminLanding())
     // MCP Access が未設定なら next() で mount(Next の 404)に落ちる。
     .route('/', createMCPOAuthMetadataRoutes())
     .route('/', createMCPRoutes(handlerFetch))

@@ -3,6 +3,27 @@ import { describe, expect, it, vi } from 'vitest';
 import { createWorkerApp } from './index';
 
 describe('createWorkerApp', () => {
+  it('redirects a cross-site deep admin navigation before the mount (landing beats mount)', async () => {
+    const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('/admin/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' } });
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get('Location')).toBe('/admin');
+    expect(handlerFetch).not.toHaveBeenCalled();
+  });
+
+  it('passes a same-origin deep admin navigation to the mount', async () => {
+    const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('/admin/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Dest': 'document' } });
+
+    expect(response.status).toBe(200);
+    expect(handlerFetch).toHaveBeenCalledOnce();
+  });
+
   it('blocks POST /api/mcp with 404 and never calls the mounted handler (guard beats mount)', async () => {
     const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
     const app = createWorkerApp(handlerFetch);

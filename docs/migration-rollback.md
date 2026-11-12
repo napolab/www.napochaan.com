@@ -2,6 +2,8 @@
 
 Payload のマイグレーションを含む PR を戻したいときの手順。`git revert` だけでは D1 は戻らない。
 
+マイグレーションは **cms（`apps/cms`、`apps/cms/migrations/`）** にだけある。web は D1 を持たない。以下の `pnpm payload …` は root からの委譲（= `pnpm --filter cms payload …`）。
+
 すべての `wrangler` / Payload CLI コマンドは account id が必要（無いと exit 13）:
 
 ```bash
@@ -22,7 +24,7 @@ Payload 3.84.1（`@payloadcms/drizzle`）の挙動:
 
 ## 正しい順番
 
-main への merge で staging は自動デプロイされる。なので D1 のロールバックは **revert を merge する前**に済ませる。
+main への merge で staging は自動デプロイされる（cms → web の順）。なので D1 のロールバックは **revert を merge する前**に済ませる。
 
 1. revert PR を作る（まだ merge しない）
 2. revert **前**のコミット（= 今の main）で、対象マイグレーションが最新バッチにあることを確認する
@@ -49,10 +51,10 @@ DROP TABLE / DROP COLUMN を含むマイグレーションは、`down` でスキ
 
 ```bash
 # 戻したい時点の bookmark を確認（RFC3339 または Unix 秒）
-pnpm exec wrangler d1 time-travel info D1 --env production --timestamp="2026-09-26T17:00:00+09:00"
+pnpm --filter cms exec wrangler d1 time-travel info D1 --env production --timestamp="2026-09-26T17:00:00+09:00"
 
 # その時点へ復元（DB を in-place で上書き。実行中のクエリはエラーになる）
-pnpm exec wrangler d1 time-travel restore D1 --env production --timestamp="2026-09-26T17:00:00+09:00"
+pnpm --filter cms exec wrangler d1 time-travel restore D1 --env production --timestamp="2026-09-26T17:00:00+09:00"
 # bookmark 指定でも可: --bookmark=<bookmark>
 ```
 
@@ -60,7 +62,7 @@ pnpm exec wrangler d1 time-travel restore D1 --env production --timestamp="2026-
 - restore は結果として「復元前の bookmark」を返す。**必ず控えておく**（restore の取り消しに使う）。
 - 復元時点以降に入ったコンテンツ（admin での編集等）も消える。
 - 復元後の `payload_migrations` はその時点の状態に戻るので、`migrate:status` で確認してから該当コミットをデプロイする。
-- 復元後は Workers Cache が古いままなので web を再 deploy する（新しい Worker version は空のキャッシュから始まる。`.claude/rules/workers-cache.md`）。
+- 復元後は web の Workers Cache が古いままなので web を再 deploy する（`pnpm --filter web deploy:<env>`）（新しい Worker version は空のキャッシュから始まる。`.claude/rules/workers-cache.md`）。
 
 ## 予防: roll-forward と expand/contract
 
@@ -75,9 +77,9 @@ pnpm exec wrangler d1 time-travel restore D1 --env production --timestamp="2026-
 
 ## ドリフトガード（`migrate:check-drift`）
 
-`.github/workflows/deploy.yml` は `deploy:database:{staging,production}` の直前に `pnpm deploy:database:check:{staging,production}`（= `payload migrate:check-drift`）を走らせる。
+`.github/workflows/deploy.yml` は cms の `deploy:database:{staging,production}` の直前に `pnpm --filter cms deploy:database:check:{staging,production}`（= `payload migrate:check-drift`）を走らせる。
 
-- `payload_migrations` の全行（`batch = -1` の dev push 行は除く）と `migrations/` のファイルを突き合わせ、**DB にだけあるマイグレーション**があれば一覧と復旧手順を出して exit 1 する。
+- `payload_migrations` の全行（`batch = -1` の dev push 行は除く）と `apps/cms/migrations/` のファイルを突き合わせ、**DB にだけあるマイグレーション**があれば一覧と復旧手順を出して exit 1 する。
 - `payload_migrations` テーブルが無い（まっさらな DB）場合はドリフト無しとみなす。
 - ローカルでも `pnpm payload migrate:check-drift` で確認できる（`.dev.vars` のローカル D1）。
 
@@ -85,7 +87,7 @@ pnpm exec wrangler d1 time-travel restore D1 --env production --timestamp="2026-
 
 表示された孤立マイグレーションに対して、どれか 1 つを選ぶ:
 
-- **(a) revert が誤りだった** → そのマイグレーション（`.ts` / `.json` と `migrations/index.ts` のエントリ）をコードに戻す PR を出す。
+- **(a) revert が誤りだった** → そのマイグレーション（`.ts` / `.json` と `apps/cms/migrations/index.ts` のエントリ）をコードに戻す PR を出す。
 - **(b) スキーマも本当に戻したい** → revert 前のコミットを checkout し、上の「正しい順番」2〜4 と同じく `migrate:status` → `migrate:down` を該当環境に実行してから、deploy workflow を再実行する。
 - **(c) 破壊的マイグレーションだった** → `down` ではデータが戻らないので、上の D1 Time Travel で復元する。
 

@@ -2,7 +2,7 @@
 
 ## 認証の仕組み
 
-MCP は Cloudflare Access のアプリ（Managed OAuth。本番は `/mcp` のパス単位アプリ、staging は admin と共用のホスト全体アプリ）と MCP Portal の後ろにある。自前の OAuth（OAuthProvider・`/oauth/authorize` の同意画面・`OAUTH_KV`）は廃止した。
+MCP は **cms Worker**（`apps/cms`）にあり、cms ホスト全体の Cloudflare Access アプリ（Managed OAuth。admin と共用）と MCP Portal の後ろにある。公開サイト（napochaan.com）では MCP は動かない。自前の OAuth（OAuthProvider・`/oauth/authorize` の同意画面・`OAUTH_KV`）は廃止した。
 
 - 認可は Access のポリシー `naporitan`（本人の email のみ）。`route.ts` が `Cf-Access-Jwt-Assertion` を `CF_ACCESS_TEAM_DOMAIN` + `CF_ACCESS_MCP_AUD` で検証し、email に一致する**既存の** Payload user を引く（作らない）。JWT 無し・不正・user 不在は 403、env 未設定は 500。
 - Access アプリ・Portal・vars の設定と有効化の手順は `docs/cloudflare-access.md` の「MCP（`/mcp` アプリと MCP Portal）」。
@@ -10,8 +10,8 @@ MCP は Cloudflare Access のアプリ（Managed OAuth。本番は `/mcp` のパ
 ## エンドポイント
 
 - Portal: `mcp.napochaan.com`（server id は本番 `napochaan`、staging `napochaanstg`）
-- 本番の MCP 本体: `https://napochaan.com/mcp`（Access 配下。MCP クライアントから直接つながず、Portal 経由にする）
-- staging の MCP 本体: `https://stg.napochaan.com/mcp`（同上）
+- 本番の MCP 本体: `https://cms.napochaan.com/mcp`（Access 配下。MCP クライアントから直接つながず、Portal 経由にする）
+- staging の MCP 本体: `https://cms-stg.napochaan.com/mcp`（同上）
 
 ## クライアント接続
 
@@ -19,11 +19,11 @@ MCP は Cloudflare Access のアプリ（Managed OAuth。本番は `/mcp` のパ
 
 Claude Desktop のコネクタに MCP Portal `mcp.napochaan.com` を追加する。認証は Portal の Managed OAuth（Dynamic Client Registration）で、同意は Access のログイン（GitHub-naporin0624）。Payload の email / password は使わない。
 
-- 以前の直結コネクタ（`https://napochaan.com/mcp`）は外して、Portal 経由に付け直す。
+- 以前の直結コネクタ（`https://napochaan.com/mcp`。cms 分離前の URL）は外して、Portal 経由に付け直す。
 - 初回に Access のログイン画面が開く。ポリシー `naporitan` に入っている本人の email で通る。
 - server の登録と、管理者側の初回 OAuth（dashboard の「Save and connect server」）は本人の操作。
 
-claude.ai の Web / モバイルの直結コネクタ(`https://napochaan.com/mcp` を直接追加する形)は、Access の DCR で callback を許可していないので使えない。Claude Code のように loopback の callback を使うクライアントは、DCR が localhost / loopback を許可しているので直結できる想定だが、未検証。
+claude.ai の Web / モバイルの直結コネクタ(`https://cms.napochaan.com/mcp` を直接追加する形)は、Access の DCR で callback を許可していないので使えない。Claude Code のように loopback の callback を使うクライアントは、DCR が localhost / loopback を許可しているので直結できる想定だが、未検証。
 
 ## 入稿ワークフロー
 
@@ -76,7 +76,7 @@ claude.ai の Web / モバイルの直結コネクタ(`https://napochaan.com/mcp
 
 認可は Access 側にあるので、KV の grant / token を消す手順は無い（`OAUTH_KV` は廃止）。恒久的に効く順に:
 
-1. **ポリシーから外す**: 再利用ポリシー `naporitan` の include から email を外す。`naporitan` は `/admin*` と `/mcp` の両方の Access アプリが共有しているので、MCP と admin の認可が同時に変わる。
+1. **ポリシーから外す**: 再利用ポリシー `naporitan` の include から email を外す。`naporitan` は cms の Access アプリ（`/admin` も `/mcp` も覆うホスト全体アプリ）が共有しているので、MCP と admin の認可が同時に変わる。
 2. **Access のセッションを失効させる**: Zero Trust ダッシュボードで該当 user の Access セッションを失効させる（画面名は Cloudflare 側の更新で変わる）。access token の TTL は 15 分、grant は 336 時間なので、失効させないと最大その間は使える。1 と合わせて行う。
 3. **（一時的な停止）Payload の user を消す**: `/mcp` は email で既存 user を引けないと 403 を返すので、JWT が生きていても即座に止まる。ただし恒久策ではない。admin の plugin は、Access を通った `/admin` への次回アクセスで user を自動作成し直すため（`docs/cloudflare-access.md`）、その後は `/mcp`（find のみ）も再び通る。MCP だけを止める独立のスイッチではない。
 

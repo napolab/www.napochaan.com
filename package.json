@@ -10,7 +10,21 @@
     "lint": "pnpm -r run lint",
     "fmt": "pnpm -r run fmt",
     "typecheck": "pnpm -r run typecheck",
-    "test": "pnpm -r run test"
+    "test": "pnpm -r run test",
+    "dev:cms": "pnpm --filter cms dev",
+    "payload": "pnpm --filter cms payload",
+    "payload:migrate": "pnpm --filter cms payload:migrate",
+    "payload:migrate:create": "pnpm --filter cms payload:migrate:create",
+    "payload:generate-importmap": "pnpm --filter cms payload:generate-importmap",
+    "seed:export": "pnpm --filter cms seed:export",
+    "seed:import": "pnpm --filter cms seed:import",
+    "seed:import:prod": "pnpm --filter cms seed:import:prod",
+    "deploy:database:check:staging": "pnpm --filter cms deploy:database:check:staging",
+    "deploy:database:staging": "pnpm --filter cms deploy:database:staging",
+    "deploy:database:check:production": "pnpm --filter cms deploy:database:check:production",
+    "deploy:database:production": "pnpm --filter cms deploy:database:production",
+    "deploy:staging": "pnpm --filter cms deploy:staging && pnpm --filter web deploy:staging",
+    "deploy:production": "pnpm --filter cms deploy:production && pnpm --filter web deploy:production"
   },
   "devDependencies": {
     "husky": "^9.1.7"

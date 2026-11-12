@@ -30,11 +30,11 @@ cache-control middleware (`apps/web/worker/middleware/cache-control`, first-matc
 
 | Class | Paths | Policy | Freshness |
 | --- | --- | --- | --- |
-| `uncacheable` (deny) | `/{blog,news,works,gallery,log}/preview*`, `/next/*`, `/admin*`, and **any request whose CMS read failed** | `no-store` — always, any status / method / cookie | never stored |
+| `uncacheable` (deny) | `/{blog,news,works,gallery,log}/preview*`, `/next/*`, `/admin*`, any other `/api/*` (api plugin, after media), and **any request whose CMS read failed** | `no-store` — always, any status / method / cookie | never stored |
 | `timeSensitive` (page) | `/`, `/log`, `/log.md`, `/log/rss.xml`, `/.well-known/security.txt` | `public, max-age=0, s-maxage=3600` | 1h at the edge + purge |
 | `cms` (page, catch-all) | every other page, feed, `.md`, llms, sitemap, robots, OG image, `/contact` | `public, max-age=0, s-maxage=31536000` | purge / deploy only |
 | keep | `/_next/*` (`/_next/image` sets its own policy, `/_next/static` is immutable) | upstream | — |
-| fill | `/api/media/file/*` media, other `/api/*` `private, no-store` | only when upstream sent none | — |
+| fill | `/api/media/file/*` media | only when upstream sent none | — |
 
 "page" policies **replace** Next's force-dynamic `private, no-cache, no-store, …` header, but only on a
 cookie-less `GET`/`HEAD` `200` — a Server Action `POST`, a 404, or a `Set-Cookie` response keeps Next's header.

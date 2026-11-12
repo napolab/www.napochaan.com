@@ -22,10 +22,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      # `cloudflare-env.d.ts` is gitignored; regenerate it from wrangler.toml so
+      # `cloudflare-env.d.ts` is gitignored; regenerate it (per app) from the wrangler config so
       # tsgo can resolve the `CloudflareEnv` type. `wrangler types` is local-only.
+      # The setup action seeds each app's `.dev.vars` from `.dev.vars.example` first.
       - run: pnpm --filter web cf:types
       - run: pnpm --filter cms cf:types
+      # root scripts run `pnpm -r run lint|typecheck` across apps/cms, apps/web and packages/cms-api
       - run: pnpm lint
       - run: pnpm typecheck
 
@@ -56,4 +58,5 @@ jobs:
           done
           echo "::error::playwright install failed after 3 attempts"
           exit 1
-      - run: pnpm --filter web test
+      # apps/web (browser + unit + workers), apps/cms (unit + workers), packages/cms-api
+      - run: pnpm test

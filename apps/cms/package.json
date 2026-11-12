@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --turbopack -p 3001",
+    "dev:worker": "opennextjs-cloudflare build && wrangler dev --port 8791",
     "build": "next build --webpack",
     "preview": "CLOUDFLARE_ENV=staging opennextjs-cloudflare build --env staging && opennextjs-cloudflare preview --env staging",
     "deploy:staging": "CLOUDFLARE_ENV=staging opennextjs-cloudflare build --env staging && CLOUDFLARE_ENV=staging opennextjs-cloudflare deploy --env staging",

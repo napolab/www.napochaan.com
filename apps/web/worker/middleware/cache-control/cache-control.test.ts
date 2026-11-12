@@ -13,6 +13,7 @@ const NEXT_DYNAMIC_POLICY = 'private, no-cache, no-store, max-age=0, must-revali
 describe('resolveCacheControl', () => {
   it.each([
     ['/api/media/file/a.jpg', { kind: 'fill', policy: MEDIA_POLICY }],
+    ['/api/health', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/_next/image', { kind: 'keep' }],
     ['/_next/static/chunks/a.js', { kind: 'keep' }],
     ['/blog/preview/1', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
@@ -43,8 +44,9 @@ describe('resolveCacheControl', () => {
   });
 
   // media は Workers Cache のキーと同じ生の pathname で判定する(decode しない)。
+  // encode された path は media を外れ、後段の api plugin(decode 判定)で no-store になる。
   it('matches media on the raw pathname only', () => {
-    expect(resolveCacheControl('/api/media/%66ile/a.jpg')).toEqual({ kind: 'page', policy: PAGE_CACHE_POLICIES.cms });
+    expect(resolveCacheControl('/api/media/%66ile/a.jpg')).toEqual({ kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable });
   });
 
   // Next は percent-encoded path を同じ route に解決する。no-store / time-sensitive の判定は

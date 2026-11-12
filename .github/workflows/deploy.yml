@@ -30,16 +30,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      # next build / opennext build が CloudflareEnv 型を解決できるよう再生成
+      # next build / opennext build が CloudflareEnv 型を解決できるよう、両 app 分を再生成
+      - run: pnpm --filter cms cf:types
       - run: pnpm --filter web cf:types
-      # migrate の前に、D1 に適用済みなのにコードから消えたマイグレーション（revert 等）を検出して止める。
+      # D1 は cms だけが持つ。migrate の前に、D1 に適用済みなのにコードから消えたマイグレーション（revert 等）を検出して止める。
       # payload migrate はローカルのファイルしか見ないので、放置すると食い違ったコードが黙ってデプロイされる。
       # 失敗時の復旧手順は docs/migration-rollback.md
-      - run: pnpm --filter web deploy:database:check:staging
+      - run: pnpm --filter cms deploy:database:check:staging
       # worker deploy の前に D1 スキーマを反映（remote binding 経由）
-      - run: pnpm --filter web deploy:database:staging
-      # opennext build → deploy → ISR cache bust（1スクリプトに同梱）
-      # Workers Cache warm-up は stg.napochaan.com が Cloudflare Access 配下のため未対応
+      - run: pnpm --filter cms deploy:database:staging
+      # deploy は cms → web の順（web の CMS binding の向き先から）。
+      # 既存の Worker 名なら定常順で通る。新規名の環境は cms(WEB なし) → web → cms(WEB あり) が要る。
+      - run: pnpm --filter cms deploy:staging
+      # opennext build → deploy。ISR は使わないので cache bust は無い（CMS 書込みは cms → env.WEB.purge()）
+      # Workers Cache warm-up は stg.napochaan.com が Cloudflare Access（ホスト全体）配下のため未対応
       # （未認証 curl は Access ログインへ 302 するので CI から warm できない）
       - run: pnpm --filter web deploy:staging
 
@@ -59,9 +63,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      - run: pnpm --filter cms cf:types
       - run: pnpm --filter web cf:types
       # revert で孤立したマイグレーションがあれば migrate / deploy の前に止める（staging と同じ理由）
-      - run: pnpm --filter web deploy:database:check:production
-      - run: pnpm --filter web deploy:database:production
-      # opennext build → deploy → ISR cache bust → Workers Cache warm-up（sitemap 全 URL + feeds）
+      - run: pnpm --filter cms deploy:database:check:production
+      - run: pnpm --filter cms deploy:database:production
+      # cms → web の順（staging と同じ理由）
+      - run: pnpm --filter cms deploy:production
+      # opennext build → deploy → Workers Cache warm-up（sitemap 全 URL + feeds。napochaan.com は Access 無し）
       - run: pnpm --filter web deploy:production
