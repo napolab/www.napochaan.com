@@ -1,0 +1,8 @@
+{
+  "tabWidth": 2,
+  "printWidth": 200,
+  "singleQuote": true,
+  "semi": true,
+  "trailingComma": "all",
+  "ignorePatterns": ["styled-system/**/*", ".open-next/**/*", ".wrangler/**/*", ".next/**/*", ".claude/**/*", "**/CLAUDE.md", "migrations/**/*", "cloudflare-env.d.ts"]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "@napochaan/cms-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./app": "./src/app/index.ts",
+    "./services": "./src/services/index.ts"
+  },
+  "scripts": {
+    "fmt": "oxfmt --write . && oxlint --fix .",
+    "lint": "oxfmt --check . && oxlint .",
+    "typecheck": "tsgo --noEmit -p tsconfig.json",
+    "test": "vitest run --typecheck"
+  },
+  "dependencies": {
+    "@hono/zod-validator": "^0.9.0",
+    "hono": "^4.12.23",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@typescript/native-preview": "7.0.0-dev.20251229.1",
+    "oxfmt": "^0.21.0",
+    "oxlint": "^1.36.0",
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.18"
+  }
+}

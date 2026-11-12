@@ -22,15 +22,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      # `cloudflare-env.d.ts` is gitignored; regenerate it from wrangler.toml so
+      # `cloudflare-env.d.ts` is gitignored; regenerate it (per app) from the wrangler config so
       # tsgo can resolve the `CloudflareEnv` type. `wrangler types` is local-only.
-      - run: pnpm cf:types
+      # The setup action seeds each app's `.dev.vars` from `.dev.vars.example` first.
+      - run: pnpm --filter web cf:types
+      - run: pnpm --filter cms cf:types
+      # root scripts run `pnpm -r run lint|typecheck` across apps/cms, apps/web and packages/cms-api
       - run: pnpm lint
       - run: pnpm typecheck
 
   test:
     name: vitest (browser + unit + workers)
-    runs-on: ubuntu-latest
+    # ubuntu-latest は 26.04 になり、Playwright が chromium を提供していない
+    # ("Playwright does not support chromium on ubuntu26.04-x64")。対応されるまで 24.04 に固定する。
+    runs-on: ubuntu-24.04
     # 実績は 1m30s 前後(chromium のダウンロード込み)。
     timeout-minutes: 20
     steps:
@@ -47,7 +52,7 @@ jobs:
         timeout-minutes: 18
         run: |
           for attempt in 1 2 3; do
-            if timeout 300 pnpm exec playwright install --with-deps chromium; then
+            if timeout 300 pnpm --filter web exec playwright install --with-deps chromium; then
               exit 0
             fi
             echo "::warning::playwright install attempt ${attempt} failed or timed out"
@@ -55,4 +60,5 @@ jobs:
           done
           echo "::error::playwright install failed after 3 attempts"
           exit 1
+      # apps/web (browser + unit + workers), apps/cms (unit + workers), packages/cms-api
       - run: pnpm test

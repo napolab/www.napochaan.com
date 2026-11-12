@@ -1,0 +1,107 @@
+import { initOpenNextCloudflareForDev } from '@opennextjs/cloudflare';
+import type { NextConfig } from 'next';
+
+import { applyClientAliases, TURBOPACK_RESOLVE_ALIAS } from './src/config/client-aliases';
+
+const nextConfig: NextConfig = {
+  poweredByHeader: false,
+  images: {
+    // 3840 is only useful for full-bleed art on a 4K display; every image here sits
+    // in the ≤1180px content column, so the largest 2× candidate is 2048.
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
+    // Next 16 defaults `qualities` to [75] and its optimizer rejects any other `q`
+    // with 400. `formatBlurURL` hand-builds `/_next/image?...&q=30|40` for blur
+    // placeholders and ambient backdrops, so allow those too. Production is
+    // unaffected either way (worker/handlers/images serves `/_next/image` via the
+    // IMAGES binding); this keeps `next dev` / `next start` rendering the blurs.
+    qualities: [30, 40, 75],
+  },
+  // The client-side Router Cache reuses already-visited RSC entries on soft
+  // navigation (and back/forward) WITHOUT refetching — and a server-side
+  // Workers Cache purge never evicts it. So a long-open tab keeps serving the RSC it
+  // cached earlier, showing an out-of-date version of a work until a hard reload
+  // discards the client cache. Keep both reuse windows at their minimum so
+  // cached segments go stale quickly and navigation re-pulls fresh RSC from the
+  // server. Next 16 enforces `static >= 30` (it warns at build time and clamps a
+  // lower value to 30s at runtime), so prefetched static segments may be reused
+  // for up to 30s; `dynamic: 0` still marks dynamic segments stale immediately.
+  // Trade-off: back/forward refetch instead of instant-reusing the cache.
+  experimental: {
+    staleTimes: { static: 30, dynamic: 0 },
+  },
+  redirects: async () => [
+    // The public route is /log (the CMS collection slug is `logs`, so /logs is a
+    // natural guess). Exact match only — /log has no detail pages, so there is
+    // nothing meaningful to map sub-paths onto. Placeholder rules (`:path*`) are
+    // also risky here: OpenNext's routing layer skips destination compilation
+    // when the source match yields no params, leaving a literal ":path*" in the
+    // Location header (bit us on staging).
+    {
+      source: '/logs',
+      destination: '/log',
+      permanent: true,
+    },
+  ],
+  // `.md` twins of the content pages. Next.js cannot express a partial dynamic
+  // segment (`[slug].md`), so the three dynamic URLs rewrite onto nested `md`
+  // route handlers. Each rule uses a plain `:slug` (always exactly one segment),
+  // which sidesteps the OpenNext `:path*` zero-segment pitfall described above.
+  rewrites: async () => [
+    { source: '/blog/:slug.md', destination: '/blog/:slug/md' },
+    { source: '/news/:slug.md', destination: '/news/:slug/md' },
+    { source: '/works/:slug.md', destination: '/works/:slug/md' },
+  ],
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  turbopack: {
+    resolveAlias: TURBOPACK_RESOLVE_ALIAS,
+    rules: {
+      '*.svg': {
+        loaders: [
+          {
+            loader: '@svgr/webpack',
+            options: {
+              ref: true,
+              svgoConfig: {
+                plugins: [{ name: 'preset-default', params: { overrides: { prefixIds: false } } }],
+              },
+            },
+          },
+        ],
+        as: '*.js',
+      },
+    },
+  },
+  webpack: (config, { isServer }) => {
+    applyClientAliases(config, isServer);
+    config.module.rules.push({
+      test: /\.svg$/,
+      use: [
+        {
+          loader: '@svgr/webpack',
+          options: {
+            ref: true,
+            svgoConfig: {
+              plugins: [{ name: 'preset-default', params: { overrides: { prefixIds: false } } }],
+            },
+          },
+        },
+      ],
+    });
+    return config;
+  },
+};
+
+export default nextConfig;
+
+// `initOpenNextCloudflareForDev` boots a miniflare instance so `getCloudflareContext`
+// works while running `next dev`. It must run ONLY in the dev server: during
+// `next build` the build spawns parallel workers that would each boot miniflare and
+// deadlock on the shared local Durable Object SQLite state (SQLITE_BUSY). Gate on
+// NODE_ENV (`next dev` => development, `next build` => production) — NEXT_PHASE is
+// not yet set when this config module is first evaluated. The production build path
+// is `opennextjs-cloudflare build`, which provides its own runtime context.
+if (process.env.NODE_ENV === 'development') {
+  void initOpenNextCloudflareForDev({ environment: process.env.CLOUDFLARE_ENV });
+}

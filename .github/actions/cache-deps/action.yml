@@ -7,7 +7,10 @@ runs:
     - name: Cache node_modules
       uses: actions/cache@v4
       with:
-        path: node_modules
+        path: |
+          node_modules
+          apps/*/node_modules
+          packages/*/node_modules
         key: node-modules-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
         restore-keys: |
           node-modules-${{ runner.os }}-

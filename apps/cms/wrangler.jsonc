@@ -1,0 +1,106 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  // Payload CMS Worker (admin / REST / CMS RPC / MCP / media upload) for cms.napochaan.com.
+  // Split out of apps/web (docs/superpowers/specs/2026-11-12-cms-split-design.md §8).
+  "name": "napochaan-cms",
+  "account_id": "cda8b0a2b410e1ff3a5bcc72c7e46f72",
+  "main": "./src/worker.ts",
+  "compatibility_date": "2025-08-15",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  // `src/rpc/local-payload` lazily imports `payload.config`, so wrangler bundles Payload a
+  // second time outside Next's bundle (same as autonomy-inc/www.prisma.com apps/cms):
+  // - `file-type`: the workerd export condition resolves `core.js`, which lacks the
+  //   `fileTypeFromFile` Payload imports; the node entry has it (nodejs_compat).
+  "alias": {
+    "file-type": "file-type/node",
+  },
+  // No Workers Cache and no OpenNext incremental cache (R2/D1/DO) bindings: the cms
+  // serves the admin and the API only, so nothing here is ISR-rendered.
+  //
+  // `vars` / bindings are NOT inherited by `env.*`, so each env repeats them.
+  // CF_ACCESS_* are left out at top level on purpose: an empty team domain disables
+  // the Access plugin, so local dev keeps the password login.
+  "vars": {
+    // Public origin of apps/web. Live Preview opens `${WEB_ORIGIN}/next/preview?...`.
+    "WEB_ORIGIN": "http://localhost:3000",
+    // Public origin of this cms Worker. Payload `cors`/`csrf` allowlist (resolveAllowedOrigins).
+    "CMS_ORIGIN": "http://localhost:3001",
+  },
+  "d1_databases": [
+    {
+      "binding": "D1",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_name": "napochaan-cms-dev",
+    },
+  ],
+  "r2_buckets": [{ "binding": "R2", "bucket_name": "napochaan-cms-dev" }],
+  // Best-effort cache purge: Payload hooks call `env.WEB.purge()` (RPC) on publish. No
+  // `entrypoint` on purpose — purge must run on web's DEFAULT entrypoint (a named one
+  // reports success without evicting; Task 0 spike). web also binds back to the cms, so
+  // deploy order matters; a missing/down web is swallowed by requestWebPurge.
+  "services": [{ "binding": "WEB", "service": "napochaan-website" }],
+  "env": {
+    "staging": {
+      "name": "napochaan-cms-staging",
+      "workers_dev": false,
+      "preview_urls": false,
+      "observability": { "enabled": true, "head_sampling_rate": 1 },
+      "routes": [{ "pattern": "cms-stg.napochaan.com", "custom_domain": true }],
+      "vars": {
+        "WEB_ORIGIN": "https://stg.napochaan.com",
+        "CMS_ORIGIN": "https://cms-stg.napochaan.com",
+        // Cloudflare Access auto-login for the Payload admin (docs/cloudflare-access.md).
+        "CF_ACCESS_TEAM_DOMAIN": "napochaan",
+        // Host-wide Access app for cms-stg.napochaan.com (Managed OAuth ON), created in the
+        // Task 0 spike (.superpowers/sdd/2026-11-12-cms-split/task-0-report.md §5).
+        "CF_ACCESS_AUD": "c582e273d62eadb31e060ca80660d5dbcc85b29076257bf71c5c8e37aded178e",
+        // MCP (/mcp → /api/mcp) sits behind the SAME host-wide app, so its AUD is the same value.
+        // Kept as a separate var because src/app/api/mcp/route.ts only accepts CF_ACCESS_MCP_AUD.
+        "CF_ACCESS_MCP_AUD": "c582e273d62eadb31e060ca80660d5dbcc85b29076257bf71c5c8e37aded178e",
+      },
+      "d1_databases": [
+        {
+          "binding": "D1",
+          "database_id": "7ff5a88d-f403-48eb-a640-21b53040dcfa",
+          "database_name": "napochaan-cms-staging",
+          "remote": true,
+        },
+      ],
+      // `remote: true` mirrors the D1 binding: Payload CLI seed/export (getPlatformProxy with
+      // experimental.remoteBindings) must hit the REAL staging bucket, not local miniflare.
+      "r2_buckets": [{ "binding": "R2", "bucket_name": "napochaan-cms-staging", "remote": true }],
+      "services": [{ "binding": "WEB", "service": "napochaan-website-staging" }],
+    },
+    "production": {
+      "name": "napochaan-cms-production",
+      "workers_dev": false,
+      "preview_urls": false,
+      "observability": { "enabled": true, "head_sampling_rate": 1 },
+      "routes": [{ "pattern": "cms.napochaan.com", "custom_domain": true }],
+      "vars": {
+        "WEB_ORIGIN": "https://napochaan.com",
+        "CMS_ORIGIN": "https://cms.napochaan.com",
+        "CF_ACCESS_TEAM_DOMAIN": "napochaan",
+        // AUD of the host-wide Access app for cms.napochaan.com (Managed OAuth ON). The
+        // /api/media-upload Bypass app has its own AUD and is not referenced here.
+        "CF_ACCESS_AUD": "95cc351749ea3258ac4e23409f688e2538afca6dad7fd88e9fd4e38e4557d266",
+        // Kept as a separate var because src/app/api/mcp/route.ts only accepts CF_ACCESS_MCP_AUD.
+        "CF_ACCESS_MCP_AUD": "95cc351749ea3258ac4e23409f688e2538afca6dad7fd88e9fd4e38e4557d266",
+      },
+      "d1_databases": [
+        {
+          "binding": "D1",
+          "database_id": "047f9f80-9805-468e-96d7-77cbcf86cf0d",
+          "database_name": "napochaan-cms-production",
+          "remote": true,
+        },
+      ],
+      "r2_buckets": [{ "binding": "R2", "bucket_name": "napochaan-cms-production", "remote": true }],
+      "services": [{ "binding": "WEB", "service": "napochaan-website-production" }],
+    },
+  },
+}

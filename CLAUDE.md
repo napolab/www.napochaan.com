@@ -3,8 +3,15 @@
 - pnpm で setup すること
 - Cloudflare Worker を利用すること
 - next.js, opennext, payloadcmsを利用すること
-- opennext では ISR を利用すること
-- seed は payload cms の bin に登録すること
+- pnpm workspaces の monorepo
+    - `apps/cms` = Payload CMS（cms.napochaan.com / cms-stg.napochaan.com、ホスト全体が Cloudflare Access 配下。`/api/media-upload` のみ Bypass）。admin・REST・MCP はここ
+    - `apps/web` = 公開サイト（napochaan.com / stg.napochaan.com）。Payload 非依存の表示専用（`@payloadcms/richtext-lexical/react` と `@payloadcms/live-preview-react` のみ可）
+    - `packages/cms-api` = shared Hono app（`createApp(services)` / `CMSAppType` / DTO / サービス interface）。実装を持たない
+- web → cms は Service Binding `env.CMS`（entrypoint `CMS`）に `hc<CMSAppType>` を載せて呼ぶこと。cms を HTTP で直接 fetch しないこと
+- web は SSR + Workers Cache。HTML は `max-age=0, s-maxage=…`、CMS 書込みで cms が `env.WEB.purge()`（web の default entrypoint）を呼んで全消しする（ISR は使わない。`.claude/rules/workers-cache.md`）
+- deploy は cms → web の順（binding 先から）
+- ローカルは cms の `wrangler dev` を先に起動してから web の `next dev`。dev registry（WRANGLER_REGISTRY_PATH / MINIFLARE_REGISTRY_PATH）は worktree ごとに固定する
+- seed は payload cms の bin に登録すること（`pnpm --filter cms payload seed`）
 - react-aria-components, panda css を利用すること
 - pnpm fmt で pnpm oxlint, pnpm oxfmt --write を実行すること
 - pnpm lint で pnpm oxlint, pnpm oxfmt --check を実行すること
