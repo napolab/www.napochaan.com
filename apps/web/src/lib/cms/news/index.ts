@@ -10,7 +10,8 @@ import type { NewsItem } from '../../../app/(site)/news/_lib/news-item';
 export const findNewsList = async (): Promise<readonly NewsItem[]> => {
   if (isBuildPhase()) return [];
 
-  const res = await getCMSClient().news.$get({ query: {} });
+  const cms = await getCMSClient();
+  const res = await cms.news.$get({ query: {} });
   assertOK('GET /news', res);
 
   return (await res.json()).map(fromNewsItemDTO);
@@ -19,7 +20,8 @@ export const findNewsList = async (): Promise<readonly NewsItem[]> => {
 export const findNewsBySlug = async (slug: string): Promise<NewsItem | undefined> => {
   if (isBuildPhase()) return undefined;
 
-  const res = await getCMSClient().news[':slug'].$get({ param: { slug: encodeURIComponent(slug) } });
+  const cms = await getCMSClient();
+  const res = await cms.news[':slug'].$get({ param: { slug: encodeURIComponent(slug) } });
   if (res.status === 404) return undefined;
   assertOK('GET /news/:slug', res);
 
@@ -31,7 +33,8 @@ export const findNewsBySlug = async (slug: string): Promise<NewsItem | undefined
 export const findNewsDraftById = async (id: string, previewSecret: string): Promise<NewsItem | undefined> => {
   if (isBuildPhase()) return undefined;
 
-  const res = await getCMSClient().drafts.news[':id'].$get({ param: { id: encodeURIComponent(id) }, header: { 'x-preview-secret': previewSecret } });
+  const cms = await getCMSClient();
+  const res = await cms.drafts.news[':id'].$get({ param: { id: encodeURIComponent(id) }, header: { 'x-preview-secret': previewSecret } });
   if (res.status === 403 || res.status === 404) return undefined;
   assertOK('GET /drafts/news/:id', res);
 
@@ -42,7 +45,8 @@ export const findNewsDraftById = async (id: string, previewSecret: string): Prom
 export const findLatestNews = async (limit: number): Promise<readonly NewsItem[]> => {
   if (isBuildPhase()) return [];
 
-  const res = await getCMSClient().news.$get({ query: { limit: `${limit}` } });
+  const cms = await getCMSClient();
+  const res = await cms.news.$get({ query: { limit: `${limit}` } });
   assertOK('GET /news?limit=', res);
 
   return (await res.json()).map(fromNewsItemDTO);

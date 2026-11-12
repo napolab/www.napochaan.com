@@ -10,7 +10,8 @@ import type { GalleryPhoto } from '@components/gallery-archive';
 export const findGalleryList = async (): Promise<readonly GalleryPhoto[]> => {
   if (isBuildPhase()) return [];
 
-  const res = await getCMSClient().gallery.$get();
+  const cms = await getCMSClient();
+  const res = await cms.gallery.$get();
   assertOK('GET /gallery', res);
 
   return (await res.json()).map(fromGalleryPhotoDTO);
@@ -21,7 +22,8 @@ export const findGalleryList = async (): Promise<readonly GalleryPhoto[]> => {
 export const findGalleryDraftList = async (previewSecret: string): Promise<readonly GalleryPhoto[]> => {
   if (isBuildPhase()) return [];
 
-  const res = await getCMSClient().drafts.gallery.$get({ header: { 'x-preview-secret': previewSecret } });
+  const cms = await getCMSClient();
+  const res = await cms.drafts.gallery.$get({ header: { 'x-preview-secret': previewSecret } });
   if (res.status === 403) return [];
   assertOK('GET /drafts/gallery', res);
 

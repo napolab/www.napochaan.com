@@ -11,8 +11,10 @@ export type CMSClient = ReturnType<typeof hc<CMSAppType>>;
 // Typed Hono RPC client over the cms Worker's named `CMS` entrypoint
 // (wrangler.toml `[[services]] binding = "CMS"`). Built per call — `hc` is a
 // cheap proxy, and the binding lives on the per-request Cloudflare context.
-export const getCMSClient = (): CMSClient => {
-  const { env } = getCloudflareContext();
+// Async context on purpose: the sync form throws outside a request (e.g.
+// `generateStaticParams` under `next dev`).
+export const getCMSClient = async (): Promise<CMSClient> => {
+  const { env } = await getCloudflareContext({ async: true });
   const cms = env.CMS;
   if (cms === undefined) throw new Error('CMS service binding is not configured (wrangler.toml [[services]] binding = "CMS")');
 

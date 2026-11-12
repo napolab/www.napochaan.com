@@ -10,7 +10,8 @@ import type { Post } from '../../../app/(site)/blog/_lib/post';
 export const findBlogList = async (): Promise<readonly Post[]> => {
   if (isBuildPhase()) return [];
 
-  const res = await getCMSClient().blog.$get();
+  const cms = await getCMSClient();
+  const res = await cms.blog.$get();
   assertOK('GET /blog', res);
 
   return (await res.json()).map(fromPostDTO);
@@ -19,7 +20,8 @@ export const findBlogList = async (): Promise<readonly Post[]> => {
 export const findBlogBySlug = async (slug: string): Promise<Post | undefined> => {
   if (isBuildPhase()) return undefined;
 
-  const res = await getCMSClient().blog[':slug'].$get({ param: { slug: encodeURIComponent(slug) } });
+  const cms = await getCMSClient();
+  const res = await cms.blog[':slug'].$get({ param: { slug: encodeURIComponent(slug) } });
   if (res.status === 404) return undefined;
   assertOK('GET /blog/:slug', res);
 
@@ -31,7 +33,8 @@ export const findBlogBySlug = async (slug: string): Promise<Post | undefined> =>
 export const findBlogDraftById = async (id: string, previewSecret: string): Promise<Post | undefined> => {
   if (isBuildPhase()) return undefined;
 
-  const res = await getCMSClient().drafts.blog[':id'].$get({ param: { id: encodeURIComponent(id) }, header: { 'x-preview-secret': previewSecret } });
+  const cms = await getCMSClient();
+  const res = await cms.drafts.blog[':id'].$get({ param: { id: encodeURIComponent(id) }, header: { 'x-preview-secret': previewSecret } });
   if (res.status === 403 || res.status === 404) return undefined;
   assertOK('GET /drafts/blog/:id', res);
 

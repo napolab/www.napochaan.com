@@ -9,7 +9,8 @@ import type { LogManualItem } from '../../../app/(site)/log/_lib/log-manual-item
 export const findLogList = async (): Promise<readonly LogManualItem[]> => {
   if (isBuildPhase()) return [];
 
-  const res = await getCMSClient().logs.$get();
+  const cms = await getCMSClient();
+  const res = await cms.logs.$get();
   assertOK('GET /logs', res);
 
   return (await res.json()).map(fromLogManualItemDTO);
@@ -20,7 +21,8 @@ export const findLogList = async (): Promise<readonly LogManualItem[]> => {
 export const findLogDraftList = async (previewSecret: string): Promise<readonly LogManualItem[]> => {
   if (isBuildPhase()) return [];
 
-  const res = await getCMSClient().drafts.logs.$get({ header: { 'x-preview-secret': previewSecret } });
+  const cms = await getCMSClient();
+  const res = await cms.drafts.logs.$get({ header: { 'x-preview-secret': previewSecret } });
   if (res.status === 403) return [];
   assertOK('GET /drafts/logs', res);
 

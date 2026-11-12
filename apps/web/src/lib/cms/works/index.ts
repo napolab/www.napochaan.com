@@ -10,7 +10,8 @@ import type { WorkRow } from '../../../app/(site)/works/_lib/work-row';
 export const findWorksList = async (): Promise<readonly WorkRow[]> => {
   if (isBuildPhase()) return [];
 
-  const res = await getCMSClient().works.$get();
+  const cms = await getCMSClient();
+  const res = await cms.works.$get();
   assertOK('GET /works', res);
 
   return (await res.json()).map(fromWorkRowDTO);
@@ -19,7 +20,8 @@ export const findWorksList = async (): Promise<readonly WorkRow[]> => {
 export const findWorkBySlug = async (slug: string): Promise<WorkRow | undefined> => {
   if (isBuildPhase()) return undefined;
 
-  const res = await getCMSClient().works[':slug'].$get({ param: { slug: encodeURIComponent(slug) } });
+  const cms = await getCMSClient();
+  const res = await cms.works[':slug'].$get({ param: { slug: encodeURIComponent(slug) } });
   if (res.status === 404) return undefined;
   assertOK('GET /works/:slug', res);
 
@@ -31,7 +33,8 @@ export const findWorkBySlug = async (slug: string): Promise<WorkRow | undefined>
 export const findWorkDraftById = async (id: string, previewSecret: string): Promise<WorkRow | undefined> => {
   if (isBuildPhase()) return undefined;
 
-  const res = await getCMSClient().drafts.works[':id'].$get({ param: { id: encodeURIComponent(id) }, header: { 'x-preview-secret': previewSecret } });
+  const cms = await getCMSClient();
+  const res = await cms.drafts.works[':id'].$get({ param: { id: encodeURIComponent(id) }, header: { 'x-preview-secret': previewSecret } });
   if (res.status === 403 || res.status === 404) return undefined;
   assertOK('GET /drafts/works/:id', res);
 

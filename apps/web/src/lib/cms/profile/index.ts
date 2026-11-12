@@ -9,7 +9,8 @@ import type { Profile } from '../../../app/(site)/about/_lib/profile';
 export const findProfile = async (): Promise<Profile | undefined> => {
   if (isBuildPhase()) return undefined;
 
-  const res = await getCMSClient().profile.$get();
+  const cms = await getCMSClient();
+  const res = await cms.profile.$get();
   if (res.status === 404) return undefined;
   assertOK('GET /profile', res);
 

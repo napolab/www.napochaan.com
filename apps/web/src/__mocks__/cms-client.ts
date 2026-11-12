@@ -10,4 +10,4 @@ import type { CMSAppType } from '@napochaan/cms-api/app';
 // context, which does not exist in the browser. This client talks to the cms
 // Hono app in-process over fixture services instead. Component tests normally
 // mock the `@lib/cms/<collection>` helper itself.
-export const getCMSClient = (): CMSClient => hc<CMSAppType>('https://cms.internal', { fetch: createFakeCMSBinding().fetch });
+export const getCMSClient = async (): Promise<CMSClient> => hc<CMSAppType>('https://cms.internal', { fetch: createFakeCMSBinding().fetch });
