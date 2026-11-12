@@ -1,0 +1,49 @@
+{
+  "name": "web-astro",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro build && wrangler dev",
+    "prepare": "panda codegen",
+    "panda": "panda",
+    "fmt": "pnpm run fmt:oxfmt && pnpm run fmt:oxlint",
+    "fmt:oxfmt": "oxfmt --write .",
+    "fmt:oxlint": "oxlint --fix --ignore-pattern .claude/worktrees .",
+    "lint": "pnpm run lint:oxfmt && pnpm run lint:oxlint",
+    "lint:oxfmt": "oxfmt --check .",
+    "lint:oxlint": "oxlint --ignore-pattern .claude/worktrees .",
+    "typecheck": "tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p worker/tsconfig.json",
+    "test": "vitest run",
+    "cf:types": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "~14.4.7",
+    "@astrojs/react": "~7.1.8",
+    "@hono/zod-validator": "^0.9.0",
+    "@napochaan/cms-api": "workspace:*",
+    "astro": "~7.4.11",
+    "durabcast": "^0.2.4",
+    "hono": "^4.12.23",
+    "neverthrow": "^8.2.0",
+    "react": "19.2.9",
+    "react-dom": "19.2.9",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.13.5",
+    "@pandacss/dev": "^1.11.1",
+    "@types/node": "^22.0.0",
+    "@types/react": "~19.2.18",
+    "@types/react-dom": "~19.2.7",
+    "@typescript/native-preview": "7.0.0-dev.20251229.1",
+    "oxfmt": "^0.21.0",
+    "oxlint": "^1.36.0",
+    "postcss": "^8.5.3",
+    "typescript": "^5.0.0",
+    "vitest": "^4.0.18",
+    "wrangler": "^4.161.0"
+  }
+}

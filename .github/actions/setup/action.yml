@@ -21,3 +21,5 @@ runs:
       shell: bash
     - run: cp -n apps/cms/.dev.vars.example apps/cms/.dev.vars
       shell: bash
+    - run: cp -n apps/web-astro/.dev.vars.example apps/web-astro/.dev.vars
+      shell: bash

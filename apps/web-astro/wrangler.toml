@@ -1,0 +1,160 @@
+name = "napochaan-website"
+account_id = "cda8b0a2b410e1ff3a5bcc72c7e46f72"
+main = "./worker/worker.ts"
+compatibility_date = "2025-08-15"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+preview_urls = false
+
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+[vars]
+BASE_URL = "http://localhost:3000"
+# cms Worker origin: Live Preview message origin and the preview pages' frame-ancestors.
+CMS_ORIGIN = "http://localhost:3001"
+TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
+CURSOR_SALT = "dev-cursor-salt-change-me"
+
+# Astro's Cloudflare build writes the client output to dist/client and points the
+# generated dist/server/wrangler.json at it; this entry is for `astro dev`.
+[assets]
+directory = "./dist/client"
+binding = "ASSETS"
+
+[images]
+binding = "IMAGES"
+
+# ===== Services =====
+
+# CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
+[[services]]
+binding = "CMS"
+service = "napochaan-cms"
+entrypoint = "CMS"
+
+[[durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
+
+# ===== Durable Objects Migrations =====
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DOQueueHandler"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["CursorRoom"]
+
+# OpenNext's ISR revalidation queue is gone (SSR + Workers Cache). staging/production
+# inherit this top-level list, so one entry covers every env that declared it in v1.
+[[migrations]]
+tag = "v3"
+deleted_classes = ["DOQueueHandler"]
+
+# ===== Staging Environment =====
+[env.staging]
+workers_dev = false
+preview_urls = false
+
+[env.staging.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.staging.vars]
+BASE_URL = "https://stg.napochaan.com"
+CMS_ORIGIN = "https://cms-stg.napochaan.com"
+TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
+# CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
+# PREVIEW_SECRET is a wrangler secret too and must equal the cms Worker's (Live Preview handshake, /next/preview).
+
+# Workers Cache: HITs are served from the edge without invoking the Worker. Every
+# CMS publish purges everything (cms → WEB.purge(), worker/entrypoint).
+[env.staging.cache]
+enabled = true
+
+[[env.staging.routes]]
+pattern = "stg.napochaan.com"
+custom_domain = true
+
+[env.staging.images]
+binding = "IMAGES"
+
+# CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
+[[env.staging.services]]
+binding = "CMS"
+service = "napochaan-cms-staging"
+entrypoint = "CMS"
+
+[[env.staging.durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
+
+# ===== Production Environment =====
+[env.production]
+workers_dev = false
+preview_urls = false
+
+[env.production.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.production.vars]
+BASE_URL = "https://napochaan.com"
+CMS_ORIGIN = "https://cms.napochaan.com"
+TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
+# CURSOR_SALT is a wrangler secret in production (set via `wrangler secret put CURSOR_SALT --env production`).
+# PREVIEW_SECRET is a wrangler secret too and must equal the cms Worker's (Live Preview handshake, /next/preview).
+
+# Workers Cache: HITs are served from the edge without invoking the Worker. Every
+# CMS publish purges everything (cms → WEB.purge(), worker/entrypoint).
+# Verified on staging first (PR #45); production HTML does not depend on the
+# Sec-CH-Prefers-Color-Scheme hint the zone advertises, so the Vary split is harmless.
+[env.production.cache]
+enabled = true
+
+[[env.production.routes]]
+pattern = "napochaan.com"
+custom_domain = true
+
+[env.production.images]
+binding = "IMAGES"
+
+# CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
+[[env.production.services]]
+binding = "CMS"
+service = "napochaan-cms-production"
+entrypoint = "CMS"
+
+[[env.production.durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
+
+# ===== Test Environment =====
+# Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,
+# `compatibility_date`, and `compatibility_flags` from the top level. Bindings
+# (DO/services/images) are NOT inherited, keeping the worker test runtime minimal.
+# `assets` IS inherited, so override it to a directory that exists at test time
+# (`dist/client` is a build artifact that is absent during tests).
+[env.test]
+# Override `main` so the workers test pool does not import the Astro adapter
+# handler (`@astrojs/cloudflare/handler`), which only resolves inside Astro's Vite
+# build. This entry only re-exports the `CursorRoom` Durable Object.
+main = "./worker/worker.test-entry.ts"
+
+[env.test.vars]
+CURSOR_SALT = "test-cursor-salt"
+TURNSTILE_SITE_KEY = "test-turnstile-site-key"
+
+[env.test.assets]
+directory = "public"
+binding = "ASSETS"
+
+[[env.test.durable_objects.bindings]]
+name = "CURSOR_ROOM"
+class_name = "CursorRoom"
+
+[[env.test.migrations]]
+tag = "v1"
+new_sqlite_classes = ["CursorRoom"]
