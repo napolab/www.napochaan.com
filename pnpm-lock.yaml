@@ -21,6 +21,9 @@ importers:
 
   apps/cms:
     dependencies:
+      '@napochaan/cms-api':
+        specifier: workspace:*
+        version: link:../../packages/cms-api
       '@napolab/payload-cloudflare-access':
         specifier: 0.0.0
         version: 0.0.0(@payloadcms/ui@3.91.0(@types/react@19.2.18)(monaco-editor@0.55.1)(next@16.4.2(@babel/core@7.29.7)(@types/node@22.19.19)(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(sass@1.77.4))(payload@3.91.0(graphql@16.14.1)(typescript@5.9.3))(react-dom@19.2.9(react@19.2.9))(react@19.2.9)(typescript@5.9.3))(payload@3.91.0(graphql@16.14.1)(typescript@5.9.3))(react@19.2.9)

@@ -32,6 +32,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@napochaan/cms-api": "workspace:*",
     "@napolab/payload-cloudflare-access": "0.0.0",
     "@opennextjs/cloudflare": "1.20.12",
     "@payloadcms/db-d1-sqlite": "3.91.0",

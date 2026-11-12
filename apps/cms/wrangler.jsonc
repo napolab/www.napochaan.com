@@ -11,6 +11,16 @@
   "preview_urls": false,
   "observability": { "enabled": true, "head_sampling_rate": 1 },
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
+  // `src/rpc/local-payload` lazily imports `payload.config`, so wrangler bundles Payload a
+  // second time outside Next's bundle (same as autonomy-inc/www.prisma.com apps/cms):
+  // - `file-type`: the workerd export condition resolves `core.js`, which lacks the
+  //   `fileTypeFromFile` Payload imports; the node entry has it (nodejs_compat).
+  // - `@opentelemetry/api`: Next's tracer (reached via `next/cache`) requires it but it
+  //   is not installed; point it at the copy Next ships.
+  "alias": {
+    "file-type": "file-type/node",
+    "@opentelemetry/api": "next/dist/compiled/@opentelemetry/api",
+  },
   // No Workers Cache and no OpenNext incremental cache (R2/D1/DO) bindings: the cms
   // serves the admin and the API only, so nothing here is ISR-rendered.
   //
