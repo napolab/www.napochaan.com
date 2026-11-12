@@ -39,7 +39,7 @@ const NewsPreviewPage = async ({ params }: Props) => {
 
   return (
     <>
-      <LivePreviewListener />
+      <LivePreviewListener serverURL={env.CMS_ORIGIN} />
       <NewsDetail item={item} prev={prev} next={next} />
     </>
   );

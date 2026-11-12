@@ -37,7 +37,7 @@ const LogPreviewPage = async () => {
 
   return (
     <>
-      <LivePreviewListener />
+      <LivePreviewListener serverURL={env.CMS_ORIGIN} />
       <LogTimeline groups={groups} />
     </>
   );

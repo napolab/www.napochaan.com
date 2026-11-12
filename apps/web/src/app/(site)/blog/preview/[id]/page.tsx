@@ -53,7 +53,7 @@ const BlogPreviewPage = async ({ params }: Props) => {
   // Renders inside the blog segment's shared `<main>` (see `blog/layout.tsx`).
   return (
     <>
-      <LivePreviewListener />
+      <LivePreviewListener serverURL={env.CMS_ORIGIN} />
       <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} titleTracking="tight" />
       {post.thumbnail === undefined ? null : <BlogHero thumbnail={post.thumbnail} title={post.title} caption={`blog / ${formattedDate}`} />}
       <div className={s.layout}>

@@ -2,20 +2,26 @@
 
 import { RefreshRouteOnSave } from '@payloadcms/live-preview-react';
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 
-// Mounted inside Payload's Live Preview iframe on the news detail page. It
-// listens for the admin's save events (posted from the CMS origin) and refreshes
-// the route so the preview reflects unsaved/draft edits in real time. Outside the
-// iframe this is inert. The CMS shares the site origin, so the expected message
-// origin is the current window's origin (resolved client-side; this component is
-// never server-rendered with a value).
-export const LivePreviewListener = () => {
+type Props = {
+  // cms Worker origin (env.CMS_ORIGIN, read on the server by the preview page).
+  // The admin posts save events from there, and RefreshRouteOnSave only accepts
+  // messages whose origin matches exactly — so no trailing slash.
+  serverURL?: string;
+};
+
+// Mounted inside the cms admin's Live Preview iframe on the draft preview pages.
+// It listens for the admin's save events and refreshes the route so the preview
+// reflects draft edits in real time. Outside the iframe this is inert. Without a
+// configured cms origin there is nothing to listen to, so it renders nothing.
+export const LivePreviewListener = ({ serverURL }: Props) => {
   const router = useRouter();
   const refresh = useCallback(() => {
     router.refresh();
   }, [router]);
-  const serverURL = useMemo(() => (typeof window === 'undefined' ? '' : window.location.origin), []);
+
+  if (serverURL === undefined) return null;
 
   return <RefreshRouteOnSave refresh={refresh} serverURL={serverURL} />;
 };

@@ -12,6 +12,8 @@ head_sampling_rate = 1
 
 [vars]
 BASE_URL = "http://localhost:3000"
+# cms Worker origin: Live Preview message origin and the preview pages' frame-ancestors.
+CMS_ORIGIN = "http://localhost:3001"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 CURSOR_SALT = "dev-cursor-salt-change-me"
 
@@ -87,6 +89,7 @@ head_sampling_rate = 1
 
 [env.staging.vars]
 BASE_URL = "https://stg.napochaan.com"
+CMS_ORIGIN = "https://cms-stg.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in staging (set via `wrangler secret put CURSOR_SALT --env staging`).
 # Cloudflare Access auto-login for the Payload admin (docs/cloudflare-access.md).
@@ -160,6 +163,7 @@ head_sampling_rate = 1
 
 [env.production.vars]
 BASE_URL = "https://napochaan.com"
+CMS_ORIGIN = "https://cms.napochaan.com"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 # CURSOR_SALT is a wrangler secret in production (set via `wrangler secret put CURSOR_SALT --env production`).
 # Cloudflare Access (docs/cloudflare-access.md): path app napochaan.com/admin* (admin).

@@ -24,10 +24,15 @@ const notFound = (): Response => ({ ok: false, status: 404 }) as unknown as Resp
 const createCtx = (overrides: Partial<OgImageContext> = {}): OgImageContext => ({
   absolute: MEDIA,
   origin: ORIGIN,
-  isDev: false,
-  env: { WORKER_SELF_REFERENCE: { fetch: vi.fn().mockResolvedValue(jpegResponse()) } } as unknown as CloudflareEnv,
+  env: { CMS: { fetch: vi.fn().mockResolvedValue(jpegResponse()) } } as unknown as CloudflareEnv,
   ...overrides,
 });
+
+const requestedURL = (ctx: OgImageContext): string => {
+  const [request] = vi.mocked(ctx.env.CMS?.fetch ?? vi.fn()).mock.calls[0] ?? [];
+  if (!(request instanceof Request)) throw new Error('CMS.fetch was not called with a Request');
+  return request.url;
+};
 
 describe('resolveOgImage', () => {
   it('passes a non-media URL through the external runner unchanged', async () => {
@@ -38,26 +43,26 @@ describe('resolveOgImage', () => {
     expect(result).toBe('https://cdn.example.com/x.png');
   });
 
-  it('returns the absolute URL for same-origin media in development', async () => {
-    const ctx = createCtx({ isDev: true });
-
-    const result = await resolveOgImage(ctx);
-
-    expect(result).toBe(MEDIA);
-  });
-
-  it('inlines same-origin media via the binding as a data URL in production', async () => {
+  it('inlines same-origin media fetched from the cms /media/:filename as a data URL in production', async () => {
     const ctx = createCtx();
 
     const result = await resolveOgImage(ctx);
 
-    expect(ctx.env.WORKER_SELF_REFERENCE?.fetch).toHaveBeenCalledWith(MEDIA);
+    expect(requestedURL(ctx)).toBe('https://cms.internal/media/x.png');
     expect(result).toBe('data:image/jpeg;base64,/9j/AA==');
+  });
+
+  it('re-encodes a percent-encoded media filename exactly once for the cms', async () => {
+    const ctx = createCtx({ absolute: `${ORIGIN}/api/media/file/a%20b%E5%86%99.png` });
+
+    await resolveOgImage(ctx);
+
+    expect(requestedURL(ctx)).toBe(`https://cms.internal/media/${encodeURIComponent('a b写.png')}`);
   });
 
   it('returns undefined when the binding serves a Satori-unsupported format (WebP)', async () => {
     const ctx = createCtx({
-      env: { WORKER_SELF_REFERENCE: { fetch: vi.fn().mockResolvedValue(webpResponse()) } } as unknown as CloudflareEnv,
+      env: { CMS: { fetch: vi.fn().mockResolvedValue(webpResponse()) } } as unknown as CloudflareEnv,
     });
 
     const result = await resolveOgImage(ctx);
@@ -75,7 +80,7 @@ describe('resolveOgImage', () => {
 
   it('returns undefined when the binding fetch is not ok in production', async () => {
     const ctx = createCtx({
-      env: { WORKER_SELF_REFERENCE: { fetch: vi.fn().mockResolvedValue(notFound()) } } as unknown as CloudflareEnv,
+      env: { CMS: { fetch: vi.fn().mockResolvedValue(notFound()) } } as unknown as CloudflareEnv,
     });
 
     const result = await resolveOgImage(ctx);

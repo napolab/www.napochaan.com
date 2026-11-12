@@ -42,7 +42,9 @@ const toBase64 = (buffer: ArrayBuffer): string => {
 };
 
 export const loadOgAssets = async (): Promise<OgAssets> => {
-  const assets = getCloudflareContext().env.ASSETS;
+  // Async form: the sync one throws outside a request under `next dev`.
+  const { env } = await getCloudflareContext({ async: true });
+  const assets = env.ASSETS;
   if (assets === undefined) throw new Error('OG assets: ASSETS binding unavailable');
 
   // Only resolved in dev (see the file header) — the dev-origin fallback target.

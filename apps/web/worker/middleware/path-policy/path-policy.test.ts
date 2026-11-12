@@ -2,132 +2,78 @@ import { Hono } from 'hono';
 import { describe, expect, it, vi } from 'vitest';
 
 import { pathPolicy, resolvePathAction } from './index';
-import { SAME_ORIGIN_FRAMING } from './plugins/admin-frame';
 
-const crossSiteDocument = { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' };
+const CMS_ORIGIN = 'https://cms-stg.napochaan.com';
+const PREVIEW_FRAMING = `frame-ancestors 'self' ${CMS_ORIGIN}`;
 
-const request = (pathname: string, headers: HeadersInit = {}, method = 'GET') => ({ method, pathname, headers: new Headers(headers) });
+const request = (pathname: string) => ({ method: 'GET', pathname, headers: new Headers(), cmsOrigin: CMS_ORIGIN });
 
 describe('resolvePathAction', () => {
-  it('prefers the landing redirect over the frame policy for a cross-site deep admin navigation', () => {
-    expect(resolvePathAction(request('/admin/collections/blog/1', crossSiteDocument))._unsafeUnwrap()).toEqual({ kind: 'redirect', location: '/admin' });
+  it.each(['/blog/preview/1', '/next/preview'])('frames %s for the cms admin', (pathname) => {
+    expect(resolvePathAction(request(pathname))._unsafeUnwrap()).toEqual({ kind: 'frame', policy: { frameAncestors: PREVIEW_FRAMING } });
   });
 
-  it.each(['/admin', '/admin/', '/admin/collections/blog/1'])('frames %s when there is no cross-site document navigation', (pathname) => {
-    expect(resolvePathAction(request(pathname))._unsafeUnwrap()).toEqual({ kind: 'frame', policy: SAME_ORIGIN_FRAMING });
-  });
-
-  it.each(['/admin', '/admin/'])('frames the admin root %s even for a cross-site document navigation', (pathname) => {
-    expect(resolvePathAction(request(pathname, crossSiteDocument))._unsafeUnwrap()).toEqual({ kind: 'frame', policy: SAME_ORIGIN_FRAMING });
-  });
-
-  it.each(['/', '/administrator', '/oauth/authorize', '/next/preview'])('has no action for %s', (pathname) => {
-    expect(resolvePathAction(request(pathname, crossSiteDocument)).isErr()).toBe(true);
+  it.each(['/', '/admin', '/admin/collections/blog/1', '/oauth/authorize'])('has no action for %s', (pathname) => {
+    expect(resolvePathAction(request(pathname)).isErr()).toBe(true);
   });
 });
 
 describe('pathPolicy', () => {
-  const build = (upstream: () => Response = () => new Response('admin')) => {
+  const build = (upstream: () => Response = () => new Response('page')) => {
     const handler = vi.fn(upstream);
-    const app = new Hono().use('*', pathPolicy()).all('*', () => handler());
+    const app = new Hono<{ Bindings: Cloudflare.Env }>().use('*', pathPolicy()).all('*', () => handler());
 
     return { app, handler };
   };
-
-  describe('redirect', () => {
-    it.each(['/admin/collections/blog/1?x=1', '/%61dmin/collections/blog/1', '/admin%2Fcollections', '/admin/%E0%A4%A'])(
-      'sends a cross-site document GET of %s to /admin without caching or calling the handler',
-      async (path) => {
-        const { app, handler } = build();
-
-        const res = await app.request(path, { headers: crossSiteDocument });
-
-        expect(res.status).toBe(302);
-        expect(res.headers.get('Location')).toBe('/admin');
-        expect(res.headers.get('Cache-Control')).toBe('no-store');
-        expect(handler).not.toHaveBeenCalled();
-      },
-    );
-
-    it('redirects HEAD the same as GET', async () => {
-      const { app, handler } = build();
-
-      const res = await app.request('/admin/collections', { method: 'HEAD', headers: crossSiteDocument });
-
-      expect(res.status).toBe(302);
-      expect(handler).not.toHaveBeenCalled();
-    });
-
-    it('lets a same-origin deep admin navigation through', async () => {
-      const { app, handler } = build();
-
-      const res = await app.request('/admin/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Dest': 'document' } });
-
-      expect(res.status).toBe(200);
-      expect(handler).toHaveBeenCalledOnce();
-    });
-
-    it.each(['POST', 'PUT', 'PATCH', 'DELETE'])('lets cross-site %s through', async (method) => {
-      const { app, handler } = build();
-
-      const res = await app.request('/admin/collections', { method, headers: crossSiteDocument });
-
-      expect(res.status).toBe(200);
-      expect(handler).toHaveBeenCalledOnce();
-    });
-  });
+  const env = { CMS_ORIGIN } as unknown as Cloudflare.Env;
 
   describe('frame', () => {
-    it.each(['/admin', '/admin/', '/admin/collections/blog/1', '/%61dmin'])('allows only same-origin framing of %s', async (path) => {
+    it.each(['/blog/preview/1', '/news/preview/1', '/works/preview/1', '/gallery/preview', '/log/preview', '/next/preview', '/%62log/preview/1'])('allows the cms admin to frame %s', async (path) => {
       const { app } = build();
 
-      const res = await app.request(path);
+      const res = await app.request(path, {}, env);
 
-      expect(res.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'self'");
-      expect(res.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+      expect(res.headers.get('Content-Security-Policy')).toBe(PREVIEW_FRAMING);
     });
 
-    it('passes a cross-site navigation to the admin root through with frame headers', async () => {
-      const { app, handler } = build();
+    it('drops an upstream X-Frame-Options that would block the cross-origin cms frame', async () => {
+      const { app } = build(() => new Response('x', { headers: { 'X-Frame-Options': 'SAMEORIGIN' } }));
 
-      const res = await app.request('/admin', { headers: crossSiteDocument });
+      const res = await app.request('/blog/preview/1', {}, env);
 
-      expect(res.status).toBe(200);
-      expect(await res.text()).toBe('admin');
-      expect(handler).toHaveBeenCalledOnce();
-      expect(res.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+      expect(res.headers.get('X-Frame-Options')).toBeNull();
+    });
+
+    it('frames same-origin only when CMS_ORIGIN is not configured', async () => {
+      const { app } = build();
+
+      const res = await app.request('/blog/preview/1');
+
+      expect(res.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'self'");
     });
 
     it('appends frame-ancestors to an existing CSP without one', async () => {
       const { app } = build(() => new Response('x', { headers: { 'Content-Security-Policy': "default-src 'self'" } }));
 
-      const res = await app.request('/admin');
+      const res = await app.request('/blog/preview/1', {}, env);
 
-      expect(res.headers.get('Content-Security-Policy')).toBe("default-src 'self'; frame-ancestors 'self'");
+      expect(res.headers.get('Content-Security-Policy')).toBe(`default-src 'self'; ${PREVIEW_FRAMING}`);
     });
 
     it('leaves an existing CSP that has frame-ancestors', async () => {
       const { app } = build(() => new Response('x', { headers: { 'Content-Security-Policy': "frame-ancestors 'none'" } }));
 
-      const res = await app.request('/admin');
+      const res = await app.request('/blog/preview/1', {}, env);
 
       expect(res.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'none'");
-    });
-
-    it('still frames a malformed percent-encoded path whose raw pathname matches', async () => {
-      const { app } = build();
-
-      const res = await app.request('/admin/%E0%A4%A');
-
-      expect(res.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
     });
   });
 
   describe('no match', () => {
-    it.each(['/', '/administrator', '/oauth/authorize?x=1', '/x/%E0%A4%A'])('does not touch %s', async (path) => {
+    it.each(['/', '/admin/collections/blog/1', '/blog/a', '/x/%E0%A4%A'])('does not touch %s', async (path) => {
       const { app, handler } = build(() => new Response('x'));
 
-      const res = await app.request(path, { headers: crossSiteDocument });
+      const res = await app.request(path, {}, env);
 
       expect(res.status).toBe(200);
       expect(handler).toHaveBeenCalledOnce();

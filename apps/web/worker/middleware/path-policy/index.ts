@@ -2,8 +2,7 @@ import { createMiddleware } from 'hono/factory';
 
 import { createRunner } from '../../lib/first-match-runner';
 import { resolveCSP } from './frame-headers';
-import { adminFramePlugin } from './plugins/admin-frame';
-import { adminLandingPlugin } from './plugins/admin-landing';
+import { previewFramePlugin } from './plugins/preview-frame';
 import { safeDecodePathname } from './safe-decode-pathname';
 
 import type { FramePolicy, PathAction, PathRequest } from './types';
@@ -11,15 +10,24 @@ import type { Context } from 'hono';
 import type { Result } from 'neverthrow';
 
 // 先頭から順に照合し、最初に match した plugin の action を採る(first match wins)。
-// 具体的なものを先に置く: admin-landing の対象(`/admin/` より深い)は admin-frame の対象(`/admin` 配下)の部分集合なので、
-// 後ろに置くと frame に先に match して redirect されなくなる。
-const plugins = [adminLandingPlugin, adminFramePlugin] as const;
+// admin は apps/cms に移った(web 側の admin route は Task 11 で削除)ので admin 向け plugin は持たない。
+const plugins = [previewFramePlugin] as const;
 
 const runPlugins = createRunner(plugins);
 
 export const resolvePathAction = (request: PathRequest): Result<PathAction, PathRequest> => runPlugins(request);
 
-const toPathRequest = (c: Context): PathRequest => ({ method: c.req.method, pathname: safeDecodePathname(new URL(c.req.url).pathname), headers: c.req.raw.headers });
+type HonoEnv = { Bindings: Cloudflare.Env };
+
+// app.request() without env (tests) leaves c.env undefined.
+const readCMSOrigin = (env: Cloudflare.Env | undefined): string | undefined => env?.CMS_ORIGIN;
+
+const toPathRequest = (c: Context<HonoEnv>): PathRequest => ({
+  method: c.req.method,
+  pathname: safeDecodePathname(new URL(c.req.url).pathname),
+  headers: c.req.raw.headers,
+  cmsOrigin: readCMSOrigin(c.env),
+});
 
 const applyRedirect = (c: Context, location: string): Response => {
   c.header('Cache-Control', 'no-store');
@@ -28,13 +36,15 @@ const applyRedirect = (c: Context, location: string): Response => {
 
 // Post-finalization c.header() rebuilds the response, which handles the
 // immutable headers of mounted handler responses (see weaken-etag.ts).
+// X-Frame-Options cannot allow a cross-origin parent, so drop any upstream value
+// and let CSP frame-ancestors decide.
 const applyFrameHeaders = (c: Context, policy: FramePolicy): void => {
   c.header('Content-Security-Policy', resolveCSP(c.res.headers.get('Content-Security-Policy'), policy.frameAncestors));
-  c.header('X-Frame-Options', policy.xFrameOptions);
+  c.header('X-Frame-Options', undefined);
 };
 
 export const pathPolicy = () =>
-  createMiddleware(async (c, next) => {
+  createMiddleware<HonoEnv>(async (c, next) => {
     const resolved = resolvePathAction(toPathRequest(c));
     if (resolved.isErr()) return next();
 

@@ -53,7 +53,7 @@ const WorkPreviewPage = async ({ params }: Props) => {
   return (
     // Renders inside the works segment's shared `<main>` (see `works/layout.tsx`).
     <>
-      <LivePreviewListener />
+      <LivePreviewListener serverURL={env.CMS_ORIGIN} />
       <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
       <WorkDetail work={work} url={absoluteUrl(`/works/${id}`)} />
       {related.length > 0 ? (

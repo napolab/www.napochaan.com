@@ -10,7 +10,7 @@ describe('redirectTo', () => {
 
 describe('frameWith', () => {
   it('builds a frame action carrying the policy', () => {
-    const policy = { frameAncestors: "frame-ancestors 'self'", xFrameOptions: 'SAMEORIGIN' };
+    const policy = { frameAncestors: "frame-ancestors 'self'" };
 
     expect(frameWith(policy)).toEqual({ kind: 'frame', policy });
   });

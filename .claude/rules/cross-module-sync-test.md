@@ -27,5 +27,6 @@ Some values must stay literal for tooling (e.g. dynamic `import('@shikijs/langs/
 | `WORK_TYPE_OPTIONS` (src/collections/fields/work-type) ↔ `type` select options in `Works` (src/collections/works.ts) | `src/lib/mcp/tools/works/works.test.ts` |
 | `CONTENT_MAX_WIDTH_PX` (src/themes/layout) ↔ site-shell `maxWidth` literal (src/components/site-shell/styles.css.ts) | `src/themes/layout.test.ts` |
 | `TITLE_JP_VAR` (src/themes/font-vars, imported directly by `titleJP` token) ↔ `variable` literal in `Zen_Kaku_Gothic_New(...)` (src/themes/fonts.ts — next/font requires a literal, can't import the constant) | `src/themes/font-vars.test.ts` (statically reads fonts.ts source; the module can't be imported under vitest — next/font/google is a build-time-only stub outside Next's compiler) |
+| `PREVIEW_ROOTS` (worker/middleware/path-policy/plugins/preview-frame) ↔ `PREVIEW_PATH_PREFIXES` (src/app/next/preview/allowed-paths) | `worker/middleware/path-policy/plugins/preview-frame/preview-frame.test.ts` |
 
 Add new pairs to this table when you introduce one.

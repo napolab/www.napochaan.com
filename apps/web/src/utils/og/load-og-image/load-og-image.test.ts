@@ -1,12 +1,18 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-// WORKER_SELF_REFERENCE binding stub behind a mutable env holder so each case can
-// present or omit the binding. The SUT reads getCloudflareContext().env.WORKER_SELF_REFERENCE.
+// CMS Service Binding stub behind a mutable env holder so each case can present
+// or omit the binding. The SUT reads the async Cloudflare context's env.CMS; the
+// sync form throws (as it does outside a request under `next dev`).
 const refFetch = vi.fn();
-const env: { WORKER_SELF_REFERENCE: { fetch: typeof refFetch } | undefined } = {
-  WORKER_SELF_REFERENCE: { fetch: refFetch },
+const env: { CMS: { fetch: typeof refFetch } | undefined } = {
+  CMS: { fetch: refFetch },
 };
-vi.mock('@opennextjs/cloudflare', () => ({ getCloudflareContext: () => ({ env }) }));
+vi.mock('@opennextjs/cloudflare', () => ({
+  getCloudflareContext: (options?: { async?: boolean }) => {
+    if (options?.async !== true) throw new Error('getCloudflareContext called in sync mode');
+    return Promise.resolve({ env });
+  },
+}));
 
 import { loadOgImage } from './index';
 
@@ -24,7 +30,7 @@ describe('loadOgImage', () => {
   afterEach(() => {
     vi.clearAllMocks();
     vi.unstubAllEnvs();
-    env.WORKER_SELF_REFERENCE = { fetch: refFetch };
+    env.CMS = { fetch: refFetch };
   });
 
   it('returns undefined for an absent src and never touches the binding', async () => {
@@ -43,13 +49,15 @@ describe('loadOgImage', () => {
     expect(refFetch).not.toHaveBeenCalled();
   });
 
-  it('inlines same-origin payload media via the binding as a data URL in production', async () => {
+  it('inlines same-origin payload media from the cms binding as a data URL in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
     refFetch.mockResolvedValue(jpegResponse());
 
     const result = await loadOgImage('/api/media/file/x.png', ORIGIN);
 
-    expect(refFetch).toHaveBeenCalledWith(`${ORIGIN}/api/media/file/x.png`);
+    const [request] = refFetch.mock.calls[0] ?? [];
+    expect(request).toBeInstanceOf(Request);
+    expect((request as Request).url).toBe('https://cms.internal/media/x.png');
     expect(result).toBe('data:image/jpeg;base64,/9j/AA==');
   });
 
@@ -62,18 +70,21 @@ describe('loadOgImage', () => {
     expect(result).toBeUndefined();
   });
 
-  it('returns the absolute URL for same-origin media in development without touching the binding', async () => {
+  // next/og refuses localhost image URLs (SSRF guard), so dev must inline via
+  // the binding too — the CMS binding exists under `next dev` as well.
+  it('inlines same-origin payload media from the cms binding in development too', async () => {
     vi.stubEnv('NODE_ENV', 'development');
+    refFetch.mockResolvedValue(jpegResponse());
 
     const result = await loadOgImage('/api/media/file/x.png', ORIGIN);
 
-    expect(result).toBe(`${ORIGIN}/api/media/file/x.png`);
-    expect(refFetch).not.toHaveBeenCalled();
+    expect(refFetch).toHaveBeenCalledOnce();
+    expect(result).toBe('data:image/jpeg;base64,/9j/AA==');
   });
 
   it('returns the absolute URL when the binding is unavailable in production', async () => {
     vi.stubEnv('NODE_ENV', 'production');
-    env.WORKER_SELF_REFERENCE = undefined;
+    env.CMS = undefined;
 
     const result = await loadOgImage('/api/media/file/x.png', ORIGIN);
 

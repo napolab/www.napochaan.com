@@ -2,23 +2,26 @@ import { getCloudflareContext } from '@opennextjs/cloudflare';
 import { draftMode } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { getPayloadClient } from '@lib/payload/client';
-
 import { isAllowedPreviewPath } from './allowed-paths';
 
-// Payload Live Preview handshake (official draft-mode pattern). The CMS iframe
-// points here with `path` + `previewSecret`; this route verifies the secret,
-// authenticates the admin user, enables Next draft mode, then redirects to the
-// preview page so server-side rendering returns the latest draft.
+// An unset/empty configured secret must never authorize: otherwise
+// `?previewSecret=` would match it.
+const isValidSecret = (submitted: string | undefined, expected: string | undefined): boolean => expected !== undefined && expected !== '' && submitted === expected;
+
+// Payload Live Preview handshake (official draft-mode pattern). The cms admin
+// iframe points here with `path` + `previewSecret`; this route verifies the
+// secret, enables Next draft mode, then redirects to the preview page so
+// server-side rendering returns the latest draft. The admin session lives on the
+// cms origin, so the shared secret is the gate (drafts themselves are fetched
+// from the cms with the same secret).
 export const GET = async (req: Request): Promise<Response> => {
   const { searchParams } = new URL(req.url);
   const path = searchParams.get('path');
-  const previewSecret = searchParams.get('previewSecret');
+  const previewSecret = searchParams.get('previewSecret') ?? undefined;
 
   const { env } = await getCloudflareContext({ async: true });
-  const expected = env.PREVIEW_SECRET;
 
-  if (previewSecret !== expected) {
+  if (!isValidSecret(previewSecret, env.PREVIEW_SECRET)) {
     return new Response('You are not allowed to preview this page', { status: 403 });
   }
 
@@ -30,28 +33,6 @@ export const GET = async (req: Request): Promise<Response> => {
   }
 
   const draft = await draftMode();
-
-  const payload = await getPayloadClient();
-  const user = await authenticate(payload, req.headers);
-  if (user === undefined) {
-    draft.disable();
-
-    return new Response('You are not allowed to preview this page', { status: 403 });
-  }
-
   draft.enable();
   redirect(path);
-};
-
-// Resolve the authenticated admin via Payload, returning `undefined` when no
-// user is attached or auth throws (invalid/expired token).
-const authenticate = async (payload: Awaited<ReturnType<typeof getPayloadClient>>, headers: Headers): Promise<unknown> => {
-  try {
-    const { user } = await payload.auth({ headers });
-    if (user === null) return undefined;
-
-    return user;
-  } catch {
-    return undefined;
-  }
 };

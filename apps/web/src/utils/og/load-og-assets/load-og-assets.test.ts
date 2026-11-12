@@ -3,7 +3,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 // ASSETS binding stub + origin stub. The SUT reads getCloudflareContext().env.ASSETS
 // and (in dev) requestOrigin(); both are mocked so this stays a pure node test.
 const assetsFetch = vi.fn();
-vi.mock('@opennextjs/cloudflare', () => ({ getCloudflareContext: () => ({ env: { ASSETS: { fetch: assetsFetch } } }) }));
+// The sync form throws outside a request under `next dev`; only the async form resolves.
+vi.mock('@opennextjs/cloudflare', () => ({
+  getCloudflareContext: (options?: { async?: boolean }) => {
+    if (options?.async !== true) throw new Error('getCloudflareContext called in sync mode');
+    return Promise.resolve({ env: { ASSETS: { fetch: assetsFetch } } });
+  },
+}));
 vi.mock('../og-image-url', () => ({ requestOrigin: async () => 'http://localhost:3000' }));
 
 import { loadOgAssets } from './index';
