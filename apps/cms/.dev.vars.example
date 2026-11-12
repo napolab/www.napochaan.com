@@ -1,0 +1,8 @@
+# `wrangler types`（pnpm cf:types）はこのファイルのキーも CloudflareEnv 型に流し込む。
+# 値はプレースホルダ。ローカル開発では .dev.vars にコピーして実値を入れること。
+PAYLOAD_SECRET=dev-placeholder
+PREVIEW_SECRET=dev-placeholder
+
+# Cloudflare Access（Payload admin ログイン）。stg/prod は wrangler vars で設定。空なら plugin 無効で password ログイン。
+CF_ACCESS_TEAM_DOMAIN=
+CF_ACCESS_AUD=

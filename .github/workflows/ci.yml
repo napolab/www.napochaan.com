@@ -25,6 +25,7 @@ jobs:
       # `cloudflare-env.d.ts` is gitignored; regenerate it from wrangler.toml so
       # tsgo can resolve the `CloudflareEnv` type. `wrangler types` is local-only.
       - run: pnpm --filter web cf:types
+      - run: pnpm --filter cms cf:types
       - run: pnpm lint
       - run: pnpm typecheck
 

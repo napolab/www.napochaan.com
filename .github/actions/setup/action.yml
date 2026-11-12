@@ -19,3 +19,5 @@ runs:
     # cp -n でローカルの実 .dev.vars は決して上書きしない。
     - run: cp -n apps/web/.dev.vars.example apps/web/.dev.vars
       shell: bash
+    - run: cp -n apps/cms/.dev.vars.example apps/cms/.dev.vars
+      shell: bash
