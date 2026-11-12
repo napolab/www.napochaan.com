@@ -85,10 +85,11 @@
         "WEB_ORIGIN": "https://napochaan.com",
         "CMS_ORIGIN": "https://cms.napochaan.com",
         "CF_ACCESS_TEAM_DOMAIN": "napochaan",
-        // TODO(Task 14): PLACEHOLDER — add "CF_ACCESS_AUD" once the host-wide Access app for
-        // cms.napochaan.com is created. Until then the Access plugin has no AUD in production.
-        // TODO(Task 14): PLACEHOLDER — add "CF_ACCESS_MCP_AUD" with the same value as CF_ACCESS_AUD.
-        // Until then /mcp answers 500 (fail closed) and the OAuth discovery routes fall through.
+        // AUD of the host-wide Access app for cms.napochaan.com (Managed OAuth ON). The
+        // /api/media-upload Bypass app has its own AUD and is not referenced here.
+        "CF_ACCESS_AUD": "95cc351749ea3258ac4e23409f688e2538afca6dad7fd88e9fd4e38e4557d266",
+        // Kept as a separate var because src/app/api/mcp/route.ts only accepts CF_ACCESS_MCP_AUD.
+        "CF_ACCESS_MCP_AUD": "95cc351749ea3258ac4e23409f688e2538afca6dad7fd88e9fd4e38e4557d266",
       },
       "d1_databases": [
         {
