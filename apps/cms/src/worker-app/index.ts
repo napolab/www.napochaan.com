@@ -1,6 +1,8 @@
 import { createFactory } from 'hono/factory';
 
 import { adminLanding } from './admin-landing';
+import { exitPreviewOnLogout } from './exit-preview-on-logout';
+import { frameGuard } from './frame-guard';
 import { createMCPRoutes } from '../worker-routes/mcp';
 import { mcpGuardRoutes } from '../worker-routes/mcp-guard';
 import { createMCPOAuthMetadataRoutes } from '../worker-routes/mcp-oauth-metadata';
@@ -21,6 +23,10 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
   const app = factory.createApp();
 
   app
+    // 最外層: mount を含む全応答に frame-ancestors 'self' / X-Frame-Options: SAMEORIGIN を付ける(clickjacking 対策)。
+    .use('*', frameGuard())
+    // cms のログアウト(plugin の access-logout の 303)を web の /next/exit-preview 経由にして web の draft mode も終わらせる。
+    .use('*', exitPreviewOnLogout())
     // cross-site の深い /admin 遷移を /admin へ(Payload の GET 描画が書込みをするため)。mount より前。
     .use('*', adminLanding())
     // MCP Access が未設定なら next() で mount(Next の 404)に落ちる。

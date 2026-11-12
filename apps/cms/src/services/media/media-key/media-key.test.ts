@@ -8,10 +8,15 @@ describe('toMediaKey', () => {
     expect(toMediaKey('my photo (1).jpg')).toBe('my photo (1).jpg');
   });
 
+  it.each(['a..png', 'photo..v2.png', '..a.png', 'a.png..'])('accepts %s (`..` inside a name is not a path segment)', (name) => {
+    expect(toMediaKey(name)).toBe(name);
+  });
+
   it.each([
     ['empty', ''],
     ['parent traversal', '../a.png'],
-    ['embedded dots', 'a..png'],
+    ['current directory', '.'],
+    ['parent directory', '..'],
     ['forward slash', 'a/b.png'],
     ['backslash', 'a\\b.png'],
     ['NUL', 'a\u0000.png'],

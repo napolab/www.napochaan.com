@@ -14,6 +14,7 @@
     "deploy:database:check:staging": "CLOUDFLARE_ENV=staging payload migrate:check-drift",
     "deploy:database:production": "CLOUDFLARE_ENV=production payload migrate",
     "deploy:database:check:production": "CLOUDFLARE_ENV=production payload migrate:check-drift",
+    "deploy:access:check:production": "node scripts/check-access-aud.mjs production",
     "payload": "payload",
     "payload:migrate": "payload migrate",
     "payload:migrate:create": "payload migrate:create",

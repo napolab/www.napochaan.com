@@ -138,7 +138,14 @@ cms-stg の deploy 後、次を順に確かめる。
 - [ ] 3. admin 内の操作（一覧・保存・画像アップロード）が通る（Server Action による保存も含む）
 - [ ] 4. 未登録 email で入ると user が自動作成される
 - [ ] 5. admin の nav のログアウトで Access のログアウト画面に遷移し（`POST /api/users/access-logout` → `303 Location: /cdn-cgi/access/logout`）、再度 `/admin` に行くと Access のログインを求められる。IdP のセッションが残っていると、ログイン画面を経ずにそのまま再ログインされることがある（IdP 側のログアウトは別）。
-  - DevTools → Network で `access-logout` の応答に `payload-token` と `__prerender_bypass` を消す `Set-Cookie` が 2 本あり、Application → Cookies からも両方が消えている
+  - ログアウト後の遷移順:
+    1. `POST /api/users/access-logout`
+    2. `303 Location: https://stg.napochaan.com/next/exit-preview?redirect=https%3A%2F%2Fcms-stg.napochaan.com%2Fcdn-cgi%2Faccess%2Flogout`
+    3. web の `/next/exit-preview` が draft mode を消す
+    4. `https://cms-stg.napochaan.com/cdn-cgi/access/logout`
+  - DevTools → Network で次を確かめる:
+    - `access-logout` の応答に、cms の `payload-token`（と cms origin の `__prerender_bypass`）を消す `Set-Cookie` が 2 本ある
+    - `exit-preview` の応答で、**web（`stg.napochaan.com`）の** `__prerender_bypass` が消える（Application → Cookies で両 origin を確認）
   - 別 origin からの POST は 403 で、`Set-Cookie` も `Location` も返らない。ホスト全体アプリが `/api/*` も覆うので、`CF_Authorization` を付けないと Access に弾かれる（非ブラウザは `401`、ブラウザは `302`）。JWT を DevTools からコピーする: `curl -si -X POST -H 'Origin: https://evil.example' --cookie CF_Authorization=<JWT> https://cms-stg.napochaan.com/api/users/access-logout`
 - [ ] 6. 別 origin からのリクエストで認証が解決されない（`user: null`）。JWT は Access ログイン済みブラウザの DevTools → Application → Cookies からコピーする。probe には `GET /api/users/me` を使う:
 
@@ -306,7 +313,13 @@ prod 後の確認:
 - **Access の env が設定されているのに対象の auth collection が無いと、config の build 時に `AccessTargetCollectionNotFound` で落ちる。** 黙って無効にすると password ログインが残る（fail-open）ので、これは意図した fail-loud。対象は `collection` option → `admin.user` → 最初の auth collection の順で決まる。
 - **ログアウトは `POST /api/<slug>/access-logout`（plugin が対象 collection に足す endpoint）を経て `/cdn-cgi/access/logout` へ。** `/cdn-cgi/access/logout` は Access のセッション cookie しか消さない。そのままだと次の 2 つがブラウザに残るので、endpoint が先に消してから `303` で Access のログアウトへ送る（`Cache-Control: no-store`）。
   - `payload-token`（名前は `<cookiePrefix>-token`）: Access の user にも `/api/users/refresh-token` が発行する。`local-jwt` が登録されないので今は読まれないが、Access を外して切り戻した瞬間に生きる。Domain / SameSite / Secure は collection の `auth.cookies` に合わせる（Payload の `generateExpiredPayloadCookie`）。
-  - `__prerender_bypass`（Next の draft mode）: 残すと、ログアウト後もそのブラウザで preview ページが下書きを表示し続ける。Next が付けるのと同じ `Path=/; HttpOnly; Secure; SameSite=None` で消す。
+  - `__prerender_bypass`（Next の draft mode）: 残すと、ログアウト後もそのブラウザで preview ページが下書きを表示し続ける。
+    - **CMS 分離後、draft mode は web の origin**（`stg.napochaan.com` / `napochaan.com`、`/next/preview` が付ける）**にある**。endpoint が `Path=/; HttpOnly; Secure; SameSite=None` で消すのは cms origin の同名 cookie だけで、web の cookie は残る。
+    - そこで cms worker（`apps/cms/src/worker-app/exit-preview-on-logout`、OpenNext の mount より前）が endpoint の `303 Location: /cdn-cgi/access/logout` を `${WEB_ORIGIN}/next/exit-preview?redirect=${CMS_ORIGIN}/cdn-cgi/access/logout`（encode 済み）に書き換える。対象は POST・303・その Location の組だけで、403 などは触らない。
+    - web の `/next/exit-preview` は draft mode を消してから cms の Access ログアウトへ送る。
+      - `redirect` は web 自身の origin と `CMS_ORIGIN` に完全一致する origin だけ許可して常に絶対 URL で返し（裸のパスを返すと `https://<web>//evil.com` などが `Location: //evil.com` になる）、それ以外（他ホスト、`//x`、`javascript:`、look-alike ホスト、別 scheme / port）は `/` に落とす（open redirect にしない）。
+      - web を先に通すのは、stg の web も Access 配下なので、Access セッションが生きている間に通す必要があるため。
+    - Payload の `afterLogout` hook は戻り値で応答を変えられず、`admin.routes.logout` は admin の view パスでしかない。どちらも Access 有効時のログアウト（plugin の endpoint）では走らないので、worker 層で掛けている。
   - 別サイトの form POST で本人をログアウトさせないよう、cookie 経路と同じ CSRF 検査（`Origin` が `payload.config.csrf` に無い・`Sec-Fetch-Site: cross-site` なら拒否）を通らなければ 403 を返し、cookie には触れない。
   - Access のログアウトは全 Access アプリのセッションを失効させる（アプリ単位のログアウトは不可）。IdP のセッションは残るので、次に `/admin` へ来たとき IdP がそのまま通して、ログイン画面を経ずに再ログインされることがある。
   - 対象 collection が `endpoints: false` だと、config の build 時に `AccessLogoutEndpointsDisabled` で落ちる（endpoint を足すと Payload が既定の REST まで戻してしまうため。`AccessTargetCollectionNotFound` と同じ fail-loud）。

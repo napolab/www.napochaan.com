@@ -103,4 +103,63 @@ describe('createWorkerApp', () => {
     expect(await response.text()).toBe('next');
     expect(handlerFetch).toHaveBeenCalledOnce();
   });
+
+  it.each(['/admin', '/admin/collections/blog', '/%61dmin'])('stamps same-origin frame headers on the mounted %s response (frame guard wraps the mount)', async (path) => {
+    const handlerFetch = vi.fn(async () => new Response('admin', { status: 200 }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request(path);
+
+    expect(handlerFetch).toHaveBeenCalledOnce();
+    expect(response.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'self'");
+    expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+  });
+
+  it('merges frame-ancestors into the mounted CSP instead of clobbering it', async () => {
+    const handlerFetch = vi.fn(async () => new Response('admin', { headers: { 'Content-Security-Policy': "default-src 'self'" } }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('/admin');
+
+    expect(response.headers.get('Content-Security-Policy')).toBe("default-src 'self'; frame-ancestors 'self'");
+  });
+
+  it('stamps frame headers on the cross-site landing redirect too (frame guard is outermost)', async () => {
+    const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('/admin/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' } });
+
+    expect(response.status).toBe(302);
+    expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+  });
+
+  it('keeps media-upload JSON intact while adding frame headers', async () => {
+    const handlerFetch = vi.fn(async () => Response.json({ ok: true }, { status: 201 }));
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('/api/media-upload', { method: 'POST' });
+
+    expect(response.status).toBe(201);
+    expect(await response.json()).toEqual({ ok: true });
+    expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+  });
+
+  it('chains the mounted Access logout through web exit-preview, keeping both expired cookies', async () => {
+    const handlerFetch = vi.fn(async () => {
+      const headers = new Headers({ Location: '/cdn-cgi/access/logout', 'Cache-Control': 'no-store' });
+      headers.append('Set-Cookie', 'payload-token=; Path=/; Max-Age=0');
+      headers.append('Set-Cookie', '__prerender_bypass=; Path=/; Max-Age=0');
+      return new Response(null, { status: 303, headers });
+    });
+    const app = createWorkerApp(handlerFetch);
+
+    const response = await app.request('/api/users/access-logout', { method: 'POST' }, { WEB_ORIGIN: 'https://stg.napochaan.com', CMS_ORIGIN: 'https://cms-stg.napochaan.com' });
+
+    expect(handlerFetch).toHaveBeenCalledOnce();
+    expect(response.status).toBe(303);
+    expect(response.headers.get('Location')).toBe('https://stg.napochaan.com/next/exit-preview?redirect=https%3A%2F%2Fcms-stg.napochaan.com%2Fcdn-cgi%2Faccess%2Flogout');
+    expect(response.headers.getSetCookie()).toHaveLength(2);
+    expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
+  });
 });

@@ -63,6 +63,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
+      # どの deploy よりも前に: cms の production に Cloudflare Access の AUD（CF_ACCESS_AUD / CF_ACCESS_MCP_AUD）が
+      # 無ければ止める。AUD が無いと Access plugin が無効になり、cms.napochaan.com が公開の Payload ログインになる。
+      # 手順は docs/production-deploy.md（Access アプリ作成 → AUD を commit → cms 単体 deploy）
+      - run: pnpm --filter cms deploy:access:check:production
       - run: pnpm --filter cms cf:types
       - run: pnpm --filter web cf:types
       # revert で孤立したマイグレーションがあれば migrate / deploy の前に止める（staging と同じ理由）
