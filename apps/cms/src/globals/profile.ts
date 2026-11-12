@@ -1,10 +1,8 @@
-import { revalidateTagsAndPaths } from '../collections/hooks/revalidate';
-import { CACHE_TAGS } from '@utils/cache-tags';
+import { purgeOnChange } from '../collections/hooks/revalidate';
 
 import type { GlobalConfig } from 'payload';
 
-// Singleton profile powering /about. Busting CACHE_TAGS.profile purges the
-// unstable_cache read; revalidatePath('/about') refreshes the ISR HTML.
+// Singleton profile powering /about; any change purges the web cache.
 export const Profile = {
   slug: 'profile',
   label: 'profile',
@@ -17,7 +15,7 @@ export const Profile = {
   },
   versions: { drafts: { autosave: { interval: 375 } } },
   hooks: {
-    afterChange: [() => revalidateTagsAndPaths([CACHE_TAGS.profile], ['/about'])],
+    afterChange: [purgeOnChange],
   },
   fields: [
     {

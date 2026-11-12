@@ -15,11 +15,8 @@
   // second time outside Next's bundle (same as autonomy-inc/www.prisma.com apps/cms):
   // - `file-type`: the workerd export condition resolves `core.js`, which lacks the
   //   `fileTypeFromFile` Payload imports; the node entry has it (nodejs_compat).
-  // - `@opentelemetry/api`: Next's tracer (reached via `next/cache`) requires it but it
-  //   is not installed; point it at the copy Next ships.
   "alias": {
     "file-type": "file-type/node",
-    "@opentelemetry/api": "next/dist/compiled/@opentelemetry/api",
   },
   // No Workers Cache and no OpenNext incremental cache (R2/D1/DO) bindings: the cms
   // serves the admin and the API only, so nothing here is ISR-rendered.
@@ -41,6 +38,11 @@
     },
   ],
   "r2_buckets": [{ "binding": "R2", "bucket_name": "napochaan-cms-dev" }],
+  // Best-effort cache purge: Payload hooks call `env.WEB.purge()` (RPC) on publish. No
+  // `entrypoint` on purpose — purge must run on web's DEFAULT entrypoint (a named one
+  // reports success without evicting; Task 0 spike). web also binds back to the cms, so
+  // deploy order matters; a missing/down web is swallowed by requestWebPurge.
+  "services": [{ "binding": "WEB", "service": "napochaan-website" }],
   "env": {
     "staging": {
       "name": "napochaan-cms-staging",
@@ -71,6 +73,7 @@
       // `remote: true` mirrors the D1 binding: Payload CLI seed/export (getPlatformProxy with
       // experimental.remoteBindings) must hit the REAL staging bucket, not local miniflare.
       "r2_buckets": [{ "binding": "R2", "bucket_name": "napochaan-cms-staging", "remote": true }],
+      "services": [{ "binding": "WEB", "service": "napochaan-website-staging" }],
     },
     "production": {
       "name": "napochaan-cms-production",
@@ -96,6 +99,7 @@
         },
       ],
       "r2_buckets": [{ "binding": "R2", "bucket_name": "napochaan-cms-production", "remote": true }],
+      "services": [{ "binding": "WEB", "service": "napochaan-website-production" }],
     },
   },
 }

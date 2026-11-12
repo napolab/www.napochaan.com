@@ -1,13 +1,11 @@
-import { CACHE_TAGS } from '@utils/cache-tags';
-
-import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
+import { createPublishedPurgeHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
 // Gallery photos feed `/gallery` (skyline masonry) and the home teaser. The image
 // is a media upload; width/height/alt come from the media record. There is no per-doc
-// detail page, so revalidatePath('/') and ('/gallery') cover the ISR HTML.
-const revalidateGallery = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.gallery], ['/', '/gallery']);
+// detail page. A published-state change (drafts are skipped) purges the whole web cache over the WEB binding.
+const revalidateGallery = createPublishedPurgeHooks();
 
 export const Gallery = {
   slug: 'gallery',
