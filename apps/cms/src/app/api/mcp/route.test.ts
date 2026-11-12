@@ -26,10 +26,21 @@ const mocks = vi.hoisted(() => ({
   getPayloadClient: vi.fn(),
   getCloudflareContext: vi.fn(),
   createAccessKeys: vi.fn(),
+  registerBlogTools: vi.fn(),
+  registerWorkTools: vi.fn(),
 }));
 
-const BASE_ENV = { PAYLOAD_SECRET: 'test-payload-secret', CF_ACCESS_TEAM_DOMAIN: 'napochaan', CF_ACCESS_MCP_AUD: 'mcp-aud' };
+const BASE_ENV = {
+  PAYLOAD_SECRET: 'test-payload-secret',
+  CF_ACCESS_TEAM_DOMAIN: 'napochaan',
+  CF_ACCESS_MCP_AUD: 'mcp-aud',
+  WEB_ORIGIN: 'https://stg.napochaan.com',
+  CMS_ORIGIN: 'https://cms-stg.napochaan.com',
+};
 
+// origin の受け渡し(env → tool deps)だけを見るため、登録関数は spy に差し替える。
+vi.mock('@lib/mcp/tools', () => ({ registerBlogTools: mocks.registerBlogTools }));
+vi.mock('@lib/mcp/tools/works', () => ({ registerWorkTools: mocks.registerWorkTools }));
 vi.mock('@lib/payload/client', () => ({
   getPayloadClient: mocks.getPayloadClient,
 }));
@@ -99,6 +110,17 @@ describe('POST /api/mcp', () => {
     mocks.createAccessKeys.mockImplementation(() => keyring.keys);
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  describe('origins', () => {
+    it('hands WEB_ORIGIN / CMS_ORIGIN from the Cloudflare env to the blog and works tools', async () => {
+      const response = await POST(withAssertion(await appToken()));
+
+      expect(response.status).toBe(200);
+      const origins = { webOrigin: 'https://stg.napochaan.com', cmsOrigin: 'https://cms-stg.napochaan.com' };
+      expect(mocks.registerBlogTools).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ ...origins, signingSecret: 'test-payload-secret' }));
+      expect(mocks.registerWorkTools).toHaveBeenCalledWith(expect.anything(), expect.objectContaining(origins));
+    });
   });
 
   describe('authentication (403)', () => {

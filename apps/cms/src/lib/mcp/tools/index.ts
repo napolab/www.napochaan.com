@@ -2,7 +2,6 @@ import { err as errResult, errAsync, fromPromise, fromThrowable, ok as okResult,
 import { z } from 'zod';
 
 import { dayjs } from '@utils/dayjs';
-import { absoluteUrl } from '@utils/site-url';
 
 import { ImageFetchError, ImageURLError, InvalidInputError, MimeTypeError, PayloadOperationError, PostNotFoundError, UploadTooLargeError } from '../errors';
 import { isRoundTrippableAlt } from '../markdown/image-ref';
@@ -25,7 +24,10 @@ export type BlogToolDeps = {
   user: User;
   codec: MarkdownCodec<Blog['body']>;
   signingSecret: string;
-  siteBaseUrl: string;
+  // public site(apps/web)の origin(WEB_ORIGIN)。公開 URL と本文リンクの newTab 判定(内部/外部)に使う。
+  webOrigin: string;
+  // この cms の origin(CMS_ORIGIN)。admin URL と create_upload_url の発行先に使う。
+  cmsOrigin: string;
 };
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -238,12 +240,12 @@ const parsePostQuery = (input: { id?: number; slug?: string }): Result<PostQuery
 };
 
 export const createBlogToolHandlers = (deps: BlogToolDeps) => {
-  const { payload, user, codec, signingSecret, siteBaseUrl } = deps;
+  const { payload, user, codec, signingSecret, webOrigin, cmsOrigin } = deps;
 
   // 本文パイプライン(検証 / alt 同期 / Lexical 往復 / newTab)は works と共用の shared モジュール。
   // blog の body は公開時には必須だが draft では null があり得る(BlogDraftDoc)ので、
   // works と同じく `?? undefined` で境界を揃えてから buildBodyPayload / resolveNextBody に渡す。
-  const { prepareBody, resolveNextBody, buildBodyPayload, verifyMediaExists } = createBodyPipeline({ payload, user, codec, siteBaseUrl });
+  const { prepareBody, resolveNextBody, buildBodyPayload, verifyMediaExists } = createBodyPipeline({ payload, user, codec, siteBaseUrl: webOrigin });
 
   // depth: 0 で読む — 既定 depth だと body 内の upload node が media doc に populate
   // され、convertLexicalToMarkdown が生 URL(![alt](url))として書き出してしまう。
@@ -360,7 +362,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
         })
         .map(({ exp, sig }) => {
           const params = new URLSearchParams({ user: `${user.id}`, exp: `${exp}`, filename: input.filename, alt: input.alt, sig });
-          const uploadURL = `${absoluteUrl('/api/media-upload')}?${params.toString()}`;
+          const uploadURL = `${new URL('/api/media-upload', cmsOrigin).href}?${params.toString()}`;
           return {
             uploadURL,
             method: 'POST',
@@ -403,7 +405,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
           id: created.id,
           slug: created.slug,
           status: 'draft',
-          adminURL: absoluteUrl(`/admin/collections/blog/${created.id}`),
+          adminURL: new URL(`/admin/collections/blog/${created.id}`, cmsOrigin).href,
           note: 'draft として作成済み。admin UI の Live Preview で確認後、publish_post で公開する。',
         }))
         .match(ok, toToolError),
@@ -437,7 +439,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
           id: updated.id,
           slug: updated.slug,
           status: 'draft version saved',
-          adminURL: absoluteUrl(`/admin/collections/blog/${updated.id}`),
+          adminURL: new URL(`/admin/collections/blog/${updated.id}`, cmsOrigin).href,
           note: '変更は draft version として保存済み。公開反映には publish_post が必要。',
         }))
         .match(ok, toToolError),
@@ -477,7 +479,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
           slug: updated.slug,
           title: updated.title,
           status: updated._status,
-          url: absoluteUrl(`/blog/${updated.slug}`),
+          url: new URL(`/blog/${updated.slug}`, webOrigin).href,
         }))
         .match(ok, toToolError),
   };

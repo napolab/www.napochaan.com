@@ -40,7 +40,7 @@ describe('MCP v2 SDK on workerd', () => {
   // このファイル自体が実 workerd 上で走っている前提(コメント末尾を参照)が崩れると、
   // 以下の全テストは「実は何も守っていない」状態にサイレントに退化する。
   // vitest workers pool は `navigator.userAgent` を固定値 'Cloudflare-Workers' にしている
-  // (実測、@cloudflare/vitest-pool-workers)。`worker/**` が将来 node pool に移設される等の
+  // (実測、@cloudflare/vitest-pool-workers)。`src/worker-runtime/**` が将来 node pool(unit project)に移設される等の
   // config 変更が起きたら、このテストごと壊れて気づけるようにする。
   it('runs on workerd, not node', () => {
     expect(navigator.userAgent).toContain('Cloudflare-Workers');

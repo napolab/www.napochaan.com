@@ -3,7 +3,6 @@ import { z } from 'zod';
 
 import { dayjs } from '@utils/dayjs';
 import { createValidator } from '@utils/run-validators';
-import { absoluteUrl } from '@utils/site-url';
 
 // collection 本体(src/collections/works.ts)は revalidate hooks 経由で next/cache を引くので
 // ここからは import しない。種別の正準値は依存ゼロの葉モジュールに置いてある(logs の
@@ -32,7 +31,10 @@ export type WorkToolDeps = {
   payload: Payload;
   user: User;
   codec: MarkdownCodec<WorkBody>;
-  siteBaseUrl: string;
+  // public site(apps/web)の origin(WEB_ORIGIN)。公開 URL と本文リンクの newTab 判定に使う。
+  webOrigin: string;
+  // この cms の origin(CMS_ORIGIN)。admin URL に使う。
+  cmsOrigin: string;
 };
 
 type WorkStatus = 'draft' | 'published' | 'all';
@@ -93,7 +95,7 @@ const toSummary = (doc: Work) => ({
   status: doc._status ?? 'draft',
 });
 
-const adminURLOf = (id: number): string => absoluteUrl(`/admin/collections/works/${id}`);
+const adminURLOf = (cmsOrigin: string, id: number): string => new URL(`/admin/collections/works/${id}`, cmsOrigin).href;
 
 const resolveStatusWhere = (status: WorkStatus): Where | undefined => {
   switch (status) {
@@ -120,11 +122,11 @@ const parseWorkQuery = (input: { id?: number; slug?: string }): ResultAsync<Work
 };
 
 export const createWorkToolHandlers = (deps: WorkToolDeps) => {
-  const { payload, user, codec, siteBaseUrl } = deps;
+  const { payload, user, codec, webOrigin, cmsOrigin } = deps;
 
   // 本文パイプライン(検証 / alt 同期 / Lexical 往復 / newTab)は blog と共用の shared モジュール。
   // works は body 任意なので、Payload の null は `?? undefined` で境界を揃えてから渡す。
-  const { prepareBody, resolveNextBody, buildBodyPayload, verifyMediaExists } = createBodyPipeline<WorkBody>({ payload, user, codec, siteBaseUrl, wording: WORK_UNEDITABLE_WORDING });
+  const { prepareBody, resolveNextBody, buildBodyPayload, verifyMediaExists } = createBodyPipeline<WorkBody>({ payload, user, codec, siteBaseUrl: webOrigin, wording: WORK_UNEDITABLE_WORDING });
 
   // create 系: bodyMarkdown 省略なら本文なし(codec を呼ばない)、指定されていれば prepareBody。
   const prepareBodyIfProvided = (bodyMarkdown: string | undefined): ResultAsync<WorkBody | undefined, McpToolError> => (bodyMarkdown === undefined ? okAsync(undefined) : prepareBody(bodyMarkdown));
@@ -153,7 +155,7 @@ export const createWorkToolHandlers = (deps: WorkToolDeps) => {
   const requireWork = (doc: Work | null): ResultAsync<Work, McpToolError> =>
     doc === null ? errAsync(new WorkNotFoundError('制作物が見つかりません。list_works で id / slug を確認してください。')) : okAsync(doc);
 
-  const buildGetWorkPayload = (doc: Work) => buildBodyPayload(doc.body ?? undefined).map((bodyPayload) => ({ ...toSummary(doc), adminURL: adminURLOf(doc.id), ...bodyPayload }));
+  const buildGetWorkPayload = (doc: Work) => buildBodyPayload(doc.body ?? undefined).map((bodyPayload) => ({ ...toSummary(doc), adminURL: adminURLOf(cmsOrigin, doc.id), ...bodyPayload }));
 
   return {
     listWorks: (input: { status?: WorkStatus; limit?: number }): Promise<ToolResult> =>
@@ -209,7 +211,7 @@ export const createWorkToolHandlers = (deps: WorkToolDeps) => {
           id: created.id,
           slug: created.slug,
           status: 'draft',
-          adminURL: adminURLOf(created.id),
+          adminURL: adminURLOf(cmsOrigin, created.id),
           note: 'draft として作成済み。admin UI の Live Preview で確認後、publish_work で公開する。',
         }))
         .match(ok, toToolError),
@@ -262,7 +264,7 @@ export const createWorkToolHandlers = (deps: WorkToolDeps) => {
           id: updated.id,
           slug: updated.slug,
           status: 'draft version saved',
-          adminURL: adminURLOf(updated.id),
+          adminURL: adminURLOf(cmsOrigin, updated.id),
           note: '変更は draft version として保存済み。公開反映には publish_work が必要。',
         }))
         .match(ok, toToolError),
@@ -302,7 +304,7 @@ export const createWorkToolHandlers = (deps: WorkToolDeps) => {
           slug: published.slug,
           title: published.title,
           status: published._status,
-          url: absoluteUrl(`/works/${published.slug}`),
+          url: new URL(`/works/${published.slug}`, webOrigin).href,
         }))
         .match(ok, toToolError),
   };

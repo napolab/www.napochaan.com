@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { mcpGuardRoutes } from './mcp-guard';
+import { mcpGuardRoutes } from './index';
 
 describe('mcpGuardRoutes', () => {
   it('blocks external POST /api/mcp', async () => {

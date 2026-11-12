@@ -99,9 +99,10 @@ const defaultFetcher: MCPOAuthMetadataFetcher = (input) => fetch(input);
 
 type CreateMCPOAuthMetadataRoutesArgs = { fetcher?: MCPOAuthMetadataFetcher };
 
-// /mcp の Access はパス単位アプリなので、Access は /.well-known/cloudflare-access-protected-resource/mcp しか
-// 返さず、標準の discovery(RFC 9728 / RFC 8414)は origin に落ちて 404 になる。MCP Portal の DCR は
-// 標準の discovery を辿るので、ここで同じ内容を返す。MCP Access が未設定なら next() で今まで通り(404)。
+// MCP Portal の DCR は標準の discovery(RFC 9728 / RFC 8414)を辿る。Access がそれを edge で返さず
+// origin に落とした場合(パス単位アプリの構成など)に備え、ここで同じ内容を返す。cms のホスト全体アプリ
+// (Managed OAuth)では Access 自身が /.well-known/oauth-authorization-server を返すことを Task 0 spike で
+// 確認済みで、ここはそのフォールバック。MCP Access が未設定なら next() で mount(Next の 404)に落ちる。
 export const createMCPOAuthMetadataRoutes = ({ fetcher = defaultFetcher }: CreateMCPOAuthMetadataRoutesArgs = {}) => {
   const factory = createFactory<HonoEnv>();
   const app = factory.createApp();

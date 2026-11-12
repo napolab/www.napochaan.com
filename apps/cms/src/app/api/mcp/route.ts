@@ -27,10 +27,10 @@ import type { Payload } from 'payload';
 
 // 信頼の前提: この route が Cloudflare Access の JWT(Cf-Access-Jwt-Assertion header)を自分で検証し、
 // その email の既存 Payload user を引いて principal にする。手前の層(worker / Access)が付けた
-// 未検証のヘッダーを信じる経路は無い。JWT は MCP 用 Access アプリ(/mcp パス単位、AUD =
-// CF_ACCESS_MCP_AUD)のものだけ通し、admin 用の CF_ACCESS_AUD は混ぜない。
-// 外部からの /api/mcp 直叩きは引き続き Hono 層の mcp-guard(worker/app.ts。登録順序は
-// worker/app.test.ts で回帰テスト済み)が 404 にする。これは多層防御であって、ここの検証を省く理由にはならない。
+// 未検証のヘッダーを信じる経路は無い。JWT は AUD = CF_ACCESS_MCP_AUD のものだけ通す(cms はホスト全体
+// アプリ 1 つなので stg/prod では CF_ACCESS_AUD と同値だが、MCP の検証はこの var だけを見る)。
+// 外部からの /api/mcp 直叩きは引き続き Hono 層の mcp-guard(src/worker-app。登録順序は
+// src/worker-app/worker-app.test.ts で回帰テスト済み)が 404 にする。これは多層防御であって、ここの検証を省く理由にはならない。
 // 応答の契約: 認証失敗(JWT 無し・不正・user 不在)→ 403(401 は成功しようのない OAuth フローに
 // クライアントを誘い込む)。CF_ACCESS_TEAM_DOMAIN / CF_ACCESS_MCP_AUD が未設定・不正、または
 // user の検索自体の失敗(D1 障害など)→ 500(fail closed)。MCP からは user を作らない。
@@ -126,7 +126,11 @@ const lookupFailed = (error: MCPUserLookupFailed): Response => {
 
 const rejectRequest = (error: MCPAuthError | MCPUserLookupFailed, headers: Headers): Response => (error instanceof MCPUserLookupFailed ? lookupFailed(error) : forbidden(error, headers));
 
-const serveMCP = async (request: Request, payload: Payload, user: User, signingSecret: string): Promise<Response> => {
+// MCP が発行する絶対 URL の origin。admin / upload は cms 自身(CMS_ORIGIN)、公開 URL と本文リンクの
+// 内部/外部判定は public site(WEB_ORIGIN)。どちらも wrangler vars(BASE_URL は cms に無い)。
+type MCPOrigins = { webOrigin: string; cmsOrigin: string };
+
+const serveMCP = async (request: Request, payload: Payload, user: User, signingSecret: string, origins: MCPOrigins): Promise<Response> => {
   // editorConfig は richtext-lexical の factory(このモジュールが import している
   // convertLexicalToMarkdown と同一の lexical コピー)で、プロジェクト共通の features
   // (BlocksFeature([ImageRow]) 込み)から組む。
@@ -140,14 +144,14 @@ const serveMCP = async (request: Request, payload: Payload, user: User, signingS
   // "already connected" で throw する)。生成は安価。
   // 元は SDK v1(@modelcontextprotocol/sdk 1.26+)で確認した制約だが、v2
   // (@modelcontextprotocol/server 2.0.0)でも同じ。実挙動は workerd 上の
-  // worker/mcp-v2-runtime.test.ts が毎回この形で組み直して固定している。
+  // src/worker-runtime/mcp-v2-runtime.test.ts が毎回この形で組み直して固定している。
   // jsonSchemaValidator を明示注入する理由: SDK の既定バリデータは実行時のランタイム判定では
   // なく、`@modelcontextprotocol/server` の `"./_shims"` エントリの **ビルド時 export condition**
   // (`workerd` | `browser` | `node` | `default`=node)で選ばれる。Next の webpack ビルドは
   // `node` を解決するため、無指定だと本番バンドルには Ajv(`AjvJsonSchemaValidator`)が入る。
   // Ajv はスキーマのコンパイルに `new Function(...)` を使うが、workerd はコード生成を禁止して
   // おり(`EvalError: Code generation from strings disallowed`)、Ajv 経路のツールを呼んだ瞬間に
-  // 本番で 500 になる。`worker/mcp-v2-runtime.test.ts` はこの分岐を検知できない —
+  // 本番で 500 になる。`src/worker-runtime/mcp-v2-runtime.test.ts` はこの分岐を検知できない —
   // vitest の workers pool(`@cloudflare/vitest-pool-workers`)は `workerd` condition を解決する
   // ため、同じコードでもテストでは自動的に `@cfworker/json-schema` ベースの Workers 版が選ばれて
   // しまい、Next ビルドで実際に何が入るかとは無関係にグリーンになる。
@@ -160,7 +164,7 @@ const serveMCP = async (request: Request, payload: Payload, user: User, signingS
     user,
     codec: createMarkdownCodec<Blog['body']>(editorConfig),
     signingSecret,
-    siteBaseUrl: process.env.BASE_URL ?? 'http://localhost:3000',
+    ...origins,
   });
   // logs は richText を持たないので codec は渡さない。
   registerLogTools(server, { payload, user });
@@ -170,7 +174,7 @@ const serveMCP = async (request: Request, payload: Payload, user: User, signingS
     payload,
     user,
     codec: createMarkdownCodec<NonNullable<Work['body']>>(editorConfig),
-    siteBaseUrl: process.env.BASE_URL ?? 'http://localhost:3000',
+    ...origins,
   });
 
   const transport = new WebStandardStreamableHTTPServerTransport({
@@ -189,7 +193,7 @@ const handleMCPRequest = async (request: Request): Promise<Response> => {
   // create_upload_url が発行する署名付き URL の HMAC secret には Payload 自体の secret を
   // 再利用する(専用 secret を新設せず、既存の秘匿値を流用する設計判断)。
   return authenticate(request.headers, config).match(
-    async (user) => serveMCP(request, await getPayloadClient(), toMCPUser(user), env.PAYLOAD_SECRET),
+    async (user) => serveMCP(request, await getPayloadClient(), toMCPUser(user), env.PAYLOAD_SECRET, { webOrigin: env.WEB_ORIGIN, cmsOrigin: env.CMS_ORIGIN }),
     (error) => rejectRequest(error, request.headers),
   );
 };

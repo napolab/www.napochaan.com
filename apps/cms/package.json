@@ -32,7 +32,10 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.9.0",
+    "@modelcontextprotocol/server": "^2.0.0",
     "@napochaan/cms-api": "workspace:*",
+    "@napolab/cloudflare-access-core": "0.0.0",
     "@napolab/payload-cloudflare-access": "0.0.0",
     "@opennextjs/cloudflare": "1.20.12",
     "@payloadcms/db-d1-sqlite": "3.91.0",
@@ -44,14 +47,18 @@
     "@payloadcms/ui": "3.91.0",
     "bson-objectid": "^2.0.4",
     "dayjs": "^1.11.21",
+    "hono": "^4.12.23",
+    "jose": "^6.2.3",
     "neverthrow": "^8.2.0",
     "next": "16.4.2",
     "payload": "3.91.0",
     "react": "19.2.9",
     "react-dom": "19.2.9",
-    "shiki": "^4.2.0"
+    "shiki": "^4.2.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.13.5",
     "@types/node": "^22.0.0",
     "@types/react": "~19.2.18",
     "@types/react-dom": "~19.2.7",

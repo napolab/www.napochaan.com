@@ -7,17 +7,10 @@ import { createBlogToolHandlers } from '.';
 import type { BlogToolDeps } from '.';
 import type { Blog, User } from '@payload-types';
 
-// Vite reserves `BASE_URL` (default '/') and injects it into `process.env` in
-// the vitest node environment, which breaks `absoluteUrl`'s `new URL(path, base)`
-// call. Stub a real origin for the duration of this suite (see src/utils/site-url
-// for the same pattern).
-beforeEach(() => {
-  vi.stubEnv('BASE_URL', 'https://www.napochaan.com');
-});
-
-afterEach(() => {
-  vi.unstubAllEnvs();
-});
+// Origins are injected through deps (no BASE_URL): the cms issues upload/admin URLs on its own
+// origin and public URLs on the web origin.
+const WEB_ORIGIN = 'https://stg.napochaan.com';
+const CMS_ORIGIN = 'https://cms-stg.napochaan.com';
 
 const user = { id: 1, email: 'dev@napochaan.com' } as User;
 const SIGNING_SECRET = 'test-signing-secret';
@@ -43,7 +36,7 @@ const createDeps = () => {
     toLexical: vi.fn((_markdown: string) => paragraphBody()),
     toMarkdown: vi.fn(() => '# md'),
   };
-  const deps = { payload, user, codec, signingSecret: SIGNING_SECRET, siteBaseUrl: 'https://napochaan.com' } as unknown as BlogToolDeps;
+  const deps = { payload, user, codec, signingSecret: SIGNING_SECRET, webOrigin: WEB_ORIGIN, cmsOrigin: CMS_ORIGIN } as unknown as BlogToolDeps;
   return { payload, codec, deps };
 };
 
@@ -90,6 +83,8 @@ describe('createPost', () => {
         data: expect.objectContaining({ _status: 'draft', slug: 'hello', thumbnail: 5 }),
       }),
     );
+    // admin は cms に移ったので adminURL は cms の origin で発行する。
+    expect(JSON.parse(result.content[0]?.text ?? '{}')).toEqual(expect.objectContaining({ adminURL: `${CMS_ORIGIN}/admin/collections/blog/10` }));
   });
 
   it('rejects raw image URLs with a recovery hint', async () => {
@@ -627,7 +622,8 @@ describe('publishPost', () => {
         },
       }),
     );
-    expect(result.content[0]?.text).toContain('/blog/hello');
+    // 公開 URL は public site(web)の origin。
+    expect(JSON.parse(result.content[0]?.text ?? '{}')).toEqual(expect.objectContaining({ url: `${WEB_ORIGIN}/blog/hello` }));
   });
 
   it('returns an error and does not update when the post does not exist', async () => {
@@ -934,6 +930,16 @@ describe('createUploadURL', () => {
     expect(parsed.method).toBe('POST');
     expect(new Date(parsed.expiresAt).getTime()).toBe(exp * 1000);
     expect(parsed.curlExample).toContain(parsed.uploadURL);
+  });
+
+  it('issues the upload URL on the cms origin (CMS_ORIGIN), not the public site', async () => {
+    const { deps } = createDeps();
+    const handlers = createBlogToolHandlers(deps);
+
+    const result = await handlers.createUploadURL({ filename: 'cover.png', alt: 'テスト画像' });
+
+    const parsed = JSON.parse(result.content[0]?.text ?? '{}') as { uploadURL: string };
+    expect(parsed.uploadURL.startsWith('https://cms-stg.napochaan.com/api/media-upload?')).toBe(true);
   });
 
   it('rejects a filename with an unresolvable extension', async () => {

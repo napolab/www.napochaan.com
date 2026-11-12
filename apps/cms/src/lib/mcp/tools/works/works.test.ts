@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
 import { WORK_TYPE_OPTIONS } from '../../../../collections/fields/work-type';
@@ -10,16 +10,10 @@ import type { WorkBody, WorkToolDeps } from '.';
 import type { McpServer } from '@modelcontextprotocol/server';
 import type { User } from '@payload-types';
 
-// Vite reserves `BASE_URL` (default '/') and injects it into `process.env` in
-// the vitest node environment, which breaks `absoluteUrl`'s `new URL(path, base)`
-// call. Stub a real origin for the duration of this suite (blog の tools.test.ts と同じ)。
-beforeEach(() => {
-  vi.stubEnv('BASE_URL', 'https://www.napochaan.com');
-});
-
-afterEach(() => {
-  vi.unstubAllEnvs();
-});
+// Origins are injected through deps (no BASE_URL): the cms issues upload/admin URLs on its own
+// origin and public URLs on the web origin.
+const WEB_ORIGIN = 'https://stg.napochaan.com';
+const CMS_ORIGIN = 'https://cms-stg.napochaan.com';
 
 const user = { id: 1, email: 'dev@napochaan.com' } as User;
 
@@ -53,7 +47,7 @@ const createDeps = () => {
     toLexical: vi.fn((_markdown: string) => paragraphBody()),
     toMarkdown: vi.fn(() => '# md'),
   };
-  const deps = { payload, user, codec, siteBaseUrl: 'https://napochaan.com' } as unknown as WorkToolDeps;
+  const deps = { payload, user, codec, webOrigin: WEB_ORIGIN, cmsOrigin: CMS_ORIGIN } as unknown as WorkToolDeps;
 
   return { payload, codec, deps };
 };
@@ -129,7 +123,7 @@ describe('getWork', () => {
     expect(result.isError).toBeUndefined();
     expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'works', id: 5, draft: true, overrideAccess: false, user, depth: 0 }));
     expect(parseText(result.content[0]?.text)).toEqual(
-      expect.objectContaining({ id: 5, slug: 'napochaan-v3', thumbnailMediaID: 7, adminURL: 'https://www.napochaan.com/admin/collections/works/5', bodyEditable: true, bodyMarkdown: '# 本文' }),
+      expect.objectContaining({ id: 5, slug: 'napochaan-v3', thumbnailMediaID: 7, adminURL: `${CMS_ORIGIN}/admin/collections/works/5`, bodyEditable: true, bodyMarkdown: '# 本文' }),
     );
   });
 
@@ -214,7 +208,7 @@ describe('createWork', () => {
     // bodyMarkdown 省略時は本文パイプラインを通さない。
     expect(codec.toLexical).not.toHaveBeenCalled();
     expect(payload.create.mock.calls[0]?.[0].data).not.toHaveProperty('body');
-    expect(parseText(result.content[0]?.text)).toEqual(expect.objectContaining({ id: 5, slug: 'napochaan-v3', status: 'draft', adminURL: 'https://www.napochaan.com/admin/collections/works/5' }));
+    expect(parseText(result.content[0]?.text)).toEqual(expect.objectContaining({ id: 5, slug: 'napochaan-v3', status: 'draft', adminURL: `${CMS_ORIGIN}/admin/collections/works/5` }));
   });
 
   it('bodyMarkdown があれば codec に渡して body を保存する', async () => {
@@ -410,7 +404,7 @@ describe('publishWork', () => {
         user,
       }),
     );
-    expect(parseText(result.content[0]?.text)).toEqual(expect.objectContaining({ id: 5, slug: 'napochaan-v3', status: 'published', url: 'https://www.napochaan.com/works/napochaan-v3' }));
+    expect(parseText(result.content[0]?.text)).toEqual(expect.objectContaining({ id: 5, slug: 'napochaan-v3', status: 'published', url: `${WEB_ORIGIN}/works/napochaan-v3` }));
   });
 
   it('存在しない id は reject し、update しない', async () => {

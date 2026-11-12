@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  // Payload CMS Worker (admin / REST / later: CMS RPC + MCP) for cms.napochaan.com.
+  // Payload CMS Worker (admin / REST / CMS RPC / MCP / media upload) for cms.napochaan.com.
   // Split out of apps/web (docs/superpowers/specs/2026-11-12-cms-split-design.md §8).
   "name": "napochaan-cms",
   "account_id": "cda8b0a2b410e1ff3a5bcc72c7e46f72",
@@ -56,6 +56,9 @@
         // Host-wide Access app for cms-stg.napochaan.com (Managed OAuth ON), created in the
         // Task 0 spike (.superpowers/sdd/2026-11-12-cms-split/task-0-report.md §5).
         "CF_ACCESS_AUD": "c582e273d62eadb31e060ca80660d5dbcc85b29076257bf71c5c8e37aded178e",
+        // MCP (/mcp → /api/mcp) sits behind the SAME host-wide app, so its AUD is the same value.
+        // Kept as a separate var because src/app/api/mcp/route.ts only accepts CF_ACCESS_MCP_AUD.
+        "CF_ACCESS_MCP_AUD": "c582e273d62eadb31e060ca80660d5dbcc85b29076257bf71c5c8e37aded178e",
       },
       "d1_databases": [
         {
@@ -81,6 +84,8 @@
         "CF_ACCESS_TEAM_DOMAIN": "napochaan",
         // TODO(Task 14): PLACEHOLDER — add "CF_ACCESS_AUD" once the host-wide Access app for
         // cms.napochaan.com is created. Until then the Access plugin has no AUD in production.
+        // TODO(Task 14): PLACEHOLDER — add "CF_ACCESS_MCP_AUD" with the same value as CF_ACCESS_AUD.
+        // Until then /mcp answers 500 (fail closed) and the OAuth discovery routes fall through.
       },
       "d1_databases": [
         {
