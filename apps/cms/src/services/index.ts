@@ -2,7 +2,9 @@ import { withPayload } from '../rpc/local-payload';
 import { createBlogService } from './blog';
 import { createGalleryService } from './gallery';
 import { createLogsService } from './logs';
+import { createMediaService } from './media';
 import { createNewsService } from './news';
+import { createPreviewService } from './preview';
 import { createProfileService } from './profile';
 import { createWorksService } from './works';
 
@@ -10,7 +12,7 @@ import type { PayloadRunner } from './payload-runner';
 import type { CMSServices } from '@napochaan/cms-api/services';
 
 // Composition root: binds every service to a Payload runner scoped to this
-// request's Cloudflare env/ctx. `media` and `preview` are stubs until Task 5.
+// request's Cloudflare env/ctx.
 export const createPayloadServices = (env: CloudflareEnv, ctx: ExecutionContext): CMSServices => {
   const run: PayloadRunner = async (fn) => withPayload(env, ctx, fn);
 
@@ -21,7 +23,7 @@ export const createPayloadServices = (env: CloudflareEnv, ctx: ExecutionContext)
     gallery: createGalleryService(run),
     logs: createLogsService(run),
     profile: createProfileService(run),
-    media: { file: async () => undefined },
-    preview: { verify: () => false },
+    media: createMediaService(env.R2),
+    preview: createPreviewService(env.PREVIEW_SECRET),
   };
 };

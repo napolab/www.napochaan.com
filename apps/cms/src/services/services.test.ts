@@ -16,11 +16,18 @@ describe('createPayloadServices', () => {
     expect(Object.keys(services).toSorted()).toEqual(['blog', 'gallery', 'logs', 'media', 'news', 'preview', 'profile', 'works']);
   });
 
-  it('stubs media.file to undefined until Task 5', async () => {
-    expect(await createPayloadServices(env, ctx).media.file('a.png')).toBeUndefined();
+  it('wires media to env.R2', async () => {
+    const get = vi.fn(async () => null);
+    const wired = { R2: { get }, PREVIEW_SECRET: 's' } as unknown as CloudflareEnv;
+
+    expect(await createPayloadServices(wired, ctx).media.file('a.png')).toBeUndefined();
+    expect(get).toHaveBeenCalledWith('a.png');
   });
 
-  it('stubs preview.verify to false until Task 5', () => {
-    expect(createPayloadServices(env, ctx).preview.verify('secret')).toBe(false);
+  it('wires preview to env.PREVIEW_SECRET', () => {
+    const wired = { PREVIEW_SECRET: 's' } as unknown as CloudflareEnv;
+
+    expect(createPayloadServices(wired, ctx).preview.verify('s')).toBe(true);
+    expect(createPayloadServices(wired, ctx).preview.verify('x')).toBe(false);
   });
 });
