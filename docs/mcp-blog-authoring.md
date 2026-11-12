@@ -76,9 +76,9 @@ claude.ai の Web / モバイルの直結コネクタ(`https://cms.napochaan.com
 
 認可は Access 側にあるので、KV の grant / token を消す手順は無い（`OAUTH_KV` は廃止）。恒久的に効く順に:
 
-1. **ポリシーから外す**: 再利用ポリシー `naporitan` の include から email を外す。`naporitan` は cms の Access アプリ（`/admin` も `/mcp` も覆うホスト全体アプリ）が共有しているので、MCP と admin の認可が同時に変わる。
+1. **ポリシーから外す**: 再利用ポリシー `naporitan` の include から email を外す。`naporitan` は cms の Access アプリ（admin の `/` 以下も `/mcp` も覆うホスト全体アプリ）が共有しているので、MCP と admin の認可が同時に変わる。
 2. **Access のセッションを失効させる**: Zero Trust ダッシュボードで該当 user の Access セッションを失効させる（画面名は Cloudflare 側の更新で変わる）。access token の TTL は 15 分、grant は 336 時間なので、失効させないと最大その間は使える。1 と合わせて行う。
-3. **（一時的な停止）Payload の user を消す**: `/mcp` は email で既存 user を引けないと 403 を返すので、JWT が生きていても即座に止まる。ただし恒久策ではない。admin の plugin は、Access を通った `/admin` への次回アクセスで user を自動作成し直すため（`docs/cloudflare-access.md`）、その後は `/mcp`（find のみ）も再び通る。MCP だけを止める独立のスイッチではない。
+3. **（一時的な停止）Payload の user を消す**: `/mcp` は email で既存 user を引けないと 403 を返すので、JWT が生きていても即座に止まる。ただし恒久策ではない。admin の plugin は、Access を通った admin（`/`）への次回アクセスで user を自動作成し直すため（`docs/cloudflare-access.md`）、その後は `/mcp`（find のみ）も再び通る。MCP だけを止める独立のスイッチではない。
 
 ## 制約
 

@@ -25,14 +25,14 @@ describe('resolveCSP', () => {
 const build = (upstream: () => Response) => new Hono().use('*', frameGuard()).all('*', upstream);
 
 describe('frameGuard', () => {
-  it.each(['/admin', '/admin/collections/blog', '/%61dmin', '/api/users/me', '/'])('allows only same-origin framing of %s', async (pathname) => {
+  it.each(['/', '/collections/blog', '/%63ollections/blog', '/api/users/me'])('allows only same-origin framing of %s', async (pathname) => {
     const res = await build(() => new Response('ok')).request(pathname);
     expect(res.headers.get('Content-Security-Policy')).toBe("frame-ancestors 'self'");
     expect(res.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
   });
 
   it('merges into an upstream CSP instead of clobbering it', async () => {
-    const res = await build(() => new Response('ok', { headers: { 'Content-Security-Policy': "default-src 'self'" } })).request('/admin');
+    const res = await build(() => new Response('ok', { headers: { 'Content-Security-Policy': "default-src 'self'" } })).request('/');
     expect(res.headers.get('Content-Security-Policy')).toBe("default-src 'self'; frame-ancestors 'self'");
   });
 

@@ -43,7 +43,7 @@ export const NewsPinnedStrip = async () => {
       <ul className="news-pinned-strip__list">
         {docs.map((doc) => (
           <li key={doc.id} className="news-pinned-strip__item">
-            <Link className="news-pinned-strip__title" href={`/admin/collections/news/${doc.id}`}>
+            <Link className="news-pinned-strip__title" href={`/collections/news/${doc.id}`}>
               {doc.title}
             </Link>
             <span className="news-pinned-strip__meta">

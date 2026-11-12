@@ -129,11 +129,10 @@ apps/cms/
     │   ├── media.ts
     │   ├── news.ts
     │   └── hooks/revalidate/      # afterChange / afterDelete → env.WEB.purge()
-    ├── app/(payload)/             # Payload admin routes
-    │   ├── admin/
-    │   │   ├── importMap.js       # Auto-generated: import map
-    │   │   └── [[...segments]]/
-    │   └── api/[...slug]/
+    ├── app/(payload)/             # Payload admin routes (admin at host root: `routes.admin = '/'`)
+    │   ├── importMap.js           # Auto-generated: import map (`admin.importMap.importMapFile`)
+    │   ├── [[...segments]]/       # admin views: `/`, `/login`, `/collections/<slug>/<id>` ...
+    │   └── api/[...slug]/         # REST (`/api/*` — static segment, wins over the catch-all)
     ├── worker.ts                  # Worker entry (CMS RPC entrypoint `CMS`, /mcp forward)
     └── seed/                      # seed bin scripts (seed / seed:export / seed:import)
 packages/cms-api/                  # shared Hono app / DTO / service interfaces (no implementation)
@@ -170,7 +169,7 @@ Always check for existing records before inserting to keep migrations idempotent
 
 These files are managed by Payload — do NOT edit manually:
 
-- `apps/cms/src/app/(payload)/admin/importMap.js`
+- `apps/cms/src/app/(payload)/importMap.js`
 - `apps/cms/src/payload-types.ts`
 - `apps/cms/migrations/*.ts`
 

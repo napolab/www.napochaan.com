@@ -95,7 +95,7 @@ const toSummary = (doc: Work) => ({
   status: doc._status ?? 'draft',
 });
 
-const adminURLOf = (cmsOrigin: string, id: number): string => new URL(`/admin/collections/works/${id}`, cmsOrigin).href;
+const adminURLOf = (cmsOrigin: string, id: number): string => new URL(`/collections/works/${id}`, cmsOrigin).href;
 
 const resolveStatusWhere = (status: WorkStatus): Where | undefined => {
   switch (status) {

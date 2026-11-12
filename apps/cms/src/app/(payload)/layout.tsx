@@ -3,7 +3,7 @@ import { adminFontVariables } from '@themes/fonts-admin';
 
 import config from '@payload-config';
 
-import { importMap } from './admin/importMap';
+import { importMap } from './importMap';
 
 import type { Metadata } from 'next';
 import type { ServerFunctionClient } from 'payload';

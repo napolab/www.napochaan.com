@@ -84,7 +84,7 @@ describe('createPost', () => {
       }),
     );
     // admin は cms に移ったので adminURL は cms の origin で発行する。
-    expect(JSON.parse(result.content[0]?.text ?? '{}')).toEqual(expect.objectContaining({ adminURL: `${CMS_ORIGIN}/admin/collections/blog/10` }));
+    expect(JSON.parse(result.content[0]?.text ?? '{}')).toEqual(expect.objectContaining({ adminURL: `${CMS_ORIGIN}/collections/blog/10` }));
   });
 
   it('rejects raw image URLs with a recovery hint', async () => {

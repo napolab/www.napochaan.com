@@ -123,6 +123,8 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+      // admin を host の root に置くので、import map も admin ディレクトリではなく (payload) 直下。
+      importMapFile: path.resolve(dirname, 'app/(payload)/importMap.js'),
     },
     livePreview: {
       url: createPreviewURLFactory({
@@ -147,6 +149,9 @@ export default buildConfig({
       };
     },
   },
+  // cms は admin 専用ホストなので admin を root(`/`)で配信する(`/collections/<slug>`, `/login`, `/logout`)。
+  // REST は既定の `/api` のまま。`/api/*` の route handler は静的セグメントなので `[[...segments]]` より優先される。
+  routes: { admin: '/' },
   cors: allowedOrigins,
   csrf: allowedOrigins,
   collections: [Users, Media, News, Works, Blog, Gallery, Logs],

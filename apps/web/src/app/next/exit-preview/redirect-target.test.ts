@@ -9,7 +9,7 @@ describe('resolveExitRedirect', () => {
     ['a same-origin path', '/blog/1?x=1#h', 'https://napochaan.com/blog/1?x=1#h'],
     ['a same-origin absolute URL', 'https://napochaan.com/works', 'https://napochaan.com/works'],
     ['the cms origin', 'https://cms.napochaan.com/cdn-cgi/access/logout', 'https://cms.napochaan.com/cdn-cgi/access/logout'],
-    ['the cms admin login', 'https://cms.napochaan.com/admin/login', 'https://cms.napochaan.com/admin/login'],
+    ['the cms admin login', 'https://cms.napochaan.com/login', 'https://cms.napochaan.com/login'],
   ])('allows %s', (_label, value, expected) => {
     expect(resolveExitRedirect(value, origins)).toBe(expected);
   });
@@ -17,20 +17,20 @@ describe('resolveExitRedirect', () => {
   it.each([
     ['missing', null],
     ['empty', ''],
-    ['an evil origin', 'https://evil.example/admin/login'],
+    ['an evil origin', 'https://evil.example/login'],
     ['a protocol-relative URL', '//evil.example/x'],
     ['a backslash protocol-relative URL', '/\\evil.example/x'],
     ['a javascript: URL', 'javascript:alert(1)'],
     ['a data: URL', 'data:text/html,<script>alert(1)</script>'],
     ['a cms-lookalike host', 'https://cms.napochaan.com.evil.example/x'],
-    ['the cms host over another scheme', 'http://cms.napochaan.com/admin/login'],
-    ['the cms host on another port', 'https://cms.napochaan.com:8443/admin/login'],
+    ['the cms host over another scheme', 'http://cms.napochaan.com/login'],
+    ['the cms host on another port', 'https://cms.napochaan.com:8443/login'],
   ])('falls back to / for %s', (_label, value) => {
     expect(resolveExitRedirect(value, origins)).toBe('/');
   });
 
   it.each(['', 'not a url'])('does not allow anything cross-origin when CMS_ORIGIN is %o', (cmsOrigin) => {
-    expect(resolveExitRedirect('https://cms.napochaan.com/admin/login', { ...origins, cmsOrigin })).toBe('/');
+    expect(resolveExitRedirect('https://cms.napochaan.com/login', { ...origins, cmsOrigin })).toBe('/');
     expect(resolveExitRedirect('/works', { ...origins, cmsOrigin })).toBe('https://napochaan.com/works');
   });
 

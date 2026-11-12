@@ -123,7 +123,7 @@ describe('getWork', () => {
     expect(result.isError).toBeUndefined();
     expect(payload.findByID).toHaveBeenCalledWith(expect.objectContaining({ collection: 'works', id: 5, draft: true, overrideAccess: false, user, depth: 0 }));
     expect(parseText(result.content[0]?.text)).toEqual(
-      expect.objectContaining({ id: 5, slug: 'napochaan-v3', thumbnailMediaID: 7, adminURL: `${CMS_ORIGIN}/admin/collections/works/5`, bodyEditable: true, bodyMarkdown: '# 本文' }),
+      expect.objectContaining({ id: 5, slug: 'napochaan-v3', thumbnailMediaID: 7, adminURL: `${CMS_ORIGIN}/collections/works/5`, bodyEditable: true, bodyMarkdown: '# 本文' }),
     );
   });
 
@@ -208,7 +208,7 @@ describe('createWork', () => {
     // bodyMarkdown 省略時は本文パイプラインを通さない。
     expect(codec.toLexical).not.toHaveBeenCalled();
     expect(payload.create.mock.calls[0]?.[0].data).not.toHaveProperty('body');
-    expect(parseText(result.content[0]?.text)).toEqual(expect.objectContaining({ id: 5, slug: 'napochaan-v3', status: 'draft', adminURL: `${CMS_ORIGIN}/admin/collections/works/5` }));
+    expect(parseText(result.content[0]?.text)).toEqual(expect.objectContaining({ id: 5, slug: 'napochaan-v3', status: 'draft', adminURL: `${CMS_ORIGIN}/collections/works/5` }));
   });
 
   it('bodyMarkdown があれば codec に渡して body を保存する', async () => {

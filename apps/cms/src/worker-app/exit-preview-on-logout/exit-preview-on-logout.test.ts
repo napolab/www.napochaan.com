@@ -52,7 +52,7 @@ describe('exitPreviewOnLogout', () => {
   });
 
   it.each([
-    ['another redirect', () => new Response(null, { status: 303, headers: { Location: '/admin' } })],
+    ['another redirect', () => new Response(null, { status: 303, headers: { Location: '/' } })],
     ['a 302 to the Access logout', () => new Response(null, { status: 302, headers: { Location: '/cdn-cgi/access/logout' } })],
   ])('leaves %s untouched', async (_label, upstream) => {
     const res = await build(upstream).request('/api/users/access-logout', { method: 'POST' }, env);

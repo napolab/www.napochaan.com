@@ -30,7 +30,7 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
 | web prod | なし                                                                                                                                         | —                                                                |
 
 - ポリシーは `naporitan`（本人の email のみ）だけ。IdP は GitHub。ホスト全体アプリと Bypass アプリはどちらも Managed OAuth 設定・セッション等を stg の既存アプリからコピーしてある。
-- ホスト全体アプリと `/api/media-upload` の Bypass アプリは同じホストで併用できる（spike で確認: `reports/2026-11-12-cms-split-spike.md` §5。`/api/media-upload` とサブパスは Worker に届き、`/api/media-uploadX` や `/` `/admin` `/mcp` は 401）。
+- ホスト全体アプリと `/api/media-upload` の Bypass アプリは同じホストで併用できる（spike で確認: `reports/2026-11-12-cms-split-spike.md` §5。`/api/media-upload` とサブパスは Worker に届き、`/api/media-uploadX` や `/` `/admin` `/mcp` は 401。spike 当時の admin は `/admin`。今の admin は host の root `/`）。
 - ホスト全体アプリは `/api/*` も覆う。ログイン後の全リクエストに `Cf-Access-Jwt-Assertion` が付くので、通るのは header 経路。
 - Managed OAuth が ON のため、未認証の非ブラウザ要求は cms のどのパスでも `401`（`/api/media-upload` を除く）、ブラウザのページ遷移は Access のログインへ `302`。
 - 以前の prod の構成（`napochaan.com/admin*` と `napochaan.com/mcp` のパス単位アプリ 2 つ、別 AUD）は cms 分離で廃止する対象（公開サイトが `napochaan.com` に残るため、cms 移行後はこれらのアプリは使われない）。
@@ -134,10 +134,10 @@ cms-stg の deploy 後、次を順に確かめる。
 **前提**: cms のホスト全体アプリは全パス（`/api/*` を含む）に `Cf-Access-Jwt-Assertion` header を付ける。ログイン後の全リクエストが header 経路になり、`CF_Authorization` cookie 経路は検証されない（cookie 経路を使うパス単位アプリは廃止した）。項目 6（別 origin の probe）は header 由来も CSRF 検査を受けるので、`{"user":null}` を期待値として確認できる。
 
 - [ ] 1. cms-stg にホスト全体のアプリ（Managed OAuth ON、policy `naporitan` のみ）と `/api/media-upload` の Bypass アプリを作り、ホスト全体アプリの AUD を `env.staging.vars` の `CF_ACCESS_AUD` / `CF_ACCESS_MCP_AUD` に設定して deploy した
-- [ ] 2. `/admin` に入ると自動ログインされ、ログインフォームが出ない
+- [ ] 2. admin（host の root `/`）に入ると自動ログインされ、ログインフォームが出ない
 - [ ] 3. admin 内の操作（一覧・保存・画像アップロード）が通る（Server Action による保存も含む）
 - [ ] 4. 未登録 email で入ると user が自動作成される
-- [ ] 5. admin の nav のログアウトで Access のログアウト画面に遷移し（`POST /api/users/access-logout` → `303 Location: /cdn-cgi/access/logout`）、再度 `/admin` に行くと Access のログインを求められる。IdP のセッションが残っていると、ログイン画面を経ずにそのまま再ログインされることがある（IdP 側のログアウトは別）。
+- [ ] 5. admin の nav のログアウトで Access のログアウト画面に遷移し（`POST /api/users/access-logout` → `303 Location: /cdn-cgi/access/logout`）、再度 `/`（admin）に行くと Access のログインを求められる。IdP のセッションが残っていると、ログイン画面を経ずにそのまま再ログインされることがある（IdP 側のログアウトは別）。
   - ログアウト後の遷移順:
     1. `POST /api/users/access-logout`
     2. `303 Location: https://stg.napochaan.com/next/exit-preview?redirect=https%3A%2F%2Fcms-stg.napochaan.com%2Fcdn-cgi%2Faccess%2Flogout`
@@ -163,7 +163,7 @@ cms-stg の deploy 後、次を順に確かめる。
 - [ ] 7a. Live Preview（admin の iframe が web の `/next/preview` を開く）が、Access ログイン済みの編集者で表示できる。web stg もホスト全体 Access 配下なので、同じブラウザで web stg にもログイン済みであること
 - [ ] 8. `/mcp` の確認は下の「MCP（`/mcp` アプリと MCP Portal）」のチェックリストで行う
 - [ ] 8a. Access 有効な間、password の書き込みが 403 で拒否される（下の「有効な間の password 書き込み拒否」）
-- [ ] 8c. 上の curl で、cross-site の深い `/admin/...` が `302 /admin` になる（admin-landing）
+- [ ] 8c. 上の curl で、cross-site の深い admin パス（`/collections/...` など）が `302 /` になる（admin-landing）
 - [ ] 8b. `POST /api/media-upload`（`create_upload_url` で発行した署名付き URL）が、Access ログイン無しで Worker に届く（署名が不正なら 4xx が Worker から返る。Access の `401` ではない）。`/api/media-uploadX` は `401`
 - [ ] 9. 実際に JWT に入る AUD が、設定した AUD と一致することを記録した（下の「AUD の実測記録」）
 
@@ -270,7 +270,7 @@ cms はホスト全体のアプリ 1 つなので、admin / MCP の JWT の `aud
 
 | リクエスト                           | token の経路（header / cookie） | JWT の `aud`（どのアプリか） |
 | ------------------------------------ | ------------------------------- | ---------------------------- |
-| `/admin` の画面遷移                  |                                 |                              |
+| admin（`/` 以下）の画面遷移          |                                 |                              |
 | admin の XHR（`/api/users/me` など） |                                 |                              |
 | `/mcp`（Portal 経由）                |                                 |                              |
 
@@ -287,7 +287,7 @@ stg の検証が済んだら、`cms.napochaan.com` のホスト全体アプリ�
 
 prod 後の確認:
 
-- [ ] `https://cms.napochaan.com/admin` で Access のログイン → 自動で admin に入る（admin の XHR `/api/users/me` が 200、strategy `cloudflare-access`）
+- [ ] `https://cms.napochaan.com/`（admin）で Access のログイン → 自動で admin に入る（admin の XHR `/api/users/me` が 200、strategy `cloudflare-access`）
 - [ ] `/mcp` は上の「MCP（`/mcp` アプリと MCP Portal）」のチェックリストで確かめる
 - [ ] 公開ページ（`https://napochaan.com/`）と `/api/media/file/*` が Access なしで見える（web prod に Access は無い）
 - [ ] 手順 4 の項目 8b（`/api/media-upload` の Bypass）が prod でも通る
@@ -321,9 +321,9 @@ prod 後の確認:
       - web を先に通すのは、stg の web も Access 配下なので、Access セッションが生きている間に通す必要があるため。
     - Payload の `afterLogout` hook は戻り値で応答を変えられず、`admin.routes.logout` は admin の view パスでしかない。どちらも Access 有効時のログアウト（plugin の endpoint）では走らないので、worker 層で掛けている。
   - 別サイトの form POST で本人をログアウトさせないよう、cookie 経路と同じ CSRF 検査（`Origin` が `payload.config.csrf` に無い・`Sec-Fetch-Site: cross-site` なら拒否）を通らなければ 403 を返し、cookie には触れない。
-  - Access のログアウトは全 Access アプリのセッションを失効させる（アプリ単位のログアウトは不可）。IdP のセッションは残るので、次に `/admin` へ来たとき IdP がそのまま通して、ログイン画面を経ずに再ログインされることがある。
+  - Access のログアウトは全 Access アプリのセッションを失効させる（アプリ単位のログアウトは不可）。IdP のセッションは残るので、次に admin（`/`）へ来たとき IdP がそのまま通して、ログイン画面を経ずに再ログインされることがある。
   - 対象 collection が `endpoints: false` だと、config の build 時に `AccessLogoutEndpointsDisabled` で落ちる（endpoint を足すと Payload が既定の REST まで戻してしまうため。`AccessTargetCollectionNotFound` と同じ fail-loud）。
-- **クロスサイトのトップレベル GET は `/admin` にだけ通す。** Access ログイン後の着地（Origin 無しのクロスサイト top-level GET）を通すため、header 由来の strategy はこれを CSRF 検査で拒否しない。strategy は headers しか見られずパスを判定できないので、cms worker（`apps/cms/src/worker-app/admin-landing`、OpenNext の mount より前に登録）が、`GET` / `HEAD` で `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest: document` の要求のうち `/admin/` 配下の深いパス（`/admin` と `/admin/` は除く。percent-encoding は decode しても判定）を `302 Location: /admin`（`Cache-Control: no-store`）で返す。別サイトのリンクから `/admin/collections/<autosave を持つ collection>/create` などを踏ませて、GET の描画で下書きや一覧の preference を書かせる経路を塞ぐため。代償として、Access のログイン前に開いていた深いパス（ブックマークなど）はログイン後に `/admin` へ着地する。開き直せばよい。順序は `worker-app.test.ts` が検出する。確認（Access ログイン済みの JWT を使う）: `curl -sI https://cms-stg.napochaan.com/admin/collections/blog -H 'Sec-Fetch-Site: cross-site' -H 'Sec-Fetch-Dest: document' --cookie 'CF_Authorization=<自分の JWT>' | grep -i -E '^(HTTP|location|cache-control)'` の期待値は `302` / `location: /admin` / `cache-control: no-store`（`Sec-Fetch-Site: same-origin` なら 200）。
+- **クロスサイトのトップレベル GET は admin の root（`/`）と admin 以外のパスにだけ通す。** Access ログイン後の着地（Origin 無しのクロスサイト top-level GET）を通すため、header 由来の strategy はこれを CSRF 検査で拒否しない。strategy は headers しか見られずパスを判定できないので、cms worker（`apps/cms/src/worker-app/admin-landing`、OpenNext の mount より前に登録）が、`GET` / `HEAD` で `Sec-Fetch-Site: cross-site` かつ `Sec-Fetch-Dest: document` の要求のうち、admin（`payload.config` の `routes.admin = '/'`）の root より深いパスを `302 Location: /`（`Cache-Control: no-store`）で返す。対象外は `/` 自身と admin 以外のパス（`/api`・`/mcp`・`/.well-known`・`/cdn-cgi`・`/_next` の各セグメントとその配下、`/favicon.ico`）。`/apix` のようにセグメント境界を越えないものは admin の catch-all に落ちるので対象。percent-encoding は生と decode 後の両方が対象外のときだけ通す。別サイトのリンクから `/collections/<autosave を持つ collection>/create` などを踏ませて、GET の描画で下書きや一覧の preference を書かせる経路を塞ぐため。代償として、Access のログイン前に開いていた深いパス（ブックマークなど）はログイン後に `/` へ着地する。開き直せばよい。順序は `worker-app.test.ts` が検出する。確認（Access ログイン済みの JWT を使う）: `curl -sI https://cms-stg.napochaan.com/collections/blog -H 'Sec-Fetch-Site: cross-site' -H 'Sec-Fetch-Dest: document' --cookie 'CF_Authorization=<自分の JWT>' | grep -i -E '^(HTTP|location|cache-control)'` の期待値は `302` / `location: /` / `cache-control: no-store`（`Sec-Fetch-Site: same-origin` なら 200）。
   - 残りとして、fetch metadata を送らない古いブラウザ（Safari 16.4 未満など）は、クロスサイトの遷移や `<img>` などの GET を `Origin` も `Sec-Fetch-*` も無しで送るので、このリダイレクトにも CSRF 検査にもかからずに通る（判定上は curl と区別できない）。この場合は空の下書きが 1 件できうる。データの漏洩・改変は無いので許容している。見覚えの無い空の下書きがあれば消してよい。POST などは `Origin` が付くので拒否される。
 - **`Cf-Access-Authenticated-User-Email` ヘッダーは信用しない。** 実装も読んでいない。Access を通らない経路では誰でも付けられる。JWT の署名・`iss`・`aud` を検証した email だけを使う。
 - `workers_dev` / `preview_urls` は全 env で false。Access を迂回する入口は無い。将来有効にするとその hostname は Access アプリの外になる。

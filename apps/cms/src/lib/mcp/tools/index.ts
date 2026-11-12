@@ -405,7 +405,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
           id: created.id,
           slug: created.slug,
           status: 'draft',
-          adminURL: new URL(`/admin/collections/blog/${created.id}`, cmsOrigin).href,
+          adminURL: new URL(`/collections/blog/${created.id}`, cmsOrigin).href,
           note: 'draft として作成済み。admin UI の Live Preview で確認後、publish_post で公開する。',
         }))
         .match(ok, toToolError),
@@ -439,7 +439,7 @@ export const createBlogToolHandlers = (deps: BlogToolDeps) => {
           id: updated.id,
           slug: updated.slug,
           status: 'draft version saved',
-          adminURL: new URL(`/admin/collections/blog/${updated.id}`, cmsOrigin).href,
+          adminURL: new URL(`/collections/blog/${updated.id}`, cmsOrigin).href,
           note: '変更は draft version として保存済み。公開反映には publish_post が必要。',
         }))
         .match(ok, toToolError),

@@ -26,10 +26,10 @@
     "cf:types": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "fmt": "pnpm run fmt:oxfmt && pnpm run fmt:oxlint",
     "fmt:oxfmt": "oxfmt --write .",
-    "fmt:oxlint": "oxlint --fix --ignore-pattern migrations --ignore-pattern src/app/\\(payload\\)/admin/importMap.js .",
+    "fmt:oxlint": "oxlint --fix --ignore-pattern migrations --ignore-pattern src/app/\\(payload\\)/importMap.js .",
     "lint": "pnpm run lint:oxfmt && pnpm run lint:oxlint",
     "lint:oxfmt": "oxfmt --check .",
-    "lint:oxlint": "oxlint --ignore-pattern migrations --ignore-pattern src/app/\\(payload\\)/admin/importMap.js .",
+    "lint:oxlint": "oxlint --ignore-pattern migrations --ignore-pattern src/app/\\(payload\\)/importMap.js .",
     "typecheck": "tsgo --noEmit -p tsconfig.json",
     "test": "vitest run"
   },

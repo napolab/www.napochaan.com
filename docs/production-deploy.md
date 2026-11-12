@@ -35,7 +35,7 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
   32 logs / 12 gallery + the profile global into prod D1, with media uploaded to
   the prod R2 bucket. No admin user is seeded. The cms runs behind host-wide
   Cloudflare Access from its first deploy (step 1–3 below), so the admin user is
-  created by Access auto-login on the first `/admin` visit — Payload's first-user
+  created by Access auto-login on the first visit to the admin (served at the host root `/`) — Payload's first-user
   onboarding screen is never exposed publicly.
 
 `napochaan-cache-production` (D1 / R2) was the OpenNext incremental / tag cache of the
@@ -130,13 +130,13 @@ the cms before anything else.
 Confirm the cms before touching web:
 
 ```bash
-curl -sI https://cms.napochaan.com/admin | head -1                        # 302 (Access login) — never a Payload login page
+curl -sI https://cms.napochaan.com/ | head -1                             # 302 (Access login) — never a Payload login page
 curl -s -o /dev/null -w '%{http_code}\n' -X POST https://cms.napochaan.com/api/media-upload   # 4xx from the route itself (Bypass), not an Access 302
 ```
 
 Then, in a browser:
 
-- Open `https://cms.napochaan.com/admin`. Access logs you in, and the admin user is created automatically.
+- Open `https://cms.napochaan.com/` (the admin is at the host root). Access logs you in, and the admin user is created automatically.
 - `curl -sI` with your Access JWT shows `content-security-policy: … frame-ancestors 'self'` and
   `x-frame-options: SAMEORIGIN`.
 
@@ -187,7 +187,7 @@ curl -sI https://napochaan.com | head -1            # 200
 curl -sI https://cms.napochaan.com | head -1        # 401 / 302 (Access)
 ```
 
-Then open `https://cms.napochaan.com/admin`. Access auto-login signs you in and creates
+Then open `https://cms.napochaan.com/` (admin root). Access auto-login signs you in and creates
 the admin user on the first visit. Publish a post and confirm `https://napochaan.com/`
 reflects it (cms `afterChange` → `env.WEB.purge()`).
 

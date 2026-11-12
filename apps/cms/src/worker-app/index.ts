@@ -27,7 +27,7 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
     .use('*', frameGuard())
     // cms のログアウト(plugin の access-logout の 303)を web の /next/exit-preview 経由にして web の draft mode も終わらせる。
     .use('*', exitPreviewOnLogout())
-    // cross-site の深い /admin 遷移を /admin へ(Payload の GET 描画が書込みをするため)。mount より前。
+    // cross-site の深い admin 遷移(admin は root)を / へ(Payload の GET 描画が書込みをするため)。mount より前。
     .use('*', adminLanding())
     // MCP Access が未設定なら next() で mount(Next の 404)に落ちる。
     .route('/', createMCPOAuthMetadataRoutes())

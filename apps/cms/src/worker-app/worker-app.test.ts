@@ -7,10 +7,10 @@ describe('createWorkerApp', () => {
     const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
     const app = createWorkerApp(handlerFetch);
 
-    const response = await app.request('/admin/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' } });
+    const response = await app.request('/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' } });
 
     expect(response.status).toBe(302);
-    expect(response.headers.get('Location')).toBe('/admin');
+    expect(response.headers.get('Location')).toBe('/');
     expect(handlerFetch).not.toHaveBeenCalled();
   });
 
@@ -18,7 +18,7 @@ describe('createWorkerApp', () => {
     const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
     const app = createWorkerApp(handlerFetch);
 
-    const response = await app.request('/admin/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Dest': 'document' } });
+    const response = await app.request('/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Dest': 'document' } });
 
     expect(response.status).toBe(200);
     expect(handlerFetch).toHaveBeenCalledOnce();
@@ -93,7 +93,7 @@ describe('createWorkerApp', () => {
     expect(handlerFetch).toHaveBeenCalledOnce();
   });
 
-  it.each(['/admin', '/api/users/me', '/api/media-upload'])('falls through %s to the mounted handler', async (path) => {
+  it.each(['/', '/collections/blog', '/api/users/me', '/api/media-upload'])('falls through %s to the mounted handler', async (path) => {
     const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
     const app = createWorkerApp(handlerFetch);
 
@@ -104,7 +104,7 @@ describe('createWorkerApp', () => {
     expect(handlerFetch).toHaveBeenCalledOnce();
   });
 
-  it.each(['/admin', '/admin/collections/blog', '/%61dmin'])('stamps same-origin frame headers on the mounted %s response (frame guard wraps the mount)', async (path) => {
+  it.each(['/', '/collections/blog', '/%63ollections/blog'])('stamps same-origin frame headers on the mounted %s response (frame guard wraps the mount)', async (path) => {
     const handlerFetch = vi.fn(async () => new Response('admin', { status: 200 }));
     const app = createWorkerApp(handlerFetch);
 
@@ -119,7 +119,7 @@ describe('createWorkerApp', () => {
     const handlerFetch = vi.fn(async () => new Response('admin', { headers: { 'Content-Security-Policy': "default-src 'self'" } }));
     const app = createWorkerApp(handlerFetch);
 
-    const response = await app.request('/admin');
+    const response = await app.request('/');
 
     expect(response.headers.get('Content-Security-Policy')).toBe("default-src 'self'; frame-ancestors 'self'");
   });
@@ -128,7 +128,7 @@ describe('createWorkerApp', () => {
     const handlerFetch = vi.fn(async () => new Response('next', { status: 200 }));
     const app = createWorkerApp(handlerFetch);
 
-    const response = await app.request('/admin/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' } });
+    const response = await app.request('/collections/blog/1', { headers: { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Dest': 'document' } });
 
     expect(response.status).toBe(302);
     expect(response.headers.get('X-Frame-Options')).toBe('SAMEORIGIN');
