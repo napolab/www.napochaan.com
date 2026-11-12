@@ -1,0 +1,11 @@
+{
+  "plugins": [],
+  "categories": {},
+  "rules": {
+    "func-style": ["error", "expression"],
+    "prefer-arrow-callback": "error",
+    "unicorn/filename-case": ["error", { "cases": { "kebabCase": true } }]
+  },
+  "env": { "builtin": true },
+  "ignorePatterns": ["**/*.test.ts", "**/*.test-d.ts"]
+}
