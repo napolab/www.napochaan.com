@@ -29,7 +29,7 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
 | staging D1 にマイグレーション適用 | `pnpm deploy:database:staging` |
 | staging からシード書き出し | `CLOUDFLARE_ENV=staging pnpm seed:export` |
 | staging へシード投入（明示依頼時のみ） | `CLOUDFLARE_ENV=staging pnpm seed:import` |
-| ISR キャッシュ bust | `CLOUDFLARE_ENV=staging pnpm revalidate:isr` |
+| Workers Cache を空にする | `pnpm deploy:staging`（新しい Worker version は空のキャッシュから始まる） |
 
 ## Full Sequence (deploy + import)
 
@@ -40,7 +40,7 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
 #    （新コード + 旧 schema は 500 になる。旧コード + 新 schema は概ね無害）
 pnpm deploy:database:staging
 
-# 2. deploy（build → deploy → ISR bust まで自動。数分かかるのでバックグラウンド推奨）
+# 2. deploy（build → deploy。数分かかるのでバックグラウンド推奨）
 pnpm deploy:staging
 
 # 3. staging の編集を先に取り込む（import するなら必須の前段）
@@ -49,8 +49,8 @@ CLOUDFLARE_ENV=staging pnpm seed:export
 # 4. import（明示依頼があるときのみ）
 CLOUDFLARE_ENV=staging pnpm seed:import
 
-# 5. import はデータ変更なので ISR bust を手動で（deploy:staging の自動 bust は import 前）
-CLOUDFLARE_ENV=staging pnpm revalidate:isr
+# 5. import は purge hook を通らない（disableRevalidate）ので、web を再 deploy して Workers Cache を空にする
+pnpm deploy:staging
 ```
 
 ## Recovery（途中で失敗したとき）
@@ -65,12 +65,12 @@ deploy / migration / import はいずれも再実行が安全（migration は適
 | --- | --- |
 | exit code 13 / `Select which Cloudflare account` / unsettled top-level await | `CLOUDFLARE_ACCOUNT_ID` 未指定。env var を付けて再実行 |
 | `D1_ERROR: no such column: ...` during seed:import | staging D1 のマイグレーション漏れ。`pnpm deploy:database:staging` してから import を再実行 |
-| import したのに stg の表示が古い | ISR キャッシュが残っている。`CLOUDFLARE_ENV=staging pnpm revalidate:isr` |
+| import したのに stg の表示が古い | Workers Cache が残っている。web を再 deploy する（Worker version が変わり Workers Cache が空になる。`.claude/rules/workers-cache.md`） |
 | seed:export がローカルの miniflare を見てしまう | `CLOUDFLARE_ENV=staging` 忘れ。これが remote bindings のスイッチ |
 | deploy がフォアグラウンドで長時間ブロック | build+deploy は数分かかる。バックグラウンド実行にする（account ID を付けていれば対話プロンプトは出ない） |
 
 ## Verification
 
-- deploy 成功: ログに `Uploaded napochaan-website-staging` / `Current Version ID:` と `[bust-isr-cache] done.`
+- deploy 成功: ログに `Uploaded napochaan-website-staging` / `Current Version ID:` 
 - export 成功: `wrote N <slug> → src/seed/data/<slug>.json` が works/news/blog/logs/gallery/profile 分出る。blog.json の本文画像は `"__file": "..."` センチネル形式であること
 - import 成功: `upserted N news/works/blog`、`recreated N logs/gallery rows`、`updated profile global`

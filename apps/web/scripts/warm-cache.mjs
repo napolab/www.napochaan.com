@@ -2,19 +2,18 @@
 //
 // Workers Cache (enabled on production, see wrangler config) is keyed by
 // Worker version, so every deploy starts with an EMPTY cache. The first
-// visitor of each page pays a full 0.6–5s ISR regeneration cold-start — the
+// visitor of each page pays a full 0.6–5s SSR cold-start — the
 // home page has hit a 524 this way. This script fetches every URL in
 // sitemap.xml (plus the RSS feeds and llms.txt exports, which are not in the
 // sitemap but ARE served through Workers Cache) right after deploy, so the
 // cache is already warm before a real visitor arrives.
 //
-// Runs automatically at the tail of `deploy:production`, right after
-// bust-isr-cache.mjs. It is intentionally best-effort: a slow or failing
+// Runs automatically at the tail of `deploy:production`. It is intentionally best-effort: a slow or failing
 // individual URL should not fail the deploy, so this only exits non-zero
 // when the sitemap itself cannot be fetched (a strong signal the deploy is
 // broken). Even that is reported as a GitHub Actions warning annotation
 // rather than a failing step: by the time this runs the Worker is already
-// deployed and the ISR cache already busted, so a red job would misreport a
+// deployed, so a red job would misreport a
 // successful deploy. (First production run: the GitHub runner's requests were
 // answered 403 by the zone's bot protection, while the same requests from a
 // residential IP pass — the block is IP/ASN based, not User-Agent based.)

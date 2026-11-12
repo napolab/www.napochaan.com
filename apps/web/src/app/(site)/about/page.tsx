@@ -8,8 +8,9 @@ import { findProfile } from '@lib/cms/profile';
 
 import type { Metadata } from 'next';
 
-// Fully static — no time-based revalidate. The profile global's afterChange hook
-// busts `/about` on every edit.
+// SSR on every Workers Cache miss; the worker stamps the purge-driven `cms` policy
+// (.claude/rules/workers-cache.md) and a CMS publish purges it.
+export const dynamic = 'force-dynamic';
 
 export const generateMetadata = async (): Promise<Metadata> => {
   const profile = await findProfile();

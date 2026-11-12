@@ -10,8 +10,10 @@ import { SectionHeading } from '@components/section-heading';
 
 import type { Metadata } from 'next';
 
-// Fully static — content is sourced from the repo's own rules, not the CMS, so the
-// page only changes on deploy (new build ID = new cache keys). No revalidate needed.
+// Content comes from the repo, not the CMS, so it only changes on deploy (Workers Cache
+// keys entries by Worker version). Still SSR: OpenNext has no incremental cache to
+// serve a prerender from (open-next.config.ts).
+export const dynamic = 'force-dynamic';
 
 export const generateMetadata = (): Metadata => {
   return {

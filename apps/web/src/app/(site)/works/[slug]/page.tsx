@@ -16,14 +16,9 @@ import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
 
-// Fully static — no time-based revalidate. The works collection's afterChange hook
-// busts the `/works/[slug]` pattern on publish/delete; otherwise the cached HTML is
-// served indefinitely.
-
-export const generateStaticParams = async () => {
-  const works = await findWorksList();
-  return works.map((work) => ({ slug: work.slug }));
-};
+// SSR on every Workers Cache miss; the worker stamps the purge-driven `cms` policy
+// (.claude/rules/workers-cache.md) and a CMS publish purges it.
+export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ slug: string }>;
 

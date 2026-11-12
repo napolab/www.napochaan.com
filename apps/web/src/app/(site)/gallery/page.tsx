@@ -6,8 +6,9 @@ import { DecodingSkeleton } from '@components/decoding-skeleton';
 
 import type { Metadata } from 'next';
 
-// Fully static — no time-based revalidate. The gallery/media hooks bust `/gallery`
-// on every change, so the cached HTML refreshes on-demand only.
+// SSR on every Workers Cache miss; the worker stamps the purge-driven `cms` policy
+// (.claude/rules/workers-cache.md) and a CMS publish purges it.
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
   alternates: {

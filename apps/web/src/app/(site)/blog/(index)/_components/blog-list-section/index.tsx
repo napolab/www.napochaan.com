@@ -6,7 +6,7 @@ import { Pagination } from '@components/pagination';
 import { dayjs } from '@utils/dayjs';
 import { findBlogList } from '@lib/cms/blog';
 
-// Shared with the `/blog/page/[num]` route's generateStaticParams.
+// Shared with the `/blog/page/[num]` route.
 export const PAGE_SIZE = 10;
 
 // The feed owns its URL shape: page 1 is the bare path, deeper pages live at the

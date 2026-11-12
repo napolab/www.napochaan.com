@@ -120,17 +120,3 @@ describe('findBlogDraftById', () => {
     await expect(findBlogDraftById('1', FAKE_PREVIEW_SECRET)).rejects.toThrow(/500/);
   });
 });
-
-describe('build phase', () => {
-  it('returns empty data without calling the cms', async () => {
-    vi.stubEnv('NEXT_PHASE', 'phase-production-build');
-    context.env = {};
-    try {
-      expect(await findBlogList()).toEqual([]);
-      expect(await findBlogBySlug('a')).toBeUndefined();
-      expect(await findBlogDraftById('1', FAKE_PREVIEW_SECRET)).toBeUndefined();
-    } finally {
-      vi.unstubAllEnvs();
-    }
-  });
-});

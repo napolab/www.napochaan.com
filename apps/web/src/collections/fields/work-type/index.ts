@@ -4,7 +4,7 @@ import type { Work } from '@payload-types';
 // 組むため、ここを唯一の定義場所にする。
 //
 // collection 本体(src/collections/works.ts)ではなくここに置くのは、works.ts が
-// ./hooks/revalidate 経由で next/cache を引いており、MCP ツール(src/lib/mcp/tools/works)や
+// ./hooks/revalidate 経由で @opennextjs/cloudflare を引いており、MCP ツール(src/lib/mcp/tools/works)や
 // node 環境の vitest から import できないため。ここは依存ゼロの葉に保つこと。
 //
 // `satisfies readonly Work['type'][]` により、payload-types.ts の再生成で union が

@@ -11,9 +11,8 @@ import { CONTENT_TYPE, OgCard, SIZE } from '@utils/og/og-card';
 import { ogLifeBoard } from '@utils/og/og-life-board';
 import { resolveOgCardData } from '@utils/og/resolve-og-card-data';
 
-// Revalidate hourly — the detail page itself is purge-driven, but revalidatePath
-// does not reach this metadata image route, so it keeps a time window.
-export const revalidate = 3600;
+// SSR on every Workers Cache miss, cached under the `cms` policy and purged with the page.
+export const dynamic = 'force-dynamic';
 export const size = SIZE;
 export const contentType = CONTENT_TYPE;
 

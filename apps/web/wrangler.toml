@@ -40,11 +40,7 @@ database_name = "napochaan-cms-dev"
 binding = "R2"
 bucket_name = "napochaan-cms-dev" # TODO: wrangler r2 bucket create napochaan-cms-dev
 
-# ===== Cache (OpenNext) =====
-
-[[services]]
-binding = "WORKER_SELF_REFERENCE"
-service = "napochaan-website"
+# ===== Services =====
 
 # CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
 [[services]]
@@ -52,22 +48,9 @@ binding = "CMS"
 service = "napochaan-cms"
 entrypoint = "CMS"
 
-[[r2_buckets]]
-binding = "NEXT_INC_CACHE_R2_BUCKET"
-bucket_name = "napochaan-cache-dev" # TODO: wrangler r2 bucket create napochaan-cache-dev
-
-[[durable_objects.bindings]]
-name = "NEXT_CACHE_DO_QUEUE"
-class_name = "DOQueueHandler"
-
 [[durable_objects.bindings]]
 name = "CURSOR_ROOM"
 class_name = "CursorRoom"
-
-[[d1_databases]]
-binding = "NEXT_TAG_CACHE_D1"
-database_name = "napochaan-cache-dev"
-database_id = "00000000-0000-0000-0000-000000000000" # TODO: wrangler d1 create napochaan-cache-dev
 
 # ===== Durable Objects Migrations =====
 [[migrations]]
@@ -77,6 +60,12 @@ new_sqlite_classes = ["DOQueueHandler"]
 [[migrations]]
 tag = "v2"
 new_sqlite_classes = ["CursorRoom"]
+
+# OpenNext's ISR revalidation queue is gone (SSR + Workers Cache). staging/production
+# inherit this top-level list, so one entry covers every env that declared it in v1.
+[[migrations]]
+tag = "v3"
+deleted_classes = ["DOQueueHandler"]
 
 # ===== Staging Environment =====
 [env.staging]
@@ -99,8 +88,7 @@ CF_ACCESS_TEAM_DOMAIN = "napochaan"
 CF_ACCESS_AUD = "98a71a2234abe4cb6d0b01125edc79f32e49d082cb42cdda611ad3e5ee445259"
 
 # Workers Cache: HITs are served from the edge without invoking the Worker. Every
-# CMS write purges everything (src/collections/hooks/revalidate/purge-workers-cache).
-# Staging first; production gets its own block once staging verification passes.
+# CMS publish purges everything (cms → WEB.purge(), worker/entrypoint).
 [env.staging.cache]
 enabled = true
 
@@ -125,32 +113,15 @@ bucket_name = "napochaan-cms-staging"
 # miniflare — otherwise media uploads land locally and the deployed worker 404s them.
 remote = true
 
-[[env.staging.services]]
-binding = "WORKER_SELF_REFERENCE"
-service = "napochaan-website-staging"
-
 # CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
 [[env.staging.services]]
 binding = "CMS"
 service = "napochaan-cms-staging"
 entrypoint = "CMS"
 
-[[env.staging.r2_buckets]]
-binding = "NEXT_INC_CACHE_R2_BUCKET"
-bucket_name = "napochaan-cache-staging" # TODO: wrangler r2 bucket create napochaan-cache-staging
-
-[[env.staging.durable_objects.bindings]]
-name = "NEXT_CACHE_DO_QUEUE"
-class_name = "DOQueueHandler"
-
 [[env.staging.durable_objects.bindings]]
 name = "CURSOR_ROOM"
 class_name = "CursorRoom"
-
-[[env.staging.d1_databases]]
-binding = "NEXT_TAG_CACHE_D1"
-database_name = "napochaan-cache-staging"
-database_id = "0af66616-6458-492f-92b3-0f1d305abd06"
 
 # ===== Production Environment =====
 [env.production]
@@ -172,7 +143,7 @@ CF_ACCESS_TEAM_DOMAIN = "napochaan"
 CF_ACCESS_AUD = "73b87411edfe8fc2670c4e0f271b11e7356d7e323f1a5ae67aa25c551027eabb"
 
 # Workers Cache: HITs are served from the edge without invoking the Worker. Every
-# CMS write purges everything (src/collections/hooks/revalidate/purge-workers-cache).
+# CMS publish purges everything (cms → WEB.purge(), worker/entrypoint).
 # Verified on staging first (PR #45); production HTML does not depend on the
 # Sec-CH-Prefers-Color-Scheme hint the zone advertises, so the Vary split is harmless.
 [env.production.cache]
@@ -197,32 +168,15 @@ bucket_name = "napochaan-cms-production"
 # See staging note: seed/export must hit the real bucket, not local miniflare.
 remote = true
 
-[[env.production.services]]
-binding = "WORKER_SELF_REFERENCE"
-service = "napochaan-website-production"
-
 # CMS reads (Hono RPC over the cms Worker's named `CMS` entrypoint; src/lib/cms/client).
 [[env.production.services]]
 binding = "CMS"
 service = "napochaan-cms-production"
 entrypoint = "CMS"
 
-[[env.production.r2_buckets]]
-binding = "NEXT_INC_CACHE_R2_BUCKET"
-bucket_name = "napochaan-cache-production"
-
-[[env.production.durable_objects.bindings]]
-name = "NEXT_CACHE_DO_QUEUE"
-class_name = "DOQueueHandler"
-
 [[env.production.durable_objects.bindings]]
 name = "CURSOR_ROOM"
 class_name = "CursorRoom"
-
-[[env.production.d1_databases]]
-binding = "NEXT_TAG_CACHE_D1"
-database_name = "napochaan-cache-production"
-database_id = "f3f67f2e-3e9d-45e6-b522-de8a90256d36"
 
 # ===== Test Environment =====
 # Used by the vitest "workers" pool (see vitest.config.ts). Inherits `main`,

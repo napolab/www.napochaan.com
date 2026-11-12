@@ -2,12 +2,15 @@ import { cache } from 'hono/cache';
 import { createFactory } from 'hono/factory';
 
 import { imageHandlers } from './handlers/images';
+import { createNextHandler } from './handlers/next';
 import { cacheControlHeaders } from './middleware/cache-control';
 import { pathPolicy } from './middleware/path-policy';
 import { weakenETag } from './middleware/weaken-etag';
 import { cursorRoutes } from './routes/cursors';
 
-type HonoEnv = { Bindings: Cloudflare.Env };
+import type { CMSHealthVariables } from './lib/cms-health';
+
+type HonoEnv = { Bindings: Cloudflare.Env; Variables: CMSHealthVariables };
 
 export type MountedFetch = (request: Request, ...args: unknown[]) => Promise<Response>;
 
@@ -35,7 +38,8 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
       ...imageHandlers,
     )
     .route('/', cursorRoutes)
-    .mount('/', handlerFetch);
+    // OpenNext, with this request's CMS binding tracked (a degraded render is never cached).
+    .all('*', createNextHandler(handlerFetch));
 
   return app;
 };

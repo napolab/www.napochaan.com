@@ -4,7 +4,7 @@ import type { Log } from '@payload-types';
 // (DJ / VJ / DJ/VJ)とバイト一致していなければならない。
 //
 // collection 本体(src/collections/logs.ts)ではなくここに置くのは、logs.ts が
-// ./hooks/revalidate 経由で next/cache を引いており、MCP ツール(src/lib/mcp/tools/logs)や
+// ./hooks/revalidate 経由で @opennextjs/cloudflare を引いており、MCP ツール(src/lib/mcp/tools/logs)や
 // node 環境の vitest から import できないため。ここは依存ゼロの葉に保つこと。
 //
 // `satisfies readonly Log['meta'][]` により、payload-types.ts の再生成で union が

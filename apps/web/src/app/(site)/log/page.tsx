@@ -7,11 +7,10 @@ import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly — this page CANNOT go purge-only: it renders external RSS
-// posts (outside the CMS, no hook can bust them) and flips `upcoming` as gigs
-// pass, both of which need a time window. The chronicle is a single continuous
-// page — no pagination — so the whole timeline is statically cached.
-export const revalidate = 3600;
+// SSR. The worker caches `/log` under the short `timeSensitive` policy, not `cms`: it
+// renders external RSS posts (no CMS purge reaches them) and flips `upcoming` as gigs
+// pass. The chronicle is a single continuous page — no pagination.
+export const dynamic = 'force-dynamic';
 
 const logDescription = '活動年表 — DJ・VJ・リリース・制作物の記録。';
 

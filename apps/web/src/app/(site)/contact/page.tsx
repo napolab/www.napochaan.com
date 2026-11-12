@@ -20,10 +20,11 @@ const contactDescription = 'お問い合わせ — フォーム、または各�
 export const generateMetadata = (): Metadata => resolveSectionMetadata({ docTitle: 'contact', description: contactDescription, path: '/contact' });
 
 // ContactFormLoader reads TURNSTILE_SITE_KEY from the Cloudflare env. A static
-// prerender resolves that env on the BUILD machine — where CI seeds .dev.vars from
-// .dev.vars.example — so `dev-placeholder` gets frozen into the cached HTML, and the
-// page has neither a time-based revalidate nor a bust-isr-cache entry to heal it.
-// The page holds no CMS data, so rendering per request costs little.
+// prerender would resolve that env on the BUILD machine — where CI seeds .dev.vars from
+// .dev.vars.example — and freeze `dev-placeholder` into the HTML. Rendered at runtime,
+// the key is a deploy-constant `[vars]` value (no cookies / headers / nonce), so the
+// GET is cached under the `cms` policy and a deploy (new Worker version) resets it.
+// The Server Action POST is never stamped (worker cache-control middleware: GET/HEAD only).
 export const dynamic = 'force-dynamic';
 
 const ContactPage = () => {

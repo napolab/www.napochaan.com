@@ -1,14 +1,12 @@
-import { CACHE_TAGS } from '@utils/cache-tags';
-
 import { LOG_META_OPTIONS } from './fields/log-meta';
-import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
+import { createPublishedPurgeHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
 // Manual chronicle entries merged into the /log timeline alongside the derived
 // news/works/external-post entries — for milestones that none of those cover.
-// There is no per-doc detail page, so revalidatePath('/') and ('/log') cover the ISR HTML.
-const revalidateLogs = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.logs], ['/', '/log']);
+// A published-state change purges the whole Workers Cache.
+const revalidateLogs = createPublishedPurgeHooks();
 
 export const Logs = {
   slug: 'logs',

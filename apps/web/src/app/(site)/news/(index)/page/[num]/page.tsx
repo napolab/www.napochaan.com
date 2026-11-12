@@ -1,27 +1,18 @@
 import { notFound, permanentRedirect } from 'next/navigation';
 import { Suspense } from 'react';
 
-import { NewsListSection, PAGE_SIZE } from '../../_components/news-list-section';
+import { NewsListSection } from '../../_components/news-list-section';
 import { parsePageParam } from '../../../../_lib/parse-page-param';
 
 import { DecodingSkeleton } from '@components/decoding-skeleton';
-import { findNewsList } from '@lib/cms/news';
 import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
-// Fully static — pages 2+ of the news archive at path-keyed `/news/page/[num]`
-// URLs (query-param pagination would opt the route into dynamic rendering). The
-// news hook's `/news/page/[num]` pattern purge busts every page on publish/delete.
-
-// Deeper pages only — page 1 is the bare `/news` (its route renders it directly),
-// and the build-phase guard makes this [] at `next build` so pages fill on demand.
-export const generateStaticParams = async () => {
-  const news = await findNewsList();
-  const totalPages = Math.ceil(news.length / PAGE_SIZE);
-
-  return Array.from({ length: Math.max(totalPages - 1, 0) }, (_, index) => ({ num: `${index + 2}` }));
-};
+// Pages 2+ at path-keyed `/news/page/[num]` URLs — never `?page=N`: the Workers
+// Cache key is the URL, and a query-keyed page could not be told apart by the worker's
+// path-based policy. SSR on every cache miss; a CMS publish purges every page.
+export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ num: string }>;
 

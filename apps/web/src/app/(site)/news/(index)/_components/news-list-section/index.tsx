@@ -6,7 +6,7 @@ import { groupNewsByYearMonth } from '../../../_lib/group-by-year-month';
 import { Pagination } from '@components/pagination';
 import { findNewsList } from '@lib/cms/news';
 
-// Shared with the `/news/page/[num]` route's generateStaticParams.
+// Shared with the `/news/page/[num]` route.
 export const PAGE_SIZE = 10;
 
 // The archive owns its URL shape: page 1 is the bare path, deeper pages live at

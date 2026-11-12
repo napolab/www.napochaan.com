@@ -18,8 +18,8 @@ const nextConfig: NextConfig = {
     qualities: [30, 40, 75],
   },
   // The client-side Router Cache reuses already-visited RSC entries on soft
-  // navigation (and back/forward) WITHOUT refetching — and server-side
-  // `revalidateTag` never evicts it. So a long-open tab keeps serving the RSC it
+  // navigation (and back/forward) WITHOUT refetching — and a server-side
+  // Workers Cache purge never evicts it. So a long-open tab keeps serving the RSC it
   // cached earlier, showing an out-of-date version of a work until a hard reload
   // discards the client cache. Keep both reuse windows at their minimum so
   // cached segments go stale quickly and navigation re-pulls fresh RSC from the

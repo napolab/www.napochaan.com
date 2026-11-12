@@ -5,7 +5,7 @@ import { WorksArchive } from '../../../_components/works-archive';
 import { Pagination } from '@components/pagination';
 import { findWorksList } from '@lib/cms/works';
 
-// Shared with the `/works/page/[num]` route's generateStaticParams.
+// Shared with the `/works/page/[num]` route.
 export const PAGE_SIZE = 50;
 
 // Inject the page href: the archive owns its own URL shape (page 1 is the bare

@@ -1,19 +1,11 @@
-import { CACHE_TAGS } from '@utils/cache-tags';
-
 import { slugField } from './fields/slug';
-import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
+import { createPublishedPurgeHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
-// News flows into ISR/`unstable_cache` reads tagged with CACHE_TAGS.news (the
-// home teaser `/`, the archive `/news`, the chronicle `/log`, and the detail
-// page `/news/{id}`). Busting the tag on publish/unpublish purges the data caches
-// via the NEXT_TAG_CACHE_D1 binding; revalidatePath('/'), ('/news'), and the
-// `/news/[slug]` pattern cover the path-keyed ISR HTML (the pattern busts every
-// detail page, keeping cross-doc derivations like prev/next fresh — these pages
-// carry no time-based revalidate). Drafts are skipped — only a published-state
-// change reaches the public site.
-const revalidateNews = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.news], ['/', '/news', '/news/page/[num]', '/news/[slug]']);
+// News feeds `/`, `/news`, `/log` and `/news/{slug}`. A published-state change (drafts
+// are skipped) purges the whole Workers Cache.
+const revalidateNews = createPublishedPurgeHooks();
 
 export const News = {
   slug: 'news',

@@ -1,16 +1,12 @@
-import { revalidatePath, revalidateTag } from 'next/cache';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { createPublishedTagAndPathRevalidateHooks, createPublishedTagRevalidateHooks, createTagRevalidateHooks, isPublished, isPublishedChange, revalidateTagsAndPaths } from '.';
+import { createPublishedPurgeHooks, isPublished, isPublishedChange, purgeOnChange } from '.';
 import { purgeWorkersCache } from './purge-workers-cache';
 
 import type { CollectionAfterChangeHook, CollectionAfterDeleteHook, PayloadRequest } from 'payload';
 
-vi.mock('next/cache', () => ({ revalidateTag: vi.fn(), revalidatePath: vi.fn() }));
 vi.mock('./purge-workers-cache', () => ({ purgeWorkersCache: vi.fn() }));
 
-const revalidateTagMock = vi.mocked(revalidateTag);
-const revalidatePathMock = vi.mocked(revalidatePath);
 const purgeWorkersCacheMock = vi.mocked(purgeWorkersCache);
 
 // Minimal PayloadRequest stand-in: the hooks only read `req.context`.
@@ -20,8 +16,6 @@ type ChangeArgs = Parameters<CollectionAfterChangeHook>[0];
 type DeleteArgs = Parameters<CollectionAfterDeleteHook>[0];
 
 beforeEach(() => {
-  revalidateTagMock.mockReset();
-  revalidatePathMock.mockReset();
   purgeWorkersCacheMock.mockReset();
 });
 
@@ -55,164 +49,54 @@ describe('isPublishedChange', () => {
   });
 });
 
-describe('createTagRevalidateHooks', () => {
-  it('dispatches every tag on change', () => {
-    const hooks = createTagRevalidateHooks(['news']);
-    const doc = { id: 1 };
-    const result = hooks.afterChange({ doc, req: makeReq() } as unknown as ChangeArgs);
+describe('createPublishedPurgeHooks', () => {
+  it('purges once for a published change and returns the doc', () => {
+    const doc = { id: 1, _status: 'published' };
+    const result = createPublishedPurgeHooks().afterChange({ doc, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
 
-    expect(revalidateTagMock).toHaveBeenCalledWith('news', { expire: 0 });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(1);
+    expect(purgeWorkersCacheMock).toHaveBeenCalledOnce();
     expect(result).toBe(doc);
   });
 
-  it('dispatches every tag on delete', () => {
-    const hooks = createTagRevalidateHooks(['news']);
-    hooks.afterDelete({ doc: { id: 1 }, req: makeReq() } as unknown as DeleteArgs);
-
-    expect(revalidateTagMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('purges the Workers Cache whenever tags are dispatched', () => {
-    const hooks = createTagRevalidateHooks(['news']);
-    hooks.afterChange({ doc: {}, req: makeReq() } as unknown as ChangeArgs);
+  it('purges for an unpublish (previous doc was published)', () => {
+    createPublishedPurgeHooks().afterChange({ doc: { _status: 'draft' }, previousDoc: { _status: 'published' }, req: makeReq() } as unknown as ChangeArgs);
     expect(purgeWorkersCacheMock).toHaveBeenCalledOnce();
   });
 
-  it('respects disableRevalidate for the purge too', () => {
-    const hooks = createTagRevalidateHooks(['news']);
-    hooks.afterChange({ doc: {}, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
+  it('does NOT purge for a draft-only change', () => {
+    createPublishedPurgeHooks().afterChange({ doc: { _status: 'draft' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
     expect(purgeWorkersCacheMock).not.toHaveBeenCalled();
   });
-});
 
-describe('createPublishedTagRevalidateHooks', () => {
-  it('does NOT dispatch for a draft-only change', () => {
-    const hooks = createPublishedTagRevalidateHooks(['news']);
-    hooks.afterChange({ doc: { _status: 'draft' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
-
-    expect(revalidateTagMock).not.toHaveBeenCalled();
+  it('does NOT purge when req.context.disableRevalidate is true', () => {
+    createPublishedPurgeHooks().afterChange({ doc: { _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
+    expect(purgeWorkersCacheMock).not.toHaveBeenCalled();
   });
 
-  it('DOES dispatch for a published change', () => {
-    const hooks = createPublishedTagRevalidateHooks(['news']);
-    hooks.afterChange({ doc: { _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
-
-    expect(revalidateTagMock).toHaveBeenCalledWith('news', { expire: 0 });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(1);
-  });
-
-  it('suppresses dispatch when req.context.disableRevalidate is true', () => {
-    const hooks = createPublishedTagRevalidateHooks(['news']);
-    hooks.afterChange({ doc: { _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
-
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-  });
-
-  it('dispatches on delete only when the doc was published', () => {
-    const hooks = createPublishedTagRevalidateHooks(['news']);
+  it('purges on delete only when the doc was published', () => {
+    const hooks = createPublishedPurgeHooks();
     hooks.afterDelete({ doc: { _status: 'draft' }, req: makeReq() } as unknown as DeleteArgs);
-    expect(revalidateTagMock).not.toHaveBeenCalled();
+    expect(purgeWorkersCacheMock).not.toHaveBeenCalled();
 
     hooks.afterDelete({ doc: { _status: 'published' }, req: makeReq() } as unknown as DeleteArgs);
-    expect(revalidateTagMock).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('createPublishedTagAndPathRevalidateHooks', () => {
-  it('fires both revalidateTag and revalidatePath on a published change', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog']);
-    hooks.afterChange({ doc: { id: 1, _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
-
-    expect(revalidateTagMock).toHaveBeenCalledWith('blog', { expire: 0 });
-    expect(revalidateTagMock).toHaveBeenCalledTimes(1);
-    expect(revalidatePathMock).toHaveBeenCalledWith('/');
-    expect(revalidatePathMock).toHaveBeenCalledWith('/blog');
-    expect(revalidatePathMock).toHaveBeenCalledTimes(2);
-  });
-
-  it('purges a dynamic pattern path with type "page" so every rendered detail page is busted', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog', '/blog/[slug]']);
-    hooks.afterChange({ doc: { id: 42, slug: 'my-post-slug', _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
-
-    expect(revalidatePathMock).toHaveBeenCalledWith('/');
-    expect(revalidatePathMock).toHaveBeenCalledWith('/blog');
-    expect(revalidatePathMock).toHaveBeenCalledWith('/blog/[slug]', 'page');
-    expect(revalidatePathMock).toHaveBeenCalledTimes(3);
-  });
-
-  it('does NOT fire for a draft-only change', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog']);
-    hooks.afterChange({ doc: { id: 1, slug: 'some-slug', _status: 'draft' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
-
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-    expect(revalidatePathMock).not.toHaveBeenCalled();
-  });
-
-  it('skips when req.context.disableRevalidate is true', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog', '/blog/[slug]']);
-    hooks.afterChange({ doc: { id: 1, slug: 'some-slug', _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
-
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-    expect(revalidatePathMock).not.toHaveBeenCalled();
-  });
-
-  it('fires on delete only when the doc was published', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog', '/blog/[slug]']);
-    hooks.afterDelete({ doc: { id: 7, slug: 'old-post', _status: 'draft' }, req: makeReq() } as unknown as DeleteArgs);
-    expect(revalidateTagMock).not.toHaveBeenCalled();
-    expect(revalidatePathMock).not.toHaveBeenCalled();
-
-    hooks.afterDelete({ doc: { id: 7, slug: 'old-post', _status: 'published' }, req: makeReq() } as unknown as DeleteArgs);
-    expect(revalidateTagMock).toHaveBeenCalledWith('blog', { expire: 0 });
-    expect(revalidatePathMock).toHaveBeenCalledWith('/blog/[slug]', 'page');
-  });
-
-  it('does not throw when revalidateTag/revalidatePath throw (CLI context)', () => {
-    revalidateTagMock.mockImplementation(() => {
-      throw new Error('static generation store missing');
-    });
-    revalidatePathMock.mockImplementation(() => {
-      throw new Error('static generation store missing');
-    });
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog', '/blog/[slug]']);
-
-    expect(() => hooks.afterChange({ doc: { id: 1, slug: 'my-post', _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs)).not.toThrow();
-  });
-
-  it('purges the Workers Cache on a published change', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog']);
-    hooks.afterChange({ doc: { id: 1, _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq() } as unknown as ChangeArgs);
     expect(purgeWorkersCacheMock).toHaveBeenCalledOnce();
   });
 
-  it('respects disableRevalidate for the purge too', () => {
-    const hooks = createPublishedTagAndPathRevalidateHooks(['blog'], ['/', '/blog']);
-    hooks.afterChange({ doc: { id: 1, _status: 'published' }, previousDoc: { _status: 'draft' }, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
+  it('does NOT purge on delete when disableRevalidate is true', () => {
+    createPublishedPurgeHooks().afterDelete({ doc: { _status: 'published' }, req: makeReq({ disableRevalidate: true }) } as unknown as DeleteArgs);
     expect(purgeWorkersCacheMock).not.toHaveBeenCalled();
   });
 });
 
-describe('revalidateTagsAndPaths', () => {
-  it('busts literal paths as-is and dynamic pattern paths with type "page"', () => {
-    revalidateTagsAndPaths(['works'], ['/', '/works', '/works/[slug]']);
-
-    expect(revalidateTagMock).toHaveBeenCalledWith('works', { expire: 0 });
-    expect(revalidatePathMock).toHaveBeenCalledWith('/');
-    expect(revalidatePathMock).toHaveBeenCalledWith('/works');
-    expect(revalidatePathMock).toHaveBeenCalledWith('/works/[slug]', 'page');
-  });
-
-  it('purges the Workers Cache', () => {
-    revalidateTagsAndPaths(['works'], ['/']);
+describe('purgeOnChange', () => {
+  it('purges and returns the doc, for collections/globals without drafts', () => {
+    const doc = { id: 1 };
+    expect(purgeOnChange({ doc, req: makeReq() } as unknown as ChangeArgs)).toBe(doc);
     expect(purgeWorkersCacheMock).toHaveBeenCalledOnce();
   });
 
-  it('does not throw when the revalidators throw (CLI context)', () => {
-    revalidateTagMock.mockImplementation(() => {
-      throw new Error('static generation store missing');
-    });
-
-    expect(() => revalidateTagsAndPaths(['works'], ['/'])).not.toThrow();
+  it('respects disableRevalidate', () => {
+    purgeOnChange({ doc: {}, req: makeReq({ disableRevalidate: true }) } as unknown as ChangeArgs);
+    expect(purgeWorkersCacheMock).not.toHaveBeenCalled();
   });
 });

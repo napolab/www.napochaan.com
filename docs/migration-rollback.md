@@ -60,7 +60,7 @@ pnpm exec wrangler d1 time-travel restore D1 --env production --timestamp="2026-
 - restore は結果として「復元前の bookmark」を返す。**必ず控えておく**（restore の取り消しに使う）。
 - 復元時点以降に入ったコンテンツ（admin での編集等）も消える。
 - 復元後の `payload_migrations` はその時点の状態に戻るので、`migrate:status` で確認してから該当コミットをデプロイする。
-- 復元後は ISR キャッシュが古いままなので `pnpm revalidate:isr` を流す。
+- 復元後は Workers Cache が古いままなので web を再 deploy する（新しい Worker version は空のキャッシュから始まる。`.claude/rules/workers-cache.md`）。
 
 ## 予防: roll-forward と expand/contract
 

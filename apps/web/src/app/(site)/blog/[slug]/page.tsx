@@ -19,15 +19,10 @@ import { resolveDetailMetadata } from '@utils/seo/resolve-detail-metadata';
 
 import type { Metadata } from 'next';
 
-// Fully static — no time-based revalidate. The blog collection's afterChange hook
-// busts `/blog/[slug]` (pattern, type 'page') on every publish/delete, so the cached
-// HTML — including prev/next navigation derived from the full list — refreshes
-// on-demand and is otherwise served from cache indefinitely.
-
-export const generateStaticParams = async () => {
-  const posts = await findBlogList();
-  return posts.map((post) => ({ slug: post.slug }));
-};
+// SSR on every Workers Cache miss; the worker stamps the purge-driven `cms` policy
+// (.claude/rules/workers-cache.md). A publish purges every page at once, so the
+// prev/next navigation derived from the full list never goes stale.
+export const dynamic = 'force-dynamic';
 
 type Params = Promise<{ slug: string }>;
 

@@ -25,11 +25,6 @@ export default defineConfig({
             'next/image': path.resolve(__dirname, 'src/__mocks__/next/image.tsx'),
             'next/headers': path.resolve(__dirname, 'src/__mocks__/next/headers.ts'),
             'next/navigation': path.resolve(__dirname, 'src/__mocks__/next/navigation.ts'),
-            // Payload data helpers wrap queries in `unstable_cache` / call the
-            // revalidators; pulling the real Next server-cache into the browser
-            // bundle makes Vite discover it mid-run and reload, failing in-flight
-            // test imports. Stub it — these never run in browser tests.
-            'next/cache': path.resolve(__dirname, 'src/__mocks__/next/cache.ts'),
             // `@lib/cms/client` reads the `CMS` Service Binding from the OpenNext
             // Cloudflare context, which does not exist in the browser. Swap in a
             // client over the cms Hono app with fixture services (data helpers are

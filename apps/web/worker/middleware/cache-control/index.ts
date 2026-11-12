@@ -1,29 +1,33 @@
 import { createMiddleware } from 'hono/factory';
 
 import { createRunner } from '../../lib/first-match-runner';
-import { allOf, equals, not, on } from '../../lib/predicate';
+import { allOf, equals, isIn, not, on } from '../../lib/predicate';
+import { PAGE_CACHE_POLICIES } from '../../../src/utils/cache-control';
+import { KEEP } from './directives';
 import { apiPlugin } from './plugins/api';
+import { cmsPlugin } from './plugins/cms';
 import { mediaPlugin } from './plugins/media';
-import { textFeedPlugin } from './plugins/text-feed';
+import { nextInternalPlugin } from './plugins/next-internal';
+import { timeSensitivePlugin } from './plugins/time-sensitive';
+import { uncacheablePlugin } from './plugins/uncacheable';
 
+import type { CMSHealthVariables } from '../../lib/cms-health';
 import type { Predicate } from '../../lib/predicate';
+import type { CacheDirective } from './types';
 import type { Context } from 'hono';
 
-export { MEDIA_POLICY, PRIVATE_POLICY, TEXT_FEED_POLICY } from './policies';
-
-// 先頭から順に照合し、最初に match した plugin の policy を採る(first match wins)。
-// 具体的なものを先に置く: media(`/api/media/file/`)は api(`/api/`)の部分集合なので、
-// 後ろに置くと api に先に match して media が private, no-store になってしまう。
-const plugins = [mediaPlugin, apiPlugin, textFeedPlugin] as const;
+// 先頭から順に照合し、最初に match した plugin の directive を採る(first match wins)。
+// 具体的なものを先に置く: media(`/api/media/file/`)は api(`/api/`)の部分集合、
+// uncacheable(`/log/preview`)と time-sensitive(`/log`)は cms(catch-all)より前。
+const plugins = [nextInternalPlugin, mediaPlugin, apiPlugin, uncacheablePlugin, timeSensitivePlugin, cmsPlugin] as const;
 
 const runPlugins = createRunner(plugins);
 
-// pathname は percent-decode しない(Workers Cache のキーと同じ生の値で判定する)。
-export const resolveCacheControl = (pathname: string): string | undefined => runPlugins(pathname).unwrapOr(undefined);
+// pathname は percent-decode せずに渡す(decode が要る判定は plugin 側の orDecoded)。
+export const resolveCacheControl = (pathname: string): CacheDirective => runPlugins(pathname).unwrapOr(KEEP);
 
 export const isOK: Predicate<Response> = on((response: Response) => response.status, equals(200));
 
-// 上流の policy(Next の draft/dynamic の `private, no-store` など)は常に勝つ。
 export const hasUpstreamCacheControl: Predicate<Response> = on(
   (response: Response) => response.headers,
   (headers) => headers.has('Cache-Control'),
@@ -35,19 +39,42 @@ export const setsCookie: Predicate<Response> = on(
   (headers) => headers.has('Set-Cookie'),
 );
 
+// fill: 上流の policy があればそれが勝つ。
 export const isShareable: Predicate<Response> = allOf(isOK, not(hasUpstreamCacheControl), not(setsCookie));
 
-const applyCacheControl = (c: Context, policy: string): void => {
-  c.header('Cache-Control', policy);
+// page: Next の force-dynamic が付ける `private, no-cache, no-store, …` は上書きする。
+export const isPageCacheable: Predicate<Response> = allOf(isOK, not(setsCookie));
+
+// Server Action の POST などは上書きしない。
+const isReadMethod: Predicate<string> = isIn(['GET', 'HEAD']);
+
+const policyFor = (c: Context, directive: CacheDirective): string | undefined => {
+  switch (directive.kind) {
+    case 'keep':
+      return undefined;
+    case 'deny':
+      return directive.policy;
+    case 'fill':
+      return isShareable(c.res) ? directive.policy : undefined;
+    case 'page':
+      return isReadMethod(c.req.method) && isPageCacheable(c.res) ? directive.policy : undefined;
+  }
 };
 
+// Post-finalization c.header() rebuilds the response, which handles the immutable headers
+// of mounted handler responses and redirects (see weaken-etag.ts).
 export const cacheControlHeaders = () =>
-  createMiddleware(async (c, next) => {
+  createMiddleware<{ Variables: CMSHealthVariables }>(async (c, next) => {
     await next();
 
-    const policy = resolveCacheControl(new URL(c.req.url).pathname);
-    if (policy === undefined) return;
-    if (!isShareable(c.res)) return;
+    // A render whose CMS read threw or got a 5xx must never be stored, whatever its path.
+    if (c.get('cmsDegraded') === true) {
+      c.header('Cache-Control', PAGE_CACHE_POLICIES.uncacheable);
+      return;
+    }
 
-    applyCacheControl(c, policy);
+    const policy = policyFor(c, resolveCacheControl(new URL(c.req.url).pathname));
+    if (policy === undefined) return;
+
+    c.header('Cache-Control', policy);
   });

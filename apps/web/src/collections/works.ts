@@ -1,17 +1,12 @@
-import { CACHE_TAGS } from '@utils/cache-tags';
-
 import { slugField } from './fields/slug';
 import { WORK_TYPE_LABELS, WORK_TYPE_OPTIONS } from './fields/work-type';
-import { createPublishedTagAndPathRevalidateHooks } from './hooks/revalidate';
+import { createPublishedPurgeHooks } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
 // Works feed the archive (`/works`), the detail page (`/works/{id}`), the home
-// teaser, and the log chronicle. Busting CACHE_TAGS.works purges those reads via
-// the unstable_cache tags; revalidatePath('/'), ('/works'), ('/log'), and the
-// `/works/[slug]` pattern cover the path-keyed ISR HTML (the pattern busts every
-// detail page — these pages carry no time-based revalidate).
-const revalidateWorks = createPublishedTagAndPathRevalidateHooks([CACHE_TAGS.works], ['/', '/works', '/works/page/[num]', '/log', '/works/[slug]']);
+// teaser, and the log chronicle. A published-state change purges the whole Workers Cache.
+const revalidateWorks = createPublishedPurgeHooks();
 
 export const Works = {
   slug: 'works',

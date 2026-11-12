@@ -19,9 +19,9 @@ describe('ContactPage', () => {
   // Regression guard for the "dev-placeholder" incident: a statically prerendered
   // /contact resolves the Cloudflare env on the BUILD machine, where CI seeds
   // .dev.vars from .dev.vars.example (TURNSTILE_SITE_KEY=dev-placeholder). That
-  // string got frozen into the cached HTML — which carries no revalidate and is not
-  // in bust-isr-cache.mjs — so Turnstile 400'd forever and the submit button stayed
-  // disabled. Rendering per request is what keeps the real key reaching the widget.
+  // string got frozen into the prerendered HTML, so Turnstile 400'd forever and the
+  // submit button stayed disabled. Rendering at runtime is what keeps the real key
+  // reaching the widget.
   it('opts out of static prerendering so the Turnstile site key comes from the runtime env', () => {
     expect(dynamic).toBe('force-dynamic');
   });

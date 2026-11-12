@@ -1,18 +1,9 @@
-import { revalidateTagsAndPaths } from './hooks/revalidate';
-import { CACHE_TAGS } from '@utils/cache-tags';
+import { purgeOnChange } from './hooks/revalidate';
 
 import type { CollectionConfig } from 'payload';
 
 // Media is referenced by news SEO images, works thumbnails, gallery images, and
-// blog thumbnails/bodies. Bust all dependent caches whenever a media document is
-// changed or deleted — the `[slug]` pattern paths bust the detail-page HTML too,
-// which no longer self-heals via a time-based revalidate.
-const revalidateMedia = (): void =>
-  revalidateTagsAndPaths(
-    [CACHE_TAGS.news, CACHE_TAGS.works, CACHE_TAGS.gallery, CACHE_TAGS.blog],
-    ['/', '/news', '/news/page/[num]', '/news/[slug]', '/works', '/works/page/[num]', '/works/[slug]', '/gallery', '/blog', '/blog/page/[num]', '/blog/[slug]'],
-  );
-
+// blog thumbnails/bodies, so any change purges the whole Workers Cache.
 export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'media', plural: 'media' },
@@ -29,8 +20,8 @@ export const Media: CollectionConfig = {
     delete: ({ req: { user } }) => user !== null,
   },
   hooks: {
-    afterChange: [revalidateMedia],
-    afterDelete: [revalidateMedia],
+    afterChange: [purgeOnChange],
+    afterDelete: [purgeOnChange],
   },
   fields: [
     {

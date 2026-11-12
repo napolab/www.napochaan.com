@@ -11,11 +11,10 @@ import { DecodingSkeleton } from '@components/decoding-skeleton';
 
 import type { Metadata } from 'next';
 
-// Revalidate hourly — the home page CANNOT go purge-only: the log teaser renders
-// external RSS posts (outside the CMS, no hook can bust them) and flips entries
-// between upcoming/past based on the current time. The time window is what keeps
-// both fresh; CMS edits still purge instantly via the collection hooks.
-export const revalidate = 3600;
+// SSR. The worker caches `/` under the short `timeSensitive` policy, not `cms`: the log
+// teaser renders external RSS posts (no CMS purge reaches them) and flips entries
+// between upcoming/past against the current time. CMS publishes still purge it.
+export const dynamic = 'force-dynamic';
 
 const homeDescription = 'DJ・VJ・グラフィック・デジタル制作。napochaan の個人サイト。';
 

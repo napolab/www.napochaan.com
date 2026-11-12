@@ -7,6 +7,10 @@ import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 
 import type { Metadata } from 'next';
 
+// SSR on every Workers Cache miss; the worker stamps the purge-driven `cms` policy
+// (.claude/rules/workers-cache.md) and a CMS publish purges it.
+export const dynamic = 'force-dynamic';
+
 const newsDescription = 'お知らせ — 制作・出演・公開のアナウンス。';
 
 export const generateMetadata = (): Metadata =>
@@ -18,8 +22,8 @@ export const generateMetadata = (): Metadata =>
     markdown: '/news.md',
   });
 
-// Fully static — no searchParams (reading them would opt the route into dynamic
-// rendering). Page 1 only; deeper pages live at `/news/page/[num]`.
+// Page 1 only; deeper pages live at path-keyed `/news/page/[num]` (never `?page=N` —
+// see .claude/rules/workers-cache.md).
 const NewsPage = () => (
   <Suspense fallback={<DecodingSkeleton fill />}>
     <NewsListSection page={1} />
