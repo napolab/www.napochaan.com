@@ -1,0 +1,40 @@
+---
+// `.astro` TypographyBand with NO React island. The markup inside <typography-band> is
+// byte-identical to the React TypographyBand (./index.tsx) — asserted by
+// typography-band.astro.test.ts — and the drift / grid snap is driven by the
+// `<typography-band>` custom element (./element.ts), which shares ./bind-band with the
+// React one. The element itself carries `transition:persist`, so the drift is never
+// remounted across ClientRouter navigations (see element.ts for the persist moves).
+import { DEFAULT_TEXT, REPEAT_COUNT } from './band-text';
+import * as styles from './styles.css';
+
+type Props = {
+  text?: string;
+};
+
+const { text = DEFAULT_TEXT } = Astro.props;
+const repeated = text.repeat(REPEAT_COUNT);
+const bands = [
+  { band: styles.bandTop, track: styles.track },
+  { band: styles.bandBottom, track: styles.track },
+  { band: styles.bandLeft, track: styles.trackVertical },
+  { band: styles.bandRight, track: styles.trackVertical },
+];
+---
+
+<typography-band class={styles.element} transition:persist="typography-band">
+  {
+    bands.map(({ band, track }) => (
+      <div class={band} data-testid="typography-band" aria-hidden="true">
+        <div class={track}>
+          <span>{repeated}</span>
+          <span>{repeated}</span>
+        </div>
+      </div>
+    ))
+  }
+</typography-band><script>
+  import { defineTypographyBandElement } from './element';
+
+  defineTypographyBandElement();
+</script>

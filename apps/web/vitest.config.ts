@@ -47,8 +47,6 @@ export default defineConfig({
             '@internationalized/date',
             'gsap',
             'gsap/ScrambleTextPlugin',
-            'gsap/ScrollToPlugin',
-            'gsap/ScrollTrigger',
             '@payloadcms/richtext-lexical/react',
             '@payloadcms/live-preview-react',
             '@radix-ui/react-slot',

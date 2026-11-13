@@ -1,0 +1,20 @@
+---
+// `.astro` BlankDim with NO React island: the React BlankDim's first render (./index.tsx:
+// the reference number alone) inside the `<blank-dim>` custom element (./element.ts),
+// which measures the cell and prints "W×H" (label text shared via ./format).
+import { blankDimLabel } from './format';
+import * as styles from './styles.css';
+
+type Props = {
+  // 2-digit reference number for the blank.
+  refLabel: string;
+};
+
+const { refLabel } = Astro.props;
+---
+
+<blank-dim class={styles.element} ref-label={refLabel}><span class={styles.blankDim} aria-hidden="true">{blankDimLabel(refLabel, null)}</span></blank-dim><script>
+  import { defineBlankDimElement } from './element';
+
+  defineBlankDimElement();
+</script>

@@ -2,6 +2,7 @@
 
 import { createContext, use, useCallback, useState, useSyncExternalStore } from 'react';
 
+import { defaultBootStore } from './default-store';
 import { createBootStore } from './store';
 
 import type { BootSnapshot, BootStore } from './store';
@@ -9,11 +10,9 @@ import type { ReactNode } from 'react';
 
 // Default store for trees with no provider: observes the document root. On the
 // Astro site every island is its own React root and mounts WITHOUT a provider, so
-// this module-level instance is what all islands share (one observer on <html>). Safe at module scope — createBootStore only touches the DOM
-// inside subscribe (client-only).
-const defaultStore = createBootStore();
-
-const BootStatusContext = createContext<BootStore>(defaultStore);
+// this shared instance (./default-store) is what all islands — and the vanilla
+// <scramble-text> element — observe (one observer on <html>).
+const BootStatusContext = createContext<BootStore>(defaultBootStore);
 
 type ProviderProps = {
   children: ReactNode;

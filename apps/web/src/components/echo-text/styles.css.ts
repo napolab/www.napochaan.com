@@ -58,3 +58,8 @@ export const red = css({
   color: 'danger.spot',
   fontStyle: 'normal',
 });
+
+// The <echo-text> custom element (echo-text.astro) is a pure wrapper: no box, so the
+// hero / masthead lay out the root span exactly as the React EchoText rendered it. A
+// class (not a stylesheet on the element) so it applies before the element upgrades.
+export const element = css({ display: 'contents' });

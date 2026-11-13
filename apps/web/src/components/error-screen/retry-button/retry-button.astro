@@ -1,0 +1,15 @@
+---
+// `.astro` RetryButton with NO React island: the generic react-aria `Button` rendered
+// server-side without a directive (static markup, as button/link-button.astro does),
+// wrapped in the `<retry-button>` custom element (./element.ts) that reloads on press
+// (./reload, shared with the React RetryButton). Accessible name: "retry".
+import { Button } from '@components/button';
+
+import * as styles from '../styles.css';
+---
+
+<retry-button class={styles.retryElement}><Button variant="danger">retry</Button></retry-button><script>
+  import { defineRetryButtonElement } from './element';
+
+  defineRetryButtonElement();
+</script>

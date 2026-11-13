@@ -3,7 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { SiteFooter } from './index';
-import { FooterNavIsland } from './island';
+import { withAppProviders } from '@components/app-providers';
+
+import { FooterNav } from './footer-nav';
 
 describe('SiteFooter', () => {
   it('renders a contentinfo footer with copyright', async () => {
@@ -36,8 +38,9 @@ describe('SiteFooter', () => {
     await expect.element(page.getByText(/build abc123/)).toBeInTheDocument();
   });
 
-  it('marks the active section from the island pathname', async () => {
-    await render(<FooterNavIsland pathname="/blog/post" props={{}} />);
+  it('marks the active section from the provided pathname', async () => {
+    const FooterNavAt = withAppProviders(FooterNav);
+    await render(<FooterNavAt pathname="/blog/post" props={{}} />);
     await expect.element(page.getByRole('navigation', { name: 'フッターナビゲーション' }).getByRole('link', { name: 'blog' })).toHaveAttribute('data-active', 'true');
   });
 });

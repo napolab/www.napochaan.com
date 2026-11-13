@@ -4,7 +4,7 @@ import { findWorkFixture, worksFeed } from './works-fixtures';
 import NotFoundPage from '../404.astro';
 import WorkDetailPage from '../works/[slug].astro';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
-import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
+import { CLIENT_LEAF_ISLANDS, mainIslandsOf, mainLeafElementsOf } from '../../test-utils/island-parity';
 
 vi.mock('@utils/request-url', () => ({ getRequestOrigin: async () => ORIGIN }));
 vi.mock('@lib/cms/works', () => ({ findWorksList: vi.fn(async () => worksFeed), findWorkBySlug: vi.fn(findWorkFixture) }));
@@ -43,17 +43,21 @@ describe('/works/[slug]', () => {
     expect(html).toContain('href="/works/work-1"');
   });
 
-  it('hydrates only client leaves (QuoteShare, ShareBar, RelatedWorks, AdjacentNav)', async () => {
-    const islands = mainIslandsOf(await (await render('a.b')).text());
+  it('hydrates only client leaves (QuoteShare; ShareBar is the <share-bar> element); RelatedWorks and AdjacentNav are static', async () => {
+    const html = await (await render('a.b')).text();
+    const islands = mainIslandsOf(html);
     expect(islands.filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
-    expect(islands).toEqual(expect.arrayContaining(['QuoteShareIsland', 'ShareBarIsland', 'RelatedWorksIsland', 'AdjacentNavIsland']));
+    expect(islands).toContain('QuoteShareIsland');
+    expect(mainLeafElementsOf(html).filter((tag) => tag === 'share-bar')).toHaveLength(1);
+    expect(islands).not.toContain('RelatedWorksIsland');
+    expect(islands).not.toContain('AdjacentNavIsland');
   });
 
   it('omits the related rail when no other work shares the type', async () => {
     const html = await (await render('work-52')).text();
     expect(html).toContain('support · 2025');
     expect(html).not.toContain('related / 関連');
-    expect(mainIslandsOf(html)).not.toContain('RelatedWorksIsland');
+    expect(html).not.toContain('aria-labelledby="related-heading"');
   });
 
   it('answers 404 with the not-found page for an unknown slug', async () => {

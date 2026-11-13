@@ -1,9 +1,9 @@
 ---
-// Port of the PostList Server Component: the `.map` lives here so each PostCard (a
-// client leaf that scrambles its title on hover) is its own island. Cards get only the
-// fields they render (never the body) and a server-formatted date (see ./post-card).
+// Port of the PostList Server Component. Each PostCard is an `.astro` twin (a static
+// card link whose title scrambles on hover without React). Cards get only the fields
+// they render (never the body) and a server-formatted date (see ./post-card).
 import { formatPostDate } from '../../lib/format-post-date';
-import { PostCardIsland } from './island';
+import PostCard from './post-card.astro';
 import * as styles from './styles.css';
 
 import type { Post } from '../../post';
@@ -13,21 +13,13 @@ type Props = {
 };
 
 const { posts } = Astro.props;
-const pathname = Astro.url.pathname;
 ---
 
 <ol class={styles.list}>
   {
     posts.map((post) => (
       <li>
-        <PostCardIsland
-          client:load
-          pathname={pathname}
-          props={{
-            post: { slug: post.slug, index: post.index, title: post.title, readMin: post.readMin, excerpt: post.excerpt },
-            formattedDate: formatPostDate(post.date),
-          }}
-        />
+        <PostCard post={post} formattedDate={formatPostDate(post.date)} />
       </li>
     ))
   }

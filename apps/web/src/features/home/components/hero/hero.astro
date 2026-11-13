@@ -1,10 +1,12 @@
 ---
-// Port of the (site) Hero Server Component. Static markup; the wordmark (EchoText),
-// the lead (TypewriterText) and the three link buttons are the client leaves.
-import { ButtonIsland } from '@components/button/island';
-import { EchoTextIsland } from '@components/echo-text/island';
+// Port of the (site) Hero Server Component. Static markup; the wordmark (EchoText) and
+// the lead (TypewriterText) are the client leaves — the `<echo-text>` /
+// `<typewriter-text>` custom elements, no island; the three link buttons are static
+// anchors (./link-button.astro, no JS).
+import LinkButton from '@components/button/link-button.astro';
+import EchoText from '@components/echo-text/echo-text.astro';
 import { SystemAnnotation } from '@components/system-annotation';
-import { TypewriterTextIsland } from '@components/typewriter-text/island';
+import TypewriterText from '@components/typewriter-text/typewriter-text.astro';
 
 import * as styles from './styles.css';
 
@@ -15,7 +17,6 @@ type Props = {
 
 const SUB = 'も～っと！ドパガキ！！！！！！！！！！！！！！(11期)';
 const { name = 'napochaan', lead = 'さまざまな「破壊」、承っております。' } = Astro.props;
-const pathname = Astro.url.pathname;
 const buttons = [
   { variant: 'solid', href: '/about', label: 'enter →' },
   { variant: 'outline', href: '/works', label: 'works' },
@@ -26,11 +27,11 @@ const buttons = [
 <header class={styles.root}>
   <SystemAnnotation tone="accent" className={styles.annotationStart}>5470009</SystemAnnotation>
   <p class={styles.kicker}>// おそろしき、なんでも屋 — engineer / DJ / VJ</p>
-  <EchoTextIsland client:load pathname={pathname} props={{ children: name }} />
-  <blockquote class={styles.lead}><TypewriterTextIsland client:load pathname={pathname} props={{ children: lead }} /></blockquote>
+  <EchoText text={name} />
+  <blockquote class={styles.lead}><TypewriterText text={lead} /></blockquote>
   <p class={styles.sub}>{SUB}</p>
   <div class={styles.buttons}>
-    {buttons.map((button) => <ButtonIsland client:load pathname={pathname} props={{ type: 'link', variant: button.variant, href: button.href, children: button.label }} />)}
+    {buttons.map((button) => <LinkButton variant={button.variant} href={button.href}>{button.label}</LinkButton>)}
   </div>
   <SystemAnnotation tone="danger" className={styles.annotationEnd}>▸ not found</SystemAnnotation>
   <SystemAnnotation tone="muted" className={styles.annotationCoords}>35.6595 / 139.7006<span class={styles.squareBlue} aria-hidden="true"></span><span class={styles.squareRed} aria-hidden="true"></span></SystemAnnotation>

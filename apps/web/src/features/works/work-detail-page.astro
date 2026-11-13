@@ -1,13 +1,13 @@
 ---
 // Port of `works/[slug]/page.tsx`'s body. WorkDetail is server-rendered (its QuoteShare
-// leaf hydrates); RelatedWorks and AdjacentNav are client leaves ('use client' in
-// apps/web) and hydrate as islands with only the fields they render.
+// leaf hydrates); RelatedWorks and AdjacentNav are `.astro` twins (static links whose
+// titles scramble without React).
 import PageHeader from '@components/page-header/page-header.astro';
-import { ShareBarIsland } from '@components/share-bar/island';
+import ShareBar from '@components/share-bar/share-bar.astro';
 import { absoluteUrl } from '@utils/site-url';
 
-import { AdjacentNavIsland } from './components/adjacent-nav/island';
-import { RelatedWorksIsland } from './components/related-works/island';
+import AdjacentNav from './components/adjacent-nav/adjacent-nav.astro';
+import RelatedWorks from './components/related-works/related-works.astro';
 import WorkDetail from './components/work-detail/work-detail.astro';
 import * as styles from './detail.css';
 import { toWorkCard, toWorkLink } from './work-card';
@@ -21,7 +21,6 @@ type Props = {
 
 const { slug, detail } = Astro.props;
 const { work, adjacent, related } = detail;
-const pathname = Astro.url.pathname;
 const url = absoluteUrl(`/works/${slug}`);
 const crumbs = [{ href: '/', label: 'home' }, { href: '/works', label: 'works' }, { label: work.title }];
 ---
@@ -32,9 +31,9 @@ const crumbs = [{ href: '/', label: 'home' }, { href: '/works', label: 'works' }
   related.length > 0 && (
     <>
       <hr class={styles.divider} />
-      <RelatedWorksIsland client:load pathname={pathname} props={{ works: related.map(toWorkCard) }} />
+      <RelatedWorks works={related.map(toWorkCard)} />
     </>
   )
 }
-<ShareBarIsland client:load pathname={pathname} props={{ url, title: work.title }} />
-<AdjacentNavIsland client:load pathname={pathname} props={{ prev: toWorkLink(adjacent.prev), next: toWorkLink(adjacent.next) }} />
+<ShareBar url={url} title={work.title} />
+<AdjacentNav prev={toWorkLink(adjacent.prev)} next={toWorkLink(adjacent.next)} />

@@ -5,7 +5,7 @@
 import PageHeader from '@components/page-header/page-header.astro';
 import { QuoteShareIsland } from '@components/quote-share/island';
 import RichText from '@components/rich-text/rich-text.astro';
-import { ShareBarIsland } from '@components/share-bar/island';
+import ShareBar from '@components/share-bar/share-bar.astro';
 import { absoluteUrl } from '@utils/site-url';
 
 import NewsNav from './components/news-nav/news-nav.astro';
@@ -35,5 +35,5 @@ const toNavItem = (news: { id: string; slug: string; title: string } | undefined
     )
   }
 </div>
-<ShareBarIsland client:load pathname={pathname} props={{ url, title: item.title }} />
+<ShareBar url={url} title={item.title} />
 <NewsNav prev={toNavItem(adjacent.prev)} next={toNavItem(adjacent.next)} />

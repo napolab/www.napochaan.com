@@ -6,6 +6,7 @@ import { useBootReady } from '@components/boot-status';
 import { usePrefersReducedMotion } from '@hooks/use-prefers-reduced-motion';
 import { useTypewriter } from '@hooks/use-typewriter';
 
+import { HOLD_MS, nextIndex, shuffle } from './cycle';
 import { QUESTIONS } from '../questions';
 import * as styles from '../styles.css';
 
@@ -13,21 +14,6 @@ import * as styles from '../styles.css';
 // — everything around it (frame, brand, progress bar) stays a Server Component.
 // It cycles QUESTIONS in order forever: type one, hold, advance, repeat. It is
 // intentionally NOT synced to the progress bar; the two animate independently.
-
-// Pure cycle step, extracted so the wrap-around is unit-testable.
-export const nextIndex = (current: number, length: number): number => (current + 1) % length;
-
-// Pure shuffle (decorate–sort–undecorate): tag each item with a drawn key, sort by
-// it, drop the key. `random` is injected so tests stay deterministic; production
-// passes Math.random. Never mutates the input — the `map` builds a fresh array.
-export const shuffle = <T,>(items: readonly T[], random: () => number): T[] =>
-  items
-    .map((item) => ({ item, key: random() }))
-    .sort((a, b) => a.key - b.key)
-    .map(({ item }) => item);
-
-// How long a finished prompt stays on screen before the next begins typing.
-const HOLD_MS = 1800;
 
 type LineProps = {
   text: string;

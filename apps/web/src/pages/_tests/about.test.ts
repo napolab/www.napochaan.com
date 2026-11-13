@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import NotFoundPage from '../404.astro';
 import AboutPage from '../about.astro';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
-import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
+import { CLIENT_LEAF_ISLANDS, mainIslandsOf, mainLeafElementsOf, mainScrambleTextCountOf } from '../../test-utils/island-parity';
 
 import type { Profile } from '../../features/about/profile';
 
@@ -59,7 +59,10 @@ describe('/about', () => {
     const html = await render();
     const islands = mainIslandsOf(html);
     expect(islands.filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
-    expect(islands).toEqual(['ScrambleTextIsland', 'EchoTextIsland', 'TypewriterTextIsland', 'ScrambleTextIsland']);
+    expect(islands).toEqual([]);
+    // The masthead's EchoText / TypewriterText and ScrambleText ship as custom elements.
+    expect(mainLeafElementsOf(html).filter((tag) => tag !== 'scramble-text')).toEqual(['echo-text', 'typewriter-text']);
+    expect(mainScrambleTextCountOf(html)).toBe(2);
   });
 
   it('answers 404 with the not-found page when the profile is missing', async () => {

@@ -5,7 +5,7 @@
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 import { Link } from '@components/link';
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 import { SectionHeading } from '@components/section-heading';
 import Table from '@components/table/table.astro';
 
@@ -19,7 +19,6 @@ type Props = {
 };
 
 const { id, works } = Astro.props;
-const pathname = Astro.url.pathname;
 const columns = [
   { key: 'thumb', label: '' },
   { key: 'no', label: 'no', desktopOnly: true },
@@ -30,7 +29,7 @@ const columns = [
 ---
 
 <section id={id} class={styles.root}>
-  <SectionHeading no="02" moreHref="/works">works<ScrambleTextIsland slot="more" client:load pathname={pathname} props={{ children: '$ ls works/' }} /></SectionHeading>
+  <SectionHeading no="02" moreHref="/works">works<ScrambleText slot="more" text="$ ls works/" /></SectionHeading>
   <Table columns={columns} rows={works}>
     {
       (work: WorkRow, key: string) => {
@@ -55,7 +54,7 @@ const columns = [
           case 'title':
             return (
               <Link href={`/works/${work.slug}`} tone="accent">
-                <ScrambleTextIsland client:load pathname={pathname} props={{ children: work.title }} />
+                <ScrambleText text={work.title} />
               </Link>
             );
           case 'type':

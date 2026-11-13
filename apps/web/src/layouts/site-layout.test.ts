@@ -1,3 +1,4 @@
+import { siteNavItems } from '@utils/nav-items';
 import { readFileSync } from 'node:fs';
 
 import { getContainerRenderer as reactContainerRenderer } from '@astrojs/react/container-renderer';
@@ -10,6 +11,7 @@ import { motionBootScriptHtml } from '@utils/motion-cookie';
 import { imageBlurScriptHtml } from '@components/image/blur-script';
 import { rootStateCarryScriptHTML } from '@utils/root-state-carry';
 
+import { leafElementsOf } from '../test-utils/island-parity';
 import SiteLayout from './site-layout.astro';
 
 const ORIGIN = 'http://localhost:8788';
@@ -82,24 +84,35 @@ describe('site-layout.astro', () => {
     expect(state.html).toContain('<main id="main-content"><p>page body</p></main>');
   });
 
-  // .claude/rules/astro-islands.md: the shell hydrates only client leaves (the
-  // 'use client' modules of the Next app), never a server tree around them.
-  it('hydrates only client leaves in the shell', () => {
-    const islands = [...state.html.matchAll(/<astro-island [^>]*component-export="([^"]+)"/g)].map((match) => match[1]);
-    expect(islands).toEqual([
-      'BootQuestionIsland',
-      'ScrollRangeSyncIsland',
-      'TypographyBandIsland',
-      'GameOfLifeIsland',
-      'SysBarIsland',
-      'FooterNavIsland',
-      'ScrambleTextIsland',
-      'ScrambleTextIsland',
-      'CursorPresenceIsland',
-    ]);
+  // .claude/rules/astro-islands.md: the shell hydrates no React at all — a page with
+  // no islands of its own loads no react-dom.
+  it('hydrates no island in the shell', () => {
+    expect(state.html).not.toContain('<astro-island');
   });
 
-  it('feeds the page pathname to the islands', () => {
-    expect(state.html).toContain('&quot;pathname&quot;:[0,&quot;/about&quot;]');
+  // The boot question, the tint's scroll-range sync, the band, the life canvas, the
+  // SysBar and the cursor layer ship as framework-free custom elements (no island),
+  // each with its registration script bundled once.
+  it('renders every interactive shell piece as a custom element', () => {
+    const elements = leafElementsOf(state.html).filter((tag) => tag !== 'scramble-text');
+    expect(elements).toEqual(['boot-question', 'scroll-range-sync', 'typography-band', 'game-of-life', 'sys-bar', 'cursor-presence']);
+    for (const file of ['boot-question.astro', 'safe-area-tint.astro', 'typography-band.astro', 'game-of-life.astro', 'sys-bar.astro', 'cursor-presence.astro']) {
+      expect(count(state.html, `${file}?astro&type=script`)).toBe(1);
+    }
+  });
+
+  // The SysBar and footer labels (both navs + colophon / sitemap) ship as the
+  // framework-free <scramble-text> element; its registration script is bundled once,
+  // however many render.
+  it('renders the SysBar and footer ScrambleText labels as <scramble-text> with one element script', () => {
+    expect(count(state.html, '<scramble-text ')).toBe(2 * siteNavItems.length + 2);
+    expect(count(state.html, 'scramble-text.astro?astro&type=script')).toBe(1);
+  });
+
+  // The persisted SysBar is rendered for the request path: the server marks the
+  // active section (the element follows later soft navigations).
+  it('marks the page section active in the SysBar from the request pathname', () => {
+    const bar = state.html.slice(state.html.indexOf('<sys-bar '), state.html.indexOf('</sys-bar>'));
+    expect([...bar.matchAll(/<a data-active="true"[^>]*href="([^"]+)"/g)].map((match) => match[1])).toEqual(['/about']);
   });
 });

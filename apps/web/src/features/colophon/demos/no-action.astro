@@ -1,0 +1,13 @@
+---
+// `.astro` NoAction with NO React island: the demo goes in the default slot (static
+// HTML plus any of the demo's own leaf islands / elements), wrapped in the
+// `<no-action>` custom element (./no-action-element.ts) that cancels every click
+// inside it in the capture phase, so showcased links never navigate.
+import * as styles from './no-action.css';
+---
+
+<no-action class={styles.root}><slot /></no-action><script>
+  import { defineNoActionElement } from './no-action-element';
+
+  defineNoActionElement();
+</script>

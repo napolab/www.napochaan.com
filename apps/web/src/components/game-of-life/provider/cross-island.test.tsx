@@ -5,7 +5,8 @@ import { render } from 'vitest-browser-react';
 import { describe, expect, it, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
-import { sharedLifeEngine, useLifeState } from './index';
+import { sharedLifeEngine } from '../shared-engine';
+import { useLifeState } from './index';
 
 // Each Astro island is its own React root. The backdrop island (GameOfLife) ticks the
 // engine and the SysBar island reads its generation, so with no provider in either

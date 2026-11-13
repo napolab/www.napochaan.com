@@ -30,14 +30,14 @@ describe('rich-text.astro', () => {
     expect(html).not.toContain('<astro-island');
   });
 
-  it('renders a heading as a direct child with its slug id and a copy-anchor island inside', async () => {
+  it('renders a heading as a direct child with its slug id and a <copy-hash-button> element inside', async () => {
     const html = await render([paragraph('lead'), heading('h2', 'Hello World'), paragraph('after')]);
-    expect(html).toMatch(/<h2 id="hello-world" data-level="2" class="[^"]+">\s*<astro-island [^>]*component-export="CopyHashButtonIsland"/);
-    expect(html).toContain('この見出しへのリンクをコピー');
+    expect(html).toMatch(/<h2 id="hello-world" data-level="2" class="[^"]+">\s*<copy-hash-button class="[^"]+" slug="hello-world" anchored><button [^>]*aria-label="この見出しへのリンクをコピー"/);
     expect(html).toMatch(/Hello World<\/span><\/h2>/);
-    expect(html.match(/<astro-island /g)).toHaveLength(1);
-    // The island lives inside the heading: the heading itself is a sibling of the paragraphs.
-    expect(html.indexOf('<h2')).toBeLessThan(html.indexOf('<astro-island'));
+    expect(html.match(/<copy-hash-button /g)).toHaveLength(1);
+    expect(html).not.toContain('<astro-island');
+    // The element lives inside the heading: the heading itself is a sibling of the paragraphs.
+    expect(html.indexOf('<h2')).toBeLessThan(html.indexOf('<copy-hash-button'));
   });
 
   it('renders an image upload as a static figure whose only island is the Lightbox', async () => {

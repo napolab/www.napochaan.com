@@ -1,0 +1,23 @@
+---
+// `.astro` twin of FooterNav (markup mirrors ./footer-nav.tsx). The active section is
+// decided on the server from the request path, and each label scrambles through the
+// Astro ScrambleText, so the nav ships no React.
+import { Link } from '@components/link';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
+import { isNavActive } from '@utils/is-nav-active';
+import { siteNavItems } from '@utils/nav-items';
+
+import * as styles from './styles.css';
+
+const { pathname } = Astro.url;
+---
+
+<nav class={styles.nav} aria-label="フッターナビゲーション">
+  {
+    siteNavItems.map(({ label, href }) => (
+      <Link href={href} className={styles.navLink} tone="muted" underline={false} data-active={isNavActive(pathname, href) ? 'true' : undefined}>
+        <ScrambleText text={label} />
+      </Link>
+    ))
+  }
+</nav>

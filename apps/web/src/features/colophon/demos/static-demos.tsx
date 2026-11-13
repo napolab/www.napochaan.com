@@ -29,7 +29,7 @@ const paginationHref = (page: number): string => `?page=${page}`;
 // Server-only demos, no directive (see ./demo-kind). A client module rendered here
 // (Image in Figure, the react-aria Link) needs no hydration: the image's blur is
 // cleared by the inline blur script and links are plain anchors. Link, Pagination and
-// FeedLink carry hrefs, so ./demo.astro wraps them in the <NoAction> island.
+// FeedLink carry hrefs, so ./demo.astro wraps them in <NoAction> (./no-action.astro).
 const staticDemos: Record<StaticDemoName, ReactNode> = {
   Marquee: <Marquee>napochaan ✕ graphic · digital · since 2020 · </Marquee>,
   Heading: (

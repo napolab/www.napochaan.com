@@ -33,3 +33,8 @@ export const actions = css({
   gap: '3',
   flexWrap: 'wrap',
 });
+
+// The <share-bar> custom element (share-bar.astro) is a pure wrapper: no box, so the
+// group lays out in the article flow exactly as the React ShareBar did. A class so it
+// applies before the element upgrades.
+export const element = css({ display: 'contents' });

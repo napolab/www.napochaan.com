@@ -3,7 +3,7 @@
 // client leaf, SSR'd and hydrated on load as in Next; the heading's labels are
 // ScrambleText leaves.
 import { GalleryIsland } from '@components/gallery/island';
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 import { SectionHeading } from '@components/section-heading';
 
 import * as styles from './styles.css';
@@ -21,6 +21,6 @@ const pathname = Astro.url.pathname;
 ---
 
 <section id={id} class={styles.root}>
-  <SectionHeading no="04" href="/gallery" moreHref="/gallery"><ScrambleTextIsland client:load pathname={pathname} props={{ children: 'gallery' }} /><ScrambleTextIsland slot="more" client:load pathname={pathname} props={{ children: '$ open gallery/' }} /></SectionHeading>
+  <SectionHeading no="04" href="/gallery" moreHref="/gallery"><ScrambleText text="gallery" /><ScrambleText slot="more" text="$ open gallery/" /></SectionHeading>
   <GalleryIsland client:load pathname={pathname} props={{ items: toGalleryItems(photos) }} />
 </section>

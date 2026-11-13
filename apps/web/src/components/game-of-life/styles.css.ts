@@ -8,3 +8,8 @@ export const root = css({
   height: 'full',
   pointerEvents: 'none',
 });
+
+// The <game-of-life> custom element (game-of-life.astro) is a pure wrapper: no box, so
+// the canvas fills the caller's box exactly as the React GameOfLife did. A class so it
+// applies before the element upgrades.
+export const element = css({ display: 'contents' });

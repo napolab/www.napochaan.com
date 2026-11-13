@@ -3,7 +3,7 @@
 // the repo, not the CMS, so it only changes on deploy (Workers Cache keys entries by
 // Worker version). Still SSR, like every page.
 import PageHeader from '@components/page-header/page-header.astro';
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 import { SectionHeading } from '@components/section-heading';
 
 import { AmbientPointer } from '../features/colophon/components/ambient-pointer';
@@ -15,7 +15,6 @@ import { colophonMetadata } from '../features/colophon/metadata';
 import * as s from '../features/colophon/styles.css';
 import SiteLayout from '../layouts/site-layout.astro';
 
-const pathname = Astro.url.pathname;
 const crumbs = [{ href: '/', label: 'home' }, { label: 'colophon' }];
 ---
 
@@ -63,8 +62,8 @@ const crumbs = [{ href: '/', label: 'home' }, { label: 'colophon' }];
     <section class={s.cell}>
       <SectionHeading no="04">source</SectionHeading>
       <a class={s.source} href={colophon.source.href} target="_blank" rel="noopener noreferrer"
-        ><span class={s.sourceLabel}><ScrambleTextIsland client:load pathname={pathname} props={{ children: colophon.source.label }} /></span><span class={s.sourceHandle}
-          ><ScrambleTextIsland client:load pathname={pathname} props={{ children: colophon.source.handle }} /></span
+        ><span class={s.sourceLabel}><ScrambleText text={colophon.source.label} /></span><span class={s.sourceHandle}
+          ><ScrambleText text={colophon.source.handle} /></span
         ><span aria-hidden="true">↗</span></a
       >
     </section>

@@ -1,0 +1,12 @@
+---
+// `.astro` twin of Divider: a separator has no interactive state, so the React
+// component renders server-only (no directive) — the `<hr>` / `role="separator"`
+// markup and data attributes ship without JS.
+import { Divider } from './index';
+
+import type { ComponentProps } from 'react';
+
+type Props = ComponentProps<typeof Divider>;
+---
+
+<Divider {...Astro.props} />

@@ -1,8 +1,6 @@
 import { Button } from '@components/button';
 
-const reloadPage = (): void => {
-  location.reload();
-};
+import { reloadPage } from './reload';
 
 type Props = {
   // Injectable for tests (a function cannot cross the island props boundary anyway).

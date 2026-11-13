@@ -11,5 +11,6 @@ describe('SysBar', () => {
     await expect.element(page.getByRole('link', { name: 'gallery' })).toBeInTheDocument();
     await expect.element(page.getByText('● rec')).toBeInTheDocument();
     await expect.element(page.getByText(/gen/)).toBeInTheDocument();
+    await expect.element(page.getByRole('button', { name: 'グローバルナビゲーション' })).toBeInTheDocument();
   });
 });

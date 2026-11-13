@@ -2,7 +2,7 @@
 // Port of the (site) BlogIndex Server Component. Post links are static anchors; each
 // title's ScrambleText and the heading's more-link label are the client leaves.
 import { Link } from '@components/link';
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 import { SectionHeading } from '@components/section-heading';
 import { SystemAnnotation } from '@components/system-annotation';
 
@@ -16,18 +16,17 @@ type Props = {
 };
 
 const { id, posts } = Astro.props;
-const pathname = Astro.url.pathname;
 ---
 
 <section id={id} class={styles.root}>
-  <SectionHeading no="05" moreHref="/blog">blog<ScrambleTextIsland slot="more" client:load pathname={pathname} props={{ children: '$ cat blog/' }} /></SectionHeading>
+  <SectionHeading no="05" moreHref="/blog">blog<ScrambleText slot="more" text="$ cat blog/" /></SectionHeading>
   <ol class={styles.list}>
     {
       posts.map((post) => (
         <li class={styles.post}>
           <span class={styles.index}>{post.index}</span>
           <Link href={`/blog/${post.slug}`} tone="accent" className={styles.title}>
-            <ScrambleTextIsland client:load pathname={pathname} props={{ children: post.title }} />
+            <ScrambleText text={post.title} />
           </Link>
           <p class={styles.meta}>
             <SystemAnnotation>{`${post.readMin} min`}</SystemAnnotation>

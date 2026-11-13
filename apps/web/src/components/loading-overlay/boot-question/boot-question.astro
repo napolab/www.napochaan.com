@@ -1,0 +1,14 @@
+---
+// `.astro` BootQuestion with NO React island. The markup inside <boot-question> is the
+// React BootQuestion's first render (./index.tsx: nothing typed yet, only the caret) —
+// asserted through boot-console.astro.test.ts — and the cycle is driven by the
+// `<boot-question>` custom element (./element.ts), which shares the typewriter
+// controller (@utils/typewriter) and the shuffle/cycle (./cycle) with the React one.
+import * as styles from '../styles.css';
+---
+
+<boot-question class={styles.bootQuestion}><span class={styles.caret}></span></boot-question><script>
+  import { defineBootQuestionElement } from './element';
+
+  defineBootQuestionElement();
+</script>

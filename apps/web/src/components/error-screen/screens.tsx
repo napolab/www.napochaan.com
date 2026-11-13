@@ -7,8 +7,8 @@ import * as s from './styles.css';
 
 // Ports of the Next `(site)/not-found.tsx` and `(site)/error.tsx` screens. Server
 // Components: src/pages/404.astro and 500.astro render their `.astro` twins
-// (not-found-screen.astro / server-error-screen.astro), which hydrate only the
-// ScrambleText label and the retry button.
+// (not-found-screen.astro / server-error-screen.astro), which hydrate nothing: the
+// ScrambleText label and the retry button are custom elements there.
 
 const HomeLink = () => (
   <Link href="/" tone="accent" className={s.homeLink}>

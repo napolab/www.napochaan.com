@@ -1,7 +1,7 @@
 ---
 // `.astro` twin of the ContactList Server Component (markup mirrors ./index.tsx); each
-// label's ScrambleText is the only island.
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+// label's ScrambleText is a `<scramble-text>` element (no React island).
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 
 import * as styles from './styles.css';
 
@@ -10,7 +10,6 @@ type Props = {
 };
 
 const { items } = Astro.props;
-const pathname = Astro.url.pathname;
 ---
 
 <ul class={styles.root}>
@@ -18,7 +17,7 @@ const pathname = Astro.url.pathname;
     items.map((item) => (
       <li>
         <a class={styles.link} href={item.href} target="_blank" rel="noopener noreferrer">
-          <ScrambleTextIsland client:load pathname={pathname} props={{ children: item.label, className: styles.label }} />
+          <ScrambleText text={item.label} className={styles.label} />
           <span class={styles.handle}>{item.handle}</span>
           <span aria-hidden="true">↗</span>
         </a>

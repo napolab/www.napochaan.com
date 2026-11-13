@@ -1,0 +1,26 @@
+---
+// `.astro` CopyHashButton with NO React island: the React CopyHashButton (./index.tsx)
+// rendered server-side without a directive — static react-aria `<button type="button"
+// aria-label>` markup, the `#` glyph is CSS — wrapped in the `<copy-hash-button>` custom
+// element (./element.ts), which copies the `#slug` link, flashes `data-copied` and, when
+// `anchored`, jumps to its enclosing heading (./copy-hash + ../jump-to-heading, shared
+// with the React one).
+import { CopyHashButton } from './index';
+import * as styles from './styles.css';
+
+type Props = {
+  slug: string;
+  label?: string;
+  className?: string;
+  // The button jumps to its own enclosing (server-rendered) heading.
+  anchored?: boolean;
+};
+
+const { slug, label, className, anchored = false } = Astro.props;
+---
+
+<copy-hash-button class={styles.element} slug={slug} anchored={anchored ? '' : undefined}><CopyHashButton slug={slug} label={label} className={className} /></copy-hash-button><script>
+  import { defineCopyHashButtonElement } from './element';
+
+  defineCopyHashButtonElement();
+</script>

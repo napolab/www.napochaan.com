@@ -78,3 +78,9 @@ export const fill = css({
   // it. Apply the single-line ellipsis here so the "…" actually renders.
   '[data-truncate] &': { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
 });
+
+// `<scramble-text>` wrapper (scramble-text.astro): generates no box, so the root span
+// lays out exactly as it did inside the old `<astro-island>` (also display: contents)
+// and parent child/sibling selectors are unaffected. A class, not a JS-set style, so it
+// applies before the element upgrades.
+export const element = css({ display: 'contents' });

@@ -1,0 +1,63 @@
+---
+// `.astro` SysBar with NO React island. The markup inside <sys-bar> is the React
+// SysBar's (./index.tsx) — asserted by sys-bar.astro.test.ts — except that each nav
+// label is the framework-free `<scramble-text trigger="group">` (its hover host, the
+// whole link slot, marked `data-scramble-host`) and the menu trigger is the static
+// react-aria Button face (./nav-menu/trigger-button, no directive). The `<sys-bar>`
+// custom element (./element.ts) ticks the clock, mirrors the life engine (gen / alive)
+// and the presence count, wires the `cursors:` / `motion:` toggles, follows the active
+// section across soft navigations, and lazy-mounts the react-aria menu on the
+// trigger's first intent — React loads only then, and never on desktop.
+//
+// The element itself carries `transition:persist`, so it is never re-rendered from
+// the server after the first page: the server values below (stamped clock, the
+// placeholder engine's gen / alive, nobody watching, both toggles on) are only the
+// first paint, exactly what the React island's SSR showed.
+import { Link } from '@components/link';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
+import { sharedLifeEngine } from '@components/game-of-life/shared-engine';
+import { isNavActive } from '@utils/is-nav-active';
+import { siteNavItems } from '@utils/nav-items';
+
+import { MenuTriggerButton } from './nav-menu/trigger-button';
+import { aliveText, cursorsText, genText, motionText, watchingText } from './status-text';
+import * as styles from './styles.css';
+
+type Props = {
+  // HH:mm:ss stamped by the layout (formatClock); the element switches to the live clock.
+  initialTime: string;
+};
+
+const { initialTime } = Astro.props;
+const { pathname } = Astro.url;
+const life = sharedLifeEngine.getState();
+---
+
+<sys-bar class={styles.element} transition:persist="sys-bar"
+  ><header class={styles.root}
+    ><div class={styles.navRow}
+      ><nav class={styles.nav} aria-label="グローバルナビゲーション"
+        >{
+          siteNavItems.map(({ label, href }, order) => (
+            <Link href={href} className={styles.navLink} data-active={isNavActive(pathname, href) ? 'true' : undefined} data-order={order} tone="inherit" underline={false} data-scramble-host>
+              <ScrambleText text={label} trigger="group" />
+            </Link>
+          ))
+        }</nav
+      ><div class={styles.menuRoot} data-nav-menu><MenuTriggerButton /></div></div
+    ><div class={styles.status}
+      ><span class={styles.clock} data-status="clock">{initialTime}</span><span class={styles.gen} data-status="gen">{genText(life.generation)}</span><span
+        class={styles.alive}
+        data-status="alive">{aliveText(life.alive)}</span
+      ><span class={styles.rec}>● rec</span><span class={styles.watching} data-status="watching">{watchingText(0)}</span><button
+        type="button"
+        class={styles.toggle}
+        data-toggle="cursors">{cursorsText(true)}</button
+      ><button type="button" class={styles.toggle} data-toggle="motion">{motionText(false)}</button></div
+    ></header
+  ><div class={styles.checker} aria-hidden="true"></div></sys-bar
+><script>
+  import { defineSysBarElement } from './element';
+
+  defineSysBarElement();
+</script>

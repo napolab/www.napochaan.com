@@ -1,9 +1,10 @@
 ---
 // Port of the about AboutMasthead Server Component. Static markup; the name (EchoText,
-// the page h1) and the lead (TypewriterText) are the client leaves.
-import { EchoTextIsland } from '@components/echo-text/island';
+// the page h1) and the lead (TypewriterText) are the client leaves — the `<echo-text>` /
+// `<typewriter-text>` custom elements, no island.
+import EchoText from '@components/echo-text/echo-text.astro';
 import { SystemAnnotation } from '@components/system-annotation';
-import { TypewriterTextIsland } from '@components/typewriter-text/island';
+import TypewriterText from '@components/typewriter-text/typewriter-text.astro';
 
 import * as styles from './styles.css';
 
@@ -14,14 +15,13 @@ type Props = {
 };
 
 const { name, kicker, lead } = Astro.props;
-const pathname = Astro.url.pathname;
 ---
 
 <header class={styles.root}>
   <SystemAnnotation tone="accent" className={styles.annotationStart}>A-0420</SystemAnnotation>
   <p class={styles.kicker}>{kicker}</p>
-  <h1 class={styles.title}><EchoTextIsland client:load pathname={pathname} props={{ children: name }} /></h1>
-  <p class={styles.lead}><TypewriterTextIsland client:load pathname={pathname} props={{ children: lead, phrase: true }} /></p>
+  <h1 class={styles.title}><EchoText text={name} /></h1>
+  <p class={styles.lead}><TypewriterText text={lead} phrase /></p>
   <SystemAnnotation tone="danger" className={styles.annotationEnd}>▸ whoami</SystemAnnotation>
   <SystemAnnotation tone="muted" className={styles.annotationCoords}>35.6595 / 139.7006<span class={styles.squareBlue} aria-hidden="true"></span><span class={styles.squareRed} aria-hidden="true"></span></SystemAnnotation>
 </header>

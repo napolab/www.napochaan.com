@@ -37,7 +37,7 @@ describe('/colophon', () => {
     }
   });
 
-  // Every demo that carries an href sits inside the <NoAction> island (colophon rule).
+  // Every demo that carries an href sits inside the <no-action> element (colophon rule).
   const NO_ACTION_DEMOS = ['RichText', 'NewsRow', 'Link', 'Pagination', 'Breadcrumbs', 'FeedLink', 'ShareBar', 'BackToIndex', 'QuoteShare'];
 
   // The stage markup of one catalog cell.
@@ -46,9 +46,14 @@ describe('/colophon', () => {
     return html.slice(start, html.indexOf('</article>', start));
   };
 
-  it.each(NO_ACTION_DEMOS)('wraps the %s demo in the no-action island', async (name) => {
+  it.each(NO_ACTION_DEMOS)('wraps the %s demo in the <no-action> element', async (name) => {
     const html = await render();
-    expect(stageOf(html, name)).toMatch(/<div class="[^"]+"><astro-island [^>]*component-export="NoAction"/);
+    expect(stageOf(html, name)).toMatch(/<div class="[^"]+"><no-action class="[^"]+">/);
+  });
+
+  it('ships no NoAction island (the wrapper is a custom element)', async () => {
+    const html = await render();
+    expect(html).not.toContain('component-export="NoAction"');
   });
 
   it('renders a non-empty stage for every catalog demo', async () => {
@@ -63,10 +68,37 @@ describe('/colophon', () => {
     expect(mainIslandsOf(html).filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
   });
 
-  it('loads the two gallery demos client-only, with the loading annotation as fallback', async () => {
+  it('loads the editorial Gallery demo client-only, with the loading annotation as fallback', async () => {
     const html = await render();
-    expect(html.match(/client="only"/g)).toHaveLength(2);
+    expect(html.match(/client="only"/g)).toHaveLength(1);
     // Astro writes the fallback once in place and once in its swap <template>.
-    expect(html.match(/<template data-astro-template="fallback"><span slot="fallback"[^>]*>\s*loading gallery…/g)).toHaveLength(2);
+    expect(html.match(/<template data-astro-template="fallback"><span slot="fallback"[^>]*>\s*loading gallery…/g)).toHaveLength(1);
+  });
+
+  it('server-renders the GalleryArchive demo through its .astro twin (only the lightboxes / blank labels hydrate)', async () => {
+    const stage = stageOf(await render(), 'GalleryArchive');
+    expect(stage).toMatch(/<ul [^>]*data-gallery/);
+    expect(stage).not.toContain('GalleryArchiveIsland');
+    expect(stage).toContain('component-export="LightboxIsland"');
+  });
+
+  it('renders the Divider demo as static separators (no island)', async () => {
+    const stage = stageOf(await render(), 'Divider');
+    expect(stage.match(/role="separator"/g)).toHaveLength(2);
+    expect(stage).not.toContain('<astro-island');
+  });
+
+  // The two shell demos run the same custom-element drivers as the site (no React):
+  // GameOfLife on its own engine, CursorPresence on the socket-free sample visitors.
+  it('runs the GameOfLife demo as an isolated-engine <game-of-life> element (no island)', async () => {
+    const stage = stageOf(await render(), 'GameOfLife');
+    expect(stage).toMatch(/<div class="[^"]+"><game-of-life class="[^"]+" engine="isolated"><canvas /);
+    expect(stage).not.toContain('<astro-island');
+  });
+
+  it('runs the CursorPresence demo as a <cursor-presence-demo> element (no island)', async () => {
+    const stage = stageOf(await render(), 'CursorPresence');
+    expect(stage).toMatch(/<cursor-presence-demo class="[^"]+"><div class="[^"]+"><canvas /);
+    expect(stage).not.toContain('<astro-island');
   });
 });

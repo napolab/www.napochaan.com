@@ -1,21 +1,23 @@
 ---
 // Port of apps/web/src/app/(site)/layout.tsx. The page `<main>` (the slot) is
 // swapped on every ClientRouter navigation; the stateful shell pieces are siblings
-// with `transition:persist` (set on their root elements, inside loading-overlay.astro
-// and shell-backdrop.astro, and on the SysBar / cursor islands here) so their DOM and
-// React roots (life canvas, cursor WebSocket, boot overlay, SysBar) survive. Only
-// client leaves hydrate (.claude/rules/astro-islands.md). Never put persist on an
-// element that wraps <slot /> — `main` would then never swap.
+// with `transition:persist` (set on their root elements, inside loading-overlay.astro,
+// shell-backdrop.astro, sys-bar.astro and cursor-presence.astro) so their DOM and
+// running state (life simulation, cursor WebSocket, boot overlay, SysBar clock)
+// survive. The shell hydrates no React: every interactive piece is a custom element
+// (.claude/rules/astro-islands.md). Never put persist on an element that wraps
+// <slot /> — `main` would then never swap.
 import { ClientRouter } from 'astro:transitions';
 
 import { buildMetadata, THEME_COLOR, VIEWPORT } from '@components/seo/build-metadata';
 import Seo from '@components/seo/seo.astro';
 import LoadingOverlay from '@components/loading-overlay/loading-overlay.astro';
-import { CursorPresenceIsland, SysBarIsland } from '@components/site-shell';
+import CursorPresence from '@components/cursor-presence/cursor-presence.astro';
 import ShellBackdrop from '@components/site-shell/shell-backdrop.astro';
 import SiteFooter from '@components/site-footer/site-footer.astro';
 import { stage } from '@components/site-shell/styles.css';
 import { formatClock } from '@components/sys-bar/format-clock';
+import SysBar from '@components/sys-bar/sys-bar.astro';
 import { imageBlurScriptHtml } from '@components/image/blur-script';
 import { fontVariables } from '@themes/fonts';
 import { root as themeRoot } from '@themes/provider/styles.css';
@@ -36,9 +38,9 @@ type Props = {
 
 const { metadata, bodyClass } = Astro.props;
 const resolved = buildMetadata(metadata, await getRequestOrigin());
-const pathname = Astro.url.pathname;
 // Stamped on the server so SysBar's clock renders in SSR; under Workers Cache it is
-// the cache-generation time and snaps to the live clock once SysBar hydrates.
+// the cache-generation time and snaps to the live clock once the <sys-bar> element
+// connects.
 const initialTime = formatClock();
 // `wf-loading boot` is in the SSR <html> class (not added by JS) so the boot overlay
 // covers the page from the very first paint; the Typekit loader only REMOVES boot. On
@@ -66,10 +68,10 @@ const initialTime = formatClock();
     <LoadingOverlay />
     <ShellBackdrop />
     <div data-cursor-surface class={stage}>
-      <SysBarIsland client:load transition:persist="sys-bar" pathname={pathname} props={{ initialTime }} />
+      <SysBar initialTime={initialTime} />
       <slot />
       <SiteFooter />
     </div>
-    <CursorPresenceIsland client:load transition:persist="cursor-presence" pathname={pathname} props={{}} />
+    <CursorPresence />
   </body>
 </html>

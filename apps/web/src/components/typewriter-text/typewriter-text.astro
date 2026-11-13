@@ -1,0 +1,32 @@
+---
+// `.astro` TypewriterText with NO React island. The markup inside <typewriter-text> is
+// byte-identical to the React TypewriterText's first render (./index.tsx: nothing typed
+// yet, only the caret) — asserted by typewriter-text.astro.test.ts — and the reveal is
+// driven by the `<typewriter-text>` custom element (./element.ts), which shares the
+// controller (@utils/typewriter) with the React useTypewriter.
+//
+// `text` replaces `children` (it is rendered twice and segmented, so it must be a plain
+// string). With `phrase`, the sizer carries the BudouX <wbr> copy (PhrasedText's markup,
+// segmented here on the server); the element clones it into the overlay once typed.
+//
+// The template is deliberately one line: whitespace between the spans would render
+// inside the host's <p>.
+import * as phrasedStyles from '@components/phrased-text/styles.css';
+import { phrase as segment } from '@utils/phrase';
+
+import * as styles from './styles.css';
+
+type Props = {
+  text: string;
+  phrase?: boolean;
+};
+
+const { text, phrase = false } = Astro.props;
+const segments = phrase ? segment(text) : [];
+---
+
+<typewriter-text class={styles.element} phrase={phrase ? '' : undefined}><span class={styles.srOnly}>{text}</span><span class={styles.typeWrap} aria-hidden="true"><span class={styles.sizer}>{phrase ? <span class={phrasedStyles.root}>{segments.map((chunk, index) => (index > 0 ? <Fragment><wbr />{chunk}</Fragment> : chunk))}</span> : text}</span><span class={styles.typed}><span class={styles.caret}></span></span></span></typewriter-text><script>
+  import { defineTypewriterTextElement } from './element';
+
+  defineTypewriterTextElement();
+</script>

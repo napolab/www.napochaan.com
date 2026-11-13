@@ -1,0 +1,16 @@
+---
+// `.astro` twin of Button's link variant (`type="link"`). A link button has no client
+// state: react-aria's Link renders a static `<a>` without a directive and Astro's
+// `<ClientRouter />` soft-navigates it, so this ships no JS. The label is the slot.
+import { Button } from './index';
+
+type Props = {
+  href: string;
+  variant?: 'solid' | 'outline' | 'danger';
+  size?: 'md' | 'sm';
+};
+
+const { href, variant, size } = Astro.props;
+---
+
+<Button type="link" href={href} variant={variant} size={size}><slot /></Button>

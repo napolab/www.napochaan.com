@@ -4,29 +4,31 @@ import { usePathname } from '@lib/navigation';
 import { useCallback, useEffect, useMemo, useRef, useSyncExternalStore, type ReactNode } from 'react';
 
 import { usePersistent } from '@hooks/use-persistent';
-import { toNormalized, type Rect } from '@lib/cursor/coordinate';
 import { createLazyVisitorPointerApp } from '@lib/cursor/lazy-visitor-pointer-app';
 import { defineCache } from '@utils/define-cache';
 
+import { bindPointerSend } from './bind-pointer-send';
 import { CursorLayer } from './cursor-layer';
-import { createSurfacePlacement, PlacementProvider } from './placement-context';
-import { PRESENCE_ENABLED_KEY, publishPresenceCount } from './presence-store';
+import { createSurfacePlacement } from './placement';
+import { PlacementProvider } from './placement-context';
+import { PRESENCE_ENABLED_KEY, publishPresenceCount } from './presence-count';
 import { readCursorColor } from './read-cursor-color';
 import { resolveSurface } from './resolve-surface';
 import * as styles from './styles.css';
 import { SurfaceRefProvider } from './surface-context';
+import { trackSurface } from './track-surface';
+
+import type { Rect } from '@lib/cursor/coordinate';
+import type { SurfaceTracker } from './track-surface';
+
+// The React CursorPresence (one React tree with its CursorSurface child, and the
+// reference markup for cursor-presence.astro). The site runs the <cursor-presence>
+// element (./element.ts), which shares the surface tracker, the pointer sender and the
+// canvas loop (./track-surface, ./bind-pointer-send, ./bind-cursor-layer) with this one.
 
 // Defer start() past React StrictMode's synchronous mount→unmount→remount in dev. The throwaway
 // first mount's timer is cleared before it fires, so only the surviving mount opens a socket.
 const START_DELAY_MS = 100;
-const AFTER_SWAP_EVENT = 'astro:after-swap';
-
-const readRect = (el: HTMLElement | null): Rect | null => {
-  if (el === null) return null;
-  const r = el.getBoundingClientRect();
-
-  return { left: r.left + window.scrollX, top: r.top + window.scrollY, width: r.width, height: r.height };
-};
 
 export const CursorPresence = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
@@ -35,7 +37,7 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
   const [enabled] = usePersistent(PRESENCE_ENABLED_KEY, true);
   const enabledRef = useRef(enabled);
   const surfaceRef = useRef<HTMLDivElement | null>(null);
-  const rectRef = useRef<Rect | null>(null);
+  const trackerRef = useRef<SurfaceTracker | null>(null);
 
   enabledRef.current = enabled;
 
@@ -56,57 +58,27 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
     app.setChannel(pathname);
   }, [app, pathname]);
 
+  const getRect = useCallback((): Rect | null => trackerRef.current?.getRect() ?? null, []);
+
   useEffect(() => {
-    // On the Astro site the stage is plain markup outside this island, and
-    // ClientRouter replaces it (with <body>) on every swap — including same-path
-    // swaps (refresh, query-only navigation) — so re-attach after each swap.
-    const surface: { el: HTMLElement | null } = { el: null };
-    const update = (): void => {
-      rectRef.current = readRect(surface.el);
-    };
-    const observer = new ResizeObserver(update);
-    const attach = (): void => {
-      observer.disconnect();
-      surface.el = resolveSurface(surfaceRef.current);
-      if (surface.el !== null) observer.observe(surface.el);
-      update();
-    };
-    attach();
-    document.addEventListener(AFTER_SWAP_EVENT, attach);
-    window.addEventListener('scroll', update, { passive: true });
-    window.addEventListener('resize', update);
+    const tracker = trackSurface(() => resolveSurface(surfaceRef.current));
+    trackerRef.current = tracker;
 
     return () => {
-      observer.disconnect();
-      document.removeEventListener(AFTER_SWAP_EVENT, attach);
-      window.removeEventListener('scroll', update);
-      window.removeEventListener('resize', update);
+      tracker.dispose();
+      trackerRef.current = null;
     };
   }, []);
 
-  useEffect(() => {
-    if (!matchMedia('(pointer:fine)').matches) return;
-    const onMove = (e: PointerEvent): void => {
-      const rect = rectRef.current;
-      if (rect === null || !enabledRef.current) return;
-      const n = toNormalized(rect, e.pageX, e.pageY);
-      app.send({ x: n.nx, y: n.ny });
-    };
-    window.addEventListener('pointermove', onMove, { passive: true });
-
-    return () => {
-      window.removeEventListener('pointermove', onMove);
-    };
-  }, [app]);
+  useEffect(() => bindPointerSend({ app, getRect, isEnabled: () => enabledRef.current }), [app, getRect]);
 
   useEffect(() => {
-    // Publish to the module-level presence store so other islands (SysBar) see it.
+    // Publish to the module-level presence store so the SysBar sees it.
     publishPresenceCount(state.count);
   }, [state.count]);
 
   useEffect(() => () => publishPresenceCount(0), []);
 
-  const getRect = useCallback((): Rect | null => rectRef.current, []);
   const getColor = useMemo(() => defineCache(readCursorColor), []);
   // Surface-anchored placement: cursors follow page content as it scrolls.
   const placement = useMemo(() => createSurfacePlacement(getRect), [getRect]);

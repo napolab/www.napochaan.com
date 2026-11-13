@@ -1,11 +1,11 @@
 ---
-// `.astro` twin of the SiteFooter Server Component (markup mirrors ./index.tsx): the
-// section nav (FooterNav) and the two ScrambleText labels are the only islands. Below
-// the fold, so they hydrate on visibility.
+// `.astro` twin of the SiteFooter Server Component (markup mirrors ./index.tsx). No
+// islands: the section nav is the static footer-nav.astro twin and every label is a
+// `<scramble-text>` element (no React).
 import { Link } from '@components/link';
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 
-import { FooterNavIsland } from './island';
+import FooterNav from './footer-nav.astro';
 import * as styles from './styles.css';
 
 type Props = {
@@ -17,9 +17,9 @@ const pathname = Astro.url.pathname;
 ---
 
 <footer class={styles.root}>
-  <FooterNavIsland client:visible pathname={pathname} props={{}} />
+  <FooterNav />
   <div class={styles.meta}>
     <span>© 2026 napochaan — graphic / digital</span>
-    <span class={styles.status}>build {buildId ?? 'dev'} · <span class={styles.live}>life: running</span> · <Link href="/colophon" tone="muted"><ScrambleTextIsland client:visible pathname={pathname} props={{ children: 'colophon' }} /></Link> · <a class={styles.sitemap} href="/sitemap.xml"><ScrambleTextIsland client:visible pathname={pathname} props={{ children: 'sitemap' }} /></a></span>
+    <span class={styles.status}>build {buildId ?? 'dev'} · <span class={styles.live}>life: running</span> · <Link href="/colophon" tone="muted"><ScrambleText text="colophon" /></Link> · <a class={styles.sitemap} href="/sitemap.xml"><ScrambleText text="sitemap" /></a></span>
   </div>
 </footer>

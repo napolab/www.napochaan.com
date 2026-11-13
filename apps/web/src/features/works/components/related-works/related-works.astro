@@ -1,0 +1,62 @@
+---
+// `.astro` twin of RelatedWorks (markup mirrors ./index.tsx). Each card is a static
+// anchor marked `data-scramble-host`, so its title (Astro ScrambleText,
+// `trigger="group"`) decodes when the whole card is hovered — no React.
+import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
+import { Link } from '@components/link';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
+import { link } from '@styled/recipes';
+import { clsx } from '@utils/clsx';
+
+import * as s from './styles.css';
+
+type RelatedWork = {
+  id: string;
+  slug: string;
+  title: string;
+  type: string;
+  thumbnail?: { src: string; width: number; height: number };
+};
+
+type Props = {
+  works: readonly RelatedWork[];
+};
+
+const { works } = Astro.props;
+const titleClass = clsx(link({ tone: 'accent', underline: true, hideOutsideFocusRing: true }), s.title);
+---
+
+<section class={s.root} aria-labelledby="related-heading">
+  <h2 id="related-heading" class={s.heading}>related / 関連</h2>
+  <ul class={s.list}>
+    {
+      works.map((work) => (
+        <li>
+          <Link href={`/works/${work.slug}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} data-scramble-host>
+            {work.thumbnail === undefined ? (
+              <span class={s.thumbPlaceholder} aria-hidden="true" />
+            ) : (
+              <Image
+                src={work.thumbnail.src}
+                alt={work.title}
+                width={work.thumbnail.width}
+                height={work.thumbnail.height}
+                sizes="64px"
+                className={s.thumb}
+                placeholder="blur"
+                blurDataURL={formatBlurURL(work.thumbnail.src, { blur: 20 })}
+              />
+            )}
+            <span class={s.body}>
+              <span class={titleClass}>
+                <ScrambleText text={work.title} trigger="group" clamp />
+              </span>
+              <span class={s.type}>{work.type}</span>
+            </span>
+          </Link>
+        </li>
+      ))
+    }
+  </ul>
+</section>

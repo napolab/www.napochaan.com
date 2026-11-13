@@ -24,12 +24,13 @@ describe('/works', () => {
     expect(html).toContain('<link rel="alternate" type="text/markdown" href="http://localhost:8788/works.md"');
   });
 
-  it('renders one h1, the feed link and the first 50 works in one archive island', async () => {
+  it('renders one h1, the feed link and the first 50 works in a static archive', async () => {
     const html = await renderIndex();
     expect(html).toMatch(/<main id="main-content" class="[^"]+">/);
     expect(html.match(/<h1[\s>]/g)).toHaveLength(1);
     expect(html).toContain('href="/works/rss.xml"');
-    expect(html.match(/component-export="WorksArchiveIsland"/g)).toHaveLength(1);
+    expect(html).toMatch(/<section [^>]*aria-label="works archive"/);
+    expect(mainIslandsOf(html)).not.toContain('WorksArchiveIsland');
     expect(html).toMatch(/<h2 id="year-2026-heading"/);
     expect(html).toContain('href="/works/a.b"');
     expect(html).toContain('href="/works/work-49"');
@@ -37,10 +38,8 @@ describe('/works', () => {
     expect(html).toContain('href="/works/page/2"');
   });
 
-  it('serializes only the fields the archive renders (never the body)', async () => {
-    const html = await renderIndex();
-    const island = html.slice(html.indexOf('component-export="WorksArchiveIsland"'));
-    expect(island.slice(0, island.indexOf('>'))).not.toContain('lead paragraph');
+  it('never renders a work body into the archive', async () => {
+    expect(await renderIndex()).not.toContain('lead paragraph');
   });
 
   it('hydrates only client leaves inside main', async () => {
