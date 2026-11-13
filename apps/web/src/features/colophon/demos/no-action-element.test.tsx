@@ -9,11 +9,23 @@ const mount = (html: string) => {
   return container;
 };
 
-// Dispatches a cancelable click on `target` and reports whether anything prevented it.
+// Dispatches a cancelable click on `target` and reports whether <no-action> prevented
+// it. A window listener (bubble phase, so after the element's capture listener) records
+// the verdict and then ALWAYS cancels the click: a click that is allowed through would
+// otherwise really navigate the test iframe ("Cannot connect to the iframe" in CI).
 const clickPrevented = (target: Element) => {
-  const event = new MouseEvent('click', { bubbles: true, cancelable: true });
-  target.dispatchEvent(event);
-  return event.defaultPrevented;
+  const seen = { prevented: false };
+  const record = (event: Event) => {
+    seen.prevented = event.defaultPrevented;
+    event.preventDefault();
+  };
+  window.addEventListener('click', record);
+  try {
+    target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+  } finally {
+    window.removeEventListener('click', record);
+  }
+  return seen.prevented;
 };
 
 describe('<no-action>', () => {
@@ -59,17 +71,26 @@ describe('<no-action>', () => {
     expect(clickPrevented(out)).toBe(false);
   });
 
-  it('stops preventing once disconnected', () => {
+  // Detached, the click never reaches window, so the verdict is read on the link itself
+  // (its own listener runs after the wrapper's capture listener, then cancels anyway).
+  it('drops the listener while disconnected and re-binds on reconnect', () => {
     const container = mount(`<${NO_ACTION_TAG}><a href="/x">x</a></${NO_ACTION_TAG}>`);
     const element = container.querySelector(NO_ACTION_TAG);
     const link = container.querySelector('a');
     if (element === null || link === null) throw new Error('not rendered');
+    const seen = { prevented: false };
+    link.addEventListener('click', (event) => {
+      seen.prevented = event.defaultPrevented;
+      event.preventDefault();
+    });
+    const click = () => link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
     element.remove();
-    const detached = document.createElement('div');
-    detached.appendChild(element);
-    document.body.appendChild(detached);
-    expect(clickPrevented(link)).toBe(true);
-    element.remove();
-    expect(clickPrevented(link)).toBe(false);
+    click();
+    expect(seen.prevented).toBe(false);
+
+    container.appendChild(element);
+    click();
+    expect(seen.prevented).toBe(true);
   });
 });
