@@ -3,6 +3,8 @@ import { contactSchema } from '@lib/contact/schema';
 import { sendContactEmail } from '@lib/contact/send-email';
 import { verifyTurnstile } from '@lib/contact/verify-turnstile';
 
+import { readField, readValues, SEND_FAILED } from './form-values';
+
 import type { ContactResult } from './state';
 
 // The bindings the submission reads (a subset of Cloudflare.Env).
@@ -13,20 +15,6 @@ export type ContactEnv = {
   CONTACT_TO_EMAIL: string;
   DISCORD_WEBHOOK_URL: string;
 };
-
-const SEND_FAILED = '送信に失敗しました。しばらくして再度お試しください。';
-
-const readField = (formData: FormData, key: string): string => {
-  const value = formData.get(key);
-
-  return typeof value === 'string' ? value : '';
-};
-
-const readValues = (formData: FormData) => ({
-  name: readField(formData, 'name'),
-  email: readField(formData, 'email'),
-  message: readField(formData, 'message'),
-});
 
 // Port of the Next Server Action (apps/web contact/_actions/submit-contact.ts), same
 // order: Turnstile (server-side siteverify) → zod schema → RESEND_API_KEY → email →

@@ -1,25 +1,13 @@
 import { actions } from 'astro:actions';
 
+import { readValues, SEND_FAILED } from '../../form-values';
+
 import type { ContactResult, ContactState } from '../../state';
 import type { server } from '../../../../actions';
 
 // Typed through the actions module itself, so the call stays typed when `.astro/`
 // (where `astro sync` writes the generated `astro:actions` types) is absent.
 const submitContactAction: (typeof server)['submitContact'] = actions.submitContact;
-
-const SEND_FAILED = '送信に失敗しました。しばらくして再度お試しください。';
-
-const readField = (formData: FormData, key: string): string => {
-  const value = formData.get(key);
-
-  return typeof value === 'string' ? value : '';
-};
-
-const readValues = (formData: FormData) => ({
-  name: readField(formData, 'name'),
-  email: readField(formData, 'email'),
-  message: readField(formData, 'message'),
-});
 
 // The action itself failing (network, 403 origin check, 500) — no `ContactResult`.
 const transportFailure = (formData: FormData): ContactResult => ({ status: 'error', message: SEND_FAILED, values: readValues(formData) });
