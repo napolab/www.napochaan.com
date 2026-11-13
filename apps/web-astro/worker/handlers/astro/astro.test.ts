@@ -145,4 +145,54 @@ describe('createAstroHandler', () => {
     );
     expect(() => getRequestContext()).toThrow('request context is not available outside a request');
   });
+
+  // A component that throws after the layout started streaming leaves Astro with a
+  // half-written 200 body. Next never cached a failed render, so this must become the
+  // 500 page and never carry a public policy.
+  it('serves the 500 page with no-store when the page body errors mid-stream', async () => {
+    const seen: string[] = [];
+    const handler: MountedFetch = async (request: Request) => {
+      const { pathname } = new URL(request.url);
+      seen.push(pathname);
+      if (pathname === '/500') return new Response('<html>500 page</html>', { status: 500, headers: { 'Content-Type': 'text/html' } });
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('<html><main>half'));
+          controller.error(new Error('body boom'));
+        },
+      });
+      return new Response(body, { headers: { 'Content-Type': 'text/html' } });
+    };
+    const app = build(handler);
+    const res = await app.request(
+      '/blog',
+      {},
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(res.status).toBe(500);
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+    expect(await res.text()).toBe('<html>500 page</html>');
+    expect(seen).toEqual(['/blog', '/500']);
+  });
+
+  it.each([404, 500])('marks a %i page no-store (never publicly cacheable)', async (status) => {
+    const app = build(async () => new Response('<html>error</html>', { status, headers: { 'Content-Type': 'text/html' } }));
+    const res = await app.request(
+      '/nope',
+      {},
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(res.status).toBe(status);
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+  });
+
+  it('leaves a successful page for the cache-control middleware to stamp', async () => {
+    const app = build(async () => new Response('<html>ok</html>', { headers: { 'Content-Type': 'text/html' } }));
+    const res = await app.request(
+      '/blog',
+      {},
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(res.headers.get('Cache-Control')).toBeNull();
+  });
 });

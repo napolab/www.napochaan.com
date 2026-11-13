@@ -11,14 +11,19 @@ import type { Metadata } from '@utils/seo/metadata';
 //   - `title` gets the `%s — napochaan` template; `{ absolute }` bypasses it.
 //   - `openGraph` / `twitter` / `alternates` from the page replace the root's whole
 //     object (shallow merge per top-level key).
-//   - with no page image, og:image falls back to the root file-convention card;
-//     twitter:image falls back to og:image.
-//   - relative URLs resolve against the request origin (`metadataBase`).
+//   - the root file-convention card (`/og-default.png`, with type / width / height)
+//     is emitted only while the page inherits the root `openGraph` / `twitter`; a page
+//     passing its own object without images emits none (live Next home: no og:image).
+//     A page's own og images also feed twitter:image when its twitter card has none.
+//   - relative URLs resolve against the request origin (`metadataBase`); the bare
+//     root resolves to the origin without a trailing slash, like Next's
+//     resolveAbsoluteUrl (`https://napochaan.com`, not `…com/`).
 
 const SITE_NAME = 'napochaan';
 const SITE_DESCRIPTION = 'napochaan の個人サイト。';
 const TITLE_SUFFIX = ` — ${SITE_NAME}`;
-const DEFAULT_OG_IMAGE: ResolvedImage = { url: '/og-default.png', width: 1280, height: 630, type: 'image/png' };
+// Same bytes as the Next (site) opengraph-image.png / twitter-image.png (1280x630 png).
+const DEFAULT_CARD_IMAGE: ResolvedImage = { url: '/og-default.png', type: 'image/png', width: 1280, height: 630 };
 
 export const THEME_COLOR = 'oklch(0.490 0.287 266)';
 export const VIEWPORT = 'width=device-width, initial-scale=1, viewport-fit=cover';
@@ -28,7 +33,7 @@ export type MetadataInput = Partial<Metadata> & {
   noindex?: boolean;
 };
 
-type ResolvedImage = { url: string; width?: number; height?: number; type?: string };
+type ResolvedImage = { url: string; type?: string; width?: number; height?: number };
 
 type Icon = { rel: 'icon' | 'apple-touch-icon'; href: string; type: string; sizes: string };
 
@@ -54,7 +59,7 @@ export type ResolvedMetadata = {
     card: 'summary' | 'summary_large_image';
     title: string;
     description?: string;
-    images: string[];
+    images: ResolvedImage[];
   };
 };
 
@@ -63,7 +68,14 @@ const ICONS: Icon[] = [
   { rel: 'apple-touch-icon', href: '/apple-icon.png', type: 'image/png', sizes: '180x180' },
 ];
 
-const absolute = (url: string, origin: string): string => new URL(url, origin).href;
+const absolute = (url: string, origin: string): string => {
+  const resolved = new URL(url, origin);
+  if (resolved.pathname === '/' && resolved.search === '' && resolved.hash === '') return resolved.origin;
+
+  return resolved.href;
+};
+
+const resolveImages = (images: readonly ResolvedImage[], origin: string): ResolvedImage[] => images.map((image) => ({ ...image, url: absolute(image.url, origin) }));
 
 const resolveTitle = (title: MetadataInput['title']): string => {
   if (title === undefined) return SITE_NAME;
@@ -84,18 +96,41 @@ const resolveAlternates = (input: MetadataInput, origin: string): Alternate[] =>
 
 const resolveOpenGraph = (input: MetadataInput, origin: string): ResolvedMetadata['openGraph'] => {
   const og = input.openGraph;
-  const images = og?.images ?? [DEFAULT_OG_IMAGE];
-  const resolvedImages = images.map((image) => ({ ...image, url: absolute(image.url, origin) }));
   if (og === undefined) {
-    return { type: 'website', siteName: SITE_NAME, title: SITE_NAME, description: SITE_DESCRIPTION, url: absolute('/', origin), locale: 'ja_JP', images: resolvedImages };
+    return {
+      type: 'website',
+      siteName: SITE_NAME,
+      title: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      url: absolute('/', origin),
+      locale: 'ja_JP',
+      images: resolveImages([DEFAULT_CARD_IMAGE], origin),
+    };
   }
 
-  return { type: og.type, siteName: og.siteName, title: og.title, description: og.description, url: absolute(og.url, origin), locale: og.locale, images: resolvedImages };
+  return {
+    type: og.type,
+    siteName: og.siteName,
+    title: og.title,
+    description: og.description,
+    url: absolute(og.url, origin),
+    locale: og.locale,
+    images: resolveImages(og.images ?? [], origin),
+  };
 };
 
-const resolveTwitter = (input: MetadataInput, origin: string, ogImages: ResolvedImage[]): ResolvedMetadata['twitter'] => {
-  const twitter = input.twitter ?? { card: 'summary_large_image', title: SITE_NAME, description: SITE_DESCRIPTION };
-  const images = twitter.images?.map((url) => absolute(url, origin)) ?? ogImages.map((image) => image.url);
+const resolveTwitter = (input: MetadataInput, origin: string, pageOgImages: ResolvedImage[]): ResolvedMetadata['twitter'] => {
+  const twitter = input.twitter;
+  if (twitter === undefined) {
+    return { card: 'summary_large_image', title: SITE_NAME, description: SITE_DESCRIPTION, images: resolveImages([DEFAULT_CARD_IMAGE], origin) };
+  }
+  const images =
+    twitter.images === undefined
+      ? pageOgImages
+      : resolveImages(
+          twitter.images.map((url) => ({ url })),
+          origin,
+        );
 
   return { card: twitter.card, title: twitter.title, description: twitter.description, images };
 };
@@ -111,6 +146,6 @@ export const buildMetadata = (input: MetadataInput, origin: string): ResolvedMet
     alternates: resolveAlternates(input, origin),
     icons: ICONS,
     openGraph,
-    twitter: resolveTwitter(input, origin, openGraph.images),
+    twitter: resolveTwitter(input, origin, input.openGraph === undefined ? [] : openGraph.images),
   };
 };

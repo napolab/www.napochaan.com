@@ -331,3 +331,10 @@ with a URL, which would be a full load). An init script wrapped `WebSocket` to c
   toggles) render as on the Next site.
 - CursorPresence now re-resolves the stage on every `astro:after-swap` (not only on pathname change), so
   same-path swaps (refresh / query-only navigation) also re-attach (test `cursor-presence/surface-swap.test.tsx`).
+
+## Fix round 1 (review against live Next head)
+
+- Navigation no longer cross-fades at all: `<html transition:animate="none">` (Playwright: 0 `::view-transition-*`
+  animations with and without reduced motion; previously 5 without).
+- Error responses: a body that throws after streaming started now yields the 500.astro page with status 500 and
+  `Cache-Control: no-store` (was a plain-text Hono 500 with no Cache-Control); 404 now sends `no-store` (was none).

@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+
 import { getContainerRenderer as reactContainerRenderer } from '@astrojs/react/container-renderer';
 import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { loadRenderers } from 'astro:container';
@@ -33,7 +35,7 @@ describe('site-layout.astro', () => {
   });
 
   it('renders <html lang="ja"> in the boot state with the font variables class', () => {
-    expect(state.html).toMatch(/^<html lang="ja" class="font-variables wf-loading boot">/);
+    expect(state.html).toMatch(/^<html data-astro-transition-scope="[^"]+" lang="ja" class="font-variables wf-loading boot">/);
   });
 
   it('emits the shell without any heading of its own (pages own the single h1)', () => {
@@ -45,6 +47,18 @@ describe('site-layout.astro', () => {
       expect(count(state.html, script.__html)).toBe(1);
     }
     expect(state.html).not.toContain('data-astro-rerun');
+  });
+
+  it('configures no navigation animation: <html> is a transition scope (transition:animate="none")', () => {
+    const scope = state.html.match(/<html[^>]*data-astro-transition-scope="([^"]+)"/)?.[1];
+    expect(scope).toBeDefined();
+    // Pin the directive's value (any transition:animate adds a scope); same static-read
+    // approach as themes/font-vars.test.ts.
+    const source = readFileSync(new URL('./site-layout.astro', import.meta.url), 'utf8');
+    expect(source.match(/<html[^>]*transition:animate="([^"]+)"/)?.[1]).toBe('none');
+    // The `animation: none` CSS for that scope is emitted into the page <head> by the
+    // page render, which the Container API does not run for a layout; the built
+    // site's zero view-transition animations are verified in the browser (report).
   });
 
   it('enables the ClientRouter', () => {

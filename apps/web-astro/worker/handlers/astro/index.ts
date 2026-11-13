@@ -1,4 +1,5 @@
 import { runWithRequestContext } from '../../../src/lib/request-context';
+import { PAGE_CACHE_POLICIES } from '../../../src/utils/cache-control';
 import { createCMSHealth, withTrackedCMS } from '../../lib/cms-health';
 import { resolveCacheControl } from '../../middleware/cache-control';
 
@@ -25,13 +26,39 @@ const isCacheablePage = (c: Context<AstroEnv>, response: Response): boolean => {
   return resolveCacheControl(new URL(c.req.url).pathname).kind === 'page';
 };
 
+type RenderTarget = { astroFetch: MountedFetch; request: Request; env: Cloudflare.Env; ctx: ExecutionContext | undefined };
+
+// A component that throws after Astro started streaming errors the body mid-way: the
+// status is already 200 and the HTML is cut off. Serve the 500 route instead (Astro
+// renders `src/pages/500.astro` there with status 500). Next never cached a failed
+// render; the status-based no-store below keeps that true here.
+const renderServerError = async ({ astroFetch, request, env, ctx }: RenderTarget): Promise<Response> => {
+  const errorPage = await astroFetch(new Request(new URL('/500', request.url), { headers: request.headers }), env, ctx);
+
+  return new Response(await errorPage.text(), { status: 500, statusText: 'Internal Server Error', headers: errorPage.headers });
+};
+
 // Astro streams the page body, so CMS reads in nested components resolve after the
 // adapter returns the Response. A cacheable page is read to the end before the
 // degraded flag is final. Only Workers Cache misses pay this (a HIT never runs the Worker).
-const settle = async (c: Context<AstroEnv>, response: Response): Promise<Response> => {
+const settle = async (c: Context<AstroEnv>, target: RenderTarget, response: Response): Promise<Response> => {
   if (!isCacheablePage(c, response)) return response;
 
-  return new Response(await response.arrayBuffer(), response);
+  try {
+    return new Response(await response.arrayBuffer(), response);
+  } catch {
+    return renderServerError(target);
+  }
+};
+
+// 404 / 500 (and any other error status) must never be shared: the cache-control
+// middleware only stamps OK responses, and Next sent `no-store` for these too.
+const withErrorPolicy = (response: Response): Response => {
+  if (response.status < 400) return response;
+  const headers = new Headers(response.headers);
+  headers.set('Cache-Control', PAGE_CACHE_POLICIES.uncacheable);
+
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 };
 
 // The mounted Astro fetch (`@astrojs/cloudflare/handler`), with this request's `CMS`
@@ -43,8 +70,9 @@ export const createAstroHandler = (astroFetch: MountedFetch) => async (c: Contex
   const health = createCMSHealth();
   const env = withTrackedCMS(c.env, health);
   const ctx = readExecutionCtx(c);
-  const settled = await runWithRequestContext({ env, ctx, request: c.req.raw }, async () => settle(c, await astroFetch(c.req.raw, env, ctx)));
+  const target: RenderTarget = { astroFetch, request: c.req.raw, env, ctx };
+  const settled = await runWithRequestContext({ env, ctx, request: c.req.raw }, async () => settle(c, target, await astroFetch(c.req.raw, env, ctx)));
   if (health.isDegraded()) c.set('cmsDegraded', true);
 
-  return settled;
+  return withErrorPolicy(settled);
 };

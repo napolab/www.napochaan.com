@@ -6,6 +6,8 @@ import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 import { buildMetadata } from './build-metadata';
 
 const PROD = 'https://www.napochaan.com';
+const APEX = 'https://napochaan.com';
+const DEFAULT_IMAGE = (origin: string) => ({ url: `${origin}/og-default.png`, type: 'image/png', width: 1280, height: 630 });
 const STG = 'https://stg.napochaan.com';
 
 describe('buildMetadata — root defaults (port of the (site) layout generateMetadata)', () => {
@@ -16,8 +18,8 @@ describe('buildMetadata — root defaults (port of the (site) layout generateMet
     expect(resolved.description).toBe('napochaan の個人サイト。');
   });
 
-  it('defaults canonical to the origin root', () => {
-    expect(resolved.canonical).toBe('https://www.napochaan.com/');
+  it('defaults canonical to the bare origin (Next resolveAbsoluteUrl drops the root slash)', () => {
+    expect(resolved.canonical).toBe('https://www.napochaan.com');
   });
 
   it('emits the root Open Graph / Twitter card with the default OG image', () => {
@@ -26,15 +28,15 @@ describe('buildMetadata — root defaults (port of the (site) layout generateMet
       siteName: 'napochaan',
       title: 'napochaan',
       description: 'napochaan の個人サイト。',
-      url: 'https://www.napochaan.com/',
+      url: 'https://www.napochaan.com',
       locale: 'ja_JP',
-      images: [{ url: 'https://www.napochaan.com/og-default.png', width: 1280, height: 630, type: 'image/png' }],
+      images: [DEFAULT_IMAGE(PROD)],
     });
     expect(resolved.twitter).toEqual({
       card: 'summary_large_image',
       title: 'napochaan',
       description: 'napochaan の個人サイト。',
-      images: ['https://www.napochaan.com/og-default.png'],
+      images: [DEFAULT_IMAGE(PROD)],
     });
   });
 
@@ -94,14 +96,14 @@ describe('buildMetadata — page metadata (resolveSectionMetadata / resolveDetai
     expect(resolved.openGraph.url).toBe('https://stg.napochaan.com/blog');
     expect(resolved.openGraph.title).toBe('blog — napochaan');
     expect(resolved.openGraph.images).toEqual([{ url: 'https://stg.napochaan.com/og-default.png' }]);
-    expect(resolved.twitter.images).toEqual(['https://stg.napochaan.com/og-default.png']);
+    expect(resolved.twitter.images).toEqual([{ url: 'https://stg.napochaan.com/og-default.png' }]);
     expect(resolved.alternates).toEqual([
       { type: 'application/rss+xml', href: 'https://stg.napochaan.com/blog/rss.xml', title: 'napochaan — blog' },
       { type: 'text/markdown', href: 'https://stg.napochaan.com/blog.md', title: 'blog' },
     ]);
   });
 
-  it('replaces the root openGraph wholesale and keeps the default OG image when the page sets none', () => {
+  it('replaces the root openGraph wholesale and emits no image when the page sets none', () => {
     const page = resolveDetailMetadata({
       docTitle: 'Post',
       path: '/blog/post',
@@ -116,8 +118,35 @@ describe('buildMetadata — page metadata (resolveSectionMetadata / resolveDetai
     expect(resolved.openGraph.url).toBe('https://www.napochaan.com/blog/post');
     expect(resolved.openGraph.title).toBe('Post — napochaan');
     expect(resolved.openGraph.description).toBe('excerpt');
-    expect(resolved.openGraph.images[0]?.url).toBe('https://www.napochaan.com/og-default.png');
-    expect(resolved.twitter.images).toEqual(['https://www.napochaan.com/og-default.png']);
+    expect(resolved.openGraph.images).toEqual([]);
+    expect(resolved.twitter.images).toEqual([]);
+  });
+
+  it('matches the live Next home head: openGraph/twitter without images → no og:image, no twitter:image', () => {
+    const home = {
+      description: 'home desc',
+      alternates: { canonical: '/' },
+      openGraph: { type: 'website', siteName: 'napochaan', locale: 'ja_JP', url: '/', title: 'napochaan', description: 'home desc' },
+      twitter: { card: 'summary_large_image', title: 'napochaan', description: 'home desc' },
+    } satisfies Parameters<typeof buildMetadata>[0];
+    const resolved = buildMetadata(home, APEX);
+
+    expect(resolved.canonical).toBe('https://napochaan.com');
+    expect(resolved.openGraph.url).toBe('https://napochaan.com');
+    expect(resolved.openGraph.images).toEqual([]);
+    expect(resolved.twitter.images).toEqual([]);
+  });
+
+  it('keeps non-root paths as-is (no slash added or dropped)', () => {
+    expect(buildMetadata({ alternates: { canonical: '/blog' } }, APEX).canonical).toBe('https://napochaan.com/blog');
+    expect(buildMetadata({ alternates: { canonical: '/blog/' } }, APEX).canonical).toBe('https://napochaan.com/blog/');
+  });
+
+  it('matches the live Next colophon head: root card with og:image and twitter:image type / size', () => {
+    const resolved = buildMetadata({ title: 'colophon', alternates: { canonical: '/colophon' } }, APEX);
+
+    expect(resolved.openGraph.images).toEqual([DEFAULT_IMAGE(APEX)]);
+    expect(resolved.twitter.images).toEqual([DEFAULT_IMAGE(APEX)]);
   });
 
   it('uses a per-page OG image route when one is given (detail opengraph-image)', () => {
@@ -127,8 +156,8 @@ describe('buildMetadata — page metadata (resolveSectionMetadata / resolveDetai
     const resolved = buildMetadata({ ...page, openGraph: { ...og, images: [{ url: '/blog/post/opengraph-image' }] } }, PROD);
 
     expect(resolved.openGraph.images).toEqual([{ url: 'https://www.napochaan.com/blog/post/opengraph-image' }]);
-    // Next fills twitter:image from og:image when the page's twitter card has none.
-    expect(resolved.twitter.images).toEqual(['https://www.napochaan.com/blog/post/opengraph-image']);
+    // A page-level OG image route also feeds twitter:image when the page's twitter card has none.
+    expect(resolved.twitter.images).toEqual([{ url: 'https://www.napochaan.com/blog/post/opengraph-image' }]);
   });
 
   it('keeps absolute URLs untouched', () => {

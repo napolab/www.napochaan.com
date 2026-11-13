@@ -23,7 +23,6 @@ import { rootStateCarryScriptHTML } from '@utils/root-state-carry';
 import type { MetadataInput } from '@components/seo/build-metadata';
 
 import '@themes/global.css';
-import './site-layout.css';
 
 type Props = {
   metadata: MetadataInput;
@@ -41,9 +40,12 @@ const initialTime = formatClock();
 // soft navigations the root-state carry script keeps the live class
 // (see @utils/root-state-carry). The four head scripts are `is:inline` without
 // `data-astro-rerun`, so each runs once per full document load.
+// `transition:animate="none"` on <html>: soft navigations swap instantly, as the
+// Next site did — no root cross-fade for anyone, regardless of the OS reduced-motion
+// setting or the SysBar motion toggle.
 ---
 
-<html lang="ja" class={`${fontVariables} wf-loading boot`}>
+<html lang="ja" class={`${fontVariables} wf-loading boot`} transition:animate="none">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content={VIEWPORT} />
