@@ -2,6 +2,13 @@
 
 Scaffolding notes for `www.napochaan.com` (Next.js 15 + Payload CMS v3 + OpenNext on Cloudflare Workers + Panda CSS + GSAP).
 
+> **Historical.** These notes record the original single-app scaffold. The repo is now a
+> monorepo: `apps/cms` is still Next.js + Payload + OpenNext on Cloudflare Workers, but the
+> public site `apps/web` is Astro (`@astrojs/cloudflare`, React islands, a Hono worker in
+> `apps/web/worker/` with Workers Cache) and no longer uses OpenNext, ISR or `next build`.
+> The OpenNext / `NEXT_PHASE` / ISR sections below describe the cms only. Secrets live in
+> each app's `.dev.vars` (template: `.dev.vars.example`).
+
 ## 1. Final versions chosen
 
 Base = `/tmp/ref-booth` (Booth2Booth), bumped to the newest safe mix across the three reference repos.

@@ -28,6 +28,9 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
     .get(
       '/_next/image',
       cache({
+        // Name kept from the OpenNext worker this replaced, so the transformed images
+        // already cached under it keep being served across the cutover instead of
+        // every variant being re-transformed under a new cache name.
         cacheName: 'opennextjs-cloudflare-images',
         // Workers Cache serves hits without invoking the Worker; drop must-revalidate
         // so stale-while-revalidate applies. Media changes purge everything.

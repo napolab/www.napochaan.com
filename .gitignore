@@ -4,7 +4,7 @@ out
 dist
 styled-system
 
-# Cloudflare / OpenNext
+# Cloudflare (.open-next/ is the apps/cms OpenNext build output)
 .open-next/
 .wrangler/
 .dev.vars

@@ -16,7 +16,9 @@ describe('ogImagePath', () => {
   });
 
   // The route filenames are literals; this keeps them in sync with the suffix table.
-  it.each(['blog', 'news', 'works'] as const)('has a route file for the %s suffix', (section) => {
-    expect(existsSync(routeFile(section, OG_IMAGE_ROUTE_SUFFIX[section]))).toBe(true);
+  // Derived from the table itself (.claude/rules/cross-module-sync-test.md), so adding a
+  // section without its route file fails here.
+  it.each(Object.entries(OG_IMAGE_ROUTE_SUFFIX))('has a route file for the %s suffix (%s)', (section, suffix) => {
+    expect(existsSync(routeFile(section, suffix))).toBe(true);
   });
 });
