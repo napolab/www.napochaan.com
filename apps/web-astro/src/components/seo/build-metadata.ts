@@ -42,7 +42,8 @@ type Alternate = { type: string; href: string; title: string };
 export type ResolvedMetadata = {
   title: string;
   description: string;
-  canonical: string;
+  // Absent when the page set `alternates` without a canonical (see resolveCanonical).
+  canonical: string | undefined;
   robots: 'noindex, nofollow' | 'noindex' | undefined;
   alternates: Alternate[];
   icons: Icon[];
@@ -82,6 +83,15 @@ const resolveTitle = (title: MetadataInput['title']): string => {
   if (typeof title === 'string') return `${title}${TITLE_SUFFIX}`;
 
   return title.absolute;
+};
+
+// Next merged a page's `alternates` over the root's (`canonical: '/'`) as one object:
+// a page that sets `alternates` without `canonical` (live /gallery: feed only) emits none.
+const resolveCanonical = (input: MetadataInput, origin: string): string | undefined => {
+  if (input.alternates === undefined) return absolute('/', origin);
+  if (input.alternates.canonical === undefined) return undefined;
+
+  return absolute(input.alternates.canonical, origin);
 };
 
 const resolveRobots = (input: MetadataInput, origin: string): ResolvedMetadata['robots'] => {
@@ -141,7 +151,7 @@ export const buildMetadata = (input: MetadataInput, origin: string): ResolvedMet
   return {
     title: resolveTitle(input.title),
     description: input.description ?? SITE_DESCRIPTION,
-    canonical: absolute(input.alternates?.canonical ?? '/', origin),
+    canonical: resolveCanonical(input, origin),
     robots: resolveRobots(input, origin),
     alternates: resolveAlternates(input, origin),
     icons: ICONS,

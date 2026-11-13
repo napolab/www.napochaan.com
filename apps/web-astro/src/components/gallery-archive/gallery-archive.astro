@@ -1,0 +1,45 @@
+---
+// `.astro` twin of the GalleryArchive Server Component (/gallery). The packed grid and
+// captions are static markup; the client `Lightbox` wraps each server-rendered Image
+// as its trigger content (slot), and each blank cell's `BlankDim` label is a leaf
+// island. The packing is shared with ./index.tsx (./archive-layout).
+import { LightboxIsland } from '@components/gallery/lightbox/island';
+import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
+
+import { ARCHIVE_BLUR_OPTIONS, ARCHIVE_IMAGE_SIZES, galleryArchiveLayout } from './archive-layout';
+import BlankCell from './blank-cell/blank-cell.astro';
+import * as styles from './styles.css';
+
+import type { GalleryPhoto } from './index';
+
+type Props = {
+  photos: readonly GalleryPhoto[];
+};
+
+const { photos } = Astro.props;
+const pathname = Astro.url.pathname;
+const { rootStyle, cells, blanks } = galleryArchiveLayout(photos);
+---
+
+<ul class={styles.root} data-gallery="true" style={rootStyle}>
+  {
+    cells.map(({ photo, style }) => (
+      <li class={styles.cell} data-photo="true" style={style}>
+        <LightboxIsland client:load pathname={pathname} props={{ src: photo.src, alt: photo.alt, width: photo.width, height: photo.height, triggerClassName: styles.trigger }}>
+          <Image
+            src={photo.src}
+            alt={photo.alt}
+            fill
+            sizes={ARCHIVE_IMAGE_SIZES}
+            className={styles.image}
+            placeholder="blur"
+            blurDataURL={formatBlurURL(photo.src, ARCHIVE_BLUR_OPTIONS)}
+          />
+        </LightboxIsland>
+        {photo.caption !== undefined && <span class={styles.caption}>{photo.caption}</span>}
+      </li>
+    ))
+  }
+  {blanks.map(({ blank, bp, index }) => <BlankCell blank={blank} bp={bp} index={index} />)}
+</ul>

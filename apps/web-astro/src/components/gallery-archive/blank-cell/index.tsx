@@ -13,9 +13,9 @@ type Props = {
 };
 
 // A blank's cw-unit position; consumed by styles.blank via --col / --y / --h.
-const blankVars = (blank: Blank): CSSProperties => ({ '--col': `${blank.col}`, '--y': `${blank.y}`, '--h': `${blank.height}` }) as CSSProperties;
+export const blankVars = (blank: Blank): CSSProperties => ({ '--col': `${blank.col}`, '--y': `${blank.y}`, '--h': `${blank.height}` }) as CSSProperties;
 
-const refNo = (index: number): string => `${index + 1}`.padStart(2, '0');
+export const refNo = (index: number): string => `${index + 1}`.padStart(2, '0');
 
 // One empty grid cell, dimensioned like a technical drawing: registration crosshairs at
 // the corners + the measured size / reference number (BlankDim). Decorative (aria-hidden).

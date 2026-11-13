@@ -137,6 +137,14 @@ describe('buildMetadata — page metadata (resolveSectionMetadata / resolveDetai
     expect(resolved.twitter.images).toEqual([]);
   });
 
+  // Next merged a page's `alternates` over the root's as a whole object, so a page that
+  // sets only `alternates.types` (live /gallery) dropped the root canonical entirely.
+  it('emits no canonical when the page sets alternates without a canonical', () => {
+    const resolved = buildMetadata({ alternates: { types: { 'application/rss+xml': [{ url: '/gallery/rss.xml', title: 'napochaan — gallery' }] } } }, APEX);
+    expect(resolved.canonical).toBeUndefined();
+    expect(resolved.alternates).toEqual([{ type: 'application/rss+xml', href: 'https://napochaan.com/gallery/rss.xml', title: 'napochaan — gallery' }]);
+  });
+
   it('keeps non-root paths as-is (no slash added or dropped)', () => {
     expect(buildMetadata({ alternates: { canonical: '/blog' } }, APEX).canonical).toBe('https://napochaan.com/blog');
     expect(buildMetadata({ alternates: { canonical: '/blog/' } }, APEX).canonical).toBe('https://napochaan.com/blog/');

@@ -25,6 +25,7 @@ export const renderReactMarkup = <P extends object>(component: ComponentType<P>,
 // leaf). Pages may hydrate nothing else.
 export const CLIENT_LEAF_ISLANDS: ReadonlySet<string> = new Set([
   'AdjacentNavIsland',
+  'BlankDimIsland',
   'BootQuestionIsland',
   'ButtonIsland',
   'CalendarIsland',
@@ -36,6 +37,7 @@ export const CLIENT_LEAF_ISLANDS: ReadonlySet<string> = new Set([
   'GalleryIsland',
   'IsolatedGameOfLifeIsland',
   'LightboxIsland',
+  'LogCalendarIsland',
   'NoAction',
   'PostCardIsland',
   'QuoteShareIsland',

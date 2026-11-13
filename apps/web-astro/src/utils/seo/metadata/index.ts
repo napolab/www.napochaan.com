@@ -13,7 +13,7 @@ export type Metadata = {
   title: string | { absolute: string };
   description?: string;
   alternates?: {
-    canonical: string;
+    canonical?: string;
     types?: Record<string, AlternateLink[]>;
   };
   openGraph?: {

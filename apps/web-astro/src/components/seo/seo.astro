@@ -12,7 +12,7 @@ const { openGraph, twitter } = metadata;
 <title>{metadata.title}</title>
 <meta name="description" content={metadata.description} />
 {metadata.robots !== undefined && <meta name="robots" content={metadata.robots} />}
-<link rel="canonical" href={metadata.canonical} />
+{metadata.canonical !== undefined && <link rel="canonical" href={metadata.canonical} />}
 {metadata.alternates.map((alternate) => <link rel="alternate" type={alternate.type} href={alternate.href} title={alternate.title} />)}
 <meta property="og:title" content={openGraph.title} />
 {openGraph.description !== undefined && <meta property="og:description" content={openGraph.description} />}

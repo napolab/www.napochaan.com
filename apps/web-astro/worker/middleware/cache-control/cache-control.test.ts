@@ -131,6 +131,18 @@ describe('cacheControlHeaders', () => {
     expect(res.headers.get('Cache-Control')).toBe(PAGE_CACHE_POLICIES.timeSensitive);
   });
 
+  // /log renders external RSS posts and flips `upcoming` against now: no CMS purge
+  // refreshes it, so the page, its markdown twin and its feed take the short policy.
+  it.each([
+    ['/log', 'text/html; charset=utf-8'],
+    ['/log.md', 'text/markdown; charset=utf-8'],
+    ['/log/rss.xml', 'application/rss+xml; charset=utf-8'],
+  ])('stamps the time-sensitive policy on %s', async (path, contentType) => {
+    const app = build(() => new Response('body', { headers: { 'Content-Type': contentType } }));
+    const res = await app.request(path);
+    expect(res.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=3600');
+  });
+
   it('stamps the cms policy on a header-less feed', async () => {
     const app = build(() => new Response('<rss/>'));
     const res = await app.request('/blog/rss.xml');
