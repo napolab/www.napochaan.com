@@ -37,15 +37,27 @@ describe.each([
     spacer.style.height = '5000px';
     document.body.appendChild(spacer);
     await mount();
-    await wait(300); // gsap chunk + listeners
+    await wait(300); // React effect / element microtask + listeners
 
     scrollTo({ top: 1013, behavior: 'instant' }); // off the 24px grid → a snap is scheduled
-    await wait(200); // SNAP_DELAY (140ms) elapsed: the 0.3s snap tween is now running
+    await wait(200); // SNAP_DELAY (140ms) elapsed: the 0.3s rAF snap tween is now running
 
     document.dispatchEvent(new Event('astro:before-swap'));
     scrollTo({ top: 0, behavior: 'instant' }); // what the router does after the swap
     await wait(600);
 
     expect(scrollY).toBe(0);
+  });
+
+  it('snaps a real resting scroll onto the 24px grid', async () => {
+    spacer.style.height = '5000px';
+    document.body.appendChild(spacer);
+    await mount();
+    await wait(300);
+
+    scrollTo({ top: 1013, behavior: 'instant' });
+    await wait(800); // SNAP_DELAY (140ms) + the 0.3s tween, then settled
+
+    expect(scrollY).toBe(1008);
   });
 });

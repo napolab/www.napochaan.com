@@ -1,18 +1,15 @@
 import type gsapType from 'gsap';
 import type { ScrambleTextPlugin as ScrambleTextPluginType } from 'gsap/ScrambleTextPlugin';
-import type { ScrollToPlugin as ScrollToPluginType } from 'gsap/ScrollToPlugin';
-import type { ScrollTrigger as ScrollTriggerType } from 'gsap/ScrollTrigger';
 
 type Gsap = typeof gsapType;
 
 // What each consumer family needs. A kit loads only its own plugin chunks on top of the
-// one shared core, so the scramble (ScrambleText / EchoText) never fetches the scroll
-// plugins and vice versa.
+// one shared core. (The TypographyBand drift / grid snap no longer uses gsap — it runs on
+// plain rAF + scroll listeners, see components/typography-band/bind-band.ts — so there is
+// no scroll kit and ScrollTrigger / ScrollToPlugin are never bundled.)
 export type GsapKits = {
   // ScrambleText / EchoText decode.
   scramble: { gsap: Gsap; ScrambleTextPlugin: typeof ScrambleTextPluginType };
-  // TypographyBand drift (scroll velocity) + grid snap (scrollTo).
-  scroll: { gsap: Gsap; ScrollTrigger: typeof ScrollTriggerType; ScrollToPlugin: typeof ScrollToPluginType };
 };
 
 export type GsapKit = keyof GsapKits;
@@ -35,26 +32,10 @@ const loadScrambleTextPlugin = once(async () => {
   return ScrambleTextPlugin;
 });
 
-const loadScrollTrigger = once(async () => {
-  const [gsap, { ScrollTrigger }] = await Promise.all([loadCore(), import('gsap/ScrollTrigger')]);
-  gsap.registerPlugin(ScrollTrigger);
-  return ScrollTrigger;
-});
-
-const loadScrollToPlugin = once(async () => {
-  const [gsap, { ScrollToPlugin }] = await Promise.all([loadCore(), import('gsap/ScrollToPlugin')]);
-  gsap.registerPlugin(ScrollToPlugin);
-  return ScrollToPlugin;
-});
-
 const KIT_LOADERS: { [K in GsapKit]: () => Promise<GsapKits[K]> } = {
   scramble: once(async () => {
     const [gsap, ScrambleTextPlugin] = await Promise.all([loadCore(), loadScrambleTextPlugin()]);
     return { gsap, ScrambleTextPlugin };
-  }),
-  scroll: once(async () => {
-    const [gsap, ScrollTrigger, ScrollToPlugin] = await Promise.all([loadCore(), loadScrollTrigger(), loadScrollToPlugin()]);
-    return { gsap, ScrollTrigger, ScrollToPlugin };
   }),
 };
 

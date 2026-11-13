@@ -22,14 +22,14 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
   const trackRightRef = useRef<HTMLDivElement>(null);
 
   // Effective reduced-motion (OS setting + the header motion toggle). Listed as a
-  // dependency so the effect reverts and re-runs when it flips — replacing the old
-  // gsap.matchMedia(OS-only) gate so the toggle can stop / resume the band too.
+  // dependency so the effect reverts and re-runs when it flips, so the header toggle
+  // can stop / resume the band too.
   const reduced = usePrefersReducedMotion();
 
   useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: imperative gsap ticker + ScrollTrigger driving a
-    // rAF-style drift/snap loop on DOM refs (./bind-band, shared with the
-    // <typography-band> element), loaded lazily (dynamic import) after mount.
+    // USEEFFECT_JUSTIFICATION: imperative rAF drift loop + scroll listeners (velocity
+    // boost, grid snap) on DOM refs (./bind-band, shared with the <typography-band>
+    // element), bound after mount and disposed synchronously.
     // The live preference too: a hydration commit runs this with the server snapshot.
     if (reduced || prefersReducedMotion()) return;
     const top = trackTopRef.current;

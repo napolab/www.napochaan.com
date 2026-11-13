@@ -16,11 +16,12 @@ import type { BandTracks } from './bind-band';
 // the incoming page's own <typography-band> connects for a moment before it is
 // replaced. So both callbacks only schedule a microtask reconcile that looks at where
 // the element ENDED UP: still connected → keep the running drift (no reset, no second
-// ticker); gone → tear everything down. A same-task connect + remove binds nothing.
+// frame loop); gone → tear everything down. A same-task connect + remove binds nothing.
 //
-// Reduced motion (OS + header toggle) is checked BEFORE bindBand(), so the gsap chunk
-// is never requested for a reduced-motion visitor (the React island's hydration
-// effect saw the server snapshot reduced=false and fetched it on every page).
+// Reduced motion (OS + header toggle) is checked BEFORE bindBand(), so a reduced-motion
+// visitor gets no frame loop and no scroll listeners at all (the React island's
+// hydration effect saw the server snapshot reduced=false and bound it on every page).
+// bindBand() itself is gsap-free (plain rAF), so the band never fetches gsap.
 export const TYPOGRAPHY_BAND_TAG = 'typography-band';
 
 const resolveTracks = (element: HTMLElement): BandTracks | null => {

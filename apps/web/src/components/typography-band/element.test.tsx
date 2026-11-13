@@ -5,12 +5,9 @@ import { MOTION_STORAGE_KEY } from '@utils/prefers-reduced-motion';
 
 import { TYPOGRAPHY_BAND_TAG, defineTypographyBandElement } from './element';
 
+// Tripwire: the band must never reach the gsap loader (no import, no call).
 const { loadGsap } = vi.hoisted(() => ({ loadGsap: vi.fn() }));
-vi.mock('@utils/gsap', async () => {
-  const actual = await vi.importActual<typeof import('@utils/gsap')>('@utils/gsap');
-  loadGsap.mockImplementation(actual.loadGsap);
-  return { loadGsap };
-});
+vi.mock('@utils/gsap', () => ({ loadGsap }));
 
 // The markup typography-band.astro renders: four bands, each holding one track.
 const band = '<div aria-hidden="true"><div><span>NAPOCHAAN · </span><span>NAPOCHAAN · </span></div></div>';
@@ -26,20 +23,12 @@ const mount = () => {
 };
 
 const flush = (ms = 50) => new Promise((resolve) => setTimeout(resolve, ms));
-const realGsap = async () => {
-  const actual = await vi.importActual<typeof import('@utils/gsap')>('@utils/gsap');
-  return actual.loadGsap('scroll');
-};
-const settle = async () => {
-  await realGsap();
-  await flush();
-};
-// The band's own ticker registrations (gsap adds internal listeners too, but none
-// while the band is idle, and its add() calls remove() internally — so leaks are
-// checked by whether the drift is still moving, not by counting remove calls).
-const spyTickerAdd = async () => {
-  const { gsap } = await realGsap();
-  return vi.spyOn(gsap.ticker, 'add');
+// Each bindBand() adds its window `scroll` listeners (velocity boost + grid snap) once,
+// so counting them tells how many times the band was bound.
+const spyScrollListeners = () => {
+  const add = vi.spyOn(window, 'addEventListener');
+  // The spy is typed from the last addEventListener overload; the runtime type is any string.
+  return () => add.mock.calls.filter(([type]) => `${type}` === 'scroll').length;
 };
 
 const firstTrack = (element: Element) => {
@@ -48,7 +37,7 @@ const firstTrack = (element: Element) => {
   return track;
 };
 
-// Whether the drift ticker is still moving the track.
+// Whether the drift loop is still moving the track.
 const isDrifting = async (track: HTMLElement) => {
   const before = track.style.transform;
   await flush(150);
@@ -65,7 +54,7 @@ describe('<typography-band>', () => {
     write(MOTION_STORAGE_KEY, null);
     document.body.replaceChildren();
     vi.restoreAllMocks();
-    loadGsap.mockClear();
+    expect(loadGsap).not.toHaveBeenCalled();
   });
 
   it('registers once (re-running the bundled script is a no-op)', () => {
@@ -73,29 +62,33 @@ describe('<typography-band>', () => {
     expect(customElements.get(TYPOGRAPHY_BAND_TAG)).toBeDefined();
   });
 
-  it('drifts the tracks once gsap has loaded', async () => {
+  it('drifts the tracks without loading gsap', async () => {
     const { element } = mount();
     const track = firstTrack(element);
 
     await expect.poll(() => track.style.transform, { timeout: 3000 }).toMatch(/translate/);
+    expect(loadGsap).not.toHaveBeenCalled();
   });
 
   // The page-level bug this element fixes: the React island's first (hydration) effect
-  // saw the server snapshot reduced=false and fetched gsap on every page.
-  it('never imports gsap while reduced motion is on, and starts once it is turned off', async () => {
+  // saw the server snapshot reduced=false and bound the band on every page.
+  it('binds nothing while reduced motion is on, and starts once it is turned off', async () => {
+    const scrollListeners = spyScrollListeners();
     write(MOTION_STORAGE_KEY, false);
-    mount();
-    await settle();
-    expect(loadGsap).not.toHaveBeenCalled();
+    const { element } = mount();
+    await flush();
+    expect(scrollListeners()).toBe(0);
+    expect(await isDrifting(firstTrack(element))).toBe(false);
 
     write(MOTION_STORAGE_KEY, true);
-    await settle();
-    expect(loadGsap).toHaveBeenCalled();
+    await flush();
+    expect(scrollListeners()).toBeGreaterThan(0);
+    expect(await isDrifting(firstTrack(element))).toBe(true);
   });
 
   it('stops the drift when reduced motion is turned on', async () => {
     const { element } = mount();
-    await settle();
+    await flush();
     expect(await isDrifting(firstTrack(element))).toBe(true);
 
     write(MOTION_STORAGE_KEY, false);
@@ -104,30 +97,30 @@ describe('<typography-band>', () => {
 
   // transition:persist moves the element (to <html>, then into the new body): each
   // move is a synchronous disconnect + connect. The band must keep drifting from where
-  // it was — no teardown, no second ticker.
-  it('survives a synchronous persist move without rebinding or leaking a ticker', async () => {
-    const add = await spyTickerAdd();
+  // it was — no teardown, no second loop.
+  it('survives a synchronous persist move without rebinding or leaking a loop', async () => {
+    const scrollListeners = spyScrollListeners();
     const { container, element } = mount();
-    await settle();
-    expect(add).toHaveBeenCalledTimes(1);
+    await flush();
+    const bound = scrollListeners();
+    expect(bound).toBeGreaterThan(0);
     await flush(150);
     const offset = firstTrack(element).style.transform;
 
     document.documentElement.appendChild(element);
     container.appendChild(element);
-    await settle();
+    await flush();
 
-    expect(add).toHaveBeenCalledTimes(1);
-    expect(loadGsap).toHaveBeenCalledTimes(1);
+    expect(scrollListeners()).toBe(bound);
     // Continuous: still drifting, and not reset back to the origin.
     expect(await isDrifting(firstTrack(element))).toBe(true);
     expect(firstTrack(element).style.transform).not.toBe(offset);
     expect(firstTrack(element).style.transform).not.toMatch(/translate\(0px, 0px\)|translate3d\(0px, 0px/);
   });
 
-  it('removes its ticker when it is really removed', async () => {
+  it('stops its frame loop when it is really removed', async () => {
     const { element } = mount();
-    await settle();
+    await flush();
     expect(await isDrifting(firstTrack(element))).toBe(true);
 
     element.remove();
@@ -138,12 +131,12 @@ describe('<typography-band>', () => {
   // The swap briefly connects the incoming page's own <typography-band> before the
   // persisted one replaces it: that transient element must leave nothing behind.
   it('binds nothing for an element connected and removed in the same task', async () => {
-    const add = await spyTickerAdd();
+    const scrollListeners = spyScrollListeners();
     const { element } = mount();
     element.remove();
-    await settle();
+    await flush();
 
-    expect(add).not.toHaveBeenCalled();
-    expect(loadGsap).not.toHaveBeenCalled();
+    expect(scrollListeners()).toBe(0);
+    expect(await isDrifting(firstTrack(element))).toBe(false);
   });
 });
