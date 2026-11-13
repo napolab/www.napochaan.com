@@ -199,6 +199,19 @@ describe('createAstroHandler', () => {
     expect(res.headers.get('Cache-Control')).toBe('no-store');
   });
 
+  // A 304 revalidates a cached copy: overwriting its Cache-Control would rewrite the
+  // policy of the stored 200 it refreshes.
+  it('leaves a 304 Not Modified untouched', async () => {
+    const app = build(async () => new Response(null, { status: 304, headers: { 'Cache-Control': 'public, max-age=0, s-maxage=31536000' } }));
+    const res = await app.request(
+      '/blog',
+      {},
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(res.status).toBe(304);
+    expect(res.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=31536000');
+  });
+
   it('leaves a successful page for the cache-control middleware to stamp', async () => {
     const app = build(async () => new Response('<html>ok</html>', { headers: { 'Content-Type': 'text/html' } }));
     const res = await app.request(

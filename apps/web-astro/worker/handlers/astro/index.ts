@@ -54,8 +54,12 @@ const settle = async (c: Context<AstroEnv>, target: RenderTarget, response: Resp
 // Redirects (e.g. the `/blog/page/1` → `/blog` 308) and 404 / 500 (any non-2xx status)
 // must never be shared: the cache-control middleware only stamps OK responses, and Next
 // sent `no-store` for these too (`private, no-cache, no-store…` on permanentRedirect).
+// A 304 Not Modified is a revalidation of a stored 200, not a page of its own: its
+// headers refresh the cached copy, so it keeps whatever policy it carries.
+const isNotModified = (response: Response): boolean => response.status === 304;
+
 const withErrorPolicy = (response: Response): Response => {
-  if (response.status < 300) return response;
+  if (response.status < 300 || isNotModified(response)) return response;
   const headers = new Headers(response.headers);
   headers.set('Cache-Control', PAGE_CACHE_POLICIES.uncacheable);
 

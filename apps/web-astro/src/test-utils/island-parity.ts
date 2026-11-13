@@ -24,6 +24,7 @@ export const renderReactMarkup = <P extends object>(component: ComponentType<P>,
 // Island exports that wrap a client leaf ('use client' in apps/web, or a colophon demo
 // leaf). Pages may hydrate nothing else.
 export const CLIENT_LEAF_ISLANDS: ReadonlySet<string> = new Set([
+  'AdjacentNavIsland',
   'BootQuestionIsland',
   'ButtonIsland',
   'CalendarIsland',
@@ -38,11 +39,13 @@ export const CLIENT_LEAF_ISLANDS: ReadonlySet<string> = new Set([
   'NoAction',
   'PostCardIsland',
   'QuoteShareIsland',
+  'RelatedWorksIsland',
   'ScrambleTextIsland',
   'ShareBarIsland',
   'TextAreaIsland',
   'TextFieldIsland',
   'TypewriterTextIsland',
+  'WorksArchiveIsland',
 ]);
 
 // The island exports rendered inside the page's <main>.

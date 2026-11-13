@@ -16,8 +16,7 @@ describe('ogImagePath', () => {
   });
 
   // The route filenames are literals; this keeps them in sync with the suffix table.
-  // Sections are added here as their routes land (news / works: Task 6).
-  it.each(['blog'] as const)('has a route file for the %s suffix', (section) => {
+  it.each(['blog', 'news', 'works'] as const)('has a route file for the %s suffix', (section) => {
     expect(existsSync(routeFile(section, OG_IMAGE_ROUTE_SUFFIX[section]))).toBe(true);
   });
 });

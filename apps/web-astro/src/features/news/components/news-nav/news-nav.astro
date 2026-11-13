@@ -1,0 +1,52 @@
+---
+// `.astro` twin of the NewsNav Server Component (markup mirrors ./index.tsx): the
+// prev / next titles' ScrambleText and the back link's label are the only islands.
+import { Link } from '@components/link';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+
+import { toSlot } from './slot';
+import * as styles from './styles.css';
+
+import type { AdjacentItem } from './slot';
+
+type Props = {
+  prev?: AdjacentItem;
+  next?: AdjacentItem;
+};
+
+const { prev, next } = Astro.props;
+const pathname = Astro.url.pathname;
+const slots = [toSlot('prev', prev), toSlot('next', next)];
+---
+
+<nav class={styles.root} aria-label="news pagination">
+  <div class={styles.pager}>
+    {
+      slots.map((slot) => {
+        switch (slot.kind) {
+          case 'absent':
+            return <span class={styles.empty} aria-hidden="true" />;
+          case 'present':
+            return (
+              <Link href={`/news/${slot.item.slug}`} className={styles.link} data-side={slot.side} tone="inherit" underline={false}>
+                {slot.side === 'prev' && (
+                  <span class={styles.arrow} aria-hidden="true">
+                    ‹
+                  </span>
+                )}
+                <span class={styles.label}>
+                  <ScrambleTextIsland client:load pathname={pathname} props={{ children: slot.item.title }} />
+                </span>
+                {slot.side === 'next' && (
+                  <span class={styles.arrow} aria-hidden="true">
+                    ›
+                  </span>
+                )}
+              </Link>
+            );
+        }
+      })
+    }
+  </div>
+  <Link href="/news" className={styles.back} tone="subtle">← <ScrambleTextIsland client:load pathname={pathname} props={{ children: 'news 一覧' }} /></Link>
+</nav>

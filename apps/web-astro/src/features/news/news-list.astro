@@ -1,0 +1,26 @@
+---
+// Port of the news `(index)` layout + NewsListSection: the list chrome (PageHeader +
+// feed link, list routes only) and one page of the archive. The page decides the 404
+// before rendering this (see ./lib/paginate-news). Pagination and FeedLink are Server
+// Components rendered without a directive (plain anchors ClientRouter intercepts).
+import { FeedLink } from '@components/feed-link';
+import PageHeader from '@components/page-header/page-header.astro';
+import { Pagination } from '@components/pagination';
+
+import NewsArchive from './components/news-archive/news-archive.astro';
+import { newsPageHref } from './lib/paginate-news';
+
+import type { NewsPage } from './lib/paginate-news';
+
+type Props = {
+  page: NewsPage;
+};
+
+const { page } = Astro.props;
+const crumbs = [{ href: '/', label: 'home' }, { label: 'news' }];
+---
+
+<PageHeader title="news" breadcrumbs={crumbs} kicker="// お知らせ" lead="近況すぎ〜↑" />
+<FeedLink href="/news/rss.xml" label="news の RSS フィード" />
+<NewsArchive groups={page.groups} />
+{page.totalPages > 1 && <Pagination currentPage={page.current} totalPages={page.totalPages} href={newsPageHref} />}

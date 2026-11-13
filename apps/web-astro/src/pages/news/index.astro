@@ -1,0 +1,19 @@
+---
+// Port of apps/web/src/app/(site)/news/{layout,(index)/layout,(index)/page}.tsx: page 1
+// of the archive. Deeper pages live at path-keyed `/news/page/[num]` (never `?page=N` —
+// .claude/rules/workers-cache.md). The worker stamps the purge-driven `cms` policy.
+import NewsList from '../../features/news/news-list.astro';
+import { loadNewsList } from '../../features/news/load-news-list';
+import { newsIndexMetadata } from '../../features/news/metadata';
+import * as s from '../../features/shared/styles.css';
+import SiteLayout from '../../layouts/site-layout.astro';
+
+const page = await loadNewsList(1);
+if (page === undefined) return Astro.rewrite('/404');
+---
+
+<SiteLayout metadata={newsIndexMetadata}>
+  <main id="main-content" class={s.main}>
+    <NewsList page={page} />
+  </main>
+</SiteLayout>
