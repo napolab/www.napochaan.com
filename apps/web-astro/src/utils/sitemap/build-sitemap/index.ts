@@ -1,0 +1,51 @@
+import { dayjs } from '@utils/dayjs';
+
+import type { Post } from '../../../features/blog/post';
+import type { NewsItem } from '../../../features/news/news-item';
+import type { WorkRow } from '../../../features/works/work-row';
+import type { Sitemap, SitemapEntry } from '../types';
+
+type BuildSitemapArgs = {
+  baseUrl: string;
+  news: readonly NewsItem[];
+  blog: readonly Post[];
+  works: readonly WorkRow[];
+};
+
+// Every public static page. Preview/admin/api routes are never listed here.
+// The home page sorts first with the highest priority.
+const STATIC_PATHS = ['', '/about', '/works', '/news', '/blog', '/log', '/gallery', '/contact', '/colophon'] as const;
+
+// Normalizes an ISO `YYYY-MM-DD` date (Asia/Tokyo) to the `lastModified` string,
+// returning undefined when the source has no date so the entry omits the field.
+const toLastModified = (date?: string): string | undefined => {
+  if (date === undefined) return undefined;
+
+  return dayjs(date).tz('Asia/Tokyo').format('YYYY-MM-DD');
+};
+
+const toStaticEntry = (baseUrl: string, path: string): SitemapEntry => ({
+  url: `${baseUrl}${path}`,
+  changeFrequency: 'weekly',
+  priority: path === '' ? 1 : 0.8,
+});
+
+const toDetailEntry = (url: string, date?: string): SitemapEntry => {
+  const lastModified = toLastModified(date);
+  if (lastModified === undefined) {
+    return { url, changeFrequency: 'monthly', priority: 0.6 };
+  }
+
+  return { url, lastModified, changeFrequency: 'monthly', priority: 0.6 };
+};
+
+export const buildSitemap = ({ baseUrl, news, blog, works }: BuildSitemapArgs): Sitemap => {
+  const staticEntries = STATIC_PATHS.map((path) => toStaticEntry(baseUrl, path));
+  // External-link news (a `url` is set) has no internal detail page — the detail
+  // route 404s for it (see is-external-news) — so it must not appear in the sitemap.
+  const newsEntries = news.filter((item) => item.url === undefined).map((item) => toDetailEntry(`${baseUrl}/news/${item.slug}`, item.date));
+  const blogEntries = blog.map((post) => toDetailEntry(`${baseUrl}/blog/${post.slug}`, post.date));
+  const worksEntries = works.map((work) => toDetailEntry(`${baseUrl}/works/${work.slug}`, work.date));
+
+  return [...staticEntries, ...newsEntries, ...blogEntries, ...worksEntries];
+};
