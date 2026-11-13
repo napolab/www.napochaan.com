@@ -5,4 +5,5 @@ import type { APIRoute } from 'astro';
 // like Next's `permanent: true`, query kept. An endpoint rather than astro.config
 // `redirects`: the Cloudflare adapter emits those as an assets `_redirects` file that
 // the asset layer answers before the worker, skipping its `no-store` on ≥300.
-export const GET: APIRoute = ({ request }) => new Response(null, { status: 308, headers: { Location: `/log${new URL(request.url).search}` } });
+// `ALL`: Next's redirect answered every method (HEAD, POST, …) with the same 308.
+export const ALL: APIRoute = ({ request }) => new Response(null, { status: 308, headers: { Location: `/log${new URL(request.url).search}` } });

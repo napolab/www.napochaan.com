@@ -22,4 +22,10 @@ describe('/logs', () => {
     const res = await renderEndpoint(endpoint, '/logs?a=1');
     expect(res.headers.get('location')).toBe('/log?a=1');
   });
+
+  it.each(['HEAD', 'POST'])('answers %s with the same 308, like the Next redirect', async (method) => {
+    const res = await renderEndpoint(endpoint, '/logs?a=1', {}, { method });
+    expect(res.status).toBe(308);
+    expect(res.headers.get('location')).toBe('/log?a=1');
+  });
 });

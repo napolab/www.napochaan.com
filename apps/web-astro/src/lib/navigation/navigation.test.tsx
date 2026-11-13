@@ -63,6 +63,19 @@ describe('useRouter', () => {
   it('refresh re-navigates to the current URL with history: replace', async () => {
     const { result } = await renderHook(() => useRouter(), { wrapper });
     result.current.refresh();
-    expect(navigate).toHaveBeenCalledWith(location.href, { history: 'replace' });
+    expect(navigate).toHaveBeenCalledWith(`${location.pathname}${location.search}`, { history: 'replace' });
+  });
+
+  // Next's router.refresh() kept the scroll position; Astro's same-page navigation
+  // scrolls to the top. Live Preview refreshes on every autosave, so the editor's
+  // viewport must not jump.
+  it('refresh restores the scroll position after the swap', async () => {
+    const scrollTo = vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    vi.spyOn(window, 'scrollY', 'get').mockReturnValue(640);
+    vi.spyOn(window, 'scrollX', 'get').mockReturnValue(0);
+    const { result } = await renderHook(() => useRouter(), { wrapper });
+    result.current.refresh();
+    await vi.waitFor(() => expect(scrollTo).toHaveBeenCalledWith({ left: 0, top: 640, behavior: 'instant' }));
+    vi.restoreAllMocks();
   });
 });

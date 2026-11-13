@@ -1,0 +1,39 @@
+---
+// Port of apps/web/src/app/(site)/log/preview/page.tsx inside log/layout.tsx. Draft-only
+// Live Preview route: 404 unless the `/next/preview` handshake set the draft cookie
+// (readDraftContext); the worker stamps `no-store` and allows the cms admin as frame
+// ancestor. The layout chrome (header, calendar, feed link) is the public /log's; only
+// the timeline reads the `logs` drafts (loadLogPreview). No page metadata (root
+// defaults).
+import { FeedLink } from '@components/feed-link';
+import { LivePreviewIsland } from '@components/live-preview/island';
+import PageHeader from '@components/page-header/page-header.astro';
+
+import { LogCalendarIsland } from '../../features/log/components/log-calendar/island';
+import { LogTimeline } from '../../features/log/components/log-timeline';
+import { loadLogPreview } from '../../features/log/load-log';
+import * as ls from '../../features/log/styles.css';
+import { readDraftContext } from '../../features/preview/read-draft-context';
+import * as s from '../../features/shared/styles.css';
+import SiteLayout from '../../layouts/site-layout.astro';
+
+const draft = await readDraftContext(Astro.request);
+if (draft === undefined) return Astro.rewrite('/404');
+const { groups, calendar } = await loadLogPreview(draft.previewSecret);
+const pathname = Astro.url.pathname;
+const crumbs = [{ href: '/', label: 'home' }, { label: 'log' }];
+---
+
+<SiteLayout metadata={{}}>
+  <main id="main-content" class={s.main}>
+    <PageHeader title="log" breadcrumbs={crumbs} kicker="// 活動年表 — gig · release · work" lead="進捗どうですか？" />
+    <div class={ls.metaRow}>
+      <span class={ls.calendarSlot}>
+        <LogCalendarIsland client:load pathname={pathname} props={{ ...calendar, label: '活動カレンダー' }} />
+      </span>
+      <FeedLink href="/log/rss.xml" label="log の RSS フィード" />
+    </div>
+    <LivePreviewIsland client:load transition:persist="live-preview" pathname={pathname} props={{ serverURL: draft.cmsOrigin }} />
+    <LogTimeline groups={groups} />
+  </main>
+</SiteLayout>

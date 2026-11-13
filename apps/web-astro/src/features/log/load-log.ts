@@ -1,4 +1,4 @@
-import { findLogList } from '@lib/cms/logs';
+import { findLogDraftList, findLogList } from '@lib/cms/logs';
 import { findWorksList } from '@lib/cms/works';
 import { dayjs } from '@utils/dayjs';
 
@@ -35,6 +35,19 @@ export const loadLogPage = async () => {
 
   return {
     groups: buildLogTimeline(works, posts, now, logs),
+    calendar: { marks: marks.map(toCalendarMark), minDate, maxDate },
+  };
+};
+
+// The /log/preview page (port of log/preview/page.tsx inside log/layout.tsx): only the
+// timeline reads the `logs` drafts. Works and external posts stay published, and the
+// layout's calendar keeps the published sources, as in Next.
+export const loadLogPreview = async (previewSecret: string) => {
+  const [{ works, posts, logs, now }, draftLogs] = await Promise.all([loadLogSources(), findLogDraftList(previewSecret)]);
+  const { marks, minDate, maxDate } = collectLogDates(works, posts, logs, now);
+
+  return {
+    groups: buildLogTimeline(works, posts, now, draftLogs),
     calendar: { marks: marks.map(toCalendarMark), minDate, maxDate },
   };
 };

@@ -1,0 +1,26 @@
+---
+// Port of apps/web/src/app/(site)/news/preview/[id]/page.tsx (inside news/layout.tsx's
+// `<main>`). Draft-only Live Preview route: 404 unless the `/next/preview` handshake set
+// the draft cookie (readDraftContext); the worker stamps `no-store` and allows the cms
+// admin as frame ancestor. Same NewsDetail body as the public page. The Next preview set
+// no metadata, so the root defaults apply.
+import { LivePreviewIsland } from '@components/live-preview/island';
+
+import { loadNewsPreview } from '../../../features/news/load-news-preview';
+import NewsDetail from '../../../features/news/news-detail.astro';
+import { readDraftContext } from '../../../features/preview/read-draft-context';
+import * as s from '../../../features/shared/styles.css';
+import SiteLayout from '../../../layouts/site-layout.astro';
+
+const draft = await readDraftContext(Astro.request);
+if (draft === undefined) return Astro.rewrite('/404');
+const detail = await loadNewsPreview(Astro.params.id ?? '', draft.previewSecret);
+if (detail === undefined) return Astro.rewrite('/404');
+---
+
+<SiteLayout metadata={{}}>
+  <main id="main-content" class={s.main}>
+    <LivePreviewIsland client:load transition:persist="live-preview" pathname={Astro.url.pathname} props={{ serverURL: draft.cmsOrigin }} />
+    <NewsDetail detail={detail} />
+  </main>
+</SiteLayout>

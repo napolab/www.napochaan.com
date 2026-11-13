@@ -47,8 +47,18 @@ const replace = (href: string): void => {
   void navigate(href, { history: 'replace' });
 };
 
+// Next's `router.refresh()` re-rendered in place. Astro's same-page navigation
+// refetches and swaps but then scrolls to the top (and only scrolls, without fetching,
+// when the URL has a hash), so re-navigate to the hash-less URL and put the scroll
+// position back once the swap is done. Live Preview calls this on every autosave.
+const refreshInPlace = async (): Promise<void> => {
+  const { scrollX, scrollY } = window;
+  await navigate(`${location.pathname}${location.search}`, { history: 'replace' });
+  window.scrollTo({ left: scrollX, top: scrollY, behavior: 'instant' });
+};
+
 const refresh = (): void => {
-  void navigate(location.href, { history: 'replace' });
+  void refreshInPlace();
 };
 
 export const useRouter = (): Router => useMemo(() => ({ push, replace, refresh }), []);

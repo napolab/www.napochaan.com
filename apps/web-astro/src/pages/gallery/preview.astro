@@ -1,0 +1,34 @@
+---
+// Port of apps/web/src/app/(site)/gallery/preview/page.tsx. Draft-only Live Preview
+// route: 404 unless the `/next/preview` handshake set the draft cookie
+// (readDraftContext); the worker stamps `no-store` and allows the cms admin as frame
+// ancestor. Gallery is an aggregate page, so this previews the whole draft list.
+// Deliberate deviation: in Next this page rendered its own `<main>` + header INSIDE
+// gallery/layout.tsx's `<main>` + header (two mains, two h1s). It renders the chrome
+// once here, as the public /gallery does. No page metadata (root defaults).
+import { FeedLink } from '@components/feed-link';
+import GalleryArchive from '@components/gallery-archive/gallery-archive.astro';
+import { LivePreviewIsland } from '@components/live-preview/island';
+import PageHeader from '@components/page-header/page-header.astro';
+import { findGalleryDraftList } from '@lib/cms/gallery';
+
+import { readDraftContext } from '../../features/preview/read-draft-context';
+import * as s from '../../features/shared/styles.css';
+import SiteLayout from '../../layouts/site-layout.astro';
+
+const draft = await readDraftContext(Astro.request);
+if (draft === undefined) return Astro.rewrite('/404');
+const photos = await findGalleryDraftList(draft.previewSecret);
+const crumbs = [{ href: '/', label: 'home' }, { label: 'gallery' }];
+---
+
+<SiteLayout metadata={{}}>
+  <main id="main-content" class={s.main}>
+    <LivePreviewIsland client:load transition:persist="live-preview" pathname={Astro.url.pathname} props={{ serverURL: draft.cmsOrigin }} />
+    <PageHeader title="gallery" breadcrumbs={crumbs} kicker="// flyer · VRChat · photo — 2024-2026" lead="まだ知らない君がいる！" />
+    <FeedLink href="/gallery/rss.xml" label="gallery の RSS フィード" />
+    <section aria-label="作品ギャラリー一覧">
+      <GalleryArchive photos={photos} />
+    </section>
+  </main>
+</SiteLayout>
