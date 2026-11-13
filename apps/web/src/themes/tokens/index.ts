@@ -151,7 +151,7 @@ export const tokens = defineTokens({
 
   fonts: {
     display: { value: '"digibop", system-ui, sans-serif' },
-    body: { value: 'var(--font-mplus1-en), var(--font-mplus1), system-ui, -apple-system, sans-serif' },
+    body: { value: 'var(--font-mplus1), system-ui, -apple-system, sans-serif' },
     // "config-mono-vf Fallback" is a metric-matched Courier New (see global.css
     // @font-face) inserted before ui-monospace so the pre-swap fallback occupies
     // config-mono-vf's exact line box — kills the font-swap CLS (SysBar reflow).
