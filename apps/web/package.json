@@ -7,7 +7,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro build && wrangler dev",
-    "prepare": "panda codegen",
+    "prepare": "panda codegen && astro sync",
     "panda": "panda",
     "fmt": "pnpm run fmt:oxfmt && pnpm run fmt:oxlint",
     "fmt:oxfmt": "oxfmt --write .",
