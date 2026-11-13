@@ -1,0 +1,20 @@
+---
+// `.astro` twin of the BackToIndex Server Component (markup mirrors ./index.tsx); the
+// label's ScrambleText is the only island.
+import { Link } from '@components/link';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+
+import * as styles from './styles.css';
+
+type Props = {
+  href: string;
+  label: string;
+};
+
+const { href, label } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<Link href={href} className={styles.root} tone="accent" underline={false}>
+  <span class={styles.arrow} aria-hidden="true">←</span><span class={styles.label}><ScrambleTextIsland client:load pathname={pathname} props={{ children: label }} /></span>
+</Link>

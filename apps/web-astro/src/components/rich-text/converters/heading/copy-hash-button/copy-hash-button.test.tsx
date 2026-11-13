@@ -51,4 +51,26 @@ describe('CopyHashButton', () => {
 
     expect(onPress).toHaveBeenCalledTimes(1);
   });
+
+  // Placed as an island inside a server-rendered heading (rich-text.astro), there is no
+  // parent to hand an onPress across the island boundary: `anchored` makes the button
+  // itself jump to its heading and put the fragment in the URL, as AnchoredHeading does.
+  it('jumps to its enclosing heading and writes the fragment when anchored', async () => {
+    vi.spyOn(navigator.clipboard, 'writeText').mockResolvedValue(undefined);
+    history.replaceState(null, '', location.pathname);
+    const scroll = vi.spyOn(HTMLElement.prototype, 'scrollIntoView').mockImplementation(() => {});
+
+    await render(
+      <h2 id="intro" data-testid="heading">
+        <CopyHashButton slug="intro" label="リンクをコピー" anchored />
+        intro
+      </h2>,
+    );
+    await page.getByRole('button', { name: 'リンクをコピー' }).click();
+
+    await expect.poll(() => location.hash).toBe('#intro');
+    expect(scroll).toHaveBeenCalledTimes(1);
+    expect(scroll.mock.contexts[0]).toBe(document.querySelector('[data-testid="heading"]'));
+    history.replaceState(null, '', location.pathname);
+  });
 });

@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import NotFoundPage from '../404.astro';
 import AboutPage from '../about.astro';
-import { ORIGIN, renderPage } from './render-page';
+import { ORIGIN, renderPage } from '../../test-utils/astro-container';
+import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
 
 import type { Profile } from '../../features/about/profile';
 
@@ -52,6 +53,13 @@ describe('/about', () => {
       expect(html).toMatch(new RegExp(`<h2[^>]*>${heading}</h2>`));
     }
     expect(html).toContain('href="https://x.com/naporin24690"');
+  });
+
+  it('hydrates only client leaves inside main (no breadcrumbs / masthead / contact list islands)', async () => {
+    const html = await render();
+    const islands = mainIslandsOf(html);
+    expect(islands.filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
+    expect(islands).toEqual(['ScrambleTextIsland', 'EchoTextIsland', 'TypewriterTextIsland', 'ScrambleTextIsland']);
   });
 
   it('answers 404 with the not-found page when the profile is missing', async () => {

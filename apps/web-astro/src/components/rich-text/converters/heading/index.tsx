@@ -5,7 +5,7 @@ import type { JSXConverters } from '@payloadcms/richtext-lexical/react';
 
 import type { NodeTypes } from '../types';
 
-const tagToLevel = (tag: string): 1 | 2 | 3 | 4 | 5 | 6 => {
+export const tagToLevel = (tag: string): 1 | 2 | 3 | 4 | 5 | 6 => {
   switch (tag) {
     case 'h1':
       return 1;

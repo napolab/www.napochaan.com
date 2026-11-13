@@ -28,18 +28,46 @@ const captionOf = (fields: unknown): string | undefined => {
  * makes the body image a tap target that opens the shared gallery Lightbox.
  * Non-image uploads fall back to a download link.
  */
+export type UploadFigure = {
+  readonly src: string;
+  readonly alt: string;
+  readonly width: number;
+  readonly height: number;
+  readonly caption: string | undefined;
+};
+
+type UploadValue = { readonly value: unknown; readonly fields?: unknown };
+
+const uploadDocOf = (node: UploadValue): Record<string, unknown> | undefined => {
+  if (typeof node.value !== 'object' || node.value === null) return undefined;
+  return node.value as Record<string, unknown>;
+};
+
+/** The zoomable in-body figure an image upload renders as, or undefined for anything else. Pure. */
+export const uploadFigureOf = (node: UploadValue): UploadFigure | undefined => {
+  const doc = uploadDocOf(node);
+  if (doc === undefined) return undefined;
+  const url = typeof doc.url === 'string' ? doc.url : undefined;
+  const mimeType = typeof doc.mimeType === 'string' ? doc.mimeType : '';
+  if (url === undefined || !mimeType.startsWith('image')) return undefined;
+
+  const alt = typeof doc.alt === 'string' ? doc.alt : '';
+  const width = typeof doc.width === 'number' ? doc.width : 800;
+  const height = typeof doc.height === 'number' ? doc.height : 450;
+
+  return { src: url, alt, width, height, caption: captionOf(node.fields) ?? (alt === '' ? undefined : alt) };
+};
+
 export const uploadConverter: Partial<JSXConverters<NodeTypes>> = {
   upload: ({ node }) => {
-    if (typeof node.value !== 'object' || node.value === null) return null;
-
-    const doc = node.value as unknown as Record<string, unknown>;
+    const doc = uploadDocOf(node);
+    if (doc === undefined) return null;
     const url = typeof doc.url === 'string' ? doc.url : undefined;
-    const mimeType = typeof doc.mimeType === 'string' ? doc.mimeType : '';
-
     if (url === undefined) return null;
 
+    const figure = uploadFigureOf(node);
     // Non-image: render a download link
-    if (!mimeType.startsWith('image')) {
+    if (figure === undefined) {
       const filename = typeof doc.filename === 'string' ? doc.filename : url;
       return (
         <a href={url} rel="noopener noreferrer">
@@ -48,11 +76,19 @@ export const uploadConverter: Partial<JSXConverters<NodeTypes>> = {
       );
     }
 
-    const alt = typeof doc.alt === 'string' ? doc.alt : '';
-    const width = typeof doc.width === 'number' ? doc.width : 800;
-    const height = typeof doc.height === 'number' ? doc.height : 450;
-    const caption = captionOf(node.fields) ?? (alt === '' ? undefined : alt);
-
-    return <Figure src={url} alt={alt} width={width} height={height} caption={caption} variant="cover" fit="intrinsic" zoomable placeholder="blur" blurDataURL={formatBlurURL(url, { blur: 20 })} />;
+    return (
+      <Figure
+        src={figure.src}
+        alt={figure.alt}
+        width={figure.width}
+        height={figure.height}
+        caption={figure.caption}
+        variant="cover"
+        fit="intrinsic"
+        zoomable
+        placeholder="blur"
+        blurDataURL={formatBlurURL(figure.src, { blur: 20 })}
+      />
+    );
   },
 };

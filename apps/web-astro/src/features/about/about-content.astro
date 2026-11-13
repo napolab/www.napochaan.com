@@ -1,17 +1,17 @@
 ---
-// Port of the Next about `AboutContent` (+ `about/layout.tsx`). Composed in Astro so
-// only the parts with client leaves are islands (breadcrumbs, masthead, contact
-// list); the section headings (no links), whoami, rich text, tag cloud and skill
-// matrix render server-only, as their Next Server Components did.
-import { BreadcrumbsIsland } from '@components/breadcrumbs/island';
-import { ContactListIsland } from '@components/contact-list/island';
-import { RichText } from '@components/rich-text';
+// Port of the Next about `AboutContent` (+ `about/layout.tsx`). Every Server Component
+// stays server-only; only client leaves hydrate: the breadcrumb / contact
+// ScrambleTexts, the masthead's EchoText / TypewriterText and the rich text's
+// copy-anchors / lightboxes (rich-text.astro).
+import Breadcrumbs from '@components/breadcrumbs/breadcrumbs.astro';
+import ContactList from '@components/contact-list/contact-list.astro';
+import RichText from '@components/rich-text/rich-text.astro';
 import { SectionHeading } from '@components/section-heading';
 
 import { SkillMatrix } from './components/skill-matrix';
 import { TagCloud } from './components/tag-cloud';
 import { Whoami } from './components/whoami';
-import { AboutMastheadIsland } from './islands';
+import AboutMasthead from './components/about-masthead/about-masthead.astro';
 import { buildWhoamiRows } from './lib/build-whoami-rows';
 import * as s from './styles.css';
 
@@ -22,14 +22,13 @@ type Props = {
 };
 
 const { profile } = Astro.props;
-const pathname = Astro.url.pathname;
 const crumbs = [{ href: '/', label: 'home' }, { label: 'about' }];
 const kicker = '// フルスタックエンジニア · DJ · VJ — リアル / VR';
 ---
 
 <main id="main-content" class={s.main}>
-  <BreadcrumbsIsland client:load pathname={pathname} props={{ items: crumbs }} />
-  <AboutMastheadIsland client:load pathname={pathname} props={{ name: profile.name, kicker, lead: profile.tagline }} />
+  <Breadcrumbs items={crumbs} />
+  <AboutMasthead name={profile.name} kicker={kicker} lead={profile.tagline} />
 
   <div class={s.topGrid}>
     <section class={s.cell}>
@@ -59,6 +58,6 @@ const kicker = '// フルスタックエンジニア · DJ · VJ — リアル /
 
   <section class={s.cell}>
     <SectionHeading no="06">contact</SectionHeading>
-    <ContactListIsland client:load pathname={pathname} props={{ items: profile.contacts }} />
+    <ContactList items={profile.contacts} />
   </section>
 </main>

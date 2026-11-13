@@ -1,0 +1,26 @@
+---
+// Port of the (site) GallerySection Server Component. The Gallery (lightbox grid) is a
+// client leaf, SSR'd and hydrated on load as in Next; the heading's labels are
+// ScrambleText leaves.
+import { GalleryIsland } from '@components/gallery/island';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+import { SectionHeading } from '@components/section-heading';
+
+import * as styles from './styles.css';
+import { toGalleryItems } from './to-gallery-items';
+
+import type { GalleryPhoto } from '@components/gallery-archive';
+
+type Props = {
+  id?: string;
+  photos: readonly GalleryPhoto[];
+};
+
+const { id, photos } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<section id={id} class={styles.root}>
+  <SectionHeading no="04" href="/gallery" moreHref="/gallery"><ScrambleTextIsland client:load pathname={pathname} props={{ children: 'gallery' }} /><ScrambleTextIsland slot="more" client:load pathname={pathname} props={{ children: '$ open gallery/' }} /></SectionHeading>
+  <GalleryIsland client:load pathname={pathname} props={{ items: toGalleryItems(photos) }} />
+</section>

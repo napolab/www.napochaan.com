@@ -9,7 +9,8 @@ export default getViteConfig(
     test: {
       name: 'astro',
       environment: 'node',
-      include: ['src/layouts/**/*.test.ts', 'src/pages/**/*.test.ts'],
+      // `*.astro.test.ts` next to an `.astro` component anywhere under src/.
+      include: ['src/layouts/**/*.test.ts', 'src/pages/**/*.test.ts', 'src/**/*.astro.test.ts'],
     },
   },
   { adapter: undefined, configFile: false, integrations: [] },

@@ -1,0 +1,64 @@
+---
+// Lexical rich text for `.astro` pages. Static runs render through the server-only
+// React converters (no JS); the nodes that carry a client leaf are composed here so
+// only that leaf is an island (see ./segment):
+//   - heading:   static <hN id> (same markup as AnchoredHeading) + CopyHashButton island
+//                (`anchored`: it scrolls to its heading and writes the fragment itself).
+//   - upload / image-row: static figure markup + the Lightbox island (figure.astro).
+// Every block stays a direct child of the container, so `:first-child` / `:last-child`
+// margins and the blog TOC's `:nth-child(N of :is(h2, h3))` timelines keep working.
+// Links stay plain anchors (ClientRouter intercepts them), as in the React RichText.
+import FigureFrame from '@components/figure/figure.astro';
+import { Heading } from '@components/heading';
+import { clsx } from '@utils/clsx';
+
+import { CopyHashButtonIsland } from './converters/heading/copy-hash-button/island';
+import * as anchoredStyles from './converters/heading/anchored-heading/styles.css';
+import * as headingStyles from './converters/heading/styles.css';
+import { IMAGE_ROW_CELL_SIZES } from './converters/image-row';
+import * as imageRowStyles from './converters/image-row/styles.css';
+import { RichTextNodes } from './index';
+import { segmentRichText } from './segment';
+import * as styles from './styles.css';
+
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
+
+type Props = {
+  data: SerializedEditorState;
+  class?: string;
+};
+
+const { data, class: className } = Astro.props;
+const pathname = Astro.url.pathname;
+const segments = segmentRichText(data);
+---
+
+<div class={clsx(styles.root, className)}>
+  {
+    segments.map((segment) => {
+      switch (segment.kind) {
+        case 'static':
+          return <RichTextNodes data={segment.data} />;
+        case 'heading':
+          return (
+            <Heading level={segment.level} id={segment.slug !== '' ? segment.slug : undefined} className={headingStyles.heading}>
+              {segment.slug !== '' && <CopyHashButtonIsland client:load pathname={pathname} props={{ slug: segment.slug, label: 'この見出しへのリンクをコピー', className: anchoredStyles.root, anchored: true }} />}
+              <RichTextNodes data={segment.inline} />
+            </Heading>
+          );
+        case 'upload':
+          return <FigureFrame {...segment.figure} variant="cover" fit="intrinsic" />;
+        case 'image-row':
+          return (
+            <div class={imageRowStyles.root}>
+              {segment.figures.map((figure) => (
+                <div class={imageRowStyles.cellRoot}>
+                  <FigureFrame src={figure.url} alt={figure.alt} width={figure.width} height={figure.height} caption={figure.caption} variant="cover" sizes={IMAGE_ROW_CELL_SIZES} />
+                </div>
+              ))}
+            </div>
+          );
+      }
+    })
+  }
+</div>

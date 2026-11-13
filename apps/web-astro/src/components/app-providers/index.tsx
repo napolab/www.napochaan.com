@@ -41,16 +41,27 @@ export type IslandProps<P> = {
   props: P;
 };
 
+// Astro passes an island's slots as extra props: `children` for the default slot and
+// the slot's name for a named slot (`<X slot="more" />` → `more`), each a static
+// <astro-slot>. They are forwarded on top of `props`, so a client leaf can wrap
+// server-rendered markup (e.g. NoAction, Lightbox) without hydrating it.
+type SlotProps = { [slot: string]: unknown };
+
+// The client hydrator calls `createElement(Island, props, undefined)` when there is no
+// default slot, so an absent slot arrives as `children: undefined`. Drop absent slots
+// so they never clobber a same-named prop (e.g. ScrambleText's `props.children`).
+const presentSlots = (slots: SlotProps): SlotProps => Object.fromEntries(Object.entries(slots).filter(([, value]) => value !== undefined));
+
 // Turns a component into an island entry point wrapped in AppProviders. `.astro`
 // props are not type-checked by tsgo, so a forgotten `pathname` throws on render
 // instead of silently rendering every nav item inactive.
 export const withAppProviders = <P extends object>(Component: ComponentType<P>) => {
-  const Island = ({ pathname, props }: IslandProps<P>) => {
+  const Island = ({ pathname, props, ...slots }: IslandProps<P> & SlotProps) => {
     if (typeof pathname !== 'string') throw new Error(`${Component.displayName ?? Component.name} island needs a \`pathname\` prop (Astro.url.pathname)`);
 
     return (
       <AppProviders pathname={pathname}>
-        <Component {...props} />
+        <Component {...props} {...presentSlots(slots)} />
       </AppProviders>
     );
   };

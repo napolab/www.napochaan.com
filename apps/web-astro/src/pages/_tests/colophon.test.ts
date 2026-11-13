@@ -2,7 +2,8 @@ import { describe, expect, it, vi } from 'vitest';
 
 import ColophonPage from '../colophon.astro';
 import { colophon } from '../../features/colophon/content';
-import { ORIGIN, renderPage } from './render-page';
+import { ORIGIN, renderPage } from '../../test-utils/astro-container';
+import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
 
 vi.mock('@utils/request-url', () => ({ getRequestOrigin: async () => ORIGIN }));
 
@@ -36,11 +37,30 @@ describe('/colophon', () => {
     }
   });
 
-  it('wraps every demo that carries an href in the no-action island', async () => {
+  // Every demo that carries an href sits inside the <NoAction> island (colophon rule).
+  const NO_ACTION_DEMOS = ['RichText', 'NewsRow', 'Link', 'Pagination', 'Breadcrumbs', 'FeedLink', 'ShareBar', 'BackToIndex', 'QuoteShare'];
+
+  // The stage markup of one catalog cell.
+  const stageOf = (html: string, name: string): string => {
+    const start = html.indexOf(`>${name}</h3>`);
+    return html.slice(start, html.indexOf('</article>', start));
+  };
+
+  it.each(NO_ACTION_DEMOS)('wraps the %s demo in the no-action island', async (name) => {
     const html = await render();
-    expect(html).toContain('href="/news/rss.xml"');
-    const feedLinkCell = html.slice(html.indexOf('>FeedLink</h3>'), html.indexOf('>Calendar</h3>'));
-    expect(feedLinkCell).toMatch(/<astro-island [^>]*component-export="NoAction"/);
+    expect(stageOf(html, name)).toMatch(/<div class="[^"]+"><astro-island [^>]*component-export="NoAction"/);
+  });
+
+  it('renders a non-empty stage for every catalog demo', async () => {
+    const html = await render();
+    for (const item of colophon.components.items) {
+      expect(stageOf(html, item.name), item.name).toMatch(/<div class="[^"]*ov_clip[^"]*">\s*<[a-z]/);
+    }
+  });
+
+  it('hydrates only client leaves inside main', async () => {
+    const html = await render();
+    expect(mainIslandsOf(html).filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
   });
 
   it('loads the two gallery demos client-only, with the loading annotation as fallback', async () => {

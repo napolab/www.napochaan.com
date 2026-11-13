@@ -1,0 +1,47 @@
+---
+// `.astro` twin of the Table Server Component (markup mirrors ./index.tsx) for rows
+// whose cells hold client leaves. Cell content comes from a callback slot:
+//   <Table columns={columns} rows={rows}>{(row, key) => …}</Table>
+// so each cell can place its own islands from `.astro`.
+import * as styles from './styles.css';
+
+type Column = { key: string; label: string; desktopOnly?: boolean };
+
+type Props = {
+  columns: readonly Column[];
+  rows: readonly unknown[];
+  caption?: string;
+};
+
+const { columns, rows, caption } = Astro.props;
+const desktopOnly = (column: Column): 'true' | undefined => (column.desktopOnly === true ? 'true' : undefined);
+const cells = await Promise.all(rows.map(async (row) => Promise.all(columns.map(async (column) => Astro.slots.render('default', [row, column.key])))));
+---
+
+<table role="table" class={styles.root}>
+  {caption !== undefined && <caption class={styles.caption}>{caption}</caption>}
+  <thead role="rowgroup" class={styles.head}>
+    <tr role="row">
+      {
+        columns.map((column) => (
+          <th role="columnheader" class={styles.headerCell} scope="col" data-desktop-only={desktopOnly(column)}>
+            {column.label}
+          </th>
+        ))
+      }
+    </tr>
+  </thead>
+  <tbody role="rowgroup" class={styles.body}>
+    {
+      cells.map((row) => (
+        <tr role="row" class={styles.row}>
+          {columns.map((column, index) => (
+            <td role="cell" class={styles.cell} data-label={column.label} data-desktop-only={desktopOnly(column)}>
+              <Fragment set:html={row[index]} />
+            </td>
+          ))}
+        </tr>
+      ))
+    }
+  </tbody>
+</table>

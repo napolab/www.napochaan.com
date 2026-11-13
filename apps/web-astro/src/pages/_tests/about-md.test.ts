@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import * as aboutMarkdown from '../about.md';
 import { buildAboutMarkdown } from '../../features/about/lib/build-about-markdown';
-import { renderEndpoint } from './render-page';
+import { renderEndpoint } from '../../test-utils/astro-container';
 
 import type { Profile } from '../../features/about/profile';
 import type { AstroComponentFactory } from 'astro/runtime/server/index.js';

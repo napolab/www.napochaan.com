@@ -13,6 +13,10 @@ export default defineConfig({
   // and per-visitor state has no place on Workers-Cache'd pages.
   session: false,
   adapter: cloudflare(),
+  // ClientRouter prefetches every link on hover unless this is exactly `false`. The
+  // Next site's react-aria links prefetched nothing, and unported / demo hrefs (the
+  // colophon catalog) must not be fetched behind the visitor's back.
+  prefetch: false,
   integrations: [react()],
   vite: {
     // linkedom stays out of the browser bundle (see src/config/client-aliases).

@@ -93,7 +93,7 @@ export default defineConfig({
           environment: 'node',
           include: ['src/**/*.test.ts'],
           // `.astro` renders need Astro's Vite plugins: see vitest.astro.config.ts.
-          exclude: [...configDefaults.exclude, 'src/layouts/**', 'src/pages/**'],
+          exclude: [...configDefaults.exclude, 'src/layouts/**', 'src/pages/**', 'src/**/*.astro.test.ts'],
         },
       },
       './vitest.astro.config.ts',

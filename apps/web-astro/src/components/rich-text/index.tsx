@@ -21,3 +21,9 @@ type Props = {
 export const RichText = ({ data, className }: Props) => {
   return <PayloadRichText data={data} converters={jsxConverters} className={clsx(styles.root, className)} />;
 };
+
+/**
+ * The same conversion without the container `<div>`: one segment of a body that
+ * `rich-text.astro` split around its client leaves (see ./segment). Server-only.
+ */
+export const RichTextNodes = ({ data }: { readonly data: SerializedEditorState }) => <PayloadRichText data={data} converters={jsxConverters} disableContainer />;

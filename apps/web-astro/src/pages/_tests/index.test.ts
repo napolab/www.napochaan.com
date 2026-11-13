@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import HomePage from '../index.astro';
-import { ORIGIN, renderPage } from './render-page';
+import { ORIGIN, renderPage } from '../../test-utils/astro-container';
+import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
 
 vi.mock('@utils/request-url', () => ({ getRequestOrigin: async () => ORIGIN }));
 vi.mock('@lib/cms/news', () => ({
@@ -64,10 +65,12 @@ describe('/ (home)', () => {
     expect(html).not.toContain('href="/blog/post-4"');
   });
 
-  it('hydrates the sections as islands (Next client leaves), never the main landmark itself', async () => {
+  it('hydrates only client leaves inside main, never a section or the landmark itself', async () => {
     const html = await render();
+    const islands = mainIslandsOf(html);
+    expect(islands.length).toBeGreaterThan(0);
+    expect(islands.filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
     const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
-    expect(main.match(/<astro-island /g)?.length).toBe(7);
-    expect(html).not.toMatch(/<astro-island [^>]*>\s*<main/);
+    expect(main).not.toMatch(/<astro-island [^>]*>\s*<(section|header)[\s>]/);
   });
 });

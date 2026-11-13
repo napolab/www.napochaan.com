@@ -1,0 +1,37 @@
+---
+// `.astro` twin of the Breadcrumbs Server Component (markup mirrors ./index.tsx): the
+// links are static anchors (ClientRouter soft-navigates them) and each crumb's
+// ScrambleText is the only island.
+import { Link } from '@components/link';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+
+import * as styles from './styles.css';
+
+type Props = {
+  items: readonly { href?: string; label: string }[];
+};
+
+const { items } = Astro.props;
+const pathname = Astro.url.pathname;
+const lastIndex = items.length - 1;
+---
+
+<nav aria-label="パンくず" class={styles.root}>
+  <ol class={styles.list}>
+    {
+      items.map((item, index) =>
+        index === lastIndex ? (
+          <li class={styles.item} data-first={`${index === 0}`} data-last="true">
+            <span class={styles.current} aria-current="page">{item.label}</span>
+          </li>
+        ) : (
+          <li class={styles.item} data-first={`${index === 0}`} data-last="false">
+            <Link href={item.href} tone="accent">
+              <ScrambleTextIsland client:load pathname={pathname} props={{ children: item.label }} />
+            </Link>
+          </li>
+        ),
+      )
+    }
+  </ol>
+</nav>

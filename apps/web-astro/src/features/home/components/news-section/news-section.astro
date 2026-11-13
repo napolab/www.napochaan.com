@@ -1,0 +1,24 @@
+---
+// Port of the (site) NewsSection Server Component. The rows are news-row.astro (only
+// their title ScrambleText hydrates); the heading's more-link label is the other leaf.
+import NewsRow from '@components/news-row/news-row.astro';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+import { SectionHeading } from '@components/section-heading';
+
+import * as styles from './styles.css';
+
+type Props = {
+  items: readonly { id: string; date: string; category: string; title: string; href?: string }[];
+};
+
+const { items } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<section class={styles.root}>
+  <SectionHeading no="01" moreHref="/news">news<ScrambleTextIsland slot="more" client:load pathname={pathname} props={{ children: '$ tail news' }} /></SectionHeading>
+  {/* news = curated important notices; the home feed shows the top 5 (pinned first, then newest), full list at /news. */}
+  <ol class={styles.log}>
+    {items.slice(0, 5).map((item) => <NewsRow date={item.date} category={item.category} title={item.title} href={item.href} />)}
+  </ol>
+</section>

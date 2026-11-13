@@ -61,6 +61,17 @@ const withErrorPolicy = (response: Response): Response => {
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 };
 
+// Next sent `text/html; charset=utf-8`; the Astro adapter sends a bare `text/html`.
+// Declare the charset on every HTML response (pages, 404, 500) so the bytes are never
+// sniffed. Other types (markdown, RSS, JSON) set their own and pass through.
+const withHTMLCharset = (response: Response): Response => {
+  if (response.headers.get('Content-Type') !== 'text/html') return response;
+  const headers = new Headers(response.headers);
+  headers.set('Content-Type', 'text/html; charset=utf-8');
+
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+};
+
 // The mounted Astro fetch (`@astrojs/cloudflare/handler`), with this request's `CMS`
 // binding wrapped. The adapter never hands page code the env passed here (pages would
 // otherwise read the raw global `cloudflare:workers` env), so the render runs inside
@@ -74,5 +85,5 @@ export const createAstroHandler = (astroFetch: MountedFetch) => async (c: Contex
   const settled = await runWithRequestContext({ env, ctx, request: c.req.raw }, async () => settle(c, target, await astroFetch(c.req.raw, env, ctx)));
   if (health.isDegraded()) c.set('cmsDegraded', true);
 
-  return withErrorPolicy(settled);
+  return withHTMLCharset(withErrorPolicy(settled));
 };

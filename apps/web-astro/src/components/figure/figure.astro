@@ -1,0 +1,29 @@
+---
+// `.astro` twin of the Figure Server Component for zoomable figures: the frame,
+// backdrop and caption are static markup and the client `Lightbox` is the only
+// island, wrapping the server-rendered Image as its trigger content (slot). Non-zoomable
+// figures keep using the React `Figure` with no directive. Markup mirrors ./index.tsx.
+import { LightboxIsland as Lightbox } from '@components/gallery/lightbox/island';
+import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
+
+import { backdropStyle, figureWidthStyle } from './index';
+import { resolveSizes } from './sizes';
+import * as styles from './styles.css';
+
+import type { Props as FigureProps } from './index';
+
+type Props = Omit<FigureProps, 'placeholder' | 'blurDataURL' | 'zoomable'>;
+
+const { src, alt, width, height, caption, variant = 'plain', fit = 'fill', sizes } = Astro.props;
+const pathname = Astro.url.pathname;
+const captionClassName = variant === 'cover' ? styles.tag : styles.caption;
+---
+
+<figure class={styles.root} data-variant={variant} data-fit={fit} style={figureWidthStyle(fit, width)}>
+  {variant === 'cover' && <span class={styles.backdrop} aria-hidden="true" style={backdropStyle(src)} />}
+  <Lightbox client:load pathname={pathname} props={{ src, alt, width, height, triggerClassName: styles.trigger }}>
+    <Image src={src} alt={alt} width={width} height={height} sizes={resolveSizes(fit, width, sizes)} placeholder="blur" blurDataURL={formatBlurURL(src, { blur: 20 })} className={styles.image} />
+  </Lightbox>
+  {caption !== undefined && <figcaption class={captionClassName}>{caption}</figcaption>}
+</figure>

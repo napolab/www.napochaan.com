@@ -195,4 +195,33 @@ describe('createAstroHandler', () => {
     );
     expect(res.headers.get('Cache-Control')).toBeNull();
   });
+
+  // Next sent `text/html; charset=utf-8`; Astro's adapter sends a bare `text/html`.
+  it.each(['/blog', '/news/missing'])('declares utf-8 on HTML responses (%s)', async (path) => {
+    const app = build(async () => new Response('<html>ok</html>', { status: path === '/blog' ? 200 : 404, headers: { 'Content-Type': 'text/html' } }));
+    const res = await app.request(
+      path,
+      {},
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(res.headers.get('Content-Type')).toBe('text/html; charset=utf-8');
+  });
+
+  it('leaves non-HTML and charset-bearing content types alone', async () => {
+    const markdown = build(async () => new Response('# a', { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } }));
+    const md = await markdown.request(
+      '/about.md',
+      {},
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(md.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+
+    const xml = build(async () => new Response('<rss/>', { headers: { 'Content-Type': 'application/xml' } }));
+    const rss = await xml.request(
+      '/news/rss.xml',
+      {},
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(rss.headers.get('Content-Type')).toBe('application/xml');
+  });
 });
