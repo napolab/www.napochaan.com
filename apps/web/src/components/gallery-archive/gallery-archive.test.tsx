@@ -2,6 +2,10 @@ import { render } from 'vitest-browser-react';
 import { describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
+// The real Panda stylesheet lays the absolutely positioned cells out on the grid;
+// without it every `fill` image stacks at the origin and intercepts the click.
+import '@themes/global.css';
+
 import { GalleryArchive } from './index';
 
 import type { GalleryPhoto } from './index';

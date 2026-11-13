@@ -1,6 +1,6 @@
 import { parseLexicalJSON } from '../lexical';
 
-import type { Profile } from '../../../../app/(site)/about/_lib/profile';
+import type { Profile } from '../../../../features/about/profile';
 import type { ProfileDTO } from '@napochaan/cms-api/services';
 
 // Maps the cms `ProfileDTO` to the site's `Profile`, restoring `bioJSON` /

@@ -7,12 +7,7 @@ const refFetch = vi.fn();
 const env: { CMS: { fetch: typeof refFetch } | undefined } = {
   CMS: { fetch: refFetch },
 };
-vi.mock('@opennextjs/cloudflare', () => ({
-  getCloudflareContext: (options?: { async?: boolean }) => {
-    if (options?.async !== true) throw new Error('getCloudflareContext called in sync mode');
-    return Promise.resolve({ env });
-  },
-}));
+vi.mock('@lib/request-context', () => ({ getRequestContext: () => ({ env }) }));
 
 import { loadOgImage } from './index';
 

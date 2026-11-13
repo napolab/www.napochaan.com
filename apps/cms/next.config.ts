@@ -16,7 +16,7 @@ export default withPayload(nextConfig);
 
 // `initOpenNextCloudflareForDev` boots miniflare so `getCloudflareContext` works under
 // `next dev`. Gate on NODE_ENV: during `next build` parallel workers would each boot
-// miniflare and deadlock on the shared local SQLite state (see apps/web/next.config.ts).
+// miniflare and deadlock on the shared local SQLite state (apps/web did the same before it moved to Astro).
 if (process.env.NODE_ENV === 'development') {
   void initOpenNextCloudflareForDev({ environment: process.env.CLOUDFLARE_ENV });
 }

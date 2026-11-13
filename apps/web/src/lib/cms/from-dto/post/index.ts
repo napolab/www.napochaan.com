@@ -1,6 +1,6 @@
 import { parseLexicalJSON } from '../lexical';
 
-import type { Post } from '../../../../app/(site)/blog/_lib/post';
+import type { Post } from '../../../../features/blog/post';
 import type { PostDTO } from '@napochaan/cms-api/services';
 
 // Maps the cms `PostDTO` to the site's `Post`, restoring `bodyJSON` to `body`.

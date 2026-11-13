@@ -1,9 +1,9 @@
 import { dayjs } from '@utils/dayjs';
 
-import type { Post } from '../../../app/(site)/blog/_lib/post';
-import type { NewsItem } from '../../../app/(site)/news/_lib/news-item';
-import type { WorkRow } from '../../../app/(site)/works/_lib/work-row';
-import type { MetadataRoute } from 'next';
+import type { Post } from '../../../features/blog/post';
+import type { NewsItem } from '../../../features/news/news-item';
+import type { WorkRow } from '../../../features/works/work-row';
+import type { Sitemap, SitemapEntry } from '../types';
 
 type BuildSitemapArgs = {
   baseUrl: string;
@@ -11,8 +11,6 @@ type BuildSitemapArgs = {
   blog: readonly Post[];
   works: readonly WorkRow[];
 };
-
-type SitemapEntry = MetadataRoute.Sitemap[number];
 
 // Every public static page. Preview/admin/api routes are never listed here.
 // The home page sorts first with the highest priority.
@@ -41,7 +39,7 @@ const toDetailEntry = (url: string, date?: string): SitemapEntry => {
   return { url, lastModified, changeFrequency: 'monthly', priority: 0.6 };
 };
 
-export const buildSitemap = ({ baseUrl, news, blog, works }: BuildSitemapArgs): MetadataRoute.Sitemap => {
+export const buildSitemap = ({ baseUrl, news, blog, works }: BuildSitemapArgs): Sitemap => {
   const staticEntries = STATIC_PATHS.map((path) => toStaticEntry(baseUrl, path));
   // External-link news (a `url` is set) has no internal detail page — the detail
   // route 404s for it (see is-external-news) — so it must not appear in the sitemap.

@@ -8,7 +8,7 @@ import type { FramePolicy, PathPolicyPlugin, PathRequest } from '../../types';
 
 // Draft preview routes the cms admin embeds in its Live Preview iframe, plus the
 // `/next/preview` handshake the iframe loads first. Keep in sync with
-// PREVIEW_PATH_PREFIXES (src/app/next/preview/allowed-paths.ts) — asserted by preview-frame.test.ts.
+// PREVIEW_PATH_PREFIXES (src/lib/preview/allowed-paths.ts) — asserted by preview-frame.test.ts.
 export const PREVIEW_ROOTS = ['/blog/preview', '/news/preview', '/works/preview', '/gallery/preview', '/log/preview', '/next/preview'] as const;
 
 const isPreviewPath = anyOf(...PREVIEW_ROOTS.map(isWithinPath));

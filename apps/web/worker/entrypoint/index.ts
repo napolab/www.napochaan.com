@@ -19,7 +19,7 @@ export const purgeEntrypointCache = async (ctx: ExecutionContext): Promise<void>
 };
 
 // The default export of worker.ts. `fetch` is the public entrance (the Hono app wrapping
-// OpenNext); `purge` is JS RPC only — there is no HTTP route to it.
+// the Astro handler); `purge` is JS RPC only — there is no HTTP route to it.
 export const createWebEntrypoint = (handlerFetch: MountedFetch) => {
   const app = createWorkerApp(handlerFetch);
 

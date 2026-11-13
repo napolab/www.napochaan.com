@@ -166,7 +166,7 @@ Notes:
 ### 6. Deploy web
 
 ```bash
-pnpm --filter web deploy:production   # opennext build → deploy → Workers Cache warm-up (apps/web/scripts/warm-cache.mjs)
+pnpm --filter web deploy:production   # CLOUDFLARE_ENV=production astro build → wrangler deploy → Workers Cache warm-up (apps/web/scripts/warm-cache.mjs)
 ```
 
 From here on, the root `pnpm deploy:production` (cms → web) and the `Deploy` workflow's

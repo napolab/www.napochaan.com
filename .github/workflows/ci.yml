@@ -27,7 +27,6 @@ jobs:
       # The setup action seeds each app's `.dev.vars` from `.dev.vars.example` first.
       - run: pnpm --filter web cf:types
       - run: pnpm --filter cms cf:types
-      - run: pnpm --filter web-astro cf:types
       # root scripts run `pnpm -r run lint|typecheck` across apps/cms, apps/web and packages/cms-api
       - run: pnpm lint
       - run: pnpm typecheck

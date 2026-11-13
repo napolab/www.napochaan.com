@@ -2,7 +2,7 @@
 
 [napochaan](https://www.napochaan.com) の個人サイト。DJ・VJ・グラフィック・デジタル制作の記録と、それを支える Web 表現の実験場。
 
-pnpm workspaces の monorepo。公開サイト（`apps/web`）と CMS（`apps/cms`）を別 Worker に分け、Next.js (App Router) を [OpenNext](https://opennext.js.org/cloudflare) 経由で Cloudflare Workers にデプロイしています。CMS には Payload (D1 + R2) を採用しています。
+pnpm workspaces の monorepo。公開サイト（`apps/web`）と CMS（`apps/cms`）を別 Worker に分け、web は [Astro](https://astro.build/)（`@astrojs/cloudflare`、SSR）、cms は Next.js (App Router) を [OpenNext](https://opennext.js.org/cloudflare) 経由で Cloudflare Workers にデプロイしています。CMS には Payload (D1 + R2) を採用しています。
 
 ```
 apps/cms          Payload CMS（admin / REST / MCP / CMS RPC）  cms.napochaan.com / cms-stg.napochaan.com（ホスト全体が Cloudflare Access 配下）
@@ -17,8 +17,8 @@ web ◀──env.WEB.purge()（CMS 書込み時にキャッシュを全消し）
 
 | 領域             | 採用技術                                                                                   |
 | ---------------- | ------------------------------------------------------------------------------------------ |
-| Framework        | Next.js 16 (App Router / React Server Components) + React 19                               |
-| Runtime / Deploy | [OpenNext](https://opennext.js.org/cloudflare) → Cloudflare Workers                        |
+| Framework        | web: Astro 7 (SSR + React 19 islands) / cms: Next.js 16 (App Router) + React 19             |
+| Runtime / Deploy | web: `@astrojs/cloudflare` / cms: [OpenNext](https://opennext.js.org/cloudflare) → Cloudflare Workers |
 | CMS              | [Payload CMS](https://payloadcms.com/) (Cloudflare D1 / R2 アダプタ)                       |
 | Styling          | [Panda CSS](https://panda-css.com/) (design tokens, container queries)                     |
 | Accessibility    | [react-aria-components](https://react-aria.adobe.com/)                                     |
@@ -33,8 +33,8 @@ web ◀──env.WEB.purge()（CMS 書込み時にキャッシュを全消し）
 - **works / news / blog** — Payload コレクション。slug ベースの URL (`/works/{slug}`)、SSR + Workers Cache、下書き Live Preview に対応
 - **log** — 出演・リリース・制作を統合した活動年表
 - **gallery** — masonry レイアウト + lightbox
-- **contact** — Server Action によるフォーム送信 (Resend メール + Discord 通知 + Cloudflare Turnstile)
-- **動的 OG 画像** — `next/og` (Satori) で詳細ページごとに生成
+- **contact** — Astro Actions によるフォーム送信 (Resend メール + Discord 通知 + Cloudflare Turnstile)
+- **動的 OG 画像** — Satori + resvg (wasm) で詳細ページごとに生成
 - **配信系** — RSS フィード / `sitemap.xml` / `llms.txt` / `llms-full.txt`
 - **リアルタイムカーソル共有** — Durable Object と WebSocket による presence
 - **フォント最適化** — Adobe Fonts (Typekit) の非同期ロード + FOUT 対策オーバーレイ
@@ -46,14 +46,14 @@ pnpm install
 
 pnpm dev            # web の開発サーバー（先に cms を起動しておく。下記）
 pnpm dev:cms        # cms（Payload admin）の開発サーバー :3001
-pnpm build          # web の本番ビルド (Next.js → OpenNext)
+pnpm build          # web の本番ビルド (astro build)
 pnpm lint           # 全 workspace: oxlint + oxfmt --check
 pnpm fmt            # 全 workspace: oxfmt --write + oxlint --fix
 pnpm typecheck      # 全 workspace: tsgo (TypeScript native preview)
 pnpm test           # 全 workspace: vitest
 ```
 
-web は cms を Service Binding 経由で呼ぶので、ローカルで RPC を通すときは `apps/cms` で `wrangler dev` を先に起動してから web の `next dev` を起動する（`pnpm --filter cms dev:worker` = OpenNext build + `wrangler dev --port 8791`）。dev registry（`WRANGLER_REGISTRY_PATH` / `MINIFLARE_REGISTRY_PATH`）は worktree ごとに固定する。
+web は cms を Service Binding 経由で呼ぶので、ローカルで RPC を通すときは `apps/cms` で `wrangler dev` を先に起動してから web の `astro dev` を起動する（`pnpm --filter cms dev:worker` = OpenNext build + `wrangler dev --port 8791`）。dev registry（`WRANGLER_REGISTRY_PATH` / `MINIFLARE_REGISTRY_PATH`）は worktree ごとに固定する。
 
 Payload / DB 関連（root の script は `apps/cms` に委譲される）:
 
@@ -70,8 +70,8 @@ pnpm seed:import                     # apps/cms/src/seed/data/*.json から投�
 
 ## Architecture Notes
 
-- **RSC ファースト** — 既定で Server Component。インタラクティブな部分のみ最小スコープの Client Component に切り出し、`Suspense` + `ErrorBoundary` で包む
-- **画像** — `next/image` を直接使わず `@components/image` 経由。`/_next/image` を Worker 層で Cloudflare Images バインディングへルーティング
+- **Islands** — web は既定で静的 HTML（directive 無しの React / `.astro`）。インタラクティブな leaf だけを `client:*` の island にする（`.claude/rules/astro-islands.md`）
+- **画像** — `@components/image` 経由（`astro:assets` は使わない）。`/_next/image` を Worker 層で Cloudflare Images バインディングへルーティング
 - **SSR とキャッシュ** — web は ISR を使わず SSR + Workers Cache（HTML は `max-age=0, s-maxage=…`）。CMS の書込みで cms の `afterChange` フックが `env.WEB.purge()` を呼び、キャッシュを全消しする（`.claude/rules/workers-cache.md`）
 - **シード** — `apps/cms/src/seed/data/*.json` を single source of truth とし、slug をキーに冪等 upsert
 

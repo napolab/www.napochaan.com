@@ -1,7 +1,7 @@
 'use client';
 
 import { RefreshRouteOnSave } from '@payloadcms/live-preview-react';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@lib/navigation';
 import { useCallback } from 'react';
 
 type Props = {

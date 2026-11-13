@@ -69,7 +69,7 @@ livePreview: {
 },
 ```
 
-The preview page itself lives in apps/web (`/…/preview/*`) and must also be added to web's `PREVIEW_PATH_PREFIXES` (`apps/web/src/app/next/preview/allowed-paths.ts`) — `PREVIEW_ROOTS` is checked against it in `preview-frame.test.ts`. `PREVIEW_SECRET` must be the same wrangler secret on cms and web.
+The preview page itself lives in apps/web (`/…/preview/*`) and must also be added to web's `PREVIEW_PATH_PREFIXES` (`apps/web/src/lib/preview/allowed-paths.ts`) — `PREVIEW_ROOTS` is checked against it in `preview-frame.test.ts`. `PREVIEW_SECRET` must be the same wrangler secret on cms and web.
 
 ### 4b. Cache purge on write
 

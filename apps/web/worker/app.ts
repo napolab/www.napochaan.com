@@ -1,8 +1,8 @@
 import { cache } from 'hono/cache';
 import { createFactory } from 'hono/factory';
 
+import { createAstroHandler } from './handlers/astro';
 import { imageHandlers } from './handlers/images';
-import { createNextHandler } from './handlers/next';
 import { cacheControlHeaders } from './middleware/cache-control';
 import { pathPolicy } from './middleware/path-policy';
 import { weakenETag } from './middleware/weaken-etag';
@@ -37,8 +37,8 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
       ...imageHandlers,
     )
     .route('/', cursorRoutes)
-    // OpenNext, with this request's CMS binding tracked (a degraded render is never cached).
-    .all('*', createNextHandler(handlerFetch));
+    // Astro, with this request's CMS binding tracked (a degraded render is never cached).
+    .all('*', createAstroHandler(handlerFetch));
 
   return app;
 };

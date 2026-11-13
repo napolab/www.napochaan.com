@@ -42,10 +42,10 @@ export type Props = {
 
 // Cover-variant backdrop source: a tiny, heavily-blurred copy of the same image,
 // handed to the decorative layer as a CSS var so it can paint it cover-cropped.
-const backdropStyle = (src: string): CSSProperties => ({ '--figure-backdrop': `url(${formatBlurURL(src, { blur: 40, width: 96, quality: 40 })})` }) as CSSProperties;
+export const backdropStyle = (src: string): CSSProperties => ({ '--figure-backdrop': `url(${formatBlurURL(src, { blur: 40, width: 96, quality: 40 })})` }) as CSSProperties;
 
 // Intrinsic fit caps the frame at the source's real width via this CSS var; fill leaves it unset.
-const figureWidthStyle = (fit: Props['fit'], width: number): CSSProperties | undefined => (fit === 'intrinsic' ? ({ '--figure-width': `${width}px` } as CSSProperties) : undefined);
+export const figureWidthStyle = (fit: Props['fit'], width: number): CSSProperties | undefined => (fit === 'intrinsic' ? ({ '--figure-width': `${width}px` } as CSSProperties) : undefined);
 
 export const Figure = ({ src, alt, width, height, caption, placeholder, blurDataURL, variant = 'plain', fit = 'fill', zoomable = false, sizes }: Props) => {
   const captionClassName = variant === 'cover' ? styles.tag : styles.caption;

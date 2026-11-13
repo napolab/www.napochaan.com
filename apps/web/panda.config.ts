@@ -9,7 +9,7 @@ export default defineConfig({
   strictTokens: true,
   jsxFramework: 'react',
   preflight: true,
-  include: ['./src/**/*.{ts,tsx}'],
+  include: ['./src/**/*.{ts,tsx,astro}'],
   exclude: [],
   outdir: 'styled-system',
   globalCss,

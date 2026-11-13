@@ -9,8 +9,10 @@ import { orDecoded } from '../../predicates';
 import type { CacheControlPlugin } from '../../types';
 
 // Draft previews render unpublished data under the draft-mode cookie and `/next/*` sets or
-// clears that cookie. Neither may ever be stored, whatever their status or cookies.
-const UNCACHEABLE_ROOTS = [...PREVIEW_ROOTS, '/next'] as const;
+// clears that cookie. Astro Actions (`/_actions/*`, form / RPC submissions) and server
+// islands (`/_server-islands/*`, per-request deferred renders) are per-request by design.
+// None may ever be stored, whatever their status or cookies.
+const UNCACHEABLE_ROOTS = [...PREVIEW_ROOTS, '/next', '/_actions', '/_server-islands'] as const;
 
 const isUncacheablePath = orDecoded(anyOf(...UNCACHEABLE_ROOTS.map(isWithinPath)));
 

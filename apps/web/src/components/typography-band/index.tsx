@@ -18,6 +18,7 @@ const VEL_DECAY = 0.9; // scroll-velocity boost decays back to the base drift
 const FRAME_MS = 1000 / 60;
 const GRID = 24; // Game-of-Life cell size; snap scroll to its multiples on rest
 const SNAP_DELAY = 140;
+const BEFORE_SWAP_EVENT = 'astro:before-swap';
 
 type Tween = ReturnType<GsapBundle['gsap']['to']>;
 
@@ -122,6 +123,9 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
         window.addEventListener('wheel', cancelSnap, { passive: true });
         window.addEventListener('touchstart', cancelSnap, { passive: true });
         window.addEventListener('keydown', cancelSnap);
+        // The band sits in a persisted island: an in-flight snap would otherwise keep
+        // tweening toward the old page's offset after ClientRouter jumps to the top.
+        document.addEventListener(BEFORE_SWAP_EVENT, cancelSnap);
 
         state.cleanup = () => {
           gsap.ticker.remove(tick);
@@ -129,6 +133,7 @@ export const TypographyBand = ({ text = DEFAULT_TEXT }: Props) => {
           window.removeEventListener('wheel', cancelSnap);
           window.removeEventListener('touchstart', cancelSnap);
           window.removeEventListener('keydown', cancelSnap);
+          document.removeEventListener(BEFORE_SWAP_EVENT, cancelSnap);
           cancelSnap();
           trigger.kill();
         };

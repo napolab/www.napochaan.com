@@ -17,13 +17,10 @@ CMS_ORIGIN = "http://localhost:3001"
 TURNSTILE_SITE_KEY = "0x4AAAAAADjJaYck8POMhei0"
 CURSOR_SALT = "dev-cursor-salt-change-me"
 
-[[rules]]
-type = "Data"
-globs = ["**/*.ttf", "**/*.otf"]
-fallthrough = true
-
+# Astro's Cloudflare build writes the client output to dist/client and points the
+# generated dist/server/wrangler.json at it; this entry is for `astro dev`.
 [assets]
-directory = ".open-next/assets"
+directory = "./dist/client"
 binding = "ASSETS"
 
 [images]
@@ -139,11 +136,11 @@ class_name = "CursorRoom"
 # `compatibility_date`, and `compatibility_flags` from the top level. Bindings
 # (DO/services/images) are NOT inherited, keeping the worker test runtime minimal.
 # `assets` IS inherited, so override it to a directory that exists at test time
-# (`.open-next/assets` is a build artifact that is absent during tests).
+# (`dist/client` is a build artifact that is absent during tests).
 [env.test]
-# Override `main` so the workers test pool does not import the OpenNext build
-# artifact (`.open-next/worker.js`), which is absent during tests. This entry
-# only re-exports the `CursorRoom` Durable Object.
+# Override `main` so the workers test pool does not import the Astro adapter
+# handler (`@astrojs/cloudflare/handler`), which only resolves inside Astro's Vite
+# build. This entry only re-exports the `CursorRoom` Durable Object.
 main = "./worker/worker.test-entry.ts"
 
 [env.test.vars]

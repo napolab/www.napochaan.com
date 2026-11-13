@@ -1,31 +1,24 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 import { createFakeCMSBinding } from '../../../__mocks__/cms-services';
+import { runWithRequestContext } from '../../request-context';
 
 import { getCMSClient } from './index';
 
-const context = vi.hoisted(() => ({ env: {} as { CMS?: { fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response> } } }));
-
-// Outside a request (`generateStaticParams` under `next dev`) the sync form
-// throws ("called without having called initOpenNextCloudflareForDev"); only
-// the async form resolves.
-vi.mock('@opennextjs/cloudflare', () => ({
-  getCloudflareContext: (options?: { async?: boolean }) => {
-    if (options?.async !== true) throw new Error('getCloudflareContext called in sync mode');
-    return Promise.resolve(context);
-  },
-}));
+const withEnv = <T>(env: Partial<Cloudflare.Env>, fn: () => T): T => runWithRequestContext({ env: env as Cloudflare.Env, ctx: undefined, request: new Request('http://localhost/') }, fn);
 
 describe('getCMSClient', () => {
-  it('builds a client from the async Cloudflare context', async () => {
-    context.env = { CMS: createFakeCMSBinding() };
-    const cms = await getCMSClient();
+  it('builds a client over the request context CMS binding', async () => {
+    const cms = withEnv({ CMS: createFakeCMSBinding() as unknown as Cloudflare.Env['CMS'] }, () => getCMSClient());
     const res = await cms.blog.$get();
     expect(res.status).toBe(200);
   });
 
-  it('rejects with a clear error when the CMS binding is missing', async () => {
-    context.env = {};
-    await expect(getCMSClient()).rejects.toThrow(/CMS service binding is not configured/);
+  it('throws a clear error when the CMS binding is missing', () => {
+    expect(() => withEnv({}, () => getCMSClient())).toThrow(/CMS service binding is not configured/);
+  });
+
+  it('throws outside a request', () => {
+    expect(() => getCMSClient()).toThrow('request context is not available outside a request');
   });
 });

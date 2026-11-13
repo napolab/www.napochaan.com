@@ -130,11 +130,11 @@ export const cardTitle = css({ fontSize: "lg" });
 
 ## Design System Catalog
 
-Every component in `src/components/` MUST be showcased in the consolidated design-system page at `src/app/(site)/colophon/`. There are no per-component sub-path routes (the old `(design-system)/components/<name>` route group was removed and aggregated here).
+Every component in `src/components/` MUST be showcased in the consolidated design-system page `/colophon` (`src/pages/colophon.astro`, content and demos in `src/features/colophon/`). There are no per-component sub-path routes (the old `(design-system)/components/<name>` route group was removed and aggregated here).
 
-- **Flow components** (render in normal layout): add a demo to `src/app/(site)/colophon/_demos/index.tsx` keyed by the component name, and an entry to `components.items` (`{ name, why }`) in `colophon/content.ts`. The key type is derived from the content, so a name without a demo — or a demo without a content entry — is a compile error.
+- **Flow components** (render in normal layout): add a demo to `src/features/colophon/demos/` (placed by name in `demos/demo.astro`, kind in `demos/demo-kind.ts`), and an entry to `components.items` (`{ name, why }`) in `src/features/colophon/content.ts`. The key type is derived from the content, so a name without a demo kind is a compile error. Demos carrying hrefs sit inside the `NoAction` island (`e.preventDefault`).
 - **Page chrome** (fixed / structural — `TypographyBand`, `GameOfLife`, `SysBar`, `SiteShell`, `PageHeader`, `SiteFooter`): do NOT box a live copy. Add a pointer to the real instance via `components.ambient` (`{ label, target }`) — the page renders inside `SiteShell`, so the live chrome is already on screen.
-- Heavy demos (e.g. `Gallery`) are code-split + wrapped in `<Suspense>` (see `_demos/gallery-lazy.tsx`).
+- Interactive demos follow `.claude/rules/astro-islands.md` (only client leaves hydrate, via `island.tsx` / `withAppProviders`).
 - Creating a new component without its catalog entry is incomplete.
 
 ## Accessibility

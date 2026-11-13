@@ -1,4 +1,4 @@
-// SATORI-LAND: this file renders for next/og (Satori), NOT the DOM. It therefore
+// SATORI-LAND: this file renders for Satori (../render-og-image), NOT the DOM. It therefore
 // uses inline `style` objects (no Panda CSS, no @components/image), only flexbox
 // layout (no CSS grid, no `word-break`), and sRGB hex/rgba colors — Satori does
 // NOT parse oklch().

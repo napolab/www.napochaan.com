@@ -29,7 +29,7 @@ export CLOUDFLARE_ACCOUNT_ID=cda8b0a2b410e1ff3a5bcc72c7e46f72
 | --- | --- |
 | staging に deploy（cms → web） | `pnpm deploy:staging`（= `pnpm --filter cms deploy:staging && pnpm --filter web deploy:staging`） |
 | cms だけ deploy | `pnpm --filter cms deploy:staging` |
-| web だけ deploy | `pnpm --filter web deploy:staging` |
+| web だけ deploy | `pnpm --filter web deploy:staging`（= `CLOUDFLARE_ENV=staging astro build && wrangler deploy --env staging`。web は Astro で、env は build 時に `dist/server/wrangler.json` へ焼き込まれる） |
 | staging D1 にマイグレーション適用 | `pnpm --filter cms deploy:database:staging`（root: `pnpm deploy:database:staging`） |
 | staging からシード書き出し | `CLOUDFLARE_ENV=staging pnpm --filter cms seed:export` |
 | staging へシード投入（明示依頼時のみ） | `CLOUDFLARE_ENV=staging pnpm --filter cms seed:import` |
@@ -74,6 +74,7 @@ deploy / migration / import はいずれも再実行が安全（migration は適
 | import したのに stg の表示が古い | Workers Cache が残っている。web を再 deploy する（Worker version が変わり Workers Cache が空になる。`.claude/rules/workers-cache.md`）。CMS 書込みの purge 自体は cms の `afterChange` が `env.WEB.purge()` で行う |
 | seed:export がローカルの miniflare を見てしまう | `CLOUDFLARE_ENV=staging` 忘れ。これが remote bindings のスイッチ |
 | web の CMS 呼び出しが 5xx / 502 | cms 未 deploy または Access 設定。web は `env.CMS`（Service Binding）経由なので cms Worker が先に生きている必要がある |
+| web deploy が `You have specified the environment "staging" ... does not match the target environment` で止まる | `dist/` が別 env（または env 無し）で build されている。`astro build` に `CLOUDFLARE_ENV` を付けずに `wrangler deploy --env` を叩いた。`pnpm --filter web deploy:staging` で build からやり直す |
 | deploy がフォアグラウンドで長時間ブロック | build+deploy は数分かかる。バックグラウンド実行にする（account ID を付けていれば対話プロンプトは出ない） |
 
 ## Verification

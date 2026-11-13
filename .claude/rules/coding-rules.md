@@ -18,7 +18,7 @@ Monorepo (pnpm workspaces: `apps/cms`, `apps/web`, `packages/cms-api`). Root scr
 | ----------------------------------------- | ------------------------------------------------------------------------ |
 | `pnpm dev`                                | Start web dev server (`pnpm --filter web dev`). web reads the cms over `env.CMS`, so start cms first (below) |
 | `pnpm dev:cms`                            | cms admin dev server (`pnpm --filter cms dev`, port 3001). For web RPC, run `pnpm --filter cms dev:worker` (OpenNext build + `wrangler dev --port 8791`) first, then `pnpm dev`; pin `WRANGLER_REGISTRY_PATH` / `MINIFLARE_REGISTRY_PATH` per worktree |
-| `pnpm build`                              | Production build of web (`pnpm --filter web build`)                      |
+| `pnpm build`                              | Production build of web (`pnpm --filter web build` = `astro build`)      |
 | `pnpm lint`                               | oxlint + oxfmt --check in every workspace                                |
 | `pnpm fmt`                                | Format code (oxfmt + oxlint --fix) in every workspace                    |
 | `pnpm typecheck`                          | Type check with `@typescript/native-preview` (tsgo) in every workspace   |
@@ -74,10 +74,9 @@ See: @.claude/rules/react.md#async-handler-rules-no-thencatch
 
 ## Tech Stack
 
-- **Framework**: Next.js 15 (App Router)
+- **Framework**: web = Astro (`output: 'server'`, `@astrojs/cloudflare`, React islands via `@astrojs/react` — see `.claude/rules/astro-islands.md`); cms = Next.js (App Router) + Payload CMS
 - **UI**: React 19 + Panda CSS
 - **Accessibility**: react-aria-components
-- **Server Components**: Next.js App Router RSC
-- **Build / Deploy**: Next.js build → OpenNext (`@opennextjs/cloudflare`) → Wrangler (Cloudflare Workers)
+- **Build / Deploy**: web: `CLOUDFLARE_ENV=<env> astro build` → `wrangler deploy --env <env>`; cms: Next.js build → OpenNext (`@opennextjs/cloudflare`) → Wrangler (Cloudflare Workers)
 - **Linting**: oxlint + oxfmt
 - **Type Check**: @typescript/native-preview (tsgo)

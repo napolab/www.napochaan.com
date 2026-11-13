@@ -289,7 +289,7 @@ Payload の `RichText`（`@payloadcms/richtext-lexical/react`）に `JSXConverte
 | link                       | 既存 `Link`（accent.text・hover 反転）                                                                                               |
 | list（ul/ol）/ listitem    | prose 版: ul=▸(accent) / ol=`decimal-leading-zero`(01.) mono accent / lineHeight jp                                                  |
 | horizontalrule             | borderTop 2px ink もしくは dashed の区切り                                                                                           |
-| upload（画像）             | 既存 `Figure`（next/image + 2px枠 + figcaption）                                                                                     |
+| upload（画像）             | 既存 `Figure`（`@components/image` + 2px枠 + figcaption）                                                                                     |
 
 実装: `src/components/rich-text/`（`RichText` ラッパ + converters + 要素 styles）。`Heading` は単体 primitive（`src/components/heading/`、level 1–6、prose 外でも使用）としても用意し、richtext の heading converter から再利用。要素ごとに class を付与（no-child-selectors 順守）。
 

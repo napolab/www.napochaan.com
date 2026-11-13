@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@lib/navigation';
 import { RouterProvider } from 'react-aria-components';
 
 import type { ReactNode } from 'react';

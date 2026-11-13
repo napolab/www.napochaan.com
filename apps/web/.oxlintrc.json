@@ -48,7 +48,23 @@
         "react-perf/jsx-no-new-object-as-prop": "off",
         "react-perf/jsx-no-new-array-as-prop": "off"
       }
+    },
+    {
+      "files": ["src/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "cloudflare:workers",
+                "message": "Page code must read bindings via getRequestContext() (src/lib/request-context) so CMS reads go through the cms-health wrapper. Only worker/ may import cloudflare:workers."
+              }
+            ]
+          }
+        ]
+      }
     }
   ],
-  "ignorePatterns": ["migrations", "src/app/(payload)/admin/importMap.js", "src/payload-types.ts", "**/*.test.{ts,tsx}"]
+  "ignorePatterns": ["dist", ".astro", "styled-system", "**/*.test.{ts,tsx}"]
 }

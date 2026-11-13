@@ -5,5 +5,5 @@
   "singleQuote": true,
   "semi": true,
   "trailingComma": "all",
-  "ignorePatterns": ["styled-system/**/*", ".open-next/**/*", ".wrangler/**/*", ".next/**/*", ".claude/**/*", "**/CLAUDE.md", "migrations/**/*", "cloudflare-env.d.ts"]
+  "ignorePatterns": ["styled-system/**/*", "dist/**/*", ".astro/**/*", ".wrangler/**/*", ".next/**/*", ".claude/**/*", "**/CLAUDE.md", "migrations/**/*", "cloudflare-env.d.ts"]
 }

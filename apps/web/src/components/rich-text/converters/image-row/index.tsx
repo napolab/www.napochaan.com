@@ -39,24 +39,40 @@ const captionOf = (caption: unknown, fallbackAlt: string): string | undefined =>
 // never label-less (same policy as the single-upload converter). `zoomable` makes
 // the cell a tap target that opens the shared gallery Lightbox, matching the
 // standalone in-body image.
-const cellFigure = (image: PopulatedImage, caption: unknown, key: number): React.ReactNode => (
+// The row is 85% of the 1180px content column, so each cell above that breakpoint is
+// half of that: 1180 * 0.85 / 2 ≈ 500px. Below it the cells share the row once the
+// row's OWN container (not the viewport) clears the 480px container query in
+// styles.css.ts — since the row is 85% of the viewport-ish column, that fires at
+// roughly 480 / 0.85 ≈ 565px viewport.
+export const IMAGE_ROW_CELL_SIZES = '(min-width: 1388px) 500px, (min-width: 565px) 42vw, 66vw';
+
+export type ImageRowFigure = PopulatedImage & { readonly caption: string | undefined };
+
+/** The populated cells of an `image-row` block, in order (unpopulated ones skipped). Pure. */
+export const imageRowFiguresOf = (cells: unknown): readonly ImageRowFigure[] => {
+  if (!Array.isArray(cells)) return [];
+
+  return cells.reduce<ImageRowFigure[]>((acc, cell: unknown) => {
+    if (!isObject(cell)) return acc;
+    const image = populatedImageOf(cell.image);
+    if (image === undefined) return acc;
+    return [...acc, { ...image, caption: captionOf(cell.caption, image.alt) }];
+  }, []);
+};
+
+const cellFigure = (figure: ImageRowFigure, key: number): React.ReactNode => (
   <div key={key} className={styles.cellRoot}>
     <Figure
-      src={image.url}
-      alt={image.alt}
-      width={image.width}
-      height={image.height}
-      caption={captionOf(caption, image.alt)}
+      src={figure.url}
+      alt={figure.alt}
+      width={figure.width}
+      height={figure.height}
+      caption={figure.caption}
       variant="cover"
       zoomable
-      // The row is 85% of the 1180px content column, so each cell above that
-      // breakpoint is half of that: 1180 * 0.85 / 2 ≈ 500px. Below it the cells
-      // share the row once the row's OWN container (not the viewport) clears the
-      // 480px container query in styles.css.ts — since the row is 85% of the
-      // viewport-ish column, that fires at roughly 480 / 0.85 ≈ 565px viewport.
-      sizes="(min-width: 1388px) 500px, (min-width: 565px) 42vw, 66vw"
+      sizes={IMAGE_ROW_CELL_SIZES}
       placeholder="blur"
-      blurDataURL={formatBlurURL(image.url, { blur: 20 })}
+      blurDataURL={formatBlurURL(figure.url, { blur: 20 })}
     />
   </div>
 );
@@ -70,17 +86,9 @@ const cellFigure = (image: PopulatedImage, caption: unknown, key: number): React
  */
 export const imageRowBlockConverters: NonNullable<JSXConverters<NodeTypes>['blocks']> = {
   'image-row': ({ node }) => {
-    const { cells } = node.fields;
-    if (!Array.isArray(cells)) return null;
-
-    const figures = cells.reduce<React.ReactNode[]>((acc, cell, index) => {
-      const image = populatedImageOf(cell.image);
-      if (image === undefined) return acc;
-      return [...acc, cellFigure(image, cell.caption, index)];
-    }, []);
-
+    const figures = imageRowFiguresOf(node.fields.cells);
     if (figures.length === 0) return null;
 
-    return <div className={styles.root}>{figures}</div>;
+    return <div className={styles.root}>{figures.map(cellFigure)}</div>;
   },
 };

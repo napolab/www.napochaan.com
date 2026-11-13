@@ -6,7 +6,7 @@
 
 export type CMSHealth = { readonly isDegraded: () => boolean; readonly markDegraded: () => void };
 
-// Hono context variable set by the Next handler (worker/handlers/next).
+// Hono context variable set by the Astro handler (worker/handlers/astro).
 export type CMSHealthVariables = { cmsDegraded?: boolean };
 
 export const createCMSHealth = (): CMSHealth => {
