@@ -30,6 +30,9 @@ jobs:
       # root scripts run `pnpm -r run lint|typecheck` across apps/cms, apps/web and packages/cms-api
       - run: pnpm lint
       - run: pnpm typecheck
+      # tsgo does not read `.astro` files; building apps/web compiles them (and the
+      # worker bundle) so template errors fail the PR instead of the deploy.
+      - run: pnpm --filter web build
 
   test:
     name: vitest (browser + unit + workers)
