@@ -1,3 +1,5 @@
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { render } from 'vitest-browser-react';
 import { page } from 'vitest/browser';
@@ -69,5 +71,23 @@ describe('Image', () => {
     await render(<Image src="/test.jpg" alt="plain" width={100} height={100} placeholder="empty" />);
 
     expect(page.getByRole('img', { name: 'plain' }).element().style.backgroundImage).toBe('');
+  });
+
+  it('clears the blur placeholder when the image already loaded before hydration', async () => {
+    // SSR markup: the browser may finish loading the <img> before React attaches
+    // onLoad, and React does not replay that `load` event.
+    const element = <Image src={PIXEL} alt="hydrated" width={1} height={1} placeholder="blur" blurDataURL={BLUR} />;
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(element);
+    document.body.appendChild(container);
+    const img = container.querySelector('img');
+    if (img === null) throw new Error('img not rendered');
+    await expect.poll(() => img.complete && img.naturalWidth > 0).toBe(true);
+
+    const root = hydrateRoot(container, element);
+
+    await expect.poll(() => img.style.backgroundImage).toBe('');
+    root.unmount();
+    container.remove();
   });
 });

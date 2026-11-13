@@ -56,6 +56,13 @@ export const Image = (props: Props) => {
     [onLoad],
   );
 
+  // React does not replay a `load` that fired before hydration (SSR markup, cached
+  // image), so also clear the placeholder when the element is already complete.
+  const handleRef = useCallback((img: HTMLImageElement | null) => {
+    if (img === null) return;
+    if (img.complete && img.naturalWidth > 0) setLoading(false);
+  }, []);
+
   const sources = useMemo(() => buildImageSources({ src, quality, unoptimized }), [src, quality, unoptimized]);
 
   const baseStyle = useMemo(() => (fill === true ? { ...FILL_STYLE, ...style } : style), [fill, style]);
@@ -69,6 +76,7 @@ export const Image = (props: Props) => {
   return (
     <img
       {...rest}
+      ref={handleRef}
       src={sources.src}
       srcSet={sources.srcSet}
       sizes={sources.srcSet === undefined ? undefined : resolveSizes({ sizes, fill, width })}
