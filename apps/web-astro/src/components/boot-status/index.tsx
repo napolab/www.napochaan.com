@@ -7,8 +7,9 @@ import { createBootStore } from './store';
 import type { BootSnapshot, BootStore } from './store';
 import type { ReactNode } from 'react';
 
-// Default store for trees with no provider (e.g. error routes): observes the
-// document root. Safe at module scope — createBootStore only touches the DOM
+// Default store for trees with no provider: observes the document root. On the
+// Astro site every island is its own React root and mounts WITHOUT a provider, so
+// this module-level instance is what all islands share (one observer on <html>). Safe at module scope — createBootStore only touches the DOM
 // inside subscribe (client-only).
 const defaultStore = createBootStore();
 

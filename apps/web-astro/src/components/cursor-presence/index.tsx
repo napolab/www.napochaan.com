@@ -10,12 +10,12 @@ import { defineCache } from '@utils/define-cache';
 
 import { CursorLayer } from './cursor-layer';
 import { createSurfacePlacement, PlacementProvider } from './placement-context';
-import { PresenceContextProvider } from './presence-context';
+import { PRESENCE_ENABLED_KEY, publishPresenceCount } from './presence-store';
 import { readCursorColor } from './read-cursor-color';
+import { resolveSurface } from './resolve-surface';
 import * as styles from './styles.css';
 import { SurfaceRefProvider } from './surface-context';
 
-const STORAGE_KEY = 'cursor-presence-enabled';
 // Defer start() past React StrictMode's synchronous mount→unmount→remount in dev. The throwaway
 // first mount's timer is cleared before it fires, so only the surviving mount opens a socket.
 const START_DELAY_MS = 100;
@@ -31,7 +31,7 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
   const pathname = usePathname();
   const app = useMemo(() => createLazyVisitorPointerApp(), []);
 
-  const [enabled, setEnabled] = usePersistent(STORAGE_KEY, true);
+  const [enabled] = usePersistent(PRESENCE_ENABLED_KEY, true);
   const enabledRef = useRef(enabled);
   const surfaceRef = useRef<HTMLDivElement | null>(null);
   const rectRef = useRef<Rect | null>(null);
@@ -56,7 +56,9 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
   }, [app, pathname]);
 
   useEffect(() => {
-    const el = surfaceRef.current;
+    // `pathname` changes after every ClientRouter swap (astro:page-load), which
+    // re-resolves the freshly swapped-in stage when it is Astro markup.
+    const el = resolveSurface(surfaceRef.current);
     const update = (): void => {
       rectRef.current = readRect(el);
     };
@@ -88,11 +90,12 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
     };
   }, [app]);
 
-  const toggle = useCallback(() => {
-    setEnabled(!enabledRef.current);
-  }, [setEnabled]);
+  useEffect(() => {
+    // Publish to the module-level presence store so other islands (SysBar) see it.
+    publishPresenceCount(state.count);
+  }, [state.count]);
 
-  const value = useMemo(() => ({ count: state.count, enabled, toggle }), [state.count, enabled, toggle]);
+  useEffect(() => () => publishPresenceCount(0), []);
 
   const getRect = useCallback((): Rect | null => rectRef.current, []);
   const getColor = useMemo(() => defineCache(readCursorColor), []);
@@ -100,15 +103,13 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
   const placement = useMemo(() => createSurfacePlacement(getRect), [getRect]);
 
   return (
-    <PresenceContextProvider value={value}>
-      <SurfaceRefProvider value={surfaceRef}>
-        {children}
-        <PlacementProvider value={placement}>
-          <div className={styles.overlay}>
-            <CursorLayer app={app} enabled={enabled} getColor={getColor} />
-          </div>
-        </PlacementProvider>
-      </SurfaceRefProvider>
-    </PresenceContextProvider>
+    <SurfaceRefProvider value={surfaceRef}>
+      {children}
+      <PlacementProvider value={placement}>
+        <div className={styles.overlay}>
+          <CursorLayer app={app} enabled={enabled} getColor={getColor} />
+        </div>
+      </PlacementProvider>
+    </SurfaceRefProvider>
   );
 };

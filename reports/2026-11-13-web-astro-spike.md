@@ -248,3 +248,28 @@ const res = await env.CMS?.fetch(`https://cms.internal/__mode/${mode}`);
 <p>{await res?.text()}</p>
 ```
 
+
+# Task 2.5 — React context across islands
+
+Each Astro island is its own React root (SSR and client), so a provider in `.astro` or in another island
+never reaches it. Every context the Next tree relied on, and its fate:
+
+| Context | Provider (Next) | Consumers | Spans islands? | Decision |
+| --- | --- | --- | --- | --- |
+| `LifeEngineContext` (`game-of-life/provider`) | `SiteShell` → `LifeEngineProvider` | `GameOfLife` (backdrop island), `SysBar` gen/alive (header island) | yes | (b) module store: the context default is now the exported `sharedLifeEngine`; the site mounts no provider. Colophon demos keep `LifeEngineProvider` for an isolated engine. |
+| `BootStatusContext` (`boot-status`) | layout → `BootStatusProvider` | `ScrambleText`, `EchoText`, `TypewriterText`, `BootQuestion` (many islands) | yes | (b) module store: the existing module-level `defaultStore` (observes `<html>`); islands mount no provider. |
+| `MotionContext` (`use-prefers-reduced-motion`) | `SiteShell` → `MotionProvider` | `usePrefersReducedMotion` (band, life, scramble, echo, typewriter, boot question, anchored heading), `useMotion` toggle (SysBar) | yes | Value already derives from module stores (persistent-store + matchMedia). Uncontrolled `MotionProvider` is mounted in every island via `AppProviders`, so the SysBar toggle (real, not the no-provider no-op) reaches every root. |
+| `PresenceContext` (`cursor-presence`) | `CursorPresence` | `SysBar` (`watching N`, cursors toggle) | yes | (b) new `cursor-presence/presence-store.ts`: count published by the cursor island, `enabled` in persistent-store. `presence-context.ts` removed. |
+| `SurfaceRefContext` (`cursor-presence`) | `CursorPresence` | `CursorSurface` | stage wraps `<slot />`, so it is Astro markup | (a) kept for one-root use (colophon); on the site `resolveSurface` falls back to `[data-cursor-surface]` and re-resolves on each pathname change (body is swapped). |
+| `PlacementContext` (`cursor-presence`) | `CursorPresence` | `CursorLayer` | no | (a) unchanged. |
+| `ResizerContext` (`canvas-resize`) | none (default) | `GameOfLife`, `CursorLayer` | no | (a) unchanged. |
+| `PathnameContext` (`lib/navigation`) | — (Task 2) | `SysBar`, `FooterNav`, `CursorPresence` | per island | (c) `AppProviders` / `withAppProviders` feed `Astro.url.pathname` into every island. |
+| react-aria `RouterProvider` | `ThemeProvider` → `ClientRouter` | every `Link` / `MenuItem href` | per island | (c) `AppProviders` wraps `RouterProvider navigate={useRouter().push}` (Astro `navigate`). |
+| `ThemeProvider` | layout `<body>` | — (adds `s.root` class + global.css) | — | not an island concern: the layout puts the class on `<body>` and imports global.css. |
+
+Server side: these module singletons are shared by every request in the isolate, so they are only mutated
+in client effects; their server snapshots are constants (engine placeholder, boot `{ready:false}`, count 0).
+
+Tests (each mounts two separate React roots via two `render()` calls): `game-of-life/provider/cross-island`,
+`boot-status/cross-island`, `cursor-presence/presence-store`, `motion-provider/cross-island`, plus
+`app-providers` and `cursor-presence/resolve-surface`.

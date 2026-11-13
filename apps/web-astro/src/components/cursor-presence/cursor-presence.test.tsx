@@ -4,7 +4,7 @@ import { page } from 'vitest/browser';
 
 import { CursorSurface } from './cursor-surface';
 import { CursorPresence } from './index';
-import { usePresence } from './presence-context';
+import { usePresence } from './presence-store';
 
 const Probe = () => {
   const { enabled, toggle } = usePresence();
