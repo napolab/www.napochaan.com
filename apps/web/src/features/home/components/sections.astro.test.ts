@@ -69,14 +69,16 @@ describe('home sections (.astro)', () => {
     expect(scrambleTextCountOf(html)).toBe(2);
   });
 
-  it("GallerySection: the Gallery is SSR'd and hydrated on load", async () => {
+  it("GallerySection: the Gallery is SSR'd and hydrated once it scrolls into view", async () => {
     const photos = [{ id: '1', src: '/m/a.jpg', width: 800, height: 600, alt: 'flyer a', caption: 'c' }];
     const html = await renderComponent(GallerySection, { props: { id: 'gallery', photos } });
     expect(html).toMatch(/<img [^>]*alt="flyer a"/);
     expect(islandsOf(html)).toEqual(['GalleryIsland']);
     // ScrambleText ships as the <scramble-text> element, not an island.
     expect(scrambleTextCountOf(html)).toBe(2);
-    expect(html).toMatch(/component-export="GalleryIsland"[^>]*client="load"/);
+    // Far below the fold: hydrating on load put island → lightbox → Dialog on the
+    // home critical request chain.
+    expect(html).toMatch(/component-export="GalleryIsland"[^>]*client="visible"/);
   });
 
   it('BlogIndex: index, title link and meta per post', async () => {
