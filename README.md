@@ -44,7 +44,7 @@ web ◀──env.WEB.purge()（CMS 書込み時にキャッシュを全消し）
 ```bash
 pnpm install
 
-pnpm dev            # web の開発サーバー（先に cms を起動しておく。下記）
+pnpm dev            # web の開発サーバー :3000（先に cms を起動しておく。下記）
 pnpm dev:cms        # cms（Payload admin）の開発サーバー :3001
 pnpm build          # web の本番ビルド (astro build)
 pnpm lint           # 全 workspace: oxlint + oxfmt --check

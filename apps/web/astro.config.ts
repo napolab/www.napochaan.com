@@ -18,6 +18,9 @@ export default defineConfig({
   // colophon catalog) must not be fetched behind the visitor's back.
   prefetch: false,
   integrations: [react()],
+  // wrangler.toml BASE_URL and the cms WEB_ORIGIN point at :3000 (the Next dev port);
+  // the cms dev server is :3001.
+  server: { port: 3000 },
   vite: {
     // linkedom stays out of the browser bundle (see src/config/client-aliases).
     plugins: [clientAliases()],
