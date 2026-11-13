@@ -1,12 +1,11 @@
-import { headers } from 'next/headers';
+import { getRequestContext } from '@lib/request-context';
 
 // The request's own origin (scheme + host). OG image fetches must resolve against
 // the server actually handling the request — works in dev on any port and in
 // production — rather than the configured BASE_URL (which may differ from the
 // port the dev server is on).
 export const requestOrigin = async (): Promise<string> => {
-  const list = await headers();
-  const host = list.get('host') ?? '';
+  const host = getRequestContext().request.headers.get('host') ?? '';
   if (host === '') return process.env.BASE_URL ?? 'http://localhost:3000';
 
   const proto = host.startsWith('localhost') || host.startsWith('127.') ? 'http' : 'https';

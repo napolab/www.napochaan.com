@@ -14,9 +14,14 @@ import type { ReactNode } from 'react';
 // engine.resize (which always uses RESEED_DENSITY).
 const PLACEHOLDER = { cols: 1, rows: 1, density: 0 } as const;
 
-const defaultEngine = createLifeEngine(PLACEHOLDER);
+// Module-level engine shared by every React root that has no LifeEngineProvider.
+// Each Astro island is its own root, so the backdrop island (GameOfLife ticks it)
+// and the SysBar island (reads gen / alive) meet here rather than through context.
+// It is only mutated inside client effects (resize / tick), so the copy that lives
+// in the server isolate stays the deterministic empty placeholder.
+export const sharedLifeEngine = createLifeEngine(PLACEHOLDER);
 
-const LifeEngineContext = createContext<LifeEngine>(defaultEngine);
+const LifeEngineContext = createContext<LifeEngine>(sharedLifeEngine);
 
 type LifeEngineProviderProps = {
   children: ReactNode;
@@ -30,7 +35,14 @@ export const LifeEngineProvider = ({ children, engine: engineProp }: LifeEngineP
 
 export const useLifeEngine = (): LifeEngine => useContext(LifeEngineContext);
 
+// The SSR snapshot is always the empty placeholder, never the live engine: islands
+// hydrate one after another, so by the time the SysBar island hydrates the backdrop
+// island may already have seeded and ticked the shared engine. Hydrating against
+// the placeholder matches the server markup; React then re-renders with the live state.
+const PLACEHOLDER_STATE = createLifeEngine(PLACEHOLDER).getState();
+const getPlaceholderState = (): LifeState => PLACEHOLDER_STATE;
+
 export const useLifeState = (): LifeState => {
   const engine = useLifeEngine();
-  return useSyncExternalStore(engine.subscribe, engine.getState, engine.getState);
+  return useSyncExternalStore(engine.subscribe, engine.getState, getPlaceholderState);
 };

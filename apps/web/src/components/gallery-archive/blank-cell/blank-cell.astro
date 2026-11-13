@@ -1,0 +1,27 @@
+---
+// `.astro` twin of the BlankCell Server Component: static crosshairs, with the client
+// `BlankDim` (runtime-measured size label) as the only island. Markup mirrors ./index.tsx.
+import { BlankDimIsland } from '../blank-dim/island';
+import * as styles from '../styles.css';
+
+import { blankVars, refNo } from './index';
+
+import type { Blank } from '../skyline/compute-blanks';
+
+type Props = {
+  blank: Blank;
+  bp: number;
+  index: number;
+};
+
+const { blank, bp, index } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<li class={styles.blank} data-bp={bp} style={blankVars(blank)} aria-hidden="true">
+  <span class={styles.corner} data-pos="tl">+</span>
+  <span class={styles.corner} data-pos="tr">+</span>
+  <span class={styles.corner} data-pos="bl">+</span>
+  <span class={styles.corner} data-pos="br">+</span>
+  <BlankDimIsland client:load pathname={pathname} props={{ refLabel: refNo(index) }} />
+</li>

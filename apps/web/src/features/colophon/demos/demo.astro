@@ -1,0 +1,148 @@
+---
+// One catalog demo (see ./demo-kind). Server Components render server-only; only
+// client leaves ('use client' in apps/web) are islands. Demos that carry hrefs sit
+// inside the <NoAction> island, which receives the demo as slot children: static
+// HTML, plus the demo's own leaf islands nested in that slot.
+import BackToIndex from '@components/back-to-index/back-to-index.astro';
+import Breadcrumbs from '@components/breadcrumbs/breadcrumbs.astro';
+import { ButtonIsland } from '@components/button/island';
+import { CalendarIsland } from '@components/calendar/island';
+import { DividerIsland } from '@components/divider/island';
+import { EchoTextIsland } from '@components/echo-text/island';
+import { GalleryArchiveIsland } from '@components/gallery-archive/island';
+import { GalleryIsland } from '@components/gallery/island';
+import BootConsole from '@components/loading-overlay/boot-console/boot-console.astro';
+import NewsRow from '@components/news-row/news-row.astro';
+import { QuoteShareIsland } from '@components/quote-share/island';
+import RichText from '@components/rich-text/rich-text.astro';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+import { ShareBarIsland } from '@components/share-bar/island';
+import { SystemAnnotation } from '@components/system-annotation';
+import { TextAreaIsland } from '@components/text-area/island';
+import { TextFieldIsland } from '@components/text-field/island';
+import { TypewriterTextIsland } from '@components/typewriter-text/island';
+
+import * as gameOfLifeStyles from './game-of-life-demo.css';
+import * as loadingOverlayStyles from './loading-overlay-demo.css';
+import * as newsRowStyles from './news-row-demo.css';
+import { breadcrumbItems, calendarMarks, galleryItems } from './demo-data';
+import { demoKindOf } from './demo-kind';
+import { CursorPresenceDemoIsland, IsolatedGameOfLifeIsland } from './islands';
+import { NoAction } from './no-action';
+import { richTextSample } from './rich-text-sample';
+import { StaticDemo } from './static-demos';
+
+import type { ComponentName, StaticDemoName } from './demo-kind';
+
+type Props = {
+  name: ComponentName;
+};
+
+const { name } = Astro.props;
+const pathname = Astro.url.pathname;
+const kind = demoKindOf(name);
+// Narrowed by `kind`; `.astro` templates cannot narrow a union themselves.
+const staticName = name as StaticDemoName;
+const buttons = ['solid', 'outline', 'danger'] as const;
+---
+
+{kind === 'static' && <StaticDemo name={staticName} />}
+{
+  kind === 'static-no-action' && (
+    <NoAction client:load>
+      <StaticDemo name={staticName} />
+    </NoAction>
+  )
+}
+{name === 'ScrambleText' && <ScrambleTextIsland client:load pathname={pathname} props={{ children: 'static internet' }} />}
+{name === 'EchoText' && <EchoTextIsland client:load pathname={pathname} props={{ children: 'napochaan', size: 'compact' }} />}
+{name === 'TypewriterText' && <TypewriterTextIsland client:load pathname={pathname} props={{ children: 'さまざまな「破壊」、承っております。' }} />}
+{
+  name === 'RichText' && (
+    <NoAction client:load>
+      <RichText data={richTextSample} />
+    </NoAction>
+  )
+}
+{
+  name === 'Gallery' && (
+    <GalleryIsland client:only="react" pathname={pathname} props={{ items: galleryItems }}>
+      <SystemAnnotation slot="fallback" tone="muted">loading gallery…</SystemAnnotation>
+    </GalleryIsland>
+  )
+}
+{
+  name === 'GalleryArchive' && (
+    <GalleryArchiveIsland client:only="react" pathname={pathname} props={{ photos: galleryItems }}>
+      <SystemAnnotation slot="fallback" tone="muted">loading gallery…</SystemAnnotation>
+    </GalleryArchiveIsland>
+  )
+}
+{
+  name === 'NewsRow' && (
+    <NoAction client:load>
+      <ol class={newsRowStyles.list}>
+        <NewsRow date="06.14" category="event" title="Booth² vol.03 を開催します" href="/news/1" />
+        <NewsRow date="05.30" category="release" title="新しいミックスを公開しました" href="https://example.com" />
+        <NewsRow date="05.02" category="info" title="サイトをリニューアルしました" />
+      </ol>
+    </NoAction>
+  )
+}
+{name === 'Button' && buttons.map((variant) => <ButtonIsland client:load pathname={pathname} props={{ variant, children: variant }} />)}
+{name === 'TextField' && <TextFieldIsland client:load pathname={pathname} props={{ label: 'name / お名前', name: 'demo-name', defaultValue: 'napochaan', autoComplete: 'off' }} />}
+{name === 'TextArea' && <TextAreaIsland client:load pathname={pathname} props={{ label: 'message / 本文', name: 'demo-message', rows: 3, defaultValue: 'はじめまして。', autoComplete: 'off' }} />}
+{
+  name === 'Divider' && (
+    <>
+      <DividerIsland client:load pathname={pathname} props={{}} />
+      <DividerIsland client:load pathname={pathname} props={{ variant: 'dashed' }} />
+    </>
+  )
+}
+{
+  name === 'Breadcrumbs' && (
+    <NoAction client:load>
+      <Breadcrumbs items={breadcrumbItems} />
+    </NoAction>
+  )
+}
+{name === 'Calendar' && <CalendarIsland client:load pathname={pathname} props={{ marks: calendarMarks, minDate: '2026-06-01', maxDate: '2026-07-31', label: '活動カレンダー（サンプル）' }} />}
+{
+  name === 'ShareBar' && (
+    <NoAction client:load>
+      <ShareBarIsland client:load pathname={pathname} props={{ url: 'https://www.napochaan.com/works/1', title: 'サンプル作品タイトル' }} />
+    </NoAction>
+  )
+}
+{
+  name === 'BackToIndex' && (
+    <NoAction client:load>
+      <BackToIndex href="/blog" label="blog 一覧へもどる" />
+    </NoAction>
+  )
+}
+{
+  name === 'QuoteShare' && (
+    <NoAction client:load>
+      <QuoteShareIsland client:load pathname={pathname} props={{ url: 'https://www.napochaan.com/blog/sample', title: 'サンプルブログ記事' }}>
+        <p>この段落をドラッグで選択すると、選択範囲の上に共有バーが出ます（PC のみ）。</p>
+      </QuoteShareIsland>
+    </NoAction>
+  )
+}
+{
+  name === 'GameOfLife' && (
+    <div class={gameOfLifeStyles.frame}>
+      <IsolatedGameOfLifeIsland client:load pathname={pathname} props={{}} />
+    </div>
+  )
+}
+{name === 'CursorPresence' && <CursorPresenceDemoIsland client:load pathname={pathname} props={{}} />}
+{
+  name === 'LoadingOverlay' && (
+    <div class={loadingOverlayStyles.frame}>
+      <BootConsole />
+    </div>
+  )
+}

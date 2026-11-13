@@ -1,0 +1,39 @@
+---
+// Port of the NewsDetail Server Component. Server-rendered except the client leaves:
+// QuoteShare (wrapping the server-rendered RichText as its slot), ShareBar, and the
+// ScrambleText / CopyHashButton / Lightbox leaves inside the header, body and nav.
+import PageHeader from '@components/page-header/page-header.astro';
+import { QuoteShareIsland } from '@components/quote-share/island';
+import RichText from '@components/rich-text/rich-text.astro';
+import { ShareBarIsland } from '@components/share-bar/island';
+import { absoluteUrl } from '@utils/site-url';
+
+import NewsNav from './components/news-nav/news-nav.astro';
+import * as styles from './detail.css';
+import { formatNewsDate } from './lib/format-news-date';
+
+import type { NewsDetail } from './load-news-detail';
+
+type Props = {
+  detail: NewsDetail;
+};
+
+const { item, adjacent } = Astro.props.detail;
+const pathname = Astro.url.pathname;
+const url = absoluteUrl(`/news/${item.slug}`);
+const crumbs = [{ href: '/', label: 'home' }, { href: '/news', label: 'news' }, { label: item.title }];
+const toNavItem = (news: { id: string; slug: string; title: string } | undefined) => (news === undefined ? undefined : { id: news.id, slug: news.slug, title: news.title });
+---
+
+<PageHeader title={item.title} breadcrumbs={crumbs} kicker={`// ${formatNewsDate(item.date)} · ${item.category}`} titleTracking="tight" />
+<div class={styles.body}>
+  {
+    item.body !== undefined && (
+      <QuoteShareIsland client:load pathname={pathname} props={{ url, title: item.title }}>
+        <RichText data={item.body} />
+      </QuoteShareIsland>
+    )
+  }
+</div>
+<ShareBarIsland client:load pathname={pathname} props={{ url, title: item.title }} />
+<NewsNav prev={toNavItem(adjacent.prev)} next={toNavItem(adjacent.next)} />

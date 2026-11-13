@@ -1,8 +1,8 @@
 import { cache } from 'hono/cache';
 import { createFactory } from 'hono/factory';
 
+import { createAstroHandler } from './handlers/astro';
 import { imageHandlers } from './handlers/images';
-import { createNextHandler } from './handlers/next';
 import { cacheControlHeaders } from './middleware/cache-control';
 import { pathPolicy } from './middleware/path-policy';
 import { weakenETag } from './middleware/weaken-etag';
@@ -28,6 +28,9 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
     .get(
       '/_next/image',
       cache({
+        // Name kept from the OpenNext worker this replaced, so the transformed images
+        // already cached under it keep being served across the cutover instead of
+        // every variant being re-transformed under a new cache name.
         cacheName: 'opennextjs-cloudflare-images',
         // Workers Cache serves hits without invoking the Worker; drop must-revalidate
         // so stale-while-revalidate applies. Media changes purge everything.
@@ -37,8 +40,8 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
       ...imageHandlers,
     )
     .route('/', cursorRoutes)
-    // OpenNext, with this request's CMS binding tracked (a degraded render is never cached).
-    .all('*', createNextHandler(handlerFetch));
+    // Astro, with this request's CMS binding tracked (a degraded render is never cached).
+    .all('*', createAstroHandler(handlerFetch));
 
   return app;
 };

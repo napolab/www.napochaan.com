@@ -1,0 +1,27 @@
+---
+// Port of apps/web/src/app/(site)/gallery/{layout,page}.tsx. The archive is the
+// GalleryArchive Server Component's `.astro` twin: the packed grid is server-rendered
+// and only its Lightbox / BlankDim leaves hydrate. The worker stamps the purge-driven
+// `cms` policy.
+import { FeedLink } from '@components/feed-link';
+import GalleryArchive from '@components/gallery-archive/gallery-archive.astro';
+import PageHeader from '@components/page-header/page-header.astro';
+import { findGalleryList } from '@lib/cms/gallery';
+
+import { galleryMetadata } from '../features/gallery/metadata';
+import * as s from '../features/shared/styles.css';
+import SiteLayout from '../layouts/site-layout.astro';
+
+const photos = await findGalleryList();
+const crumbs = [{ href: '/', label: 'home' }, { label: 'gallery' }];
+---
+
+<SiteLayout metadata={galleryMetadata}>
+  <main id="main-content" class={s.main}>
+    <PageHeader title="gallery" breadcrumbs={crumbs} kicker="// flyer · VRChat · photo — 2024-2026" lead="まだ知らない君がいる！" />
+    <FeedLink href="/gallery/rss.xml" label="gallery の RSS フィード" />
+    <section aria-label="作品ギャラリー一覧">
+      <GalleryArchive photos={photos} />
+    </section>
+  </main>
+</SiteLayout>

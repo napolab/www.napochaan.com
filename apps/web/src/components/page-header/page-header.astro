@@ -1,0 +1,49 @@
+---
+// `.astro` twin of the PageHeader Server Component (markup mirrors ./index.tsx): the
+// breadcrumbs and the lead's ScrambleText / TypewriterText are the only islands.
+import Breadcrumbs from '@components/breadcrumbs/breadcrumbs.astro';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+import { SystemAnnotation } from '@components/system-annotation';
+import { TypewriterTextIsland } from '@components/typewriter-text/island';
+
+import * as styles from './styles.css';
+
+type Props = {
+  title: string;
+  breadcrumbs: readonly { href?: string; label: string }[];
+  kicker?: string;
+  lead?: string;
+  leadReveal?: 'typewriter' | 'scramble';
+  annotation?: string;
+  titleTracking?: 'wide' | 'tight';
+};
+
+const { title, breadcrumbs, kicker, lead, leadReveal = 'typewriter', annotation, titleTracking } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<header class={styles.root}>
+  <Breadcrumbs items={breadcrumbs} />
+  {kicker !== undefined && <p class={styles.kicker}>{kicker}</p>}
+  <h1 class={styles.title} data-tracking={titleTracking}>{title}</h1>
+  {
+    lead !== undefined && (
+      <p class={styles.lead}>
+        {leadReveal === 'scramble' ? (
+          <ScrambleTextIsland client:load pathname={pathname} props={{ children: lead }} />
+        ) : (
+          <TypewriterTextIsland client:load pathname={pathname} props={{ children: lead }} />
+        )}
+      </p>
+    )
+  }
+  {
+    annotation !== undefined && (
+      <SystemAnnotation tone="muted" className={styles.annotation}>
+        {annotation}
+        <span class={styles.squareBlue} aria-hidden="true" />
+        <span class={styles.squareRed} aria-hidden="true" />
+      </SystemAnnotation>
+    )
+  }
+</header>

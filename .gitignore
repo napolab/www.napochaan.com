@@ -4,7 +4,7 @@ out
 dist
 styled-system
 
-# Cloudflare / OpenNext
+# Cloudflare (.open-next/ is the apps/cms OpenNext build output)
 .open-next/
 .wrangler/
 .dev.vars
@@ -35,3 +35,6 @@ tsconfig.tsbuildinfo
 
 # scratch design mockups (not tracked)
 .tmp-mockups/
+
+# Astro
+.astro/

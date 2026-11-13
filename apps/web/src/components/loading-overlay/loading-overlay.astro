@@ -1,0 +1,10 @@
+---
+// `.astro` twin of the LoadingOverlay Server Component (markup mirrors ./index.tsx); the
+// typed boot question inside BootConsole is the only island. Rendered once, by the site
+// layout: the root persists across ClientRouter navigations so the overlay (and its
+// typewriter) is never replayed. Show / fade stays driven by the `boot` class on <html>.
+import BootConsole from './boot-console/boot-console.astro';
+import * as styles from './styles.css';
+---
+
+<div class={styles.root} aria-hidden="true" transition:persist="boot-overlay"><BootConsole /></div>

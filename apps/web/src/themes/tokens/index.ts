@@ -156,10 +156,10 @@ export const tokens = defineTokens({
     // @font-face) inserted before ui-monospace so the pre-swap fallback occupies
     // config-mono-vf's exact line box — kills the font-swap CLS (SysBar reflow).
     mono: { value: '"config-mono-vf", "config-mono-vf Fallback", ui-monospace, "Cascadia Code", monospace' },
-    // Zen Kaku Gothic New (Google Fonts, via next/font) — used for long content
+    // Zen Kaku Gothic New (self-hosted @fontsource) — used for long content
     // detail titles (works / news / blog). Only weight 500 is loaded (see
-    // themes/fonts.ts); TITLE_JP_VAR is the shared CSS variable name, kept in
-    // sync with the next/font call there (see themes/font-vars.ts).
+    // themes/fonts.css); TITLE_JP_VAR is the shared CSS variable name, kept in
+    // sync with the declaration there (see themes/font-vars.ts).
     titleJP: { value: `var(${TITLE_JP_VAR}), sans-serif` },
   },
 

@@ -1,0 +1,35 @@
+---
+// Port of apps/web/src/app/(site)/log/{layout,page}.tsx. The worker caches /log under
+// the short `timeSensitive` policy, not `cms`: it renders external RSS posts (no CMS
+// purge reaches them) and flips `upcoming` as gigs pass. One continuous page, no
+// pagination. LogTimeline is a Server Component (no directive); the calendar trigger
+// is the only new client leaf. Its popover is closed on the server, so the Calendar's
+// "today" is computed in the browser on open, as in Next.
+import { FeedLink } from '@components/feed-link';
+import PageHeader from '@components/page-header/page-header.astro';
+
+import { LogCalendarIsland } from '../features/log/components/log-calendar/island';
+import { LogTimeline } from '../features/log/components/log-timeline';
+import { loadLogPage } from '../features/log/load-log';
+import { logMetadata } from '../features/log/metadata';
+import * as ls from '../features/log/styles.css';
+import * as s from '../features/shared/styles.css';
+import SiteLayout from '../layouts/site-layout.astro';
+
+const { groups, calendar } = await loadLogPage();
+const pathname = Astro.url.pathname;
+const crumbs = [{ href: '/', label: 'home' }, { label: 'log' }];
+---
+
+<SiteLayout metadata={logMetadata}>
+  <main id="main-content" class={s.main}>
+    <PageHeader title="log" breadcrumbs={crumbs} kicker="// 活動年表 — gig · release · work" lead="進捗どうですか？" />
+    <div class={ls.metaRow}>
+      <span class={ls.calendarSlot}>
+        <LogCalendarIsland client:load pathname={pathname} props={{ ...calendar, label: '活動カレンダー' }} />
+      </span>
+      <FeedLink href="/log/rss.xml" label="log の RSS フィード" />
+    </div>
+    <LogTimeline groups={groups} />
+  </main>
+</SiteLayout>

@@ -1,0 +1,40 @@
+---
+// Port of `works/[slug]/page.tsx`'s body. WorkDetail is server-rendered (its QuoteShare
+// leaf hydrates); RelatedWorks and AdjacentNav are client leaves ('use client' in
+// apps/web) and hydrate as islands with only the fields they render.
+import PageHeader from '@components/page-header/page-header.astro';
+import { ShareBarIsland } from '@components/share-bar/island';
+import { absoluteUrl } from '@utils/site-url';
+
+import { AdjacentNavIsland } from './components/adjacent-nav/island';
+import { RelatedWorksIsland } from './components/related-works/island';
+import WorkDetail from './components/work-detail/work-detail.astro';
+import * as styles from './detail.css';
+import { toWorkCard, toWorkLink } from './work-card';
+
+import type { WorkDetail as WorkDetailData } from './load-work-detail';
+
+type Props = {
+  slug: string;
+  detail: WorkDetailData;
+};
+
+const { slug, detail } = Astro.props;
+const { work, adjacent, related } = detail;
+const pathname = Astro.url.pathname;
+const url = absoluteUrl(`/works/${slug}`);
+const crumbs = [{ href: '/', label: 'home' }, { href: '/works', label: 'works' }, { label: work.title }];
+---
+
+<PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
+<WorkDetail work={work} url={url} />
+{
+  related.length > 0 && (
+    <>
+      <hr class={styles.divider} />
+      <RelatedWorksIsland client:load pathname={pathname} props={{ works: related.map(toWorkCard) }} />
+    </>
+  )
+}
+<ShareBarIsland client:load pathname={pathname} props={{ url, title: work.title }} />
+<AdjacentNavIsland client:load pathname={pathname} props={{ prev: toWorkLink(adjacent.prev), next: toWorkLink(adjacent.next) }} />

@@ -8,7 +8,7 @@ import type { OgImageRunner } from '../types';
 
 // Same-origin Payload media. Satori can't be handed the public URL: in the
 // worker a fetch of its own hostname hits the edge/ASSETS layer and 404s, and
-// under `next dev` next/og rejects localhost image URLs (SSRF guard). So read
+// under `astro dev` / `wrangler dev` the request origin is localhost, not a reachable public URL. So read
 // the original from the cms Worker's `/media/:filename` over the CMS Service
 // Binding (available in both) and inline the bytes as a data: URL.
 const toDataUrl = async (response: Response): Promise<string | undefined> => {

@@ -1,0 +1,26 @@
+---
+// Port of the (site) LogSection Server Component. The Timeline stays server-only React
+// (its links are static anchors); the heading's title and more-link labels are the
+// ScrambleText leaves, passed through SectionHeading's slots.
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+import { SectionHeading } from '@components/section-heading';
+import { Timeline } from '@components/timeline';
+
+import * as styles from './styles.css';
+import { toTimelineItems } from './to-timeline-items';
+
+import type { LogEntry } from '../../../log/lib/build-log-timeline';
+
+type Props = {
+  id?: string;
+  entries: readonly LogEntry[];
+};
+
+const { id, entries } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+<section id={id} class={styles.root}>
+  <SectionHeading no="03" href="/log" moreHref="/log"><ScrambleTextIsland client:load pathname={pathname} props={{ children: 'log' }} /><ScrambleTextIsland slot="more" client:load pathname={pathname} props={{ children: '$ git log' }} /></SectionHeading>
+  <Timeline items={toTimelineItems(entries)} />
+</section>

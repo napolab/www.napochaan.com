@@ -57,4 +57,4 @@ gsap.to(el, { ..., overwrite: true, onComplete: () => gsap.set(el, { clearProps:
 - Trusting CLSCulprits' named culprit — verify with sources before touching anything.
 - Believing `opacity: 0` exempts content from CLS — it does not; only `visibility: hidden` does.
 - Fixing the animation but leaving it running behind a dismissed overlay — cap BOTH paint (visibility) and the loop itself.
-- Verifying on `next dev` — measure a production build (`pnpm build` + `next start -p <port>`).
+- Verifying on a dev server (`astro dev` / `next dev`) — measure a production build (web: `pnpm --filter web preview`).

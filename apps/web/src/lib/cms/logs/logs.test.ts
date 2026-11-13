@@ -8,14 +8,8 @@ import type { CMSServices } from '@napochaan/cms-api/services';
 
 const context = vi.hoisted(() => ({ env: {} as { CMS?: { fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response> } } }));
 
-// Only the async context exists outside a request (e.g. `generateStaticParams`
-// under `next dev`): the sync form throws, so the adapters must use the async one.
-vi.mock('@opennextjs/cloudflare', () => ({
-  getCloudflareContext: (options?: { async?: boolean }) => {
-    if (options?.async !== true) throw new Error('getCloudflareContext called in sync mode');
-    return Promise.resolve(context);
-  },
-}));
+// The adapters read the CMS binding from the per-request context (getCMSClient).
+vi.mock('@lib/request-context', () => ({ getRequestContext: () => context }));
 
 const useServices = (overrides: Partial<CMSServices> = {}) => {
   context.env = { CMS: createFakeCMSBinding(createFakeCMSServices(overrides)) };

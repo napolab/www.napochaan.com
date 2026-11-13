@@ -1,6 +1,6 @@
 import { parseLexicalJSON } from '../lexical';
 
-import type { NewsItem } from '../../../../app/(site)/news/_lib/news-item';
+import type { NewsItem } from '../../../../features/news/news-item';
 import type { NewsItemDTO } from '@napochaan/cms-api/services';
 
 // Maps the cms `NewsItemDTO` to the site's `NewsItem`, restoring `bodyJSON` to

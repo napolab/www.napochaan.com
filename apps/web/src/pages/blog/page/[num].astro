@@ -1,0 +1,26 @@
+---
+// Port of apps/web/src/app/(site)/blog/(index)/page/[num]/page.tsx: pages 2+. Status is
+// decided before any HTML: a non-canonical number or a page past the end is a 404
+// (Next streamed the past-the-end `notFound()` inside Suspense, so it answered 200), and
+// `/blog/page/1` collapses onto `/blog` (Next `permanentRedirect` → 308).
+import BlogList from '../../../features/blog/blog-list.astro';
+import { loadBlogList } from '../../../features/blog/load-blog-list';
+import { blogPageMetadata } from '../../../features/blog/metadata';
+import * as s from '../../../features/blog/styles.css';
+import { parsePageParam } from '../../../features/shared/lib/parse-page-param';
+import SiteLayout from '../../../layouts/site-layout.astro';
+
+const num = Astro.params.num ?? '';
+const pageNumber = parsePageParam(num);
+if (pageNumber === undefined) return Astro.rewrite('/404');
+if (pageNumber === 1) return Astro.redirect('/blog', 308);
+
+const page = await loadBlogList(pageNumber);
+if (page === undefined) return Astro.rewrite('/404');
+---
+
+<SiteLayout metadata={blogPageMetadata(num)}>
+  <main id="main-content" class={s.main}>
+    <BlogList page={page} />
+  </main>
+</SiteLayout>

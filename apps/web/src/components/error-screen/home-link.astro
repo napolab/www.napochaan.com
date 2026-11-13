@@ -1,0 +1,12 @@
+---
+// `.astro` twin of the error screens' HomeLink (markup mirrors ./screens.tsx); the
+// ScrambleText label is the only island.
+import { Link } from '@components/link';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+
+import * as s from './styles.css';
+
+const pathname = Astro.url.pathname;
+---
+
+<Link href="/" tone="accent" className={s.homeLink}>← <ScrambleTextIsland client:load pathname={pathname} props={{ children: '/ へ戻る' }} /></Link>

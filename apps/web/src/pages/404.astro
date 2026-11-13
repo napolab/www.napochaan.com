@@ -1,0 +1,10 @@
+---
+// Port of (site)/not-found.tsx + [...not-found]/page.tsx. Astro renders this route
+// for every unmatched path with status 404 (the worker passes it through).
+import NotFoundScreen from '@components/error-screen/not-found-screen.astro';
+import SiteLayout from '../layouts/site-layout.astro';
+---
+
+<SiteLayout metadata={{ noindex: true }}>
+  <NotFoundScreen />
+</SiteLayout>

@@ -1,0 +1,62 @@
+---
+// Port of the WorkDetail Server Component: a uniform contact-sheet proof image (the
+// shared `Figure` in its `cover` variant with a `type / year` corner tag, over the
+// `AmbientBackdrop` wash), a mono `type · year` line, then the body. Server-rendered
+// except the QuoteShare client leaf, which wraps the server-rendered RichText as its
+// slot (that body carries its own CopyHashButton / Lightbox leaves). The page <h1>
+// lives in PageHeader, so this renders no heading.
+import { AmbientBackdrop } from '@components/ambient-backdrop';
+import { Figure } from '@components/figure';
+import { formatBlurURL } from '@components/image/helper';
+import { QuoteShareIsland } from '@components/quote-share/island';
+import RichText from '@components/rich-text/rich-text.astro';
+
+import * as styles from './styles.css';
+
+import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
+
+type WorkDetailData = {
+  title: string;
+  type: string;
+  year: number;
+  thumbnail?: { src: string; width: number; height: number };
+  body?: SerializedEditorState;
+};
+
+type Props = {
+  work: WorkDetailData;
+  url: string;
+};
+
+const { work, url } = Astro.props;
+const { thumbnail, body } = work;
+const pathname = Astro.url.pathname;
+---
+
+<section class={styles.root} aria-label="work detail">
+  {thumbnail !== undefined && <AmbientBackdrop src={thumbnail.src} />}
+  {
+    thumbnail === undefined ? (
+      <span class={styles.imagePlaceholder} aria-hidden="true" />
+    ) : (
+      <Figure
+        src={thumbnail.src}
+        alt={work.title}
+        width={thumbnail.width}
+        height={thumbnail.height}
+        variant="cover"
+        caption={`${work.type} / ${work.year}`}
+        placeholder="blur"
+        blurDataURL={formatBlurURL(thumbnail.src, { blur: 20 })}
+      />
+    )
+  }
+  <p class={styles.meta}>{work.type} · {work.year}</p>
+  {
+    body !== undefined && (
+      <QuoteShareIsland client:load pathname={pathname} props={{ url, title: work.title }}>
+        <RichText data={body} class={styles.body} />
+      </QuoteShareIsland>
+    )
+  }
+</section>

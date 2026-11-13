@@ -78,10 +78,10 @@ describe('imageRowBlockConverters image-row', () => {
   it('passes a sizes attribute derived from the content column and the container breakpoint', async () => {
     const { container } = await render(<>{renderImageRow([cell('a.png', 'alt a'), cell('b.png', 'alt b')])}</>);
 
-    const images = container.querySelectorAll('[data-testid="next-image"]');
+    const images = container.querySelectorAll('img');
     expect(images).toHaveLength(2);
     for (const img of images) {
-      expect(img.getAttribute('data-sizes')).toBe('(min-width: 1388px) 500px, (min-width: 565px) 42vw, 66vw');
+      expect(img.getAttribute('sizes')).toBe('(min-width: 1388px) 500px, (min-width: 565px) 42vw, 66vw');
     }
   });
 

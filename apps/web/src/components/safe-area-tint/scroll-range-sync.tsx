@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 
+const AFTER_SWAP_EVENT = 'astro:after-swap';
+
 // Publishes --scroll-range (scrollHeight - innerHeight) and --viewport-h
 // (innerHeight) onto <html>, so the safeAreaChase / safeAreaChaseBottom
 // scroll-timeline keyframes (panda.config.ts) can map timeline progress back to
@@ -30,12 +32,21 @@ export const ScrollRangeSync = () => {
 
     const observer = new ResizeObserver(publish);
     observer.observe(document.body);
+    // Astro ClientRouter replaces <body> on every soft navigation while this island
+    // persists, so move the observer to the new body after each swap.
+    const observeSwappedBody = (): void => {
+      observer.disconnect();
+      observer.observe(document.body);
+      publish();
+    };
+    document.addEventListener(AFTER_SWAP_EVENT, observeSwappedBody);
     window.addEventListener('resize', publish);
     window.visualViewport?.addEventListener('resize', publish);
 
     return () => {
       window.visualViewport?.removeEventListener('resize', publish);
       window.removeEventListener('resize', publish);
+      document.removeEventListener(AFTER_SWAP_EVENT, observeSwappedBody);
       observer.disconnect();
     };
   }, []);

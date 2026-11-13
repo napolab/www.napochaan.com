@@ -1,0 +1,46 @@
+---
+// Renders a ResolvedMetadata (see ./build-metadata) as <head> tags, in the shape
+// Next's metadata API emitted them for the (site) routes.
+import type { ResolvedMetadata } from './build-metadata';
+
+type Props = { metadata: ResolvedMetadata };
+
+const { metadata } = Astro.props;
+const { openGraph, twitter } = metadata;
+---
+
+<title>{metadata.title}</title>
+<meta name="description" content={metadata.description} />
+{metadata.robots !== undefined && <meta name="robots" content={metadata.robots} />}
+{metadata.canonical !== undefined && <link rel="canonical" href={metadata.canonical} />}
+{metadata.alternates.map((alternate) => <link rel="alternate" type={alternate.type} href={alternate.href} title={alternate.title} />)}
+<meta property="og:title" content={openGraph.title} />
+{openGraph.description !== undefined && <meta property="og:description" content={openGraph.description} />}
+<meta property="og:url" content={openGraph.url} />
+<meta property="og:site_name" content={openGraph.siteName} />
+<meta property="og:locale" content={openGraph.locale} />
+{
+  openGraph.images.map((image) => (
+    <>
+      <meta property="og:image" content={image.url} />
+      {image.type !== undefined && <meta property="og:image:type" content={image.type} />}
+      {image.width !== undefined && <meta property="og:image:width" content={`${image.width}`} />}
+      {image.height !== undefined && <meta property="og:image:height" content={`${image.height}`} />}
+    </>
+  ))
+}
+<meta property="og:type" content={openGraph.type} />
+<meta name="twitter:card" content={twitter.card} />
+<meta name="twitter:title" content={twitter.title} />
+{twitter.description !== undefined && <meta name="twitter:description" content={twitter.description} />}
+{
+  twitter.images.map((image) => (
+    <>
+      <meta name="twitter:image" content={image.url} />
+      {image.type !== undefined && <meta name="twitter:image:type" content={image.type} />}
+      {image.width !== undefined && <meta name="twitter:image:width" content={`${image.width}`} />}
+      {image.height !== undefined && <meta name="twitter:image:height" content={`${image.height}`} />}
+    </>
+  ))
+}
+{metadata.icons.map((icon) => <link rel={icon.rel} href={icon.href} type={icon.type} sizes={icon.sizes} />)}

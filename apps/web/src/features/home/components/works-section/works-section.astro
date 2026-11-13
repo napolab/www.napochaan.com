@@ -1,0 +1,69 @@
+---
+// Port of the (site) WorksSection Server Component: a contact-sheet table. Thumbnails
+// are server-rendered Images (the inline blur script clears the placeholder) and title
+// links are static anchors; each title's ScrambleText is the client leaf.
+import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
+import { Link } from '@components/link';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+import { SectionHeading } from '@components/section-heading';
+import Table from '@components/table/table.astro';
+
+import * as styles from './styles.css';
+
+import type { WorkRow } from '../../../works/work-row';
+
+type Props = {
+  id?: string;
+  works: readonly WorkRow[];
+};
+
+const { id, works } = Astro.props;
+const pathname = Astro.url.pathname;
+const columns = [
+  { key: 'thumb', label: '' },
+  { key: 'no', label: 'no', desktopOnly: true },
+  { key: 'title', label: 'title' },
+  { key: 'type', label: 'type' },
+  { key: 'year', label: 'year' },
+];
+---
+
+<section id={id} class={styles.root}>
+  <SectionHeading no="02" moreHref="/works">works<ScrambleTextIsland slot="more" client:load pathname={pathname} props={{ children: '$ ls works/' }} /></SectionHeading>
+  <Table columns={columns} rows={works}>
+    {
+      (work: WorkRow, key: string) => {
+        switch (key) {
+          case 'thumb':
+            return work.thumbnail !== undefined ? (
+              <Image
+                src={work.thumbnail.src}
+                alt={work.title}
+                width={work.thumbnail.width}
+                height={work.thumbnail.height}
+                sizes="40px"
+                className={styles.thumb}
+                placeholder="blur"
+                blurDataURL={formatBlurURL(work.thumbnail.src, { blur: 20 })}
+              />
+            ) : (
+              <span class={styles.thumbPlaceholder} aria-hidden="true" />
+            );
+          case 'no':
+            return work.no;
+          case 'title':
+            return (
+              <Link href={`/works/${work.slug}`} tone="accent">
+                <ScrambleTextIsland client:load pathname={pathname} props={{ children: work.title }} />
+              </Link>
+            );
+          case 'type':
+            return work.type;
+          default:
+            return `${work.year}`;
+        }
+      }
+    }
+  </Table>
+</section>

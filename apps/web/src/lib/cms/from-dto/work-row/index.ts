@@ -1,6 +1,6 @@
 import { parseLexicalJSON } from '../lexical';
 
-import type { WorkRow } from '../../../../app/(site)/works/_lib/work-row';
+import type { WorkRow } from '../../../../features/works/work-row';
 import type { WorkRowDTO } from '@napochaan/cms-api/services';
 
 // Maps the cms `WorkRowDTO` to the site's `WorkRow`, restoring `bodyJSON` to

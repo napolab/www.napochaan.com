@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname } from '@lib/navigation';
 import { Button, Menu, MenuItem, MenuTrigger, Popover } from 'react-aria-components';
 
-import { usePresence } from '@components/cursor-presence/presence-context';
+import { usePresence } from '@components/cursor-presence/presence-store';
 import { useLifeState } from '@components/game-of-life/provider';
 import { Link } from '@components/link';
 import { ScrambleText } from '@components/scramble-text';

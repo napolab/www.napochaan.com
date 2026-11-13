@@ -6,6 +6,7 @@ import { Heading } from '@components/heading';
 import { usePrefersReducedMotion } from '@hooks/use-prefers-reduced-motion';
 
 import { CopyHashButton } from '../copy-hash-button';
+import { jumpToHeading } from '../jump-to-heading';
 import * as headingStyles from '../styles.css';
 import * as styles from './styles.css';
 
@@ -32,8 +33,7 @@ export const AnchoredHeading = ({ level, slug, children }: Props) => {
   const reduced = usePrefersReducedMotion();
 
   const handlePress = useCallback(() => {
-    ref.current?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
-    history.replaceState(null, '', new URL(`#${slug}`, window.location.href).href);
+    jumpToHeading(ref.current, slug, reduced);
   }, [slug, reduced]);
 
   return (

@@ -1,0 +1,45 @@
+---
+// Port of apps/web/src/app/(site)/blog/preview/[id]/page.tsx (inside blog/layout.tsx's
+// `<main>`). Draft-only Live Preview route: 404 unless the `/next/preview` handshake set
+// the draft cookie (readDraftContext), then the latest draft is fetched on every request;
+// the worker stamps `no-store` and allows the cms admin as frame ancestor. Unlike the
+// public detail, the body is a plain RichText (no QuoteShare / ShareBar) and the layout
+// carries no TOC scroll-binding attributes, as in Next. The Next preview set no
+// metadata, so the root defaults apply.
+import { LivePreviewIsland } from '@components/live-preview/island';
+import PageHeader from '@components/page-header/page-header.astro';
+import RichText from '@components/rich-text/rich-text.astro';
+
+import { BlogHero } from '../../../features/blog/components/blog-hero';
+import BlogNav from '../../../features/blog/components/blog-nav/blog-nav.astro';
+import Toc from '../../../features/blog/components/toc/toc.astro';
+import * as styles from '../../../features/blog/detail.css';
+import { loadBlogPreview } from '../../../features/blog/load-blog-preview';
+import * as s from '../../../features/blog/styles.css';
+import { readDraftContext } from '../../../features/preview/read-draft-context';
+import SiteLayout from '../../../layouts/site-layout.astro';
+
+const draft = await readDraftContext(Astro.request);
+if (draft === undefined) return Astro.rewrite('/404');
+const detail = await loadBlogPreview(Astro.params.id ?? '', draft.previewSecret);
+if (detail === undefined) return Astro.rewrite('/404');
+
+const { post, adjacent, headings, formattedDate } = detail;
+const pathname = Astro.url.pathname;
+const crumbs = [{ href: '/', label: 'home' }, { href: '/blog', label: 'blog' }, { label: post.title }];
+---
+
+<SiteLayout metadata={{}}>
+  <main id="main-content" class={s.main}>
+    <LivePreviewIsland client:load transition:persist="live-preview" pathname={pathname} props={{ serverURL: draft.cmsOrigin }} />
+    <PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} titleTracking="tight" />
+    {post.thumbnail !== undefined && <BlogHero thumbnail={post.thumbnail} title={post.title} caption={`blog / ${formattedDate}`} />}
+    <div class={styles.layout}>
+      <div class={styles.tocCol}>
+        <Toc headings={headings} />
+      </div>
+      <div class={styles.bodyCol}>{post.body !== undefined && <RichText data={post.body} />}</div>
+    </div>
+    <BlogNav prev={adjacent.prev} next={adjacent.next} />
+  </main>
+</SiteLayout>

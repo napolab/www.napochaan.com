@@ -1,0 +1,48 @@
+---
+// `.astro` twin of the NewsArchive Server Component (markup mirrors ./index.tsx): the
+// `.map` lives here so each row's title ScrambleText is its own island (news-row.astro).
+// Row dates are formatted on the server (Asia/Tokyo), never in a hydrated tree.
+import NewsRow from '@components/news-row/news-row.astro';
+
+import { formatNewsMonthDay } from '../../lib/format-news-date';
+import * as styles from './styles.css';
+
+type ArchiveItem = {
+  id: string;
+  slug: string;
+  date: string;
+  category: string;
+  title: string;
+  // Optional external destination: the row links here instead of `/news/{slug}`.
+  url?: string;
+};
+
+type ArchiveGroup = {
+  key: string;
+  label: string;
+  items: readonly ArchiveItem[];
+};
+
+type Props = {
+  groups: readonly ArchiveGroup[];
+};
+
+const { groups } = Astro.props;
+---
+
+<div class={styles.root}>
+  {
+    groups.map((group) => (
+      <section class={styles.group} aria-labelledby={`news-${group.key}`}>
+        <h2 id={`news-${group.key}`} class={styles.month}>
+          {group.label}
+        </h2>
+        <ol class={styles.rows}>
+          {group.items.map((item) => (
+            <NewsRow date={formatNewsMonthDay(item.date)} category={item.category} title={item.title} href={item.url ?? `/news/${item.slug}`} />
+          ))}
+        </ol>
+      </section>
+    ))
+  }
+</div>

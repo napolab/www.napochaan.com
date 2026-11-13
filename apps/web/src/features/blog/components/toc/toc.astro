@@ -1,0 +1,35 @@
+---
+// `.astro` twin of the Toc Server Component (markup mirrors ./index.tsx): each entry's
+// ScrambleText is the only island. The `<a>` stays the `<li>`'s direct child, which the
+// global-css reading-progress rule (`[data-toc-list] > li:nth-child(N) > a`) binds to.
+import { Link } from '@components/link';
+import { ScrambleTextIsland } from '@components/scramble-text/island';
+
+import * as styles from './styles.css';
+
+import type { TocHeading } from '@components/rich-text/toc';
+
+type Props = {
+  headings: readonly TocHeading[];
+};
+
+const { headings } = Astro.props;
+const pathname = Astro.url.pathname;
+---
+
+{
+  headings.length > 0 && (
+    <nav class={styles.root} aria-label="目次">
+      <p class={styles.label}>contents</p>
+      <ol class={styles.list} data-toc-list="true">
+        {headings.map((heading) => (
+          <li class={styles.item} data-level={heading.level}>
+            <Link href={`#${heading.slug}`} tone="muted" underline={false} className={styles.link}>
+              <ScrambleTextIsland client:load pathname={pathname} props={{ children: heading.text }} />
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </nav>
+  )
+}

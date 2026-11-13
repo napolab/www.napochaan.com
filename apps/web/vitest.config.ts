@@ -6,7 +6,6 @@ import { playwright } from '@vitest/browser-playwright';
 import { configDefaults, defineConfig } from 'vitest/config';
 
 export default defineConfig({
-  plugins: [react()],
   resolve: {
     tsconfigPaths: true,
   },
@@ -22,26 +21,25 @@ export default defineConfig({
         resolve: {
           tsconfigPaths: true,
           alias: {
-            'next/image': path.resolve(__dirname, 'src/__mocks__/next/image.tsx'),
-            'next/headers': path.resolve(__dirname, 'src/__mocks__/next/headers.ts'),
-            'next/navigation': path.resolve(__dirname, 'src/__mocks__/next/navigation.ts'),
-            // `@lib/cms/client` reads the `CMS` Service Binding from the OpenNext
-            // Cloudflare context, which does not exist in the browser. Swap in a
-            // client over the cms Hono app with fixture services (data helpers are
-            // normally mocked per-test). See src/__mocks__/cms-client.ts.
-            '@lib/cms/client': path.resolve(__dirname, 'src/__mocks__/cms-client.ts'),
+            // `@lib/cms/client` reads the `CMS` Service Binding from the per-request
+            // context, which does not exist in the browser. Swap in a client over the
+            // cms Hono app with fixture services (data helpers are normally mocked
+            // per-test). See src/__mocks__/cms-client.ts.
+            '@lib/cms/client': path.resolve(import.meta.dirname, 'src/__mocks__/cms-client.ts'),
+            // Astro's client router is only available inside an Astro build.
+            'astro:transitions/client': path.resolve(import.meta.dirname, 'src/__mocks__/astro-transitions-client.ts'),
+            // Astro Actions' client proxy is likewise build-only (the contact form).
+            'astro:actions': path.resolve(import.meta.dirname, 'src/__mocks__/astro-actions.ts'),
           },
         },
-        // Pre-bundle every browser-test dependency up front. Otherwise Vite
-        // discovers some of them late and triggers a mid-run reload
-        // ("optimized dependencies changed. reloading"), which makes an in-flight
-        // test-file import fail with "Failed to fetch dynamically imported module"
-        // — a suite-level failure `retry` cannot recover. Keep in sync with the
-        // deps surfaced by `DEBUG=vite:deps` (node_modules/.vite/.../_metadata.json).
+        // Pre-bundle every browser-test dependency up front so Vite does not
+        // trigger a mid-run reload ("optimized dependencies changed. reloading").
         optimizeDeps: {
           include: [
             'react',
             'react-dom',
+            'react-dom/client',
+            'react-dom/server',
             'react/jsx-runtime',
             'react/jsx-dev-runtime',
             'react-aria-components',
@@ -51,9 +49,9 @@ export default defineConfig({
             'gsap/ScrambleTextPlugin',
             'gsap/ScrollToPlugin',
             'gsap/ScrollTrigger',
-            '@marsidev/react-turnstile',
-            '@opennextjs/cloudflare',
             '@payloadcms/richtext-lexical/react',
+            '@payloadcms/live-preview-react',
+            '@radix-ui/react-slot',
             'shiki/core',
             'shiki/engine/javascript',
             '@shikijs/langs/bash',
@@ -74,6 +72,7 @@ export default defineConfig({
             'reconnecting-websocket',
             'fast-json-stable-stringify',
             'zod',
+            '@marsidev/react-turnstile',
           ],
         },
         test: {
@@ -96,8 +95,11 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['src/**/*.test.ts'],
+          // `.astro` renders need Astro's Vite plugins: see vitest.astro.config.ts.
+          exclude: [...configDefaults.exclude, 'src/layouts/**', 'src/pages/**', 'src/**/*.astro.test.ts'],
         },
       },
+      './vitest.astro.config.ts',
       {
         plugins: [
           cloudflareTest({

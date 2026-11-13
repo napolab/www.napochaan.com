@@ -83,4 +83,4 @@ claude.ai の Web / モバイルの直結コネクタ(`https://cms.napochaan.com
 ## 制約
 
 - image-row block は上記フェンス構文で Markdown 往復に対応済み。今後 image-row 以外の独自 block が追加された場合、対応済み block(`src/lib/mcp/markdown/index.ts` の `SUPPORTED_BLOCK_TYPES`)に含まれていなければその記事は MCP から本文更新不可(get_post が bodyEditable: false を返す)
-- `next dev`(localhost:3000)は worker シェルを経由せず、`CF_ACCESS_MCP_AUD` も空なので `/api/mcp` は 500 になる。動作確認は staging で行う（Portal 経由）
+- cms の `next dev`(localhost:3001)は worker シェルを経由せず、`CF_ACCESS_MCP_AUD` も空なので `/api/mcp` は 500 になる。動作確認は staging で行う（Portal 経由）

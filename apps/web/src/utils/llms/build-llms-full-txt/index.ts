@@ -1,9 +1,9 @@
 import { extractPlainText } from '@utils/lexical/extract-plain-text';
 
-import type { Profile } from '../../../app/(site)/about/_lib/profile';
-import type { Post } from '../../../app/(site)/blog/_lib/post';
-import type { NewsItem } from '../../../app/(site)/news/_lib/news-item';
-import type { WorkRow } from '../../../app/(site)/works/_lib/work-row';
+import type { Profile } from '../../../features/about/profile';
+import type { Post } from '../../../features/blog/post';
+import type { NewsItem } from '../../../features/news/news-item';
+import type { WorkRow } from '../../../features/works/work-row';
 
 type BuildLLMsFullTxtArgs = {
   baseUrl: string;

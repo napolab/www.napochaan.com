@@ -1,0 +1,36 @@
+---
+// Port of apps/web/src/app/(site)/(home)/{layout,page}.tsx. The worker caches `/`
+// under the short `timeSensitive` policy, not `cms`: the log teaser renders external
+// RSS posts (no CMS purge reaches them) and flips entries between upcoming/past
+// against the current time. CMS publishes still purge it.
+// The sections are `.astro` ports of the (site) Server Components: server-rendered
+// markup with only their client leaves (ScrambleText, EchoText, TypewriterText,
+// Button, Gallery) as islands.
+import { homeAbout } from '../features/home/about-sample';
+import AboutWhoami from '../features/home/components/about-whoami/about-whoami.astro';
+import BlogIndex from '../features/home/components/blog-index/blog-index.astro';
+import GallerySection from '../features/home/components/gallery-section/gallery-section.astro';
+import Hero from '../features/home/components/hero/hero.astro';
+import LogSection from '../features/home/components/log-section/log-section.astro';
+import NewsSection from '../features/home/components/news-section/news-section.astro';
+import WorksSection from '../features/home/components/works-section/works-section.astro';
+import { loadHome } from '../features/home/load-home';
+import { homeMetadata } from '../features/home/metadata';
+import * as s from '../features/shared/styles.css';
+import SiteLayout from '../layouts/site-layout.astro';
+
+const { news, works, logEntries, photos, posts } = await loadHome();
+---
+
+<SiteLayout metadata={homeMetadata}>
+  <main id="main-content" class={s.main}>
+    <h1 class={s.srOnly}>napochaan — DJ・VJ・グラフィック・デジタル</h1>
+    <Hero />
+    <AboutWhoami id="about" {...homeAbout} />
+    <NewsSection items={news} />
+    <WorksSection id="works" works={works} />
+    <LogSection id="log" entries={logEntries} />
+    <GallerySection id="gallery" photos={photos} />
+    <BlogIndex id="blog" posts={posts} />
+  </main>
+</SiteLayout>

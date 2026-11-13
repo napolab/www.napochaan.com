@@ -1,6 +1,6 @@
 import { extractPlainText } from '@utils/lexical/extract-plain-text';
 
-import type { Metadata } from 'next';
+import type { Metadata } from '../metadata';
 import type { SerializedEditorState } from '@payloadcms/richtext-lexical/lexical';
 
 // The admin-entered SEO group, already coerced to the consumed shape (NULLs →

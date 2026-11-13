@@ -15,7 +15,10 @@ describe('resolveCacheControl', () => {
     ['/api/media/file/a.jpg', { kind: 'fill', policy: MEDIA_POLICY }],
     ['/api/health', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/_next/image', { kind: 'keep' }],
-    ['/_next/static/chunks/a.js', { kind: 'keep' }],
+    ['/_astro/client.JLSpUPyv.js', { kind: 'keep' }],
+    ['/_image', { kind: 'keep' }],
+    ['/_actions/contact.send', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
+    ['/_server-islands/Island', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/blog/preview/1', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/news/preview/1', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
     ['/works/preview/1', { kind: 'deny', policy: PAGE_CACHE_POLICIES.uncacheable }],
@@ -128,6 +131,18 @@ describe('cacheControlHeaders', () => {
     expect(res.headers.get('Cache-Control')).toBe(PAGE_CACHE_POLICIES.timeSensitive);
   });
 
+  // /log renders external RSS posts and flips `upcoming` against now: no CMS purge
+  // refreshes it, so the page, its markdown twin and its feed take the short policy.
+  it.each([
+    ['/log', 'text/html; charset=utf-8'],
+    ['/log.md', 'text/markdown; charset=utf-8'],
+    ['/log/rss.xml', 'application/rss+xml; charset=utf-8'],
+  ])('stamps the time-sensitive policy on %s', async (path, contentType) => {
+    const app = build(() => new Response('body', { headers: { 'Content-Type': contentType } }));
+    const res = await app.request(path);
+    expect(res.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=3600');
+  });
+
   it('stamps the cms policy on a header-less feed', async () => {
     const app = build(() => new Response('<rss/>'));
     const res = await app.request('/blog/rss.xml');
@@ -145,6 +160,18 @@ describe('cacheControlHeaders', () => {
     const res = await app.request('/next/preview');
     expect(res.headers.get('Cache-Control')).toBe('no-store');
     expect(res.headers.get('Set-Cookie')).toBe('__prerender_bypass=x');
+  });
+
+  it('stamps the cms policy on GET /contact', async () => {
+    const app = build(() => new Response('html'));
+    const res = await app.request('/contact');
+    expect(res.headers.get('Cache-Control')).toBe(PAGE_CACHE_POLICIES.cms);
+  });
+
+  it('stamps no-store on an Astro Action POST (/_actions/submitContact)', async () => {
+    const app = build(() => new Response('{"status":"success"}', { headers: { 'Content-Type': 'application/json+devalue' } }));
+    const res = await app.request('/_actions/submitContact', { method: 'POST' });
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
   });
 
   it('leaves non-GET page responses (Server Actions) alone', async () => {

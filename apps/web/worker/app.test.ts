@@ -77,10 +77,12 @@ describe('createWorkerApp', () => {
     expect(response.headers.get('X-Frame-Options')).toBeNull();
   });
 
-  it('keeps the Next.js private policy on a Server Action POST', async () => {
-    const handlerFetch = vi.fn(async () => new Response('form', { headers: { 'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate' } }));
+  // A form POST to a page (Astro Action form mode) carries no Cache-Control from Astro;
+  // the Astro handler marks every non-GET/HEAD response no-store.
+  it.each<Record<string, string>>([{}, { 'Cache-Control': 'public, max-age=60' }])('marks a page POST no-store (upstream headers %o)', async (headers) => {
+    const handlerFetch = vi.fn(async () => new Response('form', { headers }));
     const app = createWorkerApp(handlerFetch);
     const response = await app.request('/contact', { method: 'POST' });
-    expect(response.headers.get('Cache-Control')).toBe('private, no-cache, no-store, max-age=0, must-revalidate');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
   });
 });

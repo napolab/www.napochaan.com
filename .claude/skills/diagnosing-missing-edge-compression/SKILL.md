@@ -1,6 +1,6 @@
 ---
 name: diagnosing-missing-edge-compression
-description: Use when a response served through Cloudflare (Workers/OpenNext) arrives uncompressed — no content-encoding header, transferred size equals raw size despite Accept-Encoding gzip/br/zstd — or when auditing transfer sizes shows full-size HTML/JS.
+description: Use when a response served through Cloudflare (Workers — Astro web or OpenNext cms) arrives uncompressed — no content-encoding header, transferred size equals raw size despite Accept-Encoding gzip/br/zstd — or when auditing transfer sizes shows full-size HTML/JS.
 ---
 
 # Diagnosing Missing Edge Compression on Cloudflare
@@ -13,7 +13,7 @@ Facts that counter the usual wrong guesses:
 
 - Cloudflare **does** auto-compress Worker-generated responses (gzip/br/zstd, per Accept-Encoding). No CompressionStream, no in-worker compression needed.
 - Workers Static Assets are **not** "uncompressed by design" — their default strong ETag is what blocks compression.
-- An explicit `Content-Encoding: identity` from the origin/worker also blocks it (OpenNext sets this only for `localhost` — a wrangler-dev workaround, irrelevant in production).
+- An explicit `Content-Encoding: identity` from the origin/worker also blocks it (cms's OpenNext sets this only for `localhost` — a wrangler-dev workaround, irrelevant in production).
 - Zone toggles (Brotli setting) are almost never the cause.
 
 ## Verify (before theorizing)
@@ -30,8 +30,8 @@ Then correlate: list several routes' `etag` / `content-encoding` headers. In thi
 
 | Path | Fix | Why this shape |
 |---|---|---|
-| Worker-rendered (HTML/ISR) | Rewrite ETag to weak `W/"..."` in `worker/middleware/weaken-etag.ts` (Hono, post-`next()` `c.header()`) | Weak ETag keeps If-None-Match 304s while permitting transforms |
-| `/_next/static/*` assets | `public/_headers`: `! ETag` + `Cache-Control: public, max-age=31536000, immutable` | Workers Assets serve BEFORE the worker runs — no middleware can reach them. Hashed URLs need no validator; removing ETag without adding `immutable` would regress to full re-downloads |
+| Worker-rendered (HTML) | Rewrite ETag to weak `W/"..."` in `worker/middleware/weaken-etag.ts` (Hono, post-`next()` `c.header()`) | Weak ETag keeps If-None-Match 304s while permitting transforms |
+| `/_astro/*` assets (web; `/_next/static/*` on cms) | `public/_headers`: `! ETag` + `Cache-Control: public, max-age=31536000, immutable` | Workers Assets serve BEFORE the worker runs — no middleware can reach them. Hashed URLs need no validator; removing ETag without adding `immutable` would regress to full re-downloads |
 | Unhashed public assets (og images) | Leave alone | Stable URLs need ETag 304s; images are incompressible anyway |
 
 ## Common Mistakes

@@ -1,0 +1,28 @@
+import cloudflare from '@astrojs/cloudflare';
+import react from '@astrojs/react';
+import { defineConfig } from 'astro/config';
+
+import { clientAliases } from './src/config/client-aliases';
+
+// Every page is SSR (no prerender) and cached by Workers Cache in front of the Worker
+// (.claude/rules/workers-cache.md). The Worker entry is wrangler.toml `main`
+// (worker/worker.ts), which mounts the adapter's handler inside the Hono app.
+export default defineConfig({
+  output: 'server',
+  // No Astro sessions: the adapter would otherwise auto-provision a SESSION KV binding,
+  // and per-visitor state has no place on Workers-Cache'd pages.
+  session: false,
+  adapter: cloudflare(),
+  // ClientRouter prefetches every link on hover unless this is exactly `false`. The
+  // Next site's react-aria links prefetched nothing, and unported / demo hrefs (the
+  // colophon catalog) must not be fetched behind the visitor's back.
+  prefetch: false,
+  integrations: [react()],
+  // wrangler.toml BASE_URL and the cms WEB_ORIGIN point at :3000 (the Next dev port);
+  // the cms dev server is :3001.
+  server: { port: 3000 },
+  vite: {
+    // linkedom stays out of the browser bundle (see src/config/client-aliases).
+    plugins: [clientAliases()],
+  },
+});

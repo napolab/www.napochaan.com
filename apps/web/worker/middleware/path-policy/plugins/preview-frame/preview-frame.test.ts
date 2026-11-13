@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { PREVIEW_PATH_PREFIXES } from '../../../../../src/app/next/preview/allowed-paths';
+import { PREVIEW_PATH_PREFIXES } from '../../../../../src/lib/preview/allowed-paths';
 
 import { PREVIEW_ROOTS, previewFramePlugin } from './index';
 

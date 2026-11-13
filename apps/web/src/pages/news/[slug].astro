@@ -1,0 +1,20 @@
+---
+// Port of apps/web/src/app/(site)/news/{layout,[slug]/page}.tsx. A missing slug and an
+// external-link item (it points off-site and has no detail page) are a 404, decided
+// before any HTML. The worker stamps the purge-driven `cms` policy.
+import NewsDetail from '../../features/news/news-detail.astro';
+import { loadNewsDetail } from '../../features/news/load-news-detail';
+import { newsDetailMetadata } from '../../features/news/metadata';
+import * as s from '../../features/shared/styles.css';
+import SiteLayout from '../../layouts/site-layout.astro';
+
+const slug = Astro.params.slug ?? '';
+const detail = await loadNewsDetail(slug);
+if (detail === undefined) return Astro.rewrite('/404');
+---
+
+<SiteLayout metadata={newsDetailMetadata(detail.item, slug)}>
+  <main id="main-content" class={s.main}>
+    <NewsDetail detail={detail} />
+  </main>
+</SiteLayout>

@@ -1,0 +1,48 @@
+---
+// Port of apps/web/src/app/(site)/works/preview/[id]/page.tsx (inside works/layout.tsx's
+// `<main>`). Draft-only Live Preview route: 404 unless the `/next/preview` handshake set
+// the draft cookie (readDraftContext); the worker stamps `no-store` and allows the cms
+// admin as frame ancestor. Unlike the public detail there is no ShareBar, and the
+// WorkDetail share URL is built from the id, as in Next. No page metadata (root
+// defaults).
+import { LivePreviewIsland } from '@components/live-preview/island';
+import PageHeader from '@components/page-header/page-header.astro';
+import { absoluteUrl } from '@utils/site-url';
+
+import { readDraftContext } from '../../../features/preview/read-draft-context';
+import * as s from '../../../features/shared/styles.css';
+import { AdjacentNavIsland } from '../../../features/works/components/adjacent-nav/island';
+import { RelatedWorksIsland } from '../../../features/works/components/related-works/island';
+import WorkDetail from '../../../features/works/components/work-detail/work-detail.astro';
+import * as styles from '../../../features/works/detail.css';
+import { loadWorkPreview } from '../../../features/works/load-work-preview';
+import { toWorkCard, toWorkLink } from '../../../features/works/work-card';
+import SiteLayout from '../../../layouts/site-layout.astro';
+
+const id = Astro.params.id ?? '';
+const draft = await readDraftContext(Astro.request);
+if (draft === undefined) return Astro.rewrite('/404');
+const detail = await loadWorkPreview(id, draft.previewSecret);
+if (detail === undefined) return Astro.rewrite('/404');
+
+const { work, adjacent, related } = detail;
+const pathname = Astro.url.pathname;
+const crumbs = [{ href: '/', label: 'home' }, { href: '/works', label: 'works' }, { label: work.title }];
+---
+
+<SiteLayout metadata={{}}>
+  <main id="main-content" class={s.main}>
+    <LivePreviewIsland client:load transition:persist="live-preview" pathname={pathname} props={{ serverURL: draft.cmsOrigin }} />
+    <PageHeader title={work.title} breadcrumbs={crumbs} titleTracking="tight" />
+    <WorkDetail work={work} url={absoluteUrl(`/works/${id}`)} />
+    {
+      related.length > 0 && (
+        <>
+          <hr class={styles.divider} />
+          <RelatedWorksIsland client:load pathname={pathname} props={{ works: related.map(toWorkCard) }} />
+        </>
+      )
+    }
+    <AdjacentNavIsland client:load pathname={pathname} props={{ prev: toWorkLink(adjacent.prev), next: toWorkLink(adjacent.next) }} />
+  </main>
+</SiteLayout>
