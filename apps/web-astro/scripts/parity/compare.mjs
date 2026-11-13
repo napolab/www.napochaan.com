@@ -176,14 +176,18 @@ export const diffRecords = (a, b) => {
 const matchesValue = (expected, actual) => (expected instanceof RegExp ? expected.test(actual) : expected === actual);
 
 // `path`, `field`, `a` and `b` are each a string (exact) or a RegExp.
-const matchesEntry = (entry, path, diff) => matchesValue(entry.path, path) && matchesValue(entry.field, diff.field) && matchesValue(entry.a, `${diff.a}`) && matchesValue(entry.b, `${diff.b}`);
+// An entry with `status` additionally requires BOTH records to answer that status.
+const matchesStatus = (entry, records) => entry.status === undefined || (records?.a?.status === entry.status && records?.b?.status === entry.status);
+
+const matchesEntry = (entry, path, diff, records) =>
+  matchesValue(entry.path, path) && matchesValue(entry.field, diff.field) && matchesValue(entry.a, `${diff.a}`) && matchesValue(entry.b, `${diff.b}`) && matchesStatus(entry, records);
 
 /**
  * Split diffs into accepted (a whitelist entry matches the path, field and BOTH values)
- * and mismatches. Returns the whitelist entries that were used, so unused ones can be reported.
+ * and mismatches. `records` (`{ a, b }`) feeds entries that pin a status. Returns the whitelist entries that were used, so unused ones can be reported.
  */
-export const applyWhitelist = (path, diffs, whitelist) => {
-  const results = diffs.map((diff) => ({ diff, entry: whitelist.find((entry) => matchesEntry(entry, path, diff)) }));
+export const applyWhitelist = (path, diffs, whitelist, records) => {
+  const results = diffs.map((diff) => ({ diff, entry: whitelist.find((entry) => matchesEntry(entry, path, diff, records)) }));
   return {
     accepted: results.filter(({ entry }) => entry !== undefined),
     mismatches: results.filter(({ entry }) => entry === undefined).map(({ diff }) => diff),

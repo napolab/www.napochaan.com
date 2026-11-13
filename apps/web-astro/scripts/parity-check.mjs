@@ -45,7 +45,7 @@ const discoverSlugs = async () => {
 
 const compareProbe = async (probe) => {
   const [a, b] = await Promise.all([fetchRecord(baseA, probe.path), fetchRecord(baseB, probe.path)]);
-  const { accepted, mismatches } = applyWhitelist(probe.path, diffRecords(a, b), WHITELIST);
+  const { accepted, mismatches } = applyWhitelist(probe.path, diffRecords(a, b), WHITELIST, { a, b });
   const unexpectedStatus = a.status !== `${probe.expect}`;
   return { probe, a, b, accepted, mismatches, unexpectedStatus };
 };

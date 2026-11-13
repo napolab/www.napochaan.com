@@ -140,6 +140,26 @@ describe('applyWhitelist', () => {
     expect(applyWhitelist('/blog/page/2', [diff], WHITELIST).mismatches).toEqual([diff]);
   });
 
+  describe('missing-slug-og-image', () => {
+    const diff = { field: 'og:image', a: 'http://x/blog/post-1/opengraph-image-fx5gi7', b: 'http://x/og-default.png' };
+    const notFound = { a: { status: '404' }, b: { status: '404' } };
+
+    it('accepts the segment OG leak only on the 404 probe paths', () => {
+      expect(applyWhitelist('/blog/does-not-exist', [{ ...diff, a: 'http://x/blog/does-not-exist/opengraph-image-fx5gi7' }], WHITELIST, notFound).mismatches).toEqual([]);
+    });
+
+    it('does NOT accept a valid slug whose og:image fell back to the default', () => {
+      const ok = { a: { status: '200' }, b: { status: '200' } };
+      expect(applyWhitelist('/blog/post-1', [diff], WHITELIST, ok).mismatches).toEqual([diff]);
+    });
+
+    it('does NOT accept the missing-slug path unless both sides answer 404', () => {
+      const leak = { ...diff, a: 'http://x/blog/does-not-exist/opengraph-image-fx5gi7' };
+      expect(applyWhitelist('/blog/does-not-exist', [leak], WHITELIST, { a: { status: '404' }, b: { status: '200' } }).mismatches).toEqual([leak]);
+      expect(applyWhitelist('/blog/does-not-exist', [leak], WHITELIST).mismatches).toEqual([leak]);
+    });
+  });
+
   it('every entry carries an id and a reason, ids unique', () => {
     const ids = WHITELIST.map((entry) => entry.id);
     expect(new Set(ids).size).toBe(ids.length);

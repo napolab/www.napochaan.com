@@ -83,7 +83,7 @@ Adding the hashed Next URLs then surfaced **4 real mismatches**, which are fixed
 | --- | --- | --- | --- |
 | `default-og-image-url` | any / og:image | `/opengraph-image-12o0cb.png` → `/og-default.png` | Ruling: og/twitter image URL change. The bytes are identical (md5 83c89b0f…), and the hashed URL still serves 200 on B |
 | `default-twitter-image-url` | any / twitter:image | `/twitter-image-12o0cb.png` → `/og-default.png` | Same ruling. Next's twitter-image and og-default are byte-identical |
-| `missing-slug-og-image` | `/blog\|news/<missing>` / og:image | segment OG route → `/og-default.png` | Next keeps the segment OG convention on a 404 page that is noindex |
+| `missing-slug-og-image` | `/blog\|news/does-not-exist` only, **both sides 404** / og:image | segment OG route → `/og-default.png` | Not a ledger ruling. Next keeps the segment OG convention on a 404 page that is noindex. The entry is pinned to the 404 probe paths and to status 404 on both sides, so a valid slug that falls back to the default image is still a mismatch (tested) |
 | `not-found-robots-local` | any / robots | `noindex` → `noindex, nofollow` | Local-host only. Next injects `noindex` ahead of the metadata value; on production both emit `noindex` (live Next 404; `build-metadata.ts`) |
 | `not-found-h1-ssr` | any / h1 | ∅ → `404` | Next (locally and on live) renders the not-found body client-side; Astro SSRs it. An improvement |
 | `past-the-end-page-404` | `/{blog,news,works}/page/3` / all | 200 → 404 | Ruling: past-the-end pages are real 404s |
@@ -208,7 +208,7 @@ The chrome-devtools MCP `lighthouse_audit` and `emulate` tools failed on this br
 
 **Performance** is much better on Astro. TBT drops about 30×, and LCP falls by half or more.
 
-**CLS: no regression.** The blog post's 0.000 vs 0.136 under simulated throttling is a timing artifact, not a font-metric regression.
+**CLS: equivalent; the Typekit swap is shared and unfixed.** The blog post's 0.000 vs 0.136 under simulated throttling is a timing artifact, not a regression from the @fontsource switch. The underlying Typekit swap shift exists on both apps and is not fixed here.
 - **Culprit.** Lighthouse names the `TypographyBand` marquee column (`div.pos_fixed > div.d_flex … will-change_transform`) together with the Typekit swap in the SysBar links and buttons. That is the same shift as on Next.
   - Both apps use the same Typekit kit (`wf-*` classes).
   - The `@fontsource` body fonts contribute only text nodes at about 0.0002.

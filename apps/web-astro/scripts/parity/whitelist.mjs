@@ -1,6 +1,7 @@
 // Accepted A (Next) ↔ B (Astro) differences for scripts/parity-check.mjs. Each entry
 // matches one field on a path pattern AND both observed values, so an unrelated change
-// to the same field still fails. `reason` cites the ledger ruling
+// to the same field still fails. An optional `status` also requires both sides to answer
+// it. `reason` cites the ledger ruling
 // (.superpowers/sdd/2026-11-13-web-astro-migration/progress.md) or the evidence.
 //
 // Normalizations applied before diffing (scripts/parity/compare.mjs, not entries here):
@@ -35,11 +36,15 @@ export const WHITELIST = [
   },
   {
     id: 'missing-slug-og-image',
-    path: /^\/(blog|news)\/[^/]+$/,
+    // Only the 404 probe paths, and only when both sides answer 404: a valid slug whose
+    // og:image fell back to the default must stay a mismatch.
+    path: /^\/(blog|news)\/does-not-exist$/,
+    status: '404',
     field: 'og:image',
-    a: /\/(blog|news)\/[^/]+\/opengraph-image-(fx5gi7|5nvrt4)$/,
+    a: /\/(blog|news)\/does-not-exist\/opengraph-image-(fx5gi7|5nvrt4)$/,
     b: /\/og-default\.png$/,
-    reason: 'Next keeps the segment OG file-convention on a not-found slug (a 404, noindex page); Astro renders the 404 page with the default image.',
+    reason:
+      'Next keeps the segment OG file-convention on a not-found slug (a 404, noindex page); Astro renders the 404 page with the default image. Not a ledger ruling: Next-artifact on a noindex 404 page, evidence in reports/2026-11-13-web-astro-parity.md.',
   },
   {
     id: 'not-found-robots-local',
