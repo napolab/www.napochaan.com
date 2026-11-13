@@ -52,6 +52,13 @@ describe('/blog.md', () => {
   });
 });
 
+// The container calls the endpoint module directly with the params the router would
+// extract; it does not route. That `/blog/a.b.md` reaches `[slug].md.ts` with slug `a.b`
+// (and not `[slug].astro` with `a.b.md`) depends on Astro's route priority, whose
+// matcher is internal (`astro/dist/core/routing`, not in the package exports). It is
+// verified through the built worker (`astro build` + `wrangler dev`): see the curl
+// matrix in .superpowers/sdd/2026-11-13-web-astro-migration/task-5-report.md
+// (`/blog/a.b.md` → markdown for `a.b`, `/blog/x.y.md` → text/plain 404).
 describe('/blog/[slug].md', () => {
   it('resolves a dotted slug (a.b) and serves its markdown', async () => {
     vi.stubEnv('BASE_URL', BASE);

@@ -186,6 +186,19 @@ describe('createAstroHandler', () => {
     expect(res.headers.get('Cache-Control')).toBe('no-store');
   });
 
+  // Next sent `private, no-cache, no-store…` on its permanentRedirect (e.g. `/blog/page/1`).
+  it('marks a 308 redirect no-store', async () => {
+    const app = build(async () => new Response(null, { status: 308, headers: { Location: '/blog' } }));
+    const res = await app.request(
+      '/blog/page/1',
+      {},
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(res.status).toBe(308);
+    expect(res.headers.get('Location')).toBe('/blog');
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+  });
+
   it('leaves a successful page for the cache-control middleware to stamp', async () => {
     const app = build(async () => new Response('<html>ok</html>', { headers: { 'Content-Type': 'text/html' } }));
     const res = await app.request(

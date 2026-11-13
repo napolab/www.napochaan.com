@@ -51,10 +51,11 @@ const settle = async (c: Context<AstroEnv>, target: RenderTarget, response: Resp
   }
 };
 
-// 404 / 500 (and any other error status) must never be shared: the cache-control
-// middleware only stamps OK responses, and Next sent `no-store` for these too.
+// Redirects (e.g. the `/blog/page/1` → `/blog` 308) and 404 / 500 (any non-2xx status)
+// must never be shared: the cache-control middleware only stamps OK responses, and Next
+// sent `no-store` for these too (`private, no-cache, no-store…` on permanentRedirect).
 const withErrorPolicy = (response: Response): Response => {
-  if (response.status < 400) return response;
+  if (response.status < 300) return response;
   const headers = new Headers(response.headers);
   headers.set('Cache-Control', PAGE_CACHE_POLICIES.uncacheable);
 
