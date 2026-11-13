@@ -6,3 +6,14 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
   ! ETag
+
+# Next's file-convention OG / icon URLs (hashed names already on social cards and in
+# crawler caches). Next served them as routes with the cms page policy; keep it.
+/opengraph-image-12o0cb.png
+  Cache-Control: public, max-age=0, s-maxage=31536000
+/twitter-image-12o0cb.png
+  Cache-Control: public, max-age=0, s-maxage=31536000
+/icon-12o0cb.png
+  Cache-Control: public, max-age=0, s-maxage=31536000
+/apple-icon-12o0cb.png
+  Cache-Control: public, max-age=0, s-maxage=31536000
