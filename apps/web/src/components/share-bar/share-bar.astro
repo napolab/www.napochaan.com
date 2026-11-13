@@ -1,0 +1,22 @@
+---
+// `.astro` ShareBar with NO React island: the React ShareBar (./index.tsx) rendered
+// server-side without a directive — the labelled group, the X intent link and the share
+// `<button>` as static markup — wrapped in the `<share-bar>` custom element
+// (./element.ts), which wires the share button (Web Share API → clipboard fallback via
+// @utils/share, shared with the React useShare).
+import { ShareBar } from './index';
+import * as styles from './styles.css';
+
+type Props = {
+  url: string;
+  title: string;
+};
+
+const { url, title } = Astro.props;
+---
+
+<share-bar class={styles.element} share-url={url} share-title={title}><ShareBar url={url} title={title} /></share-bar><script>
+  import { defineShareBarElement } from './element';
+
+  defineShareBarElement();
+</script>

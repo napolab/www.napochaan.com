@@ -27,3 +27,8 @@ export const root = css({
   _focusVisible: { layerStyle: 'focusRing', outlineOffset: '[-3px]' },
   '&:focus-visible::after': { inset: '[3px]' },
 });
+
+// The <copy-hash-button> custom element (copy-hash-button.astro) is a pure wrapper: no
+// box, so the button still positions against (and reveals with) its heading. A class
+// so it applies before the element upgrades.
+export const element = css({ display: 'contents' });

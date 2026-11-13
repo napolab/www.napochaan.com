@@ -7,7 +7,7 @@
 import PageHeader from '@components/page-header/page-header.astro';
 import { QuoteShareIsland } from '@components/quote-share/island';
 import RichText from '@components/rich-text/rich-text.astro';
-import { ShareBarIsland } from '@components/share-bar/island';
+import ShareBar from '@components/share-bar/share-bar.astro';
 import { absoluteUrl } from '@utils/site-url';
 
 import { BlogHero } from './components/blog-hero';
@@ -45,5 +45,5 @@ const crumbs = [{ href: '/', label: 'home' }, { href: '/blog', label: 'blog' }, 
     }
   </div>
 </div>
-<ShareBarIsland client:load pathname={pathname} props={{ url, title: post.title }} />
+<ShareBar url={url} title={post.title} />
 <BlogNav prev={adjacent.prev} next={adjacent.next} />

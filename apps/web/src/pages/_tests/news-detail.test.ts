@@ -4,7 +4,7 @@ import { findNewsFixture, newsFeed } from './news-fixtures';
 import NotFoundPage from '../404.astro';
 import NewsDetailPage from '../news/[slug].astro';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
-import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
+import { CLIENT_LEAF_ISLANDS, mainIslandsOf, mainLeafElementsOf } from '../../test-utils/island-parity';
 
 vi.mock('@utils/request-url', () => ({ getRequestOrigin: async () => ORIGIN }));
 vi.mock('@lib/cms/news', () => ({ findNewsList: vi.fn(async () => newsFeed), findNewsBySlug: vi.fn(findNewsFixture) }));
@@ -53,7 +53,8 @@ describe('/news/[slug]', () => {
     const islands = mainIslandsOf(await (await render('a.b')).text());
     expect(islands.filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
     expect(islands).toContain('QuoteShareIsland');
-    expect(islands).toContain('ShareBarIsland');
+    // ShareBar ships as the <share-bar> element, not an island.
+    expect(mainLeafElementsOf(await (await render('a.b')).text()).filter((tag) => tag === 'share-bar')).toHaveLength(1);
   });
 
   it.each(['x', 'ext-item'])('answers 404 with the not-found page for %s (unknown / external)', async (slug) => {

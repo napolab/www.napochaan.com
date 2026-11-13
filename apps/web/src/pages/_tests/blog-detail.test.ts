@@ -4,7 +4,7 @@ import { blogFeed } from './blog-fixtures';
 import NotFoundPage from '../404.astro';
 import BlogDetailPage from '../blog/[slug].astro';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
-import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
+import { CLIENT_LEAF_ISLANDS, mainIslandsOf, mainLeafElementsOf } from '../../test-utils/island-parity';
 
 import type { Post } from '../../features/blog/post';
 
@@ -71,8 +71,11 @@ describe('/blog/[slug]', () => {
     const islands = mainIslandsOf(await (await render('a.b')).text());
     expect(islands.filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
     expect(islands).toContain('QuoteShareIsland');
-    expect(islands).toContain('ShareBarIsland');
-    expect(islands.filter((name) => name === 'CopyHashButtonIsland')).toHaveLength(2);
+    // ShareBar and the heading copy-anchors ship as custom elements, not islands.
+    const html = await (await render('a.b')).text();
+    const elements = mainLeafElementsOf(html);
+    expect(elements.filter((tag) => tag === 'share-bar')).toHaveLength(1);
+    expect(elements.filter((tag) => tag === 'copy-hash-button')).toHaveLength(2);
   });
 
   it('answers 404 with the not-found page for an unknown slug', async () => {

@@ -7,6 +7,7 @@ import { useShare } from '@hooks/use-share';
 
 import { buildTweetUrl } from '@utils/tweet-intent';
 import { ShareIcon } from './icons';
+import { COPIED_LABEL, SHARE_LABEL } from './labels';
 import * as styles from './styles.css';
 
 type Props = {
@@ -33,7 +34,7 @@ export const ShareBar = ({ url, title }: Props) => {
         </Button>
         <Button variant="outline" onPress={share}>
           <ShareIcon width={16} height={16} />
-          {copied ? 'copied ✓' : 'share'}
+          {copied ? COPIED_LABEL : SHARE_LABEL}
         </Button>
       </div>
     </div>
