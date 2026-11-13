@@ -1,9 +1,9 @@
 ---
 // `.astro` twin of the NewsRow Server Component (markup mirrors ./index.tsx). The title
-// link is a static anchor; its ScrambleText is the only island, with the external ↗
-// passed through the island's `trailing` slot so it still tucks against the last line.
+// link is a static anchor; its ScrambleText is the `<scramble-text>` element (no React),
+// with the external ↗ passed through the `trailing` slot so it still tucks against the last line.
 import { Link } from '@components/link';
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 import { Tag } from '@components/tag';
 import { isExternal } from '@utils/is-external';
 
@@ -17,7 +17,6 @@ type Props = {
 };
 
 const { date, category, title, href } = Astro.props;
-const pathname = Astro.url.pathname;
 const external = href !== undefined && isExternal(href);
 ---
 
@@ -30,11 +29,9 @@ const external = href !== undefined && isExternal(href);
     ) : (
       <Link href={href} tone="accent" className={styles.titleLink} target={external ? '_blank' : undefined} rel={external ? 'noopener noreferrer' : undefined}>
         {external ? (
-          <ScrambleTextIsland client:load pathname={pathname} props={{ children: title }}>
-            <span slot="trailing" class={styles.externalMark} aria-hidden="true">↗</span>
-          </ScrambleTextIsland>
+          <ScrambleText text={title}><span slot="trailing" class={styles.externalMark} aria-hidden="true">↗</span></ScrambleText>
         ) : (
-          <ScrambleTextIsland client:load pathname={pathname} props={{ children: title }} />
+          <ScrambleText text={title} />
         )}
       </Link>
     )

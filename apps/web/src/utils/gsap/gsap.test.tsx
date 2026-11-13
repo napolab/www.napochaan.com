@@ -12,20 +12,34 @@ import { loadGsap } from './index';
 type PluginRegistry = Record<string, unknown>;
 type CoreGlobals = { globals: () => Record<string, unknown> };
 
+// Order matters: the browser context is per test file and the kits share one core, so
+// the scramble-only assertion must run before anything requests the scroll kit.
 describe('loadGsap', () => {
-  it('resolves gsap with the scramble, scroll-trigger and scroll-to plugins registered', async () => {
-    const { gsap, ScrollTrigger } = await loadGsap();
+  it('loads the scramble kit without fetching the scroll plugins', async () => {
+    const { gsap, ScrambleTextPlugin } = await loadGsap('scramble');
     const plugins = gsap.plugins as unknown as PluginRegistry;
     const core = gsap.core as unknown as CoreGlobals;
 
+    expect(ScrambleTextPlugin).toBeDefined();
     expect(gsap.plugins.scrambleText).toBeDefined();
+    expect(plugins.scrollTo).toBeUndefined();
+    expect(core.globals().ScrollTrigger).toBeUndefined();
+  });
+
+  it('loads the scroll kit with scroll-trigger and scroll-to registered on the same core', async () => {
+    const scramble = await loadGsap('scramble');
+    const { gsap, ScrollTrigger, ScrollToPlugin } = await loadGsap('scroll');
+    const plugins = gsap.plugins as unknown as PluginRegistry;
+    const core = gsap.core as unknown as CoreGlobals;
+
+    expect(gsap).toBe(scramble.gsap);
+    expect(ScrollToPlugin).toBeDefined();
     expect(plugins.scrollTo).toBeDefined();
     expect(core.globals().ScrollTrigger).toBe(ScrollTrigger);
   });
 
   it('returns the same bundle on repeated calls', async () => {
-    const a = await loadGsap();
-    const b = await loadGsap();
-    expect(a).toBe(b);
+    expect(await loadGsap('scramble')).toBe(await loadGsap('scramble'));
+    expect(await loadGsap('scroll')).toBe(await loadGsap('scroll'));
   });
 });

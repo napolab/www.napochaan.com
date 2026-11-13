@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { renderComponent } from '../../test-utils/astro-container';
-import { renderReactMarkup, stripIslands } from '../../test-utils/island-parity';
+import { renderReactMarkup, scrambleTextCountOf, stripIslands } from '../../test-utils/island-parity';
 import Twin from './contact-list.astro';
 import { ContactList } from './index';
 
@@ -20,9 +20,11 @@ describe('contact-list.astro', () => {
     expect(stripIslands(html)).toBe(renderReactMarkup(ContactList, props));
   });
 
-  it('hydrates only its client leaves', async () => {
+  it('hydrates nothing; the labels are <scramble-text> elements', async () => {
     const [props] = cases;
     const html = await renderComponent(Twin, { props });
-    expect([...html.matchAll(/component-export="([^"]+)"/g)].map((match) => match[1])).toEqual(['ScrambleTextIsland', 'ScrambleTextIsland']);
+    expect([...html.matchAll(/component-export="([^"]+)"/g)].map((match) => match[1])).toEqual([]);
+    // ScrambleText ships as the <scramble-text> element, not an island.
+    expect(scrambleTextCountOf(html)).toBe(2);
   });
 });

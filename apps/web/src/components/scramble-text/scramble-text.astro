@@ -1,0 +1,35 @@
+---
+// `.astro` ScrambleText with NO React island. The markup inside <scramble-text> is
+// byte-identical to the React ScrambleText (./index.tsx) — asserted by
+// scramble-text.astro.test.ts — and the decode is driven by the `<scramble-text>`
+// custom element (./element.ts), which shares ./bind-scramble with the React one.
+//
+// Props mirror the React component, except:
+//   - `text` replaces `children` (rendered three times, so it must be a plain string).
+//   - `trailing` is a named slot: <span slot="trailing" aria-hidden="true">↗</span>.
+//   - trigger="group" has no `host` value: the hovered host is the nearest ancestor
+//     the caller marks with `data-scramble-host` (no value), e.g.
+//       <a href={href} data-scramble-host>…<ScrambleText text={title} trigger="group" /></a>
+//
+// The template is deliberately one line: the root span is inline-block, so any
+// whitespace between the tags would render as a space or widen the ghost.
+import { clsx } from '@utils/clsx';
+
+import * as styles from './styles.css';
+
+type Props = {
+  text: string;
+  className?: string;
+  clamp?: boolean;
+  truncate?: boolean;
+  trigger?: 'self' | 'group';
+};
+
+const { text, className, clamp, truncate, trigger } = Astro.props;
+---
+
+<scramble-text class={styles.element} trigger={trigger === 'group' ? 'group' : undefined}><span class={clsx(styles.root, className)} data-clamp={clamp ? 'true' : undefined} data-truncate={truncate ? 'true' : undefined}><span class={styles.srOnly}>{text}</span><span aria-hidden="true" class={styles.ghost}>{text}</span><span aria-hidden="true" class={styles.fill}>{text}</span><slot name="trailing" /></span></scramble-text><script>
+  import { defineScrambleTextElement } from './element';
+
+  defineScrambleTextElement();
+</script>

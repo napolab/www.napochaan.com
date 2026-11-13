@@ -1,8 +1,13 @@
+import { act } from 'react';
+import { hydrateRoot } from 'react-dom/client';
+import { renderToString } from 'react-dom/server';
 import { render } from 'vitest-browser-react';
 import { describe, expect, it, vi } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { MotionProvider } from '@components/motion-provider';
+import { write } from '@utils/persistent-store';
+import { MOTION_STORAGE_KEY } from '@utils/prefers-reduced-motion';
 
 import { ScrambleText } from './index';
 
@@ -73,14 +78,15 @@ describe('ScrambleText', () => {
   });
 
   // Regression: navigating away used to throw "RangeError: Maximum call stack
-  // size exceeded at Context.getTweens". On the MOBILE breakpoint the decode
-  // tween fires via a ScrollTrigger created inside a gsap.matchMedia condition;
-  // when decode was owned by the outer useGSAP context, invoking it while the
-  // conditional context was active cross-linked the two contexts into a cycle,
-  // and the unmount-time context.revert() recursed forever. The matchMedia branch
-  // only runs below 768px, so we force it by stubbing window.matchMedia. The
-  // overflow surfaces asynchronously (deferred ScrollTrigger refresh + revert),
-  // so we capture window errors across a flush window instead of asserting sync.
+  // size exceeded at Context.getTweens". The mobile decode then fired via a
+  // ScrollTrigger inside a gsap.matchMedia condition, and a decode owned by the
+  // outer context cross-linked the two contexts into a cycle that the unmount-time
+  // revert() recursed through forever. The in-view trigger is now an
+  // IntersectionObserver with one gsap.context per breakpoint branch, so no nested
+  // contexts exist — kept to pin that an in-view decode still unmounts cleanly. The
+  // mobile branch only runs below 768px, so we force it by stubbing
+  // window.matchMedia, and capture window errors across a flush window (the decode
+  // and the revert are asynchronous).
   it('unmounts without a getTweens stack overflow on the mobile breakpoint', async () => {
     const original = window.matchMedia.bind(window);
     window.matchMedia = ((query: string) =>
@@ -103,7 +109,7 @@ describe('ScrambleText', () => {
 
     try {
       const screen = await render(<ScrambleText>archive</ScrambleText>);
-      await new Promise((resolve) => setTimeout(resolve, 50));
+      await expect.poll(() => screen.container.querySelector('[data-scrambling]')).not.toBeNull();
       screen.unmount();
       await new Promise((resolve) => setTimeout(resolve, 50));
 
@@ -117,9 +123,8 @@ describe('ScrambleText', () => {
   });
 
   // Spec §4: under reduced motion the gsap import itself must be skipped, not
-  // merely no-op'd after loading — the effect returns before loadGsap() is
-  // ever called, so neither the desktop hover branch nor the mobile
-  // ScrollTrigger branch can bind.
+  // merely no-op'd after loading — the effect returns before bindScramble(), so
+  // neither the desktop hover branch nor the mobile in-view branch can bind.
   it('never imports gsap when reduced motion is on', async () => {
     loadGsap.mockClear();
     await render(
@@ -130,5 +135,25 @@ describe('ScrambleText', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(loadGsap).not.toHaveBeenCalled();
+  });
+
+  // A hydrated island (sys-bar) commits its first render with the server snapshot
+  // (reduced=false) and runs its effects before re-rendering with the client value: the
+  // effect must read the live preference, or every page fetches gsap for a
+  // reduced-motion visitor.
+  it('never imports gsap while hydrating for a reduced-motion visitor', async () => {
+    loadGsap.mockClear();
+    write(MOTION_STORAGE_KEY, false);
+    const container = document.createElement('div');
+    container.innerHTML = renderToString(<ScrambleText>archive</ScrambleText>);
+    document.body.appendChild(container);
+
+    const root = await act(async () => hydrateRoot(container, <ScrambleText>archive</ScrambleText>));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(loadGsap).not.toHaveBeenCalled();
+
+    act(() => root.unmount());
+    container.remove();
+    write(MOTION_STORAGE_KEY, null);
   });
 });

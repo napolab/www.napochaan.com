@@ -2,7 +2,7 @@
 // Port of the (site) AboutWhoami Server Component. Server-only markup; the heading's
 // "$ whoami" more-link label (ScrambleText) is the only client leaf, passed through
 // SectionHeading's `more` slot.
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 import { SectionHeading } from '@components/section-heading';
 
 import * as styles from './styles.css';
@@ -16,7 +16,6 @@ type Props = {
 };
 
 const { id, skills, now, likes, wants } = Astro.props;
-const pathname = Astro.url.pathname;
 const rows = [
   { key: 'skills', value: skills.join(' · ') },
   { key: 'now', value: now },
@@ -26,7 +25,7 @@ const rows = [
 ---
 
 <section id={id} class={styles.root}>
-  <SectionHeading no="00" moreHref="/about">about<ScrambleTextIsland slot="more" client:load pathname={pathname} props={{ children: '$ whoami' }} /></SectionHeading>
+  <SectionHeading no="00" moreHref="/about">about<ScrambleText slot="more" text="$ whoami" /></SectionHeading>
   <div class={styles.who}>
     <p class={styles.prompt}>$ whoami</p>
     {
