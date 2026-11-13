@@ -26,6 +26,8 @@ const renderPaged = async (num: string): Promise<Response> => {
   return renderPage(BlogPagedPage, `/blog/page/${num}`, { '/404': NotFoundPage }, { num });
 };
 
+const mainOf = (html: string): string => html.slice(html.indexOf('<main'), html.indexOf('</main>'));
+
 describe('/blog', () => {
   it('titles the page and links its feed and markdown twin', async () => {
     const html = await renderIndex();
@@ -40,7 +42,8 @@ describe('/blog', () => {
     expect(html).toMatch(/<main id="main-content" class="[^"]+">/);
     expect(html.match(/<h1[\s>]/g)).toHaveLength(1);
     expect(html).toContain('href="/blog/rss.xml"');
-    expect(html.match(/<a [^>]*data-scramble-host/g)).toHaveLength(10);
+    // Post cards inside main (the SysBar's nav slots are scramble hosts too).
+    expect(mainOf(html).match(/<a [^>]*data-scramble-host/g)).toHaveLength(10);
     expect(mainIslandsOf(html)).not.toContain('PostCardIsland');
     expect(html).toContain('href="/blog/a.b"');
     expect(html).toContain('2026.01.20');
@@ -60,7 +63,7 @@ describe('/blog/page/[num]', () => {
     const html = await res.text();
     expect(html).toContain('<title>blog — page 2 — napochaan</title>');
     expect(html).toContain('<link rel="canonical" href="http://localhost:8788/blog/page/2"');
-    expect(html.match(/<a [^>]*data-scramble-host/g)).toHaveLength(2);
+    expect(mainOf(html).match(/<a [^>]*data-scramble-host/g)).toHaveLength(2);
     expect(html).toContain('aria-current="page"');
   });
 

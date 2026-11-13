@@ -37,7 +37,7 @@ describe('/colophon', () => {
     }
   });
 
-  // Every demo that carries an href sits inside the <NoAction> island (colophon rule).
+  // Every demo that carries an href sits inside the <no-action> element (colophon rule).
   const NO_ACTION_DEMOS = ['RichText', 'NewsRow', 'Link', 'Pagination', 'Breadcrumbs', 'FeedLink', 'ShareBar', 'BackToIndex', 'QuoteShare'];
 
   // The stage markup of one catalog cell.
@@ -46,9 +46,14 @@ describe('/colophon', () => {
     return html.slice(start, html.indexOf('</article>', start));
   };
 
-  it.each(NO_ACTION_DEMOS)('wraps the %s demo in the no-action island', async (name) => {
+  it.each(NO_ACTION_DEMOS)('wraps the %s demo in the <no-action> element', async (name) => {
     const html = await render();
-    expect(stageOf(html, name)).toMatch(/<div class="[^"]+"><astro-island [^>]*component-export="NoAction"/);
+    expect(stageOf(html, name)).toMatch(/<div class="[^"]+"><no-action class="[^"]+">/);
+  });
+
+  it('ships no NoAction island (the wrapper is a custom element)', async () => {
+    const html = await render();
+    expect(html).not.toContain('component-export="NoAction"');
   });
 
   it('renders a non-empty stage for every catalog demo', async () => {
@@ -80,6 +85,20 @@ describe('/colophon', () => {
   it('renders the Divider demo as static separators (no island)', async () => {
     const stage = stageOf(await render(), 'Divider');
     expect(stage.match(/role="separator"/g)).toHaveLength(2);
+    expect(stage).not.toContain('<astro-island');
+  });
+
+  // The two shell demos run the same custom-element drivers as the site (no React):
+  // GameOfLife on its own engine, CursorPresence on the socket-free sample visitors.
+  it('runs the GameOfLife demo as an isolated-engine <game-of-life> element (no island)', async () => {
+    const stage = stageOf(await render(), 'GameOfLife');
+    expect(stage).toMatch(/<div class="[^"]+"><game-of-life class="[^"]+" engine="isolated"><canvas /);
+    expect(stage).not.toContain('<astro-island');
+  });
+
+  it('runs the CursorPresence demo as a <cursor-presence-demo> element (no island)', async () => {
+    const stage = stageOf(await render(), 'CursorPresence');
+    expect(stage).toMatch(/<cursor-presence-demo class="[^"]+"><div class="[^"]+"><canvas /);
     expect(stage).not.toContain('<astro-island');
   });
 });

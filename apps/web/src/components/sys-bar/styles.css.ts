@@ -223,3 +223,8 @@ export const checker = css({
   backgroundImage: '[conic-gradient(token(colors.fg.default) 25%, transparent 0 50%, token(colors.fg.default) 0 75%, transparent 0)]',
   backgroundSize: '[16px 16px]',
 });
+
+// The <sys-bar> custom element (sys-bar.astro) is a pure wrapper: no box, so the header
+// and the checker strip lay out in the stage exactly as the React SysBar did. A class
+// so it applies before the element upgrades.
+export const element = css({ display: 'contents' });

@@ -1,14 +1,16 @@
 ---
 // One catalog demo (see ./demo-kind). Server Components render server-only; only
 // client leaves ('use client' in apps/web) are islands. Demos that carry hrefs sit
-// inside the <NoAction> island, which receives the demo as slot children: static
-// HTML, plus the demo's own leaf islands nested in that slot.
+// inside the <NoAction> `.astro` wrapper (a `<no-action>` element, no React), which
+// receives the demo as slot children: static HTML, plus the demo's own leaf islands
+// / elements nested in that slot.
 import BackToIndex from '@components/back-to-index/back-to-index.astro';
 import Breadcrumbs from '@components/breadcrumbs/breadcrumbs.astro';
 import { ButtonIsland } from '@components/button/island';
 import { CalendarIsland } from '@components/calendar/island';
 import Divider from '@components/divider/divider.astro';
 import EchoText from '@components/echo-text/echo-text.astro';
+import GameOfLife from '@components/game-of-life/game-of-life.astro';
 import GalleryArchive from '@components/gallery-archive/gallery-archive.astro';
 import { GalleryIsland } from '@components/gallery/island';
 import BootConsole from '@components/loading-overlay/boot-console/boot-console.astro';
@@ -22,13 +24,13 @@ import { TextAreaIsland } from '@components/text-area/island';
 import { TextFieldIsland } from '@components/text-field/island';
 import TypewriterText from '@components/typewriter-text/typewriter-text.astro';
 
+import CursorPresenceDemo from './cursor-presence-demo.astro';
 import * as gameOfLifeStyles from './game-of-life-demo.css';
 import * as loadingOverlayStyles from './loading-overlay-demo.css';
 import * as newsRowStyles from './news-row-demo.css';
 import { breadcrumbItems, calendarMarks, galleryItems } from './demo-data';
 import { demoKindOf } from './demo-kind';
-import { CursorPresenceDemoIsland, IsolatedGameOfLifeIsland } from './islands';
-import { NoAction } from './no-action';
+import NoAction from './no-action.astro';
 import { richTextSample } from './rich-text-sample';
 import { StaticDemo } from './static-demos';
 
@@ -49,7 +51,7 @@ const buttons = ['solid', 'outline', 'danger'] as const;
 {kind === 'static' && <StaticDemo name={staticName} />}
 {
   kind === 'static-no-action' && (
-    <NoAction client:load>
+    <NoAction>
       <StaticDemo name={staticName} />
     </NoAction>
   )
@@ -59,7 +61,7 @@ const buttons = ['solid', 'outline', 'danger'] as const;
 {name === 'TypewriterText' && <TypewriterText text="さまざまな「破壊」、承っております。" />}
 {
   name === 'RichText' && (
-    <NoAction client:load>
+    <NoAction>
       <RichText data={richTextSample} />
     </NoAction>
   )
@@ -74,7 +76,7 @@ const buttons = ['solid', 'outline', 'danger'] as const;
 {name === 'GalleryArchive' && <GalleryArchive photos={galleryItems} />}
 {
   name === 'NewsRow' && (
-    <NoAction client:load>
+    <NoAction>
       <ol class={newsRowStyles.list}>
         <NewsRow date="06.14" category="event" title="Booth² vol.03 を開催します" href="/news/1" />
         <NewsRow date="05.30" category="release" title="新しいミックスを公開しました" href="https://example.com" />
@@ -96,7 +98,7 @@ const buttons = ['solid', 'outline', 'danger'] as const;
 }
 {
   name === 'Breadcrumbs' && (
-    <NoAction client:load>
+    <NoAction>
       <Breadcrumbs items={breadcrumbItems} />
     </NoAction>
   )
@@ -104,21 +106,21 @@ const buttons = ['solid', 'outline', 'danger'] as const;
 {name === 'Calendar' && <CalendarIsland client:load pathname={pathname} props={{ marks: calendarMarks, minDate: '2026-06-01', maxDate: '2026-07-31', label: '活動カレンダー（サンプル）' }} />}
 {
   name === 'ShareBar' && (
-    <NoAction client:load>
+    <NoAction>
       <ShareBar url="https://www.napochaan.com/works/1" title="サンプル作品タイトル" />
     </NoAction>
   )
 }
 {
   name === 'BackToIndex' && (
-    <NoAction client:load>
+    <NoAction>
       <BackToIndex href="/blog" label="blog 一覧へもどる" />
     </NoAction>
   )
 }
 {
   name === 'QuoteShare' && (
-    <NoAction client:load>
+    <NoAction>
       <QuoteShareIsland client:load pathname={pathname} props={{ url: 'https://www.napochaan.com/blog/sample', title: 'サンプルブログ記事' }}>
         <p>この段落をドラッグで選択すると、選択範囲の上に共有バーが出ます（PC のみ）。</p>
       </QuoteShareIsland>
@@ -128,11 +130,11 @@ const buttons = ['solid', 'outline', 'danger'] as const;
 {
   name === 'GameOfLife' && (
     <div class={gameOfLifeStyles.frame}>
-      <IsolatedGameOfLifeIsland client:load pathname={pathname} props={{}} />
+      <GameOfLife engine="isolated" />
     </div>
   )
 }
-{name === 'CursorPresence' && <CursorPresenceDemoIsland client:load pathname={pathname} props={{}} />}
+{name === 'CursorPresence' && <CursorPresenceDemo />}
 {
   name === 'LoadingOverlay' && (
     <div class={loadingOverlayStyles.frame}>

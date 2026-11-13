@@ -1,0 +1,24 @@
+---
+// `.astro` GameOfLife with NO React island. The canvas inside <game-of-life> is
+// byte-identical to the React GameOfLife (./index.tsx) — asserted by
+// game-of-life.astro.test.ts — and the simulation is driven by the `<game-of-life>`
+// custom element (./element.ts), which shares ./bind-life with the React one. The
+// caller's box decides the size; the page background persists that box
+// (shell-backdrop.astro), and the element keeps the simulation running across moves.
+//
+// `engine="isolated"` gives this instance its own engine (the colophon demo), so it
+// never disturbs the background's gen count in the SysBar.
+import * as styles from './styles.css';
+
+type Props = {
+  engine?: 'shared' | 'isolated';
+};
+
+const { engine } = Astro.props;
+---
+
+<game-of-life class={styles.element} engine={engine === 'isolated' ? 'isolated' : undefined}><canvas data-testid="game-of-life" aria-hidden="true" class={styles.root}></canvas></game-of-life><script>
+  import { defineGameOfLifeElement } from './element';
+
+  defineGameOfLifeElement();
+</script>

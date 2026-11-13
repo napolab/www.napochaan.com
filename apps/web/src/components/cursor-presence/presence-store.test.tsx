@@ -4,7 +4,8 @@ import { page } from 'vitest/browser';
 
 import { write } from '@utils/persistent-store';
 
-import { PRESENCE_ENABLED_KEY, publishPresenceCount, usePresence } from './presence-store';
+import { PRESENCE_ENABLED_KEY, publishPresenceCount } from './presence-count';
+import { usePresence } from './presence-store';
 
 // The cursor island owns the socket and the SysBar island shows `watching N` and the
 // cursors toggle — two separate React roots sharing one module-level presence store.

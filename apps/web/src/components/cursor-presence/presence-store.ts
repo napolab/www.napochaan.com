@@ -1,17 +1,14 @@
 'use client';
 
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import { useMemo, useSyncExternalStore } from 'react';
 
 import { usePersistent } from '@hooks/use-persistent';
-import { read } from '@utils/persistent-store';
 
-// Module-level presence state shared across React roots. Each Astro island is its
-// own root: the CursorPresence island owns the socket and publishes the visitor
-// count here; the SysBar island reads it (`watching N`) and flips the opt-out. The
-// `enabled` flag lives in the persistent store (localStorage), which is already
-// module-scoped, so both roots stay in sync through it.
+import { getPresenceCount, PRESENCE_ENABLED_KEY, subscribePresenceCount, togglePresenceEnabled } from './presence-count';
 
-export const PRESENCE_ENABLED_KEY = 'cursor-presence-enabled';
+// React view of the framework-free presence store (./presence-count), for the React
+// twins (SysBar reference markup, tests). The custom elements read ./presence-count
+// directly.
 
 export type PresenceValue = {
   count: number;
@@ -19,34 +16,11 @@ export type PresenceValue = {
   toggle: () => void;
 };
 
-const listeners = new Set<() => void>();
-const cell = { count: 0 };
-
-// Called from the CursorPresence island's effect only (never during render), so the
-// server copy of this module keeps count 0.
-export const publishPresenceCount = (count: number): void => {
-  if (cell.count === count) return;
-  cell.count = count;
-  for (const listener of listeners) listener();
-};
-
-const subscribeCount = (listener: () => void): (() => void) => {
-  listeners.add(listener);
-
-  return () => {
-    listeners.delete(listener);
-  };
-};
-
-const getCount = (): number => cell.count;
 const getServerCount = (): number => 0;
 
 export const usePresence = (): PresenceValue => {
-  const count = useSyncExternalStore(subscribeCount, getCount, getServerCount);
-  const [enabled, setEnabled] = usePersistent(PRESENCE_ENABLED_KEY, true);
-  // Read the store at call time rather than closing over `enabled`, so a toggle
-  // fired from a root that has not re-rendered yet still flips the latest value.
-  const toggle = useCallback(() => setEnabled(!read(PRESENCE_ENABLED_KEY, true)), [setEnabled]);
+  const count = useSyncExternalStore(subscribePresenceCount, getPresenceCount, getServerCount);
+  const [enabled] = usePersistent(PRESENCE_ENABLED_KEY, true);
 
-  return useMemo(() => ({ count, enabled, toggle }), [count, enabled, toggle]);
+  return useMemo(() => ({ count, enabled, toggle: togglePresenceEnabled }), [count, enabled]);
 };

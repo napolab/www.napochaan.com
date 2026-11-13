@@ -12,6 +12,7 @@ import { siteNavItems } from '@utils/nav-items';
 
 import { isNavActive } from '@utils/is-nav-active';
 import { NavMenu } from './nav-menu';
+import { aliveText, cursorsText, genText, motionText, watchingText } from './status-text';
 import * as styles from './styles.css';
 import { useClock } from './use-clock';
 
@@ -31,13 +32,14 @@ const NavLink = ({ label, href, active, order }: { label: string; href: string; 
   );
 };
 
+// The React SysBar: the reference markup for sys-bar.astro (the site runs the
+// <sys-bar> element, ./element.ts — no React until the mobile menu is first used).
 export const SysBar = ({ initialTime }: { initialTime: string }) => {
   const clock = useClock(initialTime);
   const state = useLifeState();
   const pathname = usePathname();
   const presence = usePresence();
   const motion = useMotion();
-  const gen = `${state.generation}`.padStart(4, '0');
 
   return (
     <>
@@ -55,21 +57,31 @@ export const SysBar = ({ initialTime }: { initialTime: string }) => {
               that opens the full set of targets in a react-aria Menu popover, so
               the bar never wraps to a second row. The menu code itself is a lazy
               chunk, fetched on the first hover / focus / press of the trigger. */}
-          <div className={styles.menuRoot}>
+          <div className={styles.menuRoot} data-nav-menu="">
             <NavMenu pathname={pathname} />
           </div>
         </div>
         <div className={styles.status}>
-          <span className={styles.clock}>{clock}</span>
-          <span className={styles.gen}>gen {gen}</span>
-          <span className={styles.alive}>alive {state.alive}</span>
+          {/* data-status / data-toggle: the hooks the <sys-bar> element writes the
+              live values through (sys-bar.astro renders this same markup). */}
+          <span className={styles.clock} data-status="clock">
+            {clock}
+          </span>
+          <span className={styles.gen} data-status="gen">
+            {genText(state.generation)}
+          </span>
+          <span className={styles.alive} data-status="alive">
+            {aliveText(state.alive)}
+          </span>
           <span className={styles.rec}>● rec</span>
-          <span className={styles.watching}>watching {presence.count}</span>
-          <button type="button" className={styles.toggle} onClick={presence.toggle}>
-            {presence.enabled ? 'cursors: on' : 'cursors: off'}
+          <span className={styles.watching} data-status="watching">
+            {watchingText(presence.count)}
+          </span>
+          <button type="button" className={styles.toggle} data-toggle="cursors" onClick={presence.toggle}>
+            {cursorsText(presence.enabled)}
           </button>
-          <button type="button" className={styles.toggle} onClick={motion.toggle}>
-            {motion.reduced ? 'motion: off' : 'motion: on'}
+          <button type="button" className={styles.toggle} data-toggle="motion" onClick={motion.toggle}>
+            {motionText(motion.reduced)}
           </button>
         </div>
       </header>

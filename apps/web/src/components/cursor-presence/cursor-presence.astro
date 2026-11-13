@@ -1,0 +1,16 @@
+---
+// `.astro` CursorPresence layer with NO React island. The overlay + canvas inside
+// <cursor-presence> are byte-identical to the React CursorPresence with no children
+// (./index.tsx) — asserted by cursor-presence.astro.test.ts — and the presence socket,
+// pointer broadcast and cursor drawing are driven by the `<cursor-presence>` custom
+// element (./element.ts). The coordinate surface is the layout's `[data-cursor-surface]`
+// stage, resolved from the DOM. The element itself carries `transition:persist`, so
+// the socket stays open across ClientRouter navigations.
+import * as styles from './styles.css';
+---
+
+<cursor-presence class={styles.element} transition:persist="cursor-presence"><div class={styles.overlay}><canvas class={styles.canvas} aria-hidden="true"></canvas></div></cursor-presence><script>
+  import { defineCursorPresenceElement } from './element';
+
+  defineCursorPresenceElement();
+</script>

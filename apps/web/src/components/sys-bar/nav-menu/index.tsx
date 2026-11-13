@@ -1,10 +1,8 @@
 import { Suspense, lazy, startTransition, useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { Button } from 'react-aria-components';
 
-import * as styles from '../styles.css';
 import { INITIAL_HANDOFF } from './handoff';
 import { MenuBoundary } from './menu-boundary';
-import { MENU_LABEL, TriggerFace } from './trigger-face';
+import { MenuTriggerButton } from './trigger-button';
 
 import type { PressEvent } from 'react-aria-components';
 import type { MenuHandoff } from './handoff';
@@ -24,9 +22,8 @@ type PlaceholderProps = {
   onUnmount: (focused: boolean) => void;
 };
 
-// The trigger before the menu chunk lands: the same react-aria Button face (so the
-// data-hovered / data-pressed styles and the accessible name are identical), wired to
-// request the chunk on hover / focus / press start and to remember the press.
+// The trigger before the menu chunk lands (./trigger-button), wired to request the
+// chunk on hover / focus / press start and to remember the press.
 const PlaceholderTrigger = ({ onIntent, onPressStart, onPressEnd, onPress, onUnmount }: PlaceholderProps) => {
   const ref = useRef<HTMLButtonElement>(null);
 
@@ -38,24 +35,7 @@ const PlaceholderTrigger = ({ onIntent, onPressStart, onPressEnd, onPress, onUnm
     return () => onUnmount(button !== null && button === document.activeElement);
   }, [onUnmount]);
 
-  return (
-    // aria-haspopup / aria-expanded mirror what react-aria's MenuTrigger puts on its
-    // Button, so the swap is silent to assistive tech.
-    <Button
-      ref={ref}
-      className={styles.menuButton}
-      aria-label={MENU_LABEL}
-      aria-haspopup="true"
-      aria-expanded={false}
-      onHoverStart={onIntent}
-      onFocus={onIntent}
-      onPressStart={onPressStart}
-      onPressEnd={onPressEnd}
-      onPress={onPress}
-    >
-      <TriggerFace />
-    </Button>
-  );
+  return <MenuTriggerButton ref={ref} onHoverStart={onIntent} onFocus={onIntent} onPressStart={onPressStart} onPressEnd={onPressEnd} onPress={onPress} />;
 };
 
 const focusStrategyOf = (event: PressEvent): MenuHandoff['focusStrategy'] => {

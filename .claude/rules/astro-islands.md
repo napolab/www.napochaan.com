@@ -67,9 +67,13 @@ no React root at all. Ship it as an `.astro` component driven by a custom elemen
   `@utils/prefers-reduced-motion`).
 - Ancestors that drive the leaf are marked explicitly (`data-scramble-host` +
   `<ScrambleText trigger="group" />`), never found by a generic parent walk.
-- Check reduced motion (`prefersReducedMotion()`) BEFORE `loadGsap()`, so a
-  reduced-motion visitor never fetches the gsap chunk (a React island's hydration effect
-  sees the server snapshot `reduced=false` and fetches it anyway).
+- Check reduced motion (`prefersReducedMotion()`) BEFORE `loadGsap()` / binding, so a
+  reduced-motion visitor never fetches the gsap chunk or starts a loop (a React island's
+  hydration effect sees the server snapshot `reduced=false` and fetches it anyway).
+- Don't reach for gsap when a plain rAF loop / listener does: a leaf in the site shell
+  (every page) pays gsap core on every page. `typography-band/bind-band.ts` replicates
+  the ticker (lagSmoothing), ScrollTrigger velocity and the scrollTo tween in ~200 lines
+  instead of loading gsap core + ScrollTrigger + ScrollToPlugin (~46KB gz).
 - Anything that measures scroll / layout at bind defers while `isSwapping()`
   (`@utils/client-router-swap`) and binds at `astro:page-load`.
 - `transition:persist` goes on the element itself. The swap moves a persisted node with
@@ -98,3 +102,20 @@ Hydrating either only adds JS.
 React context cannot cross island roots or Astro slots. State that several islands share
 (boot status, life engine, presence, motion) lives in module-level stores, not providers.
 A provider and its consumers that must share context have to be one island.
+
+## React Only on Intent: Lazy-Mounted Leaves
+
+The site shell (`shell-backdrop.astro`, `sys-bar.astro`, `cursor-presence.astro`) ships no
+island, so a page without islands of its own loads no react-dom. A shell piece that truly
+needs react-aria (the SysBar mobile menu) stays static markup until the first intent and
+then mounts React from a dynamic import:
+
+- The element wires the server-rendered react-aria face with plain listeners and records
+  the press (`sys-bar/nav-menu/track-trigger.ts` → the existing `handoff.ts`).
+- On the first intent it `import()`s a mount module (`sys-bar/nav-menu/mount.tsx`) that
+  `createRoot`s into the trigger's container inside `flushSync`, with `AppProviders`
+  (RouterProvider → `navigate`) and a path seeded from `location.pathname`.
+- Stores an element needs must be framework-free modules (`game-of-life/shared-engine.ts`,
+  `cursor-presence/presence-count.ts`, `sys-bar/clock-store.ts`, `@utils/motion-toggle`);
+  the React hooks wrap them. `src/test-utils/element-import-graph.test.ts` fails when an
+  element's static import graph reaches React.

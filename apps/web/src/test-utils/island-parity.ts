@@ -11,16 +11,25 @@ export const CLIENT_LEAF_ELEMENTS = [
   'blank-dim',
   'boot-question',
   'copy-hash-button',
+  'cursor-presence',
+  'cursor-presence-demo',
   'echo-text',
+  'no-action',
+  'game-of-life',
   'retry-button',
   'scramble-text',
   'scroll-range-sync',
   'share-bar',
+  'sys-bar',
   'typewriter-text',
   'typography-band',
 ] as const;
 
-const LEAF_ELEMENT_TAG = new RegExp(`<\\/?(${CLIENT_LEAF_ELEMENTS.join('|')})\\b[^>]*>`, 'g');
+// `(?![\\w-])` instead of `\\b`: a tag boundary, so `cursor-presence` never matches a
+// longer custom tag that starts with it.
+const TAG_END = '(?![\\w-])';
+
+const LEAF_ELEMENT_TAG = new RegExp(`<\\/?(${CLIENT_LEAF_ELEMENTS.join('|')})${TAG_END}[^>]*>`, 'g');
 
 // Normalizes a rendered fragment so an `.astro` twin (leaf islands) and its React
 // Server Component original (one tree) compare equal when their markup matches:
@@ -61,14 +70,10 @@ export const CLIENT_LEAF_ISLANDS: ReadonlySet<string> = new Set([
   'ButtonIsland',
   'CalendarIsland',
   'ContactFormIsland',
-  'CursorPresenceDemoIsland',
   'GalleryIsland',
-  'GameOfLifeIsland',
-  'IsolatedGameOfLifeIsland',
   'LightboxIsland',
   'LivePreviewIsland',
   'LogCalendarIsland',
-  'NoAction',
   'QuoteShareIsland',
   'TextAreaIsland',
   'TextFieldIsland',
@@ -88,7 +93,7 @@ export const scrambleTextCountOf = (html: string): number => (html.match(/<scram
 // The `<scramble-text>` elements rendered inside the page's <main>.
 export const mainScrambleTextCountOf = (html: string): number => scrambleTextCountOf(html.slice(html.indexOf('<main'), html.indexOf('</main>')));
 
-const LEAF_ELEMENT_OPEN = new RegExp(`<(${CLIENT_LEAF_ELEMENTS.join('|')})\\b`, 'g');
+const LEAF_ELEMENT_OPEN = new RegExp(`<(${CLIENT_LEAF_ELEMENTS.join('|')})${TAG_END}`, 'g');
 
 // The CLIENT_LEAF_ELEMENTS custom elements in a rendered fragment, in document order
 // (the element counterpart of islandExportsOf).

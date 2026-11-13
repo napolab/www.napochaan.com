@@ -1,0 +1,15 @@
+---
+// The colophon CursorPresence demo with NO React island: the sized cell + the cursor
+// canvas (the same canvas markup as the site's layer), driven by the
+// `<cursor-presence-demo>` element (./cursor-presence-demo-element.ts) with the
+// socket-free sample visitors.
+import * as cursorStyles from '@components/cursor-presence/styles.css';
+
+import * as styles from './cursor-presence-demo.css';
+---
+
+<cursor-presence-demo class={cursorStyles.element}><div class={styles.frame}><canvas class={cursorStyles.canvas} aria-hidden="true"></canvas></div></cursor-presence-demo><script>
+  import { defineCursorPresenceDemoElement } from './cursor-presence-demo-element';
+
+  defineCursorPresenceDemoElement();
+</script>

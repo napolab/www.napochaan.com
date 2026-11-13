@@ -1,11 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
-import { usePersistent } from '@hooks/use-persistent';
 import { MotionContext, useReducedMotionSnapshot } from '@hooks/use-prefers-reduced-motion';
-import { writeMotionCookie } from '@utils/motion-cookie';
-import { MOTION_STORAGE_KEY } from '@utils/prefers-reduced-motion';
+import { toggleMotion, writeMotionPlay } from '@utils/motion-toggle';
 
 import type { MotionValue } from '@hooks/use-prefers-reduced-motion';
 import type { ReactNode } from 'react';
@@ -23,26 +21,18 @@ type Props = {
 // setting; with no override yet, it follows the OS. The whole `reduced` value can
 // be forced via the controlled prop.
 export const MotionProvider = ({ children, reduced: controlled }: Props) => {
-  const [, setOverride] = usePersistent<boolean | null>(MOTION_STORAGE_KEY, null);
   const snapshot = useReducedMotionSnapshot();
   const reduced = controlled ?? snapshot;
 
-  // Flip the effective motion state: store the explicit "motion enabled" boolean
-  // that is the opposite of the current motion-on — i.e. the current `reduced`.
-  const toggle = useCallback(() => {
-    setOverride(snapshot);
-    writeMotionCookie(snapshot);
-  }, [snapshot, setOverride]);
-
   useEffect(() => {
-    // USEEFFECT_JUSTIFICATION: imperative bridge from JS state to CSS. Pure-CSS
-    // animations read `var(--motion-play)`; writing it inline on <html> lets the
-    // toggle (which can override the OS either way) pause/resume them. Inline beats
-    // the stylesheet :root default, so this is the effective source once JS runs.
-    document.documentElement.style.setProperty('--motion-play', reduced ? 'paused' : 'running');
+    // USEEFFECT_JUSTIFICATION: imperative bridge from JS state to CSS (see
+    // @utils/motion-toggle writeMotionPlay — the <sys-bar> element keeps it in step on
+    // pages without React).
+    writeMotionPlay(reduced);
   }, [reduced]);
 
-  const value = useMemo<MotionValue>(() => ({ reduced, toggle }), [reduced, toggle]);
+  // The toggle is framework-free (shared with the <sys-bar> element).
+  const value = useMemo<MotionValue>(() => ({ reduced, toggle: toggleMotion }), [reduced]);
 
   return <MotionContext.Provider value={value}>{children}</MotionContext.Provider>;
 };

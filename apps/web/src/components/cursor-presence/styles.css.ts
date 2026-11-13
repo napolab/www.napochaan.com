@@ -20,3 +20,8 @@ export const overlay = css({
   pointerEvents: 'none',
   zIndex: 'overlay',
 });
+
+// The <cursor-presence> custom element (cursor-presence.astro) is a pure wrapper: no
+// box, so the fixed overlay lays out exactly as the React CursorPresence's did. A class
+// so it applies before the element upgrades.
+export const element = css({ display: 'contents' });
