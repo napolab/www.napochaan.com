@@ -2,6 +2,10 @@ import { render } from 'vitest-browser-react';
 import { describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
+// The real Panda stylesheet lays the absolutely positioned cells out on the grid;
+// without it every `fill` image stacks at the origin and intercepts the click.
+import '@themes/global.css';
+
 import { GalleryArchive } from './index';
 
 import type { GalleryPhoto } from './index';
@@ -37,11 +41,7 @@ describe('GalleryArchive', () => {
 
   it('opens a lightbox dialog when a photo is activated', async () => {
     await render(<GalleryArchive photos={photos} />);
-    // `fill` images are absolutely positioned; without the Panda stylesheet in the
-    // test page every cell stacks at the origin, so a pointer click would land on
-    // the topmost cell. Dispatch the activation on the trigger itself instead.
-    const trigger = page.getByRole('button', { name: /flyer a/ }).element();
-    trigger.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+    await page.getByRole('button', { name: /flyer a/ }).click();
     await expect.element(page.getByRole('dialog')).toBeInTheDocument();
   });
 

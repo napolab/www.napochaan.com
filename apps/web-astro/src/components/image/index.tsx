@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useState } from 'react';
 
+import { BLUR_ATTRIBUTE } from './blur-script';
 import { buildImageSources } from './sources';
 
 import type { ComponentPropsWithoutRef, CSSProperties, SyntheticEvent } from 'react';
@@ -43,7 +44,8 @@ const blurPlaceholderStyle = (style: CSSProperties | undefined, blurDataURL: str
 
 // `<img>` with a responsive srcset through the worker images path
 // (`/_next/image`, served by worker/handlers/images) and an optional blur
-// placeholder painted as the background until the real image loads.
+// placeholder painted as the background until the real image loads. Hydrated, the
+// component clears it (onLoad / ref); server-only, imageBlurScriptHtml does.
 export const Image = (props: Props) => {
   const { src, width, height, fill, priority, quality, placeholder, blurDataURL, unoptimized, sizes, style, onLoad, ...rest } = props;
   const [loading, setLoading] = useState(true);
@@ -67,15 +69,21 @@ export const Image = (props: Props) => {
 
   const baseStyle = useMemo(() => (fill === true ? { ...FILL_STYLE, ...style } : style), [fill, style]);
 
+  const showBlur = placeholder === 'blur' && blurDataURL !== undefined && loading;
+
   const resolvedStyle = useMemo(() => {
-    if (placeholder !== 'blur' || blurDataURL === undefined || !loading) return baseStyle;
+    if (!showBlur || blurDataURL === undefined) return baseStyle;
 
     return blurPlaceholderStyle(baseStyle, blurDataURL);
-  }, [placeholder, blurDataURL, loading, baseStyle]);
+  }, [showBlur, blurDataURL, baseStyle]);
+
+  // Lets imageBlurScriptHtml clear the placeholder when this Image never hydrates.
+  const blurMarker = useMemo(() => (showBlur ? { [BLUR_ATTRIBUTE]: '' } : {}), [showBlur]);
 
   return (
     <img
       {...rest}
+      {...blurMarker}
       ref={handleRef}
       src={sources.src}
       srcSet={sources.srcSet}
