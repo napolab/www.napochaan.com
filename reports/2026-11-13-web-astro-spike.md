@@ -273,3 +273,61 @@ in client effects; their server snapshots are constants (engine placeholder, boo
 Tests (each mounts two separate React roots via two `render()` calls): `game-of-life/provider/cross-island`,
 `boot-status/cross-island`, `cursor-presence/presence-store`, `motion-provider/cross-island`, plus
 `app-providers` and `cursor-presence/resolve-surface`.
+
+# Task 3 — persisted shell verification (manual, chrome-devtools MCP)
+
+Setup: `astro build` + `wrangler dev -c dist/server/wrangler.json --port 8788` (no CMS needed: the layout reads
+none), temporary pages `src/pages/tmp-persist/{a,b,boom}.astro` using `site-layout.astro` (deleted before commit).
+Navigation was driven by clicking in-page links and `history.back()` inside one document (never `navigate_page`
+with a URL, which would be a full load). An init script wrapped `WebSocket` to count constructions and set
+`window.__marker` to detect full reloads.
+
+| Step | path | h1 | same document | same backdrop `<canvas>` | WebSockets (readyState) | `html.boot` | fetches |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| initial load | /tmp-persist/a | page a | — | — | [1] | false | (document) |
+| click plain `<a>` | /tmp-persist/b | page b | yes | yes | [1] | false | `/tmp-persist/b` ×1 |
+| click SysBar react-aria `Link` "works" (404 route) | /works | 404 | yes | yes | [1] | false | `/works` ×1 (no double navigation) |
+| `history.back()` | /tmp-persist/b | page b | yes | yes | [1] | false | `/tmp-persist/b` ×1, transferSize 8063 (network, not reused) |
+
+- Network panel: exactly one `document` request (the initial load); every navigation is one `fetch` of the page.
+  Back navigation re-fetches (pages send `max-age=0`), so no cached document is reused.
+- Single WebSocket (`/api/cursors`, OPEN) across all navigations; SysBar `watching 1`.
+- Boot overlay not replayed: after each swap `<html>` keeps `font-variables wf-… wf-active` (no `boot`,
+  no `wf-loading`) and the inline style (`--motion-play`, `--scroll-range`, …); the overlay root stays
+  `opacity 0 / visibility hidden`. This needed `@utils/root-state-carry` — Astro's `swapRootAttributes` copies the
+  incoming SSR `<html>` attributes (`wf-loading boot`) and the Typekit / motion scripts do not run again.
+- Inline head scripts: the carry script's install counter stayed at 1 across navigations.
+- Typekit fonts are registered through the FontFace API (`document.fonts`: digibop, config-mono-vf), not head
+  nodes, so `swapHeadElements` does not drop them; the carry script's head-node copy is a no-op safety net.
+- SysBar active nav state follows the page (`works` active on /works).
+- `prefers-reduced-motion`: the chrome-devtools `emulate` tool failed (CDP `Network.emulateNetworkConditionsByRule`
+  error), so this was checked with Playwright `emulateMedia({ reducedMotion })` against the same server:
+  no-preference → `::view-transition-*` root fade animations run; reduce → none (layout CSS rule).
+- Status codes (curl): unknown path → **404** (404.astro, no `Cache-Control: public`); a page throwing in
+  frontmatter → **500** (500.astro, no public cache header); normal page → 200 `public, max-age=0, s-maxage=31536000`.
+- Hydration: the first prod run showed React #418 in the SysBar island (SSR `alive 0`, client `alive 651`):
+  the backdrop island seeds the shared life engine before the SysBar island hydrates. Fixed by giving
+  `useLifeState` a constant placeholder server snapshot (test added). Honest timeline: two more loads after the
+  first rebuild still logged #418 and showed the sys-bar header regenerated; that wrangler start had not been
+  confirmed to bind 8788, so a stale bundle is the likely cause (not proven). On a fresh build with wrangler
+  confirmed listening on 8788 (workerd pid in `ss -ltnp`), 10 fresh Playwright loads: 0 console errors,
+  0 island subtrees regenerated (MutationObserver on removed element nodes inside `astro-island`).
+
+## Second session (after review)
+
+- Inline scripts run once: the unguarded Typekit loader inserted `use.typekit.net/vmz7pfu.js` exactly once
+  (MutationObserver count 1, one resource entry) across three soft navigations (a→b, b→a, back). (The carry
+  script's own counter is not evidence: it returns early on its window flag.)
+- Scroll on navigation (pages ~3000px tall):
+  - push navigation: `scrollY` is 0 at `astro:after-swap` and still 0 after 1.2s, both when clicked at rest and
+    when clicked 200ms after scrolling to an off-grid offset (TypographyBand grid-snap tween in flight);
+  - `history.back()` restores the previous offset (2111 → 2111);
+  - first run exposed a bug: the persisted TypographyBand's in-flight snap tween dragged the new page back to the
+    old offset (2111) after the router's jump to top. Fixed: the band cancels the snap on `astro:before-swap`
+    (test `typography-band/snap-swap.test.tsx`).
+  - note: `html { scroll-behavior: smooth }` (global-css) makes script-driven `scrollIntoView`/`scrollTo`
+    without `behavior` smooth; the router itself uses `behavior: 'instant'`.
+- Screenshot: overlay lifted, TypographyBand frame, Game-of-Life grid, SysBar (`gen`, `alive`, `watching 1`,
+  toggles) render as on the Next site.
+- CursorPresence now re-resolves the stage on every `astro:after-swap` (not only on pathname change), so
+  same-path swaps (refresh / query-only navigation) also re-attach (test `cursor-presence/surface-swap.test.tsx`).

@@ -1,0 +1,9 @@
+/* No view-transition animation for visitors who ask for reduced motion: ClientRouter
+   then swaps instantly, like the Next site always did. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

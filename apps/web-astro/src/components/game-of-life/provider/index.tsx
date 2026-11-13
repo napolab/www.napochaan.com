@@ -35,7 +35,14 @@ export const LifeEngineProvider = ({ children, engine: engineProp }: LifeEngineP
 
 export const useLifeEngine = (): LifeEngine => useContext(LifeEngineContext);
 
+// The SSR snapshot is always the empty placeholder, never the live engine: islands
+// hydrate one after another, so by the time the SysBar island hydrates the backdrop
+// island may already have seeded and ticked the shared engine. Hydrating against
+// the placeholder matches the server markup; React then re-renders with the live state.
+const PLACEHOLDER_STATE = createLifeEngine(PLACEHOLDER).getState();
+const getPlaceholderState = (): LifeState => PLACEHOLDER_STATE;
+
 export const useLifeState = (): LifeState => {
   const engine = useLifeEngine();
-  return useSyncExternalStore(engine.subscribe, engine.getState, engine.getState);
+  return useSyncExternalStore(engine.subscribe, engine.getState, getPlaceholderState);
 };

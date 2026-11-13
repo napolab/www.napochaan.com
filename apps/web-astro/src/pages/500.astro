@@ -1,0 +1,10 @@
+---
+// Port of (site)/error.tsx. Astro renders this route with status 500 when a page
+// throws before its response starts streaming.
+import { ServerErrorIsland } from '@components/error-screen/screens';
+import SiteLayout from '../layouts/site-layout.astro';
+---
+
+<SiteLayout metadata={{ noindex: true }}>
+  <ServerErrorIsland client:load pathname={Astro.url.pathname} props={{}} />
+</SiteLayout>

@@ -19,6 +19,7 @@ import { SurfaceRefProvider } from './surface-context';
 // Defer start() past React StrictMode's synchronous mount→unmount→remount in dev. The throwaway
 // first mount's timer is cleared before it fires, so only the surviving mount opens a socket.
 const START_DELAY_MS = 100;
+const AFTER_SWAP_EVENT = 'astro:after-swap';
 
 const readRect = (el: HTMLElement | null): Rect | null => {
   if (el === null) return null;
@@ -56,24 +57,32 @@ export const CursorPresence = ({ children }: { children: ReactNode }) => {
   }, [app, pathname]);
 
   useEffect(() => {
-    // `pathname` changes after every ClientRouter swap (astro:page-load), which
-    // re-resolves the freshly swapped-in stage when it is Astro markup.
-    const el = resolveSurface(surfaceRef.current);
+    // On the Astro site the stage is plain markup outside this island, and
+    // ClientRouter replaces it (with <body>) on every swap — including same-path
+    // swaps (refresh, query-only navigation) — so re-attach after each swap.
+    const surface: { el: HTMLElement | null } = { el: null };
     const update = (): void => {
-      rectRef.current = readRect(el);
+      rectRef.current = readRect(surface.el);
     };
-    update();
     const observer = new ResizeObserver(update);
-    if (el !== null) observer.observe(el);
+    const attach = (): void => {
+      observer.disconnect();
+      surface.el = resolveSurface(surfaceRef.current);
+      if (surface.el !== null) observer.observe(surface.el);
+      update();
+    };
+    attach();
+    document.addEventListener(AFTER_SWAP_EVENT, attach);
     window.addEventListener('scroll', update, { passive: true });
     window.addEventListener('resize', update);
 
     return () => {
       observer.disconnect();
+      document.removeEventListener(AFTER_SWAP_EVENT, attach);
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
     };
-  }, [pathname]);
+  }, []);
 
   useEffect(() => {
     if (!matchMedia('(pointer:fine)').matches) return;

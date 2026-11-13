@@ -92,8 +92,11 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['src/**/*.test.ts'],
+          // `.astro` renders need Astro's Vite plugins: see vitest.astro.config.ts.
+          exclude: [...configDefaults.exclude, 'src/layouts/**', 'src/pages/**'],
         },
       },
+      './vitest.astro.config.ts',
       {
         plugins: [
           cloudflareTest({
