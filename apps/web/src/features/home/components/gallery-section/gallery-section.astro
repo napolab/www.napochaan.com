@@ -1,7 +1,9 @@
 ---
 // Port of the (site) GallerySection Server Component. The Gallery (lightbox grid) is a
-// client leaf, SSR'd and hydrated on load as in Next; the heading's labels are
-// ScrambleText leaves.
+// client leaf, SSR'd and hydrated once it scrolls into view (`client:visible`): the
+// section sits far below the fold, and `client:load` put island → lightbox → Dialog on
+// the home critical request chain. The /gallery page keeps its own directive. The
+// heading's labels are ScrambleText leaves.
 import { GalleryIsland } from '@components/gallery/island';
 import ScrambleText from '@components/scramble-text/scramble-text.astro';
 import { SectionHeading } from '@components/section-heading';
@@ -22,5 +24,5 @@ const pathname = Astro.url.pathname;
 
 <section id={id} class={styles.root}>
   <SectionHeading no="04" href="/gallery" moreHref="/gallery"><ScrambleText text="gallery" /><ScrambleText slot="more" text="$ open gallery/" /></SectionHeading>
-  <GalleryIsland client:load pathname={pathname} props={{ items: toGalleryItems(photos) }} />
+  <GalleryIsland client:visible pathname={pathname} props={{ items: toGalleryItems(photos) }} />
 </section>

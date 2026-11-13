@@ -6,6 +6,7 @@ import { experimental_AstroContainer as AstroContainer } from 'astro/container';
 import { loadRenderers } from 'astro:container';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { fontFacesHref } from '@themes/font-faces';
 import { typekitLoaderHtml } from '@themes/typekit';
 import { motionBootScriptHtml } from '@utils/motion-cookie';
 import { imageBlurScriptHtml } from '@components/image/blur-script';
@@ -19,6 +20,9 @@ const ORIGIN = 'http://localhost:8788';
 // The layout resolves metadata against the request origin; outside a worker request
 // there is no request context, so stub the origin lookup itself.
 vi.mock('@utils/request-url', () => ({ getRequestOrigin: async () => ORIGIN }));
+// Vitest does not emit CSS assets, so a `?url` CSS import resolves to ''. Stand in
+// a built-looking URL; the real hashed /_astro/ URL is checked against the build.
+vi.mock('@themes/font-faces', () => ({ fontFacesHref: '/_astro/font-faces.test.css' }));
 
 const renderLayout = async (pathname: string, slot: string): Promise<string> => {
   const container = await AstroContainer.create({ renderers: await loadRenderers([reactContainerRenderer()]) });
@@ -61,6 +65,17 @@ describe('site-layout.astro', () => {
     // The `animation: none` CSS for that scope is emitted into the page <head> by the
     // page render, which the Container API does not run for a layout; the built
     // site's zero view-transition animations are verified in the browser (report).
+  });
+
+  // The @font-face rules are kept out of the render-blocking CSS: one print-media link
+  // flipped to `all` on load, plus a <noscript> fallback for no-JS visitors.
+  it('links the @font-face stylesheet without blocking render, once', () => {
+    expect(fontFacesHref).toBe('/_astro/font-faces.test.css');
+    const links = state.html.match(/<link [^>]*rel="stylesheet"[^>]*>/g) ?? [];
+    const fontLinks = links.filter((link) => link.includes(`href="${fontFacesHref}"`));
+    expect(fontLinks).toHaveLength(2);
+    expect(state.html).toContain(`<link rel="stylesheet" href="${fontFacesHref}" media="print" onload="this.media='all'">`);
+    expect(state.html).toContain(`<noscript><link rel="stylesheet" href="${fontFacesHref}"></noscript>`);
   });
 
   it('enables the ClientRouter', () => {
