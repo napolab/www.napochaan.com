@@ -1,0 +1,72 @@
+---
+// Port of apps/web/src/app/(site)/colophon/{layout,page}.tsx. Content comes from
+// the repo, not the CMS, so it only changes on deploy (Workers Cache keys entries by
+// Worker version). Still SSR, like every page.
+import { PageHeaderIsland } from '@components/page-header/island';
+import { SectionHeading } from '@components/section-heading';
+
+import { AmbientPointer } from '../features/colophon/components/ambient-pointer';
+import { ComponentDemo } from '../features/colophon/components/component-demo';
+import { Manifesto } from '../features/colophon/components/manifesto';
+import { colophon } from '../features/colophon/content';
+import Demo from '../features/colophon/demos/demo.astro';
+import { SourceLinkIsland } from '../features/colophon/islands';
+import { colophonMetadata } from '../features/colophon/metadata';
+import * as s from '../features/colophon/styles.css';
+import SiteLayout from '../layouts/site-layout.astro';
+
+const pathname = Astro.url.pathname;
+const crumbs = [{ href: '/', label: 'home' }, { label: 'colophon' }];
+---
+
+<SiteLayout metadata={colophonMetadata}>
+  <main id="main-content" class={s.main}>
+    <PageHeaderIsland
+      client:load
+      pathname={pathname}
+      props={{ title: colophon.title, breadcrumbs: crumbs, kicker: colophon.kicker, lead: colophon.lead, leadReveal: 'scramble', annotation: 'この世界だけに閉じている' }}
+    />
+
+    <section class={s.cell}>
+      <SectionHeading no="01" more="$ cat concept.md">concept</SectionHeading>
+      <p class={s.intro}>{colophon.concept.intro}</p>
+      <Manifesto items={colophon.concept.points} />
+    </section>
+
+    <section class={s.cell}>
+      <SectionHeading no="02" more="$ ls components/">ui</SectionHeading>
+      <p class={s.intro}>{colophon.components.intro}</p>
+      <ul class={s.ambientList}>
+        {colophon.components.ambient.map((item) => <AmbientPointer label={item.label} target={item.target} />)}
+      </ul>
+      <div class={s.demoGrid}>
+        {
+          colophon.components.items.map((item) => (
+            <ComponentDemo name={item.name} why={item.why}>
+              <Demo name={item.name} />
+            </ComponentDemo>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class={s.cell}>
+      <SectionHeading no="03" more="$ ls stack/">stack</SectionHeading>
+      <dl class={s.stack}>
+        {
+          colophon.stack.map((row) => (
+            <div class={s.stackRow}>
+              <dt class={s.stackTerm}>{row.term}</dt>
+              <dd class={s.stackDesc}>{row.description}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </section>
+
+    <section class={s.cell}>
+      <SectionHeading no="04">source</SectionHeading>
+      <SourceLinkIsland client:load pathname={pathname} props={colophon.source} />
+    </section>
+  </main>
+</SiteLayout>

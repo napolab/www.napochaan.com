@@ -1,0 +1,52 @@
+---
+// One catalog demo, placed by its kind (see ./demo-kind).
+import { SystemAnnotation } from '@components/system-annotation';
+
+import { galleryItems } from './demo-data';
+import { demoKindOf } from './demo-kind';
+import { GalleryArchiveDemoIsland, GalleryDemoIsland } from './gallery-demos';
+import { InteractiveDemoIsland } from './interactive-demos';
+import { NoAction } from './no-action';
+import { StaticDemo } from './static-demos';
+
+import type { ComponentName, InteractiveDemoName, StaticDemoName } from './demo-kind';
+
+type Props = {
+  name: ComponentName;
+};
+
+const { name } = Astro.props;
+const pathname = Astro.url.pathname;
+const kind = demoKindOf(name);
+// Narrowed by `kind` below; `.astro` templates cannot narrow a union themselves.
+const staticName = name as StaticDemoName;
+const interactiveName = name as InteractiveDemoName;
+---
+
+{kind === 'static' && <StaticDemo name={staticName} />}
+{
+  kind === 'static-no-action' && (
+    <NoAction client:load>
+      <StaticDemo name={staticName} />
+    </NoAction>
+  )
+}
+{kind === 'interactive' && <InteractiveDemoIsland client:load pathname={pathname} props={{ name: interactiveName }} />}
+{
+  kind === 'gallery' && (
+    <GalleryDemoIsland client:only="react" pathname={pathname} props={{ items: galleryItems }}>
+      <SystemAnnotation slot="fallback" tone="muted">
+        loading gallery…
+      </SystemAnnotation>
+    </GalleryDemoIsland>
+  )
+}
+{
+  kind === 'gallery-archive' && (
+    <GalleryArchiveDemoIsland client:only="react" pathname={pathname} props={{ photos: galleryItems }}>
+      <SystemAnnotation slot="fallback" tone="muted">
+        loading gallery…
+      </SystemAnnotation>
+    </GalleryArchiveDemoIsland>
+  )
+}

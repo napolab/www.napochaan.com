@@ -1,0 +1,28 @@
+---
+// Port of apps/web/src/app/(site)/(home)/{layout,page}.tsx. The worker caches `/`
+// under the short `timeSensitive` policy, not `cms`: the log teaser renders external
+// RSS posts (no CMS purge reaches them) and flips entries between upcoming/past
+// against the current time. CMS publishes still purge it.
+import { homeAbout } from '../features/home/about-sample';
+import { AboutWhoamiIsland, BlogIndexIsland, GallerySectionIsland, HeroIsland, LogSectionIsland, NewsSectionIsland, WorksSectionIsland } from '../features/home/islands';
+import { loadHome } from '../features/home/load-home';
+import { homeMetadata } from '../features/home/metadata';
+import * as s from '../features/shared/styles.css';
+import SiteLayout from '../layouts/site-layout.astro';
+
+const pathname = Astro.url.pathname;
+const { news, works, logEntries, photos, posts } = await loadHome();
+---
+
+<SiteLayout metadata={homeMetadata}>
+  <main id="main-content" class={s.main}>
+    <h1 class={s.srOnly}>napochaan — DJ・VJ・グラフィック・デジタル</h1>
+    <HeroIsland client:load pathname={pathname} props={{}} />
+    <AboutWhoamiIsland client:load pathname={pathname} props={{ id: 'about', ...homeAbout }} />
+    <NewsSectionIsland client:load pathname={pathname} props={{ items: news }} />
+    <WorksSectionIsland client:load pathname={pathname} props={{ id: 'works', works }} />
+    <LogSectionIsland client:load pathname={pathname} props={{ id: 'log', entries: logEntries }} />
+    <GallerySectionIsland client:load pathname={pathname} props={{ id: 'gallery', photos }} />
+    <BlogIndexIsland client:load pathname={pathname} props={{ id: 'blog', posts }} />
+  </main>
+</SiteLayout>

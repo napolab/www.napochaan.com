@@ -1,0 +1,16 @@
+---
+// Port of apps/web/src/app/(site)/about/{layout,page}.tsx. The worker stamps the
+// purge-driven `cms` policy; a CMS publish purges it. A missing profile is a 404
+// (Next `notFound()`), decided before any HTML is written.
+import AboutContent from '../features/about/about-content.astro';
+import { resolveAboutMetadata } from '../features/about/metadata';
+import SiteLayout from '../layouts/site-layout.astro';
+import { findProfile } from '@lib/cms/profile';
+
+const profile = await findProfile();
+if (profile === undefined) return Astro.rewrite('/404');
+---
+
+<SiteLayout metadata={resolveAboutMetadata(profile)}>
+  <AboutContent profile={profile} />
+</SiteLayout>

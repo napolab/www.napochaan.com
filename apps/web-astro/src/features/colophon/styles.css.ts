@@ -1,0 +1,116 @@
+import { css } from '@styled/css';
+
+export const main = css({
+  display: 'flex',
+  flexDirection: 'column',
+  // Fill the shell's flex column so the footer pins to the bottom of the fold on
+  // short pages (see site-shell `stage`). Inert once content exceeds the viewport.
+  flexGrow: 1,
+  gap: { base: '8', desktop: 'section' },
+});
+
+export const cell = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'block',
+});
+
+// stack: mono category rows on a shared subgrid so every label lines up and the
+// value column starts on one edge.
+export const stack = css({
+  display: 'grid',
+  gridTemplateColumns: '[max-content 1fr]',
+  columnGap: 'element',
+  rowGap: 'inline',
+});
+
+export const stackRow = css({
+  display: 'grid',
+  gridColumn: '[1 / -1]',
+  gridTemplateColumns: '[subgrid]',
+  alignItems: 'baseline',
+});
+
+export const stackTerm = css({
+  fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
+  fontSize: 'xs',
+  letterSpacing: 'wide',
+  textTransform: 'uppercase',
+  // fg.muted (≥4.5:1 vs canvas); fg.subtle was 4.03 and failed AA at this size.
+  color: 'fg.muted',
+});
+
+export const stackDesc = css({
+  margin: '0',
+  fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
+  fontSize: 'sm',
+  color: 'fg.default',
+});
+
+// source: outline button-style external link (mirrors the about contact link).
+export const source = css({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 'inline',
+  alignSelf: 'flex-start',
+  paddingInline: 'element',
+  paddingBlock: '2',
+  fontFamily: 'mono',
+  fontVariationSettings: '"wght" 600',
+  fontSize: 'sm',
+  textDecorationLine: 'none',
+  color: 'fg.default',
+  borderWidth: 'hairline',
+  borderStyle: 'solid',
+  borderColor: 'border.default',
+  borderRadius: 'none',
+  transitionProperty: '[color,border-color]',
+  transitionDuration: 'fast',
+  transitionTimingFunction: 'stepSnap',
+  _focusVisible: { layerStyle: 'focusRing' },
+  '@media (prefers-reduced-motion: reduce)': { transitionDuration: 'instant' },
+});
+
+export const sourceLabel = css({
+  color: 'fg.muted',
+});
+
+export const sourceHandle = css({
+  fontWeight: 'medium',
+});
+
+// Loose narrator intro line that opens the type / components sections.
+// Measure is a fixed rem (not ch) so it doesn't scale with font-size and stays
+// aligned with the manifesto descriptions below it; line-break:strict applies
+// Japanese kinsoku so phrases don't break awkwardly.
+export const intro = css({
+  margin: '0',
+  fontFamily: 'body',
+  fontSize: { base: 'md', desktop: 'lg' },
+  lineHeight: 'body',
+  color: 'fg.muted',
+  maxWidth: '[40rem]',
+  lineBreak: 'strict',
+});
+
+// The ambient-chrome pointer list (TypographyBand / GameOfLife / SysBar).
+export const ambientList = css({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'inline',
+  margin: '0',
+  padding: '0',
+  listStyleType: 'none',
+});
+
+// The component catalog grid: one column on mobile, two from tablet up.
+// minmax(0, 1fr) lets a track shrink below its content's intrinsic width, so a
+// wide demo scrolls inside its cell (overflowX on ComponentDemo's stage) instead
+// of pushing the grid past the page and getting clipped.
+export const demoGrid = css({
+  display: 'grid',
+  gridTemplateColumns: { base: '[minmax(0, 1fr)]', tablet: '[repeat(2, minmax(0, 1fr))]' },
+  gap: 'block',
+});

@@ -1,0 +1,64 @@
+---
+// Port of the Next about `AboutContent` (+ `about/layout.tsx`). Composed in Astro so
+// only the parts with client leaves are islands (breadcrumbs, masthead, contact
+// list); the section headings (no links), whoami, rich text, tag cloud and skill
+// matrix render server-only, as their Next Server Components did.
+import { BreadcrumbsIsland } from '@components/breadcrumbs/island';
+import { ContactListIsland } from '@components/contact-list/island';
+import { RichText } from '@components/rich-text';
+import { SectionHeading } from '@components/section-heading';
+
+import { SkillMatrix } from './components/skill-matrix';
+import { TagCloud } from './components/tag-cloud';
+import { Whoami } from './components/whoami';
+import { AboutMastheadIsland } from './islands';
+import { buildWhoamiRows } from './lib/build-whoami-rows';
+import * as s from './styles.css';
+
+import type { Profile } from './profile';
+
+type Props = {
+  profile: Profile;
+};
+
+const { profile } = Astro.props;
+const pathname = Astro.url.pathname;
+const crumbs = [{ href: '/', label: 'home' }, { label: 'about' }];
+const kicker = '// フルスタックエンジニア · DJ · VJ — リアル / VR';
+---
+
+<main id="main-content" class={s.main}>
+  <BreadcrumbsIsland client:load pathname={pathname} props={{ items: crumbs }} />
+  <AboutMastheadIsland client:load pathname={pathname} props={{ name: profile.name, kicker, lead: profile.tagline }} />
+
+  <div class={s.topGrid}>
+    <section class={s.cell}>
+      <SectionHeading no="01" more="$ whoami">whoami</SectionHeading>
+      <Whoami items={buildWhoamiRows(profile)} />
+    </section>
+    <section class={s.cell}>
+      <SectionHeading no="02" more="$ cat bio.md">bio</SectionHeading>
+      {profile.bio !== undefined && <RichText data={profile.bio} />}
+    </section>
+  </div>
+
+  <section class={s.cell}>
+    <SectionHeading no="03" more="$ cat philosophy.md">philosophy</SectionHeading>
+    {profile.philosophy !== undefined && <RichText data={profile.philosophy} />}
+  </section>
+
+  <section class={s.cell}>
+    <SectionHeading no="04" more="$ ls love/">love</SectionHeading>
+    <TagCloud items={profile.love} />
+  </section>
+
+  <section class={s.cell}>
+    <SectionHeading no="05" more="$ ls skill/">skill</SectionHeading>
+    <SkillMatrix groups={profile.skillGroups} />
+  </section>
+
+  <section class={s.cell}>
+    <SectionHeading no="06">contact</SectionHeading>
+    <ContactListIsland client:load pathname={pathname} props={{ items: profile.contacts }} />
+  </section>
+</main>
