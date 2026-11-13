@@ -1,0 +1,40 @@
+---
+// `.astro` twin of PostCard (markup mirrors ./post-card.tsx). The card is a static
+// anchor marked `data-scramble-host`, so hovering anywhere on it decodes the title
+// (Astro ScrambleText, `trigger="group"`) — no React. The date arrives formatted
+// server-side (see ./post-card.tsx). `aria-label` keeps the link's name the title.
+import { Link } from '@components/link';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
+import { SystemAnnotation } from '@components/system-annotation';
+import { link } from '@styled/recipes';
+import { clsx } from '@utils/clsx';
+
+import * as s from './styles.css';
+
+type Post = {
+  slug: string;
+  index: string;
+  title: string;
+  readMin: number;
+  excerpt: string;
+};
+
+type Props = {
+  post: Post;
+  formattedDate: string;
+};
+
+const { post, formattedDate } = Astro.props;
+---
+
+<Link className={s.card} aria-label={post.title} href={`/blog/${post.slug}`} tone="inherit" underline={false} data-scramble-host>
+  <span class={s.index}>{post.index}</span>
+  <span class={clsx(link({ tone: 'accent', underline: true, hideOutsideFocusRing: true }), s.title)}>
+    <ScrambleText text={post.title} trigger="group" />
+  </span>
+  <p class={s.meta}>
+    <SystemAnnotation>{`${post.readMin} min`}</SystemAnnotation>
+    <SystemAnnotation>{formattedDate}</SystemAnnotation>
+  </p>
+  <p class={s.excerpt}>{post.excerpt}</p>
+</Link>

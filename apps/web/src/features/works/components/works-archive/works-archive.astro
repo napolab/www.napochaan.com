@@ -1,0 +1,86 @@
+---
+// `.astro` twin of WorksArchive (markup mirrors ./index.tsx). Each row is a static
+// anchor marked `data-scramble-host`, so its title (Astro ScrambleText,
+// `trigger="group"`) decodes when the row is hovered; the year spines scramble on
+// their own hover. No React.
+import { Image } from '@components/image';
+import { formatBlurURL } from '@components/image/helper';
+import { Link } from '@components/link';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
+import { link } from '@styled/recipes';
+import { clsx } from '@utils/clsx';
+
+import { groupByYear } from './group-by-year';
+import * as s from './styles.css';
+
+type ArchiveItem = {
+  id: string;
+  slug: string;
+  title: string;
+  type: string;
+  year: number;
+  thumbnail?: { src: string; width: number; height: number };
+};
+
+type Props = {
+  works: readonly ArchiveItem[];
+};
+
+const { works } = Astro.props;
+const groups = groupByYear(works);
+const titleClass = clsx(link({ tone: 'accent', underline: true, hideOutsideFocusRing: true }), s.title);
+
+// The per-spine sticky offset and the row's ambient wash url, as CSS custom
+// properties (the only style bridge dynamic-styles.md allows). See ./index.tsx.
+const spineStyle = (index: number): string => `--spine-index:${index}`;
+const ambientStyle = (src: string): string => `--thumb:url(${formatBlurURL(src, { blur: 40, width: 96, quality: 40 })})`;
+---
+
+<section class={s.root} aria-label="works archive">
+  {
+    groups.map((group, index) => (
+      <>
+        <span id={`year-${group.year}`} class={s.anchor} style={spineStyle(index)} aria-hidden="true" />
+        <h2 id={`year-${group.year}-heading`} class={s.spine} style={spineStyle(index)}>
+          <Link href={`#year-${group.year}`} className={s.spineLink} tone="inherit" underline={false} hideOutsideFocusRing>
+            <ScrambleText text={`${group.year}`} />
+          </Link>
+        </h2>
+        <ul class={s.rows} aria-labelledby={`year-${group.year}-heading`}>
+          {group.items.map((work) => (
+            <li>
+              <Link href={`/works/${work.slug}`} className={clsx(s.item, 'group')} tone="inherit" underline={false} hideOutsideFocusRing data-scramble-host>
+                {work.thumbnail !== undefined && <span class={s.ambient} aria-hidden="true" style={ambientStyle(work.thumbnail.src)} />}
+                {work.thumbnail === undefined ? (
+                  <span class={s.thumbPlaceholder} aria-hidden="true" />
+                ) : (
+                  <Image
+                    src={work.thumbnail.src}
+                    alt={work.title}
+                    width={work.thumbnail.width}
+                    height={work.thumbnail.height}
+                    sizes="64px"
+                    className={s.thumb}
+                    placeholder="blur"
+                    blurDataURL={formatBlurURL(work.thumbnail.src, { blur: 20 })}
+                  />
+                )}
+                <span class={s.body}>
+                  <span class={titleClass}>
+                    <ScrambleText text={work.title} trigger="group" clamp />
+                  </span>
+                  <span class={s.meta}>
+                    <span class={s.type}>{work.type}</span>
+                    <span class={s.arrow} aria-hidden="true">
+                      →
+                    </span>
+                  </span>
+                </span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </>
+    ))
+  }
+</section>

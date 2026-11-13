@@ -1,14 +1,14 @@
 ---
 // Port of the works `(index)` layout + WorksListSection: the list chrome (PageHeader +
 // feed link, list routes only) and one page of the archive. The page decides the 404
-// before rendering this (see ./lib/paginate-works). WorksArchive is a client leaf
-// ('use client' in apps/web) and hydrates as one island; it gets only the fields it
-// renders (never the body). Pagination and FeedLink render without a directive.
+// before rendering this (see ./lib/paginate-works). WorksArchive is an `.astro` twin
+// (static rows whose titles scramble without React); it gets only the fields it renders
+// (never the body). Pagination and FeedLink render without a directive.
 import { FeedLink } from '@components/feed-link';
 import PageHeader from '@components/page-header/page-header.astro';
 import { Pagination } from '@components/pagination';
 
-import { WorksArchiveIsland } from './components/works-archive/island';
+import WorksArchive from './components/works-archive/works-archive.astro';
 import { worksPageHref } from './lib/paginate-works';
 import { toWorkCard } from './work-card';
 
@@ -19,11 +19,10 @@ type Props = {
 };
 
 const { page } = Astro.props;
-const pathname = Astro.url.pathname;
 const crumbs = [{ href: '/', label: 'home' }, { label: 'works' }];
 ---
 
 <PageHeader title="works" breadcrumbs={crumbs} kicker="// archive — dev·vrchat·video·graphic" lead="なにかを作るって楽しいんだよなぁ〜😁" />
 <FeedLink href="/works/rss.xml" label="works の RSS フィード" />
-<WorksArchiveIsland client:load pathname={pathname} props={{ works: page.works.map(toWorkCard) }} />
+<WorksArchive works={page.works.map(toWorkCard)} />
 {page.totalPages > 1 && <Pagination currentPage={page.current} totalPages={page.totalPages} href={worksPageHref} />}

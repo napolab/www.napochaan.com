@@ -1,0 +1,54 @@
+---
+// `.astro` twin of AdjacentNav (markup mirrors ./index.tsx). The prev / next links are
+// static anchors and their titles scramble through the Astro ScrambleText, so the nav
+// ships no React.
+import BackToIndex from '@components/back-to-index/back-to-index.astro';
+import { Link } from '@components/link';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
+
+import * as s from './styles.css';
+
+import type { WorkLink } from '../../work-card';
+
+type Props = {
+  prev?: WorkLink;
+  next?: WorkLink;
+};
+
+const { prev, next } = Astro.props;
+// Same present/absent model as ./index.tsx: an absent neighbour renders an empty
+// placeholder so the other side stays pinned to its edge.
+const slots = [
+  { side: 'prev', work: prev },
+  { side: 'next', work: next },
+] as const;
+---
+
+<nav class={s.root} aria-label="works pagination">
+  <div class={s.pager}>
+    {
+      slots.map(({ side, work }) =>
+        work === undefined ? (
+          <span class={s.empty} aria-hidden="true" />
+        ) : (
+          <Link href={`/works/${work.slug}`} className={s.link} data-side={side} tone="inherit" underline={false}>
+            {side === 'prev' && (
+              <span class={s.arrow} aria-hidden="true">
+                ‹
+              </span>
+            )}
+            <span class={s.label}>
+              <ScrambleText text={work.title} truncate />
+            </span>
+            {side === 'next' && (
+              <span class={s.arrow} aria-hidden="true">
+                ›
+              </span>
+            )}
+          </Link>
+        ),
+      )
+    }
+  </div>
+  <BackToIndex href="/works" label="works 一覧へもどる" />
+</nav>
