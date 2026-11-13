@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { usePathname } from '@lib/navigation';
-import { Button, Menu, MenuItem, MenuTrigger, Popover } from 'react-aria-components';
 
 import { usePresence } from '@components/cursor-presence/presence-store';
 import { useLifeState } from '@components/game-of-life/provider';
@@ -12,6 +11,7 @@ import { useMotion } from '@hooks/use-prefers-reduced-motion';
 import { siteNavItems } from '@utils/nav-items';
 
 import { isNavActive } from '@utils/is-nav-active';
+import { NavMenu } from './nav-menu';
 import * as styles from './styles.css';
 import { useClock } from './use-clock';
 
@@ -53,24 +53,10 @@ export const SysBar = ({ initialTime }: { initialTime: string }) => {
           </nav>
           {/* Below 768px (i.e. once any slot has collapsed): a single trigger
               that opens the full set of targets in a react-aria Menu popover, so
-              the bar never wraps to a second row. */}
+              the bar never wraps to a second row. The menu code itself is a lazy
+              chunk, fetched on the first hover / focus / press of the trigger. */}
           <div className={styles.menuRoot}>
-            <MenuTrigger>
-              {/* aria-label names the trigger (and, through it, the popover) so the
-                  decorative ≡ glyph never leaks into the accessible name. */}
-              <Button className={styles.menuButton} aria-label="グローバルナビゲーション">
-                <span aria-hidden="true">≡</span> menu
-              </Button>
-              <Popover className={styles.popover}>
-                <Menu className={styles.menu} aria-label="グローバルナビゲーション">
-                  {siteNavItems.map(({ label, href }) => (
-                    <MenuItem key={label} href={href} className={styles.menuItem} data-active={isNavActive(pathname, href) ? 'true' : undefined}>
-                      {label}
-                    </MenuItem>
-                  ))}
-                </Menu>
-              </Popover>
-            </MenuTrigger>
+            <NavMenu pathname={pathname} />
           </div>
         </div>
         <div className={styles.status}>
