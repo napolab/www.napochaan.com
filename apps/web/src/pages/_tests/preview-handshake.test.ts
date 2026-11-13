@@ -45,10 +45,16 @@ describe('/next/preview', () => {
   });
 
   it('sets the draft cookie and 307-redirects to the preview path with the right secret', async () => {
-    const res = await callPreview('previewSecret=right&path=/blog/preview/1');
-    expect(res.status).toBe(307);
-    expect(res.headers.get('location')).toBe('/blog/preview/1');
-    expect(res.headers.get('set-cookie')).toBe(await draftCookieHeader('right'));
+    // The cookie signs its issue time, so pin the clock for the comparison.
+    vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-11-13T00:00:00Z') });
+    try {
+      const res = await callPreview('previewSecret=right&path=/blog/preview/1');
+      expect(res.status).toBe(307);
+      expect(res.headers.get('location')).toBe('/blog/preview/1');
+      expect(res.headers.get('set-cookie')).toBe(await draftCookieHeader('right'));
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
 
