@@ -1,7 +1,7 @@
 ---
-description: next/dynamic with ssr:false must be used in Client Components only
+description: apps/cms only — next/dynamic with ssr:false must be used in Client Components only (apps/web is Astro; see .claude/rules/astro-islands.md)
 paths:
-  - "src/app/**/*.tsx"
+  - "apps/cms/src/**/*.tsx"
 ---
 
 `next/dynamic({ ssr: false })` is **not allowed in Server Components**. Next.js App Router treats all components as Server Components by default, and `ssr: false` requires a Client Component boundary.

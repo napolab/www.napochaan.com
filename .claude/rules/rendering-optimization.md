@@ -1,6 +1,6 @@
 ---
 paths:
-  - "src/**/*.tsx"
+  - "apps/*/src/**/*.tsx"
 ---
 
 # Rendering Optimization
@@ -174,9 +174,11 @@ const FilteredList = ({ items, query }: FilteredListProps) => {
 };
 ```
 
-## Server Components as Optimization
+## Server Rendering as Optimization
 
-In vinext, Server Components don't re-render on the client at all. Use them to keep expensive rendering on the server:
+Server-rendered components don't re-render on the client at all. Use them to keep expensive rendering on the server. In apps/cms (Next.js App Router) that means React Server Components, as below; in apps/web (Astro) it means React components rendered from `.astro` without a `client:*` directive, with only the interactive leaf hydrated (`.claude/rules/astro-islands.md`).
+
+apps/cms example:
 
 ```tsx
 // Server Component - zero client-side JS, never re-renders

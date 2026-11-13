@@ -1,13 +1,18 @@
 ---
 paths:
-  - "src/**/*.tsx"
+  - "apps/*/src/**/*.tsx"
 ---
 
 # React Conventions
 
-## Server Components First
+## Server-Rendered First
 
-This project uses vinext with React Server Components (RSC). Components are Server Components by default. **Always prefer RSC. Keep CSR to the absolute minimum.**
+**Always prefer server rendering. Keep CSR to the absolute minimum.** How that is expressed differs per app:
+
+- **apps/cms** (Next.js App Router): React Server Components. Components are Server Components by default; the rules below (`'use client'`, CSR boundary) apply as written.
+- **apps/web** (Astro): there is no `'use client'` or RSC. React components render to static HTML from `.astro`; only genuine client leaves hydrate via `client:*`. Follow `.claude/rules/astro-islands.md` for island placement.
+
+In apps/cms:
 
 - Use `'use client'` directive only when the component needs interactivity (event handlers, hooks, browser APIs)
 - Keep data fetching in Server Components using `async` functions

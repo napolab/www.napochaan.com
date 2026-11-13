@@ -1,12 +1,13 @@
 ---
-description: Require TDD (Red-Green-Refactor) for lib, components, and colocated _components
+description: Require TDD (Red-Green-Refactor) for utils, components, and page-specific components in both apps
 paths:
-  - "src/utils/**/*.{ts,tsx}"
-  - "src/components/**/*.{ts,tsx}"
-  - "src/app/**/_components/**/*.{ts,tsx}"
+  - "apps/*/src/utils/**/*.{ts,tsx}"
+  - "apps/*/src/components/**/*.{ts,tsx,astro}"
+  - "apps/cms/src/app/**/_components/**/*.{ts,tsx}"
+  - "apps/web/src/features/**/*.{ts,tsx,astro}"
 ---
 
-Code under `src/utils/`, `src/components/`, and colocated `_components/` must be developed with TDD.
+Code under `src/utils/`, `src/components/`, and page-specific components (apps/cms: colocated `_components/`; apps/web: `src/features/`) must be developed with TDD.
 
 Invoke the `superpowers:test-driven-development` skill and follow the Red → Green → Refactor cycle.
 

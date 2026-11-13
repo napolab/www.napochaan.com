@@ -1,9 +1,11 @@
 ---
 name: rsc-first
-description: Use when building Next.js App Router pages or components. Triggers on "create page", "build component", "add feature", "new route", or any UI implementation task in this project. Ensures Server Components by default with fine-grained client islands.
+description: Use when building Next.js App Router pages or components in apps/cms (the Payload CMS app) only. Ensures Server Components by default with fine-grained 'use client' leaves. Not for apps/web, which is Astro — for apps/web see .claude/rules/astro-islands.md.
 ---
 
 # RSC-First Architecture
+
+> **Scope: apps/cms only** (Next.js App Router). apps/web is Astro: there is no `'use client'` / RSC there; the same "smallest interactive leaf" principle is expressed as `client:*` islands. For apps/web (Astro) follow `.claude/rules/astro-islands.md` instead.
 
 ## Core Principle
 

@@ -1,9 +1,11 @@
 ---
 name: file-colocation
-description: Use when creating pages, layouts, or components in this Next.js App Router + Panda CSS project. Triggers on "create page", "add component", "new route", "build section", or any file creation task under src/app/ or src/components/.
+description: Use when creating pages, layouts, or components in apps/cms (the Next.js App Router + Panda CSS Payload app) only, i.e. file creation under apps/cms/src/app/ or apps/cms/src/components/. Not for apps/web, which is Astro (src/pages/*.astro, src/features/<x>/components) — for apps/web see .claude/rules/astro-islands.md.
 ---
 
 # File Colocation
+
+> **Scope: apps/cms only** (Next.js App Router `src/app/`). apps/web is Astro: routes are `src/pages/*.astro`, page-specific components live under `src/features/<feature>/components/`, and shared ones in `src/components/` (styles still colocate as `styles.css.ts`). For apps/web (Astro) follow `.claude/rules/astro-islands.md` instead.
 
 ## Overview
 

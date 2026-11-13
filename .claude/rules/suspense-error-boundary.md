@@ -1,6 +1,6 @@
 ---
 paths:
-  - "src/**/*.tsx"
+  - "apps/*/src/**/*.tsx"
 ---
 
 # Suspense & ErrorBoundary Pattern
@@ -23,7 +23,7 @@ import { ErrorBoundary } from 'react-error-boundary';
 
 ## Route Components Pattern
 
-In `src/app/`, place page-specific components in `_components/` directory:
+apps/cms (Next.js App Router): in `src/app/`, place page-specific components in `_components/` directory. (apps/web is Astro: routes are `src/pages/*.astro` and page-specific components live under `src/features/<feature>/components/`; a suspending component must be inside a hydrated island — see `.claude/rules/astro-islands.md`.)
 
 ```
 src/app/
