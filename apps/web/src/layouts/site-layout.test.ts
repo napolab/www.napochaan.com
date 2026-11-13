@@ -73,13 +73,30 @@ describe('site-layout.astro', () => {
     expect(state.html).toContain('<meta name="robots" content="noindex, nofollow"');
   });
 
-  it('persists the stateful shell islands but never the element around the page slot', () => {
-    for (const name of ['boot-overlay', 'shell-backdrop', 'sys-bar', 'cursor-presence']) {
+  it('persists the stateful shell pieces but never the element around the page slot', () => {
+    for (const name of ['boot-overlay', 'safe-area-tint', 'typography-band', 'life-frame', 'sys-bar', 'cursor-presence']) {
       expect(count(state.html, `data-astro-transition-persist="${name}"`)).toBe(1);
     }
     const stageOpen = state.html.match(/<div[^>]*data-cursor-surface[^>]*>/)?.[0] ?? '';
     expect(stageOpen).not.toContain('data-astro-transition-persist');
     expect(state.html).toContain('<main id="main-content"><p>page body</p></main>');
+  });
+
+  // .claude/rules/astro-islands.md: the shell hydrates only client leaves (the
+  // 'use client' modules of the Next app), never a server tree around them.
+  it('hydrates only client leaves in the shell', () => {
+    const islands = [...state.html.matchAll(/<astro-island [^>]*component-export="([^"]+)"/g)].map((match) => match[1]);
+    expect(islands).toEqual([
+      'BootQuestionIsland',
+      'ScrollRangeSyncIsland',
+      'TypographyBandIsland',
+      'GameOfLifeIsland',
+      'SysBarIsland',
+      'FooterNavIsland',
+      'ScrambleTextIsland',
+      'ScrambleTextIsland',
+      'CursorPresenceIsland',
+    ]);
   });
 
   it('feeds the page pathname to the islands', () => {

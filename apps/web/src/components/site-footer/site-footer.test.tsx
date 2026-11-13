@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { page } from 'vitest/browser';
 
 import { SiteFooter } from './index';
+import { FooterNavIsland } from './island';
 
 describe('SiteFooter', () => {
   it('renders a contentinfo footer with copyright', async () => {
@@ -33,5 +34,10 @@ describe('SiteFooter', () => {
   it('still shows the build status line', async () => {
     await render(<SiteFooter buildId="abc123" />);
     await expect.element(page.getByText(/build abc123/)).toBeInTheDocument();
+  });
+
+  it('marks the active section from the island pathname', async () => {
+    await render(<FooterNavIsland pathname="/blog/post" props={{}} />);
+    await expect.element(page.getByRole('navigation', { name: 'フッターナビゲーション' }).getByRole('link', { name: 'blog' })).toHaveAttribute('data-active', 'true');
   });
 });

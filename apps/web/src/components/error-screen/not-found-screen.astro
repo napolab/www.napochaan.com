@@ -1,0 +1,8 @@
+---
+// `.astro` twin of NotFoundScreen (./screens.tsx): ErrorScreen renders server-side with
+// the home link slotted in; only its ScrambleText label hydrates.
+import HomeLink from './home-link.astro';
+import { ErrorScreen } from './index';
+---
+
+<ErrorScreen code="404" kind="not found" lead="お探しのページは存在しないか、移動した可能性があります。" tag="▸ not found"><HomeLink /></ErrorScreen>

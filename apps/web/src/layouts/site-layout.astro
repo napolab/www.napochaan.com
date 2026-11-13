@@ -1,14 +1,19 @@
 ---
 // Port of apps/web/src/app/(site)/layout.tsx. The page `<main>` (the slot) is
-// swapped on every ClientRouter navigation; the stateful shell pieces are sibling
-// islands with `transition:persist` so their React roots (life canvas, cursor
-// WebSocket, boot overlay, SysBar) survive. Never put persist on an element that
-// wraps <slot /> — `main` would then never swap.
+// swapped on every ClientRouter navigation; the stateful shell pieces are siblings
+// with `transition:persist` (set on their root elements, inside loading-overlay.astro
+// and shell-backdrop.astro, and on the SysBar / cursor islands here) so their DOM and
+// React roots (life canvas, cursor WebSocket, boot overlay, SysBar) survive. Only
+// client leaves hydrate (.claude/rules/astro-islands.md). Never put persist on an
+// element that wraps <slot /> — `main` would then never swap.
 import { ClientRouter } from 'astro:transitions';
 
 import { buildMetadata, THEME_COLOR, VIEWPORT } from '@components/seo/build-metadata';
 import Seo from '@components/seo/seo.astro';
-import { CursorPresenceIsland, LoadingOverlayIsland, ShellBackdropIsland, SiteFooterIsland, SysBarIsland } from '@components/site-shell';
+import LoadingOverlay from '@components/loading-overlay/loading-overlay.astro';
+import { CursorPresenceIsland, SysBarIsland } from '@components/site-shell';
+import ShellBackdrop from '@components/site-shell/shell-backdrop.astro';
+import SiteFooter from '@components/site-footer/site-footer.astro';
 import { stage } from '@components/site-shell/styles.css';
 import { formatClock } from '@components/sys-bar/format-clock';
 import { imageBlurScriptHtml } from '@components/image/blur-script';
@@ -58,12 +63,12 @@ const initialTime = formatClock();
     <ClientRouter />
   </head>
   <body class={clsx(themeRoot, bodyClass)}>
-    <LoadingOverlayIsland client:load transition:persist="boot-overlay" pathname={pathname} props={{}} />
-    <ShellBackdropIsland client:load transition:persist="shell-backdrop" pathname={pathname} props={{}} />
+    <LoadingOverlay />
+    <ShellBackdrop />
     <div data-cursor-surface class={stage}>
       <SysBarIsland client:load transition:persist="sys-bar" pathname={pathname} props={{ initialTime }} />
       <slot />
-      <SiteFooterIsland client:visible pathname={pathname} props={{}} />
+      <SiteFooter />
     </div>
     <CursorPresenceIsland client:load transition:persist="cursor-presence" pathname={pathname} props={{}} />
   </body>

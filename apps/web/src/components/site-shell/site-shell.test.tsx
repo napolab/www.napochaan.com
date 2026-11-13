@@ -5,10 +5,11 @@ import { page } from 'vitest/browser';
 
 import { sharedLifeEngine } from '@components/game-of-life/provider';
 
-import { CursorPresenceIsland, LoadingOverlayIsland, ShellBackdropIsland, SiteFooterIsland, SysBarIsland } from './index';
+import { CursorPresenceIsland, ShellBackdrop, SysBarIsland } from './index';
 
 // The Next SiteShell wrapped the page; on Astro the persisted shell is a set of
-// sibling islands around the swapped page <main>. Each is its own React root.
+// siblings around the swapped page <main>. SysBar and the cursor layer are islands;
+// ShellBackdrop is the server reference markup for shell-backdrop.astro.
 
 afterEach(() => {
   vi.mocked(navigate).mockClear();
@@ -16,7 +17,7 @@ afterEach(() => {
 
 describe('shell islands', () => {
   it('renders the backdrop: safe-area tint, typography band and the life canvas', async () => {
-    const { container } = await render(<ShellBackdropIsland pathname="/" props={{}} />);
+    const { container } = await render(<ShellBackdrop />);
 
     await expect.element(page.getByTestId('safe-area-tint')).toBeInTheDocument();
     expect(container.querySelectorAll('[data-testid="typography-band"]')).toHaveLength(4);
@@ -43,19 +44,6 @@ describe('shell islands', () => {
     await page.getByRole('navigation', { name: 'グローバルナビゲーション' }).getByRole('link', { name: 'blog' }).click();
 
     expect(navigate).toHaveBeenCalledWith('/blog');
-  });
-
-  it('renders the footer with the active section', async () => {
-    await render(<SiteFooterIsland pathname="/blog/post" props={{}} />);
-
-    await expect.element(page.getByRole('contentinfo')).toBeInTheDocument();
-    await expect.element(page.getByRole('navigation', { name: 'フッターナビゲーション' }).getByRole('link', { name: 'blog' })).toHaveAttribute('data-active', 'true');
-  });
-
-  it('renders the aria-hidden boot overlay', async () => {
-    const { container } = await render(<LoadingOverlayIsland pathname="/" props={{}} />);
-
-    expect(container.querySelector('[aria-hidden="true"]')?.textContent).toContain('napochaan');
   });
 
   it('mounts the cursor presence layer without wrapping page content', async () => {
