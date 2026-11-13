@@ -158,8 +158,8 @@ export const tokens = defineTokens({
     mono: { value: '"config-mono-vf", "config-mono-vf Fallback", ui-monospace, "Cascadia Code", monospace' },
     // Zen Kaku Gothic New (self-hosted @fontsource) — used for long content
     // detail titles (works / news / blog). Only weight 500 is loaded (see
-    // themes/fonts.css); TITLE_JP_VAR is the shared CSS variable name, kept in
-    // sync with the declaration there (see themes/font-vars.ts).
+    // themes/font-faces.css); TITLE_JP_VAR is the shared CSS variable name, kept in
+    // sync with the declaration in themes/fonts.css (see themes/font-vars.ts).
     titleJP: { value: `var(${TITLE_JP_VAR}), sans-serif` },
   },
 

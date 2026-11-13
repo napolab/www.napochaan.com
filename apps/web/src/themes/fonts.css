@@ -1,31 +1,12 @@
 /*
- * Self-hosted web fonts (@fontsource), replacing apps/web's next/font/google.
- * Exposes the same CSS variables the tokens read (themes/tokens):
- *   --font-mplus1             M PLUS 1 400/500, Latin + Japanese
+ * Font CSS variables the tokens read (themes/tokens), render-blocking so the token
+ * stacks resolve from the first paint:
+ *   --font-mplus1               M PLUS 1 400/500, Latin + Japanese
  *   --font-zen-kaku-gothic-new  Zen Kaku Gothic New 500 (TITLE_JP_VAR, themes/font-vars)
- * No <link rel="preload"> for any of them: @font-face rules are cheap CSS, and the
- * files only download where a glyph is actually painted.
+ * The @font-face rules for these families live in ./font-faces.css, which the site
+ * layout loads as a separate non-render-blocking stylesheet. Keep this file free of
+ * @font-face / @import (asserted in font-vars.test.ts).
  */
-
-/*
- * M PLUS 1 400/500 with every unicode-range slice (Latin + Japanese): Latin and
- * Japanese body text both follow font-weight at the same regular weight (no
- * Latin-only 700 face — it made Latin read heavier than the Japanese next to it),
- * and Japanese never falls through to the system font. Slices are fetched only for
- * glyphs actually painted.
- */
-@import '@fontsource/m-plus-1/400.css';
-@import '@fontsource/m-plus-1/500.css';
-
-/*
- * Zen Kaku Gothic New (weight 500 only) — the Japanese gothic for long content
- * detail titles (PageHeader `titleTracking="tight"`). Fontsource ships it as
- * unicode-range-split @font-face rules, so the browser only fetches the glyph
- * slices the `titleJP` token actually paints; pages that never render a tight
- * title download nothing.
- */
-@import '@fontsource/zen-kaku-gothic-new/500.css';
-
 .font-variables {
   --font-mplus1: 'M PLUS 1';
   --font-zen-kaku-gothic-new: 'Zen Kaku Gothic New';

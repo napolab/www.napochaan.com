@@ -1,0 +1,29 @@
+/*
+ * Self-hosted web font faces (@fontsource). NOT part of the render-blocking layout
+ * CSS: the site layout links this file as its own stylesheet that loads without
+ * blocking first paint (`media="print"` flipped to `all` on load, see
+ * layouts/site-layout.astro). Text paints in the fallback stack first and swaps in
+ * (font-display: swap, as before). The CSS variables naming these families stay
+ * render-blocking in ./fonts.css.
+ *
+ * Every rule keeps fontsource's unicode-range split, so a slice file only downloads
+ * when a glyph in it is actually painted. The woff fallback src fontsource emits is
+ * stripped at build time (woff2 only — src/config/woff2-only, wired in
+ * postcss.config.ts). No <link rel="preload"> for any face.
+ */
+
+/*
+ * M PLUS 1 400/500 with every unicode-range slice (Latin + Japanese): Latin and
+ * Japanese body text both follow font-weight at the same regular weight (no
+ * Latin-only 700 face — it made Latin read heavier than the Japanese next to it),
+ * and Japanese never falls through to the system font.
+ */
+@import '@fontsource/m-plus-1/400.css';
+@import '@fontsource/m-plus-1/500.css';
+
+/*
+ * Zen Kaku Gothic New (weight 500 only) — the Japanese gothic for long content
+ * detail titles (PageHeader `titleTracking="tight"`). Pages that never render a
+ * tight title download no slice.
+ */
+@import '@fontsource/zen-kaku-gothic-new/500.css';
