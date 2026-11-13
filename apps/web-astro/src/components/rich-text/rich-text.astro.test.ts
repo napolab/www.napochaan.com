@@ -61,6 +61,19 @@ describe('rich-text.astro', () => {
     expect(topLevelTags(html).filter((tag) => tag !== 'div')).toEqual(['h2', 'p', 'h3', 'p']);
   });
 
+  // CodeBlock is an async Server Component (Shiki). React's server renderer awaits it
+  // inside the static run, so the highlighted tokens land in the page HTML.
+  it('renders the async Shiki code block highlighted', async () => {
+    const code = { type: 'block', fields: { id: 'c', blockType: 'Code', code: 'const answer: number = 42;', language: 'typescript' }, format: '', version: 2 };
+    const html = await render([paragraph('before'), code, paragraph('after')]);
+    expect(html).not.toContain('[object Promise]');
+    expect(html).toMatch(/<pre class="[^"]+"><code><span class="line">/);
+    expect(html).toContain('style="color:var(--code-keyword)">const</span>');
+    expect(html).toContain('42');
+    expect(html.indexOf('before')).toBeLessThan(html.indexOf('<pre'));
+    expect(html.indexOf('<pre')).toBeLessThan(html.indexOf('after'));
+  });
+
   // Every converter the colophon sample exercises (headings, inline formats, links,
   // lists, quote, hr, upload, image-row, youtube) except the async Shiki code block,
   // which renderToStaticMarkup cannot render.

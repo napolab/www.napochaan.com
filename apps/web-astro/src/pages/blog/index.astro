@@ -1,0 +1,19 @@
+---
+// Port of apps/web/src/app/(site)/blog/{layout,(index)/layout,(index)/page}.tsx: page 1
+// of the feed. Deeper pages live at path-keyed `/blog/page/[num]` (never `?page=N` —
+// .claude/rules/workers-cache.md). The worker stamps the purge-driven `cms` policy.
+import BlogList from '../../features/blog/blog-list.astro';
+import { loadBlogList } from '../../features/blog/load-blog-list';
+import { blogIndexMetadata } from '../../features/blog/metadata';
+import * as s from '../../features/blog/styles.css';
+import SiteLayout from '../../layouts/site-layout.astro';
+
+const page = await loadBlogList(1);
+if (page === undefined) return Astro.rewrite('/404');
+---
+
+<SiteLayout metadata={blogIndexMetadata}>
+  <main id="main-content" class={s.main}>
+    <BlogList page={page} />
+  </main>
+</SiteLayout>

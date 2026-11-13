@@ -1,0 +1,20 @@
+---
+// Port of apps/web/src/app/(site)/blog/{layout,[slug]/page}.tsx. An unknown slug is a
+// 404, decided before any HTML. The worker stamps the purge-driven `cms` policy; a
+// publish purges every page at once, so prev / next never go stale.
+import BlogDetail from '../../features/blog/blog-detail.astro';
+import { loadBlogDetail } from '../../features/blog/load-blog-detail';
+import { blogDetailMetadata } from '../../features/blog/metadata';
+import * as s from '../../features/blog/styles.css';
+import SiteLayout from '../../layouts/site-layout.astro';
+
+const slug = Astro.params.slug ?? '';
+const detail = await loadBlogDetail(slug);
+if (detail === undefined) return Astro.rewrite('/404');
+---
+
+<SiteLayout metadata={blogDetailMetadata(detail.post, slug)}>
+  <main id="main-content" class={s.main}>
+    <BlogDetail slug={slug} detail={detail} />
+  </main>
+</SiteLayout>

@@ -3,18 +3,18 @@ import { getRequestContext } from '@lib/request-context';
 import { requestOrigin } from '../og-image-url';
 
 // Loads the OG card's binary assets (fonts + digibop wordmark) from the worker's
-// ASSETS binding rather than over the network. Fetching via the binding works in
-// `opennextjs-cloudflare preview` and production alike, where BASE_URL points at
-// the public domain (which would 404 these worker-local files). Fonts are handed
-// to Satori as ArrayBuffers; the wordmark is inlined as a data: URL so Satori
-// never performs its own fetch.
+// ASSETS binding rather than over the network. The binding serves `dist/client`
+// (`public/og/*` is copied there by `astro build`) under `wrangler dev` and in
+// production alike, where a fetch of the public domain from inside the worker would
+// not reach these files. Fonts are handed to Satori as ArrayBuffers; the wordmark is
+// inlined as a data: URL so Satori never performs its own fetch.
 //
-// Dev exception: under `next dev` the ASSETS binding is backed by the unbuilt
-// `.open-next/assets` dir, so these files 404 until an `opennextjs-cloudflare
-// build` runs. Next still serves `/public` at the dev origin, so in development we
-// fall back to fetching the same path from there — OG images render under `next
-// dev` with no build step. The fallback is guarded by NODE_ENV and only reached
-// when the binding actually 404s, so production/preview never touch it.
+// Dev exception: under `astro dev` the ASSETS binding may not serve these files
+// (wrangler.toml points it at the `dist/client` build output). Vite still serves
+// `public/` at the dev origin, so in development we fall back to fetching the same
+// path from there — OG images render under `astro dev` with no build step. The fallback is guarded by
+// NODE_ENV and only reached when the binding actually 404s, so production never
+// touches it.
 
 export type OgFont = { name: string; data: ArrayBuffer; weight: 400 | 700; style: 'normal' };
 export type OgAssets = { fonts: OgFont[]; wordmarkUrl: string };

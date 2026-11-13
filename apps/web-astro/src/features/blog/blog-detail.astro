@@ -1,0 +1,49 @@
+---
+// Port of `blog/[slug]/page.tsx`'s body. Server-rendered except the client leaves:
+// QuoteShare (wrapping the server-rendered RichText as its slot), ShareBar, and the
+// ScrambleText / CopyHashButton / Lightbox leaves inside the header, TOC, body and nav.
+// The RichText blocks stay direct children of its container (rich-text.astro), which
+// the TOC's `[data-toc-body] :nth-child(N of :is(h2, h3))` view-timelines rely on.
+import PageHeader from '@components/page-header/page-header.astro';
+import { QuoteShareIsland } from '@components/quote-share/island';
+import RichText from '@components/rich-text/rich-text.astro';
+import { ShareBarIsland } from '@components/share-bar/island';
+import { absoluteUrl } from '@utils/site-url';
+
+import { BlogHero } from './components/blog-hero';
+import BlogNav from './components/blog-nav/blog-nav.astro';
+import Toc from './components/toc/toc.astro';
+import * as styles from './detail.css';
+
+import type { BlogDetail } from './load-blog-detail';
+
+type Props = {
+  slug: string;
+  detail: BlogDetail;
+};
+
+const { slug, detail } = Astro.props;
+const { post, adjacent, headings, formattedDate } = detail;
+const pathname = Astro.url.pathname;
+const url = absoluteUrl(`/blog/${slug}`);
+const crumbs = [{ href: '/', label: 'home' }, { href: '/blog', label: 'blog' }, { label: post.title }];
+---
+
+<PageHeader title={post.title} breadcrumbs={crumbs} kicker={`// ${post.readMin} min · ${formattedDate}`} titleTracking="tight" />
+{post.thumbnail !== undefined && <BlogHero thumbnail={post.thumbnail} title={post.title} caption={`blog / ${formattedDate}`} />}
+<div class={styles.layout} data-toc-scope="true">
+  <div class={styles.tocCol}>
+    <Toc headings={headings} />
+  </div>
+  <div class={styles.bodyCol} data-toc-body="true">
+    {
+      post.body !== undefined && (
+        <QuoteShareIsland client:load pathname={pathname} props={{ url, title: post.title }}>
+          <RichText data={post.body} />
+        </QuoteShareIsland>
+      )
+    }
+  </div>
+</div>
+<ShareBarIsland client:load pathname={pathname} props={{ url, title: post.title }} />
+<BlogNav prev={adjacent.prev} next={adjacent.next} />

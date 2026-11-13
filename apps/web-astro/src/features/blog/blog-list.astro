@@ -1,0 +1,26 @@
+---
+// Port of the `(index)` layout + BlogListSection: the list chrome (PageHeader + feed
+// link, list routes only) and one page of the feed. The page decides the 404 before
+// rendering this (see ./lib/paginate-posts). Pagination and FeedLink are Server
+// Components rendered without a directive (plain anchors ClientRouter intercepts).
+import { FeedLink } from '@components/feed-link';
+import PageHeader from '@components/page-header/page-header.astro';
+import { Pagination } from '@components/pagination';
+
+import PostList from './components/post-list/post-list.astro';
+import { blogPageHref } from './lib/paginate-posts';
+
+import type { PostPage } from './lib/paginate-posts';
+
+type Props = {
+  page: PostPage;
+};
+
+const { page } = Astro.props;
+const crumbs = [{ href: '/', label: 'home' }, { label: 'blog' }];
+---
+
+<PageHeader title="blog" breadcrumbs={crumbs} kicker="// 記事" lead="あ、ほんと(発見)" />
+<FeedLink href="/blog/rss.xml" label="blog の RSS フィード" />
+<PostList posts={page.posts} />
+{page.totalPages > 1 && <Pagination currentPage={page.current} totalPages={page.totalPages} href={blogPageHref} />}

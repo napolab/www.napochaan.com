@@ -4,7 +4,9 @@
 
 type AlternateLink = { url: string; title: string };
 
-type OpenGraphImage = { url: string };
+// `type` / `width` / `height` render as og:image:* (and twitter:image:* when the
+// twitter card inherits the og images), as Next emitted them for file-convention images.
+type OpenGraphImage = { url: string; type?: string; width?: number; height?: number };
 
 export type Metadata = {
   // A bare title gets the site suffix appended; `absolute` is used verbatim.

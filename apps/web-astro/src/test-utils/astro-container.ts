@@ -10,22 +10,26 @@ const createContainer = async () => AstroContainer.create({ renderers: await loa
 
 type ExtraRoutes = Record<string, AstroComponentFactory>;
 
+// A dynamic route's `Astro.params` (the container does not match the pathname
+// against the route pattern, so tests pass what the router would extract).
+type Params = Record<string, string | undefined>;
+
 // Full-page render (not a partial) of a route component at `pathname`. `routes` are
 // registered for `Astro.rewrite` targets (e.g. `/404`).
-export const renderPage = async (page: AstroComponentFactory, pathname: string, routes: ExtraRoutes = {}): Promise<Response> => {
+export const renderPage = async (page: AstroComponentFactory, pathname: string, routes: ExtraRoutes = {}, params: Params = {}): Promise<Response> => {
   const container = await createContainer();
   for (const [route, component] of Object.entries(routes)) {
     container.insertPageRoute(route, component);
   }
 
-  return container.renderToResponse(page, { request: new Request(`${ORIGIN}${pathname}`), partial: false });
+  return container.renderToResponse(page, { request: new Request(`${ORIGIN}${pathname}`), partial: false, params });
 };
 
 // An endpoint module (`export const GET`) rendered through the container.
-export const renderEndpoint = async (endpoint: AstroComponentFactory, pathname: string): Promise<Response> => {
+export const renderEndpoint = async (endpoint: AstroComponentFactory, pathname: string, params: Params = {}): Promise<Response> => {
   const container = await createContainer();
 
-  return container.renderToResponse(endpoint, { request: new Request(`${ORIGIN}${pathname}`), routeType: 'endpoint' });
+  return container.renderToResponse(endpoint, { request: new Request(`${ORIGIN}${pathname}`), routeType: 'endpoint', params });
 };
 
 type ComponentRenderOptions = {

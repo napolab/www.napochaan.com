@@ -30,6 +30,7 @@
     "@payloadcms/live-preview-react": "3.91.0",
     "@payloadcms/richtext-lexical": "3.91.0",
     "@radix-ui/react-slot": "^1.2.4",
+    "@resvg/resvg-wasm": "2.6.2",
     "astro": "~7.4.11",
     "budoux": "^0.8.4",
     "dayjs": "^1.11.21",
@@ -43,6 +44,7 @@
     "react-aria-components": "^1.18.0",
     "react-dom": "19.2.9",
     "reconnecting-websocket": "^4.4.0",
+    "satori": "0.29.0",
     "shiki": "^4.6.0",
     "zod": "^4.4.3"
   },
