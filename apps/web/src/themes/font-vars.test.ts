@@ -4,6 +4,7 @@ import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 import { TITLE_JP_VAR } from './font-vars';
+import { tokens } from './tokens';
 
 // The font CSS variables are declared in fonts.css (plain CSS, which cannot import
 // TITLE_JP_VAR). This test statically reads that source and asserts the declared
@@ -19,9 +20,15 @@ describe('font CSS variables stay in sync with fonts.css', () => {
     expect(declared).toBe(TITLE_JP_VAR);
   });
 
-  it('fonts.css declares the body font variables the tokens read', () => {
+  it('fonts.css declares the body font variable the tokens read', () => {
     expect(fontsCSS).toMatch(/--font-mplus1:\s*'M PLUS 1';/);
-    expect(fontsCSS).toMatch(/--font-mplus1-en:\s*'M PLUS 1 En';/);
+  });
+
+  // Latin follows font-weight like Japanese: no Latin-only heavy face that would
+  // paint every Latin glyph at 700 next to 400 Japanese.
+  it('has no Latin-only M PLUS 1 face overriding the weight', () => {
+    expect(fontsCSS).not.toMatch(/M PLUS 1 En|--font-mplus1-en|m-plus-1-latin-700/);
+    expect(tokens.fonts.body.value).toMatch(/^var\(--font-mplus1\),/);
   });
 
   // Japanese body text is painted by M PLUS 1 at a regular weight (400/500, all
