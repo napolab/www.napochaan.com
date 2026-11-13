@@ -137,3 +137,8 @@ export const barFill = css({
     animation: '[loadBar 2800ms ease-out forwards]',
   },
 });
+
+// The <boot-question> custom element (boot-question/boot-question.astro) is a pure
+// wrapper: no box, so the typed text and caret sit in the status line's flex row
+// exactly as the React BootQuestion rendered them. A class so it applies pre-upgrade.
+export const bootQuestion = css({ display: 'contents' });

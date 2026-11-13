@@ -7,20 +7,20 @@ import BackToIndex from '@components/back-to-index/back-to-index.astro';
 import Breadcrumbs from '@components/breadcrumbs/breadcrumbs.astro';
 import { ButtonIsland } from '@components/button/island';
 import { CalendarIsland } from '@components/calendar/island';
-import { DividerIsland } from '@components/divider/island';
-import { EchoTextIsland } from '@components/echo-text/island';
-import { GalleryArchiveIsland } from '@components/gallery-archive/island';
+import Divider from '@components/divider/divider.astro';
+import EchoText from '@components/echo-text/echo-text.astro';
+import GalleryArchive from '@components/gallery-archive/gallery-archive.astro';
 import { GalleryIsland } from '@components/gallery/island';
 import BootConsole from '@components/loading-overlay/boot-console/boot-console.astro';
 import NewsRow from '@components/news-row/news-row.astro';
 import { QuoteShareIsland } from '@components/quote-share/island';
 import RichText from '@components/rich-text/rich-text.astro';
-import { ScrambleTextIsland } from '@components/scramble-text/island';
-import { ShareBarIsland } from '@components/share-bar/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
+import ShareBar from '@components/share-bar/share-bar.astro';
 import { SystemAnnotation } from '@components/system-annotation';
 import { TextAreaIsland } from '@components/text-area/island';
 import { TextFieldIsland } from '@components/text-field/island';
-import { TypewriterTextIsland } from '@components/typewriter-text/island';
+import TypewriterText from '@components/typewriter-text/typewriter-text.astro';
 
 import * as gameOfLifeStyles from './game-of-life-demo.css';
 import * as loadingOverlayStyles from './loading-overlay-demo.css';
@@ -54,9 +54,9 @@ const buttons = ['solid', 'outline', 'danger'] as const;
     </NoAction>
   )
 }
-{name === 'ScrambleText' && <ScrambleTextIsland client:load pathname={pathname} props={{ children: 'static internet' }} />}
-{name === 'EchoText' && <EchoTextIsland client:load pathname={pathname} props={{ children: 'napochaan', size: 'compact' }} />}
-{name === 'TypewriterText' && <TypewriterTextIsland client:load pathname={pathname} props={{ children: 'さまざまな「破壊」、承っております。' }} />}
+{name === 'ScrambleText' && <ScrambleText text="static internet" />}
+{name === 'EchoText' && <EchoText text="napochaan" size="compact" />}
+{name === 'TypewriterText' && <TypewriterText text="さまざまな「破壊」、承っております。" />}
 {
   name === 'RichText' && (
     <NoAction client:load>
@@ -71,13 +71,7 @@ const buttons = ['solid', 'outline', 'danger'] as const;
     </GalleryIsland>
   )
 }
-{
-  name === 'GalleryArchive' && (
-    <GalleryArchiveIsland client:only="react" pathname={pathname} props={{ photos: galleryItems }}>
-      <SystemAnnotation slot="fallback" tone="muted">loading gallery…</SystemAnnotation>
-    </GalleryArchiveIsland>
-  )
-}
+{name === 'GalleryArchive' && <GalleryArchive photos={galleryItems} />}
 {
   name === 'NewsRow' && (
     <NoAction client:load>
@@ -95,8 +89,8 @@ const buttons = ['solid', 'outline', 'danger'] as const;
 {
   name === 'Divider' && (
     <>
-      <DividerIsland client:load pathname={pathname} props={{}} />
-      <DividerIsland client:load pathname={pathname} props={{ variant: 'dashed' }} />
+      <Divider />
+      <Divider variant="dashed" />
     </>
   )
 }
@@ -111,7 +105,7 @@ const buttons = ['solid', 'outline', 'danger'] as const;
 {
   name === 'ShareBar' && (
     <NoAction client:load>
-      <ShareBarIsland client:load pathname={pathname} props={{ url: 'https://www.napochaan.com/works/1', title: 'サンプル作品タイトル' }} />
+      <ShareBar url="https://www.napochaan.com/works/1" title="サンプル作品タイトル" />
     </NoAction>
   )
 }

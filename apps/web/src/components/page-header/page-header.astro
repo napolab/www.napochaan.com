@@ -1,10 +1,11 @@
 ---
-// `.astro` twin of the PageHeader Server Component (markup mirrors ./index.tsx): the
-// breadcrumbs and the lead's ScrambleText / TypewriterText are the only islands.
+// `.astro` twin of the PageHeader Server Component (markup mirrors ./index.tsx). No
+// island: the lead's TypewriterText is the `<typewriter-text>` element, breadcrumbs and
+// the ScrambleText lead are `<scramble-text>` elements.
 import Breadcrumbs from '@components/breadcrumbs/breadcrumbs.astro';
-import { ScrambleTextIsland } from '@components/scramble-text/island';
+import ScrambleText from '@components/scramble-text/scramble-text.astro';
 import { SystemAnnotation } from '@components/system-annotation';
-import { TypewriterTextIsland } from '@components/typewriter-text/island';
+import TypewriterText from '@components/typewriter-text/typewriter-text.astro';
 
 import * as styles from './styles.css';
 
@@ -19,7 +20,6 @@ type Props = {
 };
 
 const { title, breadcrumbs, kicker, lead, leadReveal = 'typewriter', annotation, titleTracking } = Astro.props;
-const pathname = Astro.url.pathname;
 ---
 
 <header class={styles.root}>
@@ -30,9 +30,9 @@ const pathname = Astro.url.pathname;
     lead !== undefined && (
       <p class={styles.lead}>
         {leadReveal === 'scramble' ? (
-          <ScrambleTextIsland client:load pathname={pathname} props={{ children: lead }} />
+          <ScrambleText text={lead} />
         ) : (
-          <TypewriterTextIsland client:load pathname={pathname} props={{ children: lead }} />
+          <TypewriterText text={lead} />
         )}
       </p>
     )

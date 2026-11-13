@@ -1,13 +1,13 @@
 ---
 // `.astro` twin of the ShellBackdrop Server Component (markup mirrors ./index.tsx). Only
-// the client leaves hydrate (ScrollRangeSync inside SafeAreaTint, TypographyBand,
-// GameOfLife); each top-level piece persists across ClientRouter navigations so the
+// GameOfLife hydrates; ScrollRangeSync (inside SafeAreaTint) and TypographyBand are
+// custom elements. Each top-level piece persists across ClientRouter navigations so the
 // life canvas and the band animation are never remounted. No wrapper element: the
 // pieces must stay direct children of <body> (the tint strips anchor to the initial
 // containing block, and the band paints above the tint by DOM order on the same z).
 import SafeAreaTint from '@components/safe-area-tint/safe-area-tint.astro';
 import { GameOfLifeIsland } from '@components/game-of-life/island';
-import { TypographyBandIsland } from '@components/typography-band/island';
+import TypographyBand from '@components/typography-band/typography-band.astro';
 
 import * as styles from './styles.css';
 
@@ -15,5 +15,5 @@ const pathname = Astro.url.pathname;
 ---
 
 <SafeAreaTint />
-<TypographyBandIsland client:load transition:persist="typography-band" pathname={pathname} props={{}} />
+<TypographyBand />
 <div class={styles.lifeFrame} transition:persist="life-frame"><GameOfLifeIsland client:load pathname={pathname} props={{}} /></div>

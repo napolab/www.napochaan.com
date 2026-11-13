@@ -1,0 +1,24 @@
+---
+// `.astro` EchoText with NO React island. The markup inside <echo-text> is
+// byte-identical to the React EchoText (./index.tsx) — asserted by
+// echo-text.astro.test.ts — and the decode is driven by the `<echo-text>` custom
+// element (./element.ts), which shares ./bind-echo with the React one.
+//
+// `text` replaces `children` (rendered four times and used as the accessible name, so
+// it must be a plain string). The template is one line: the root is inline-block, so
+// whitespace between the tags would render.
+import * as styles from './styles.css';
+
+type Props = {
+  text: string;
+  size?: 'hero' | 'compact';
+};
+
+const { text, size = 'hero' } = Astro.props;
+---
+
+<echo-text class={styles.element}><span data-size={size} class={styles.root} role="img" aria-label={text}><span aria-hidden="true" data-size={size} class={styles.echoOut}>{text}</span><span aria-hidden="true" data-size={size} class={styles.echoBlue}>{text}</span><span aria-hidden="true" class={styles.fill}><span data-scramble="true">{text}</span><span class={styles.red}>.</span></span></span></echo-text><script>
+  import { defineEchoTextElement } from './element';
+
+  defineEchoTextElement();
+</script>

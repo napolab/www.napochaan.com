@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { renderComponent } from '../../test-utils/astro-container';
-import { renderReactMarkup, stripIslands } from '../../test-utils/island-parity';
+import { islandExportsOf, leafElementCountOf, renderReactMarkup, stripIslands } from '../../test-utils/island-parity';
 import Twin from './gallery-archive.astro';
 import { GalleryArchive } from './index';
 
@@ -21,11 +21,12 @@ describe('gallery-archive.astro', () => {
     expect(stripIslands(html)).toBe(renderReactMarkup(GalleryArchive, { photos }));
   });
 
-  it('hydrates only the lightboxes and the blank dimension labels', async () => {
+  it('hydrates only the lightboxes; the blank dimension labels are <blank-dim> elements', async () => {
     const html = await renderComponent(Twin, { props: { photos } });
-    const islands = [...html.matchAll(/component-export="([^"]+)"/g)].map((match) => match[1]);
-    expect(islands.filter((name) => name === 'LightboxIsland')).toHaveLength(photos.length);
-    expect(islands.filter((name) => name !== 'LightboxIsland').every((name) => name === 'BlankDimIsland')).toBe(true);
-    expect(islands).toContain('BlankDimIsland');
+    const islands = islandExportsOf(html);
+    expect(islands).toEqual(photos.map(() => 'LightboxIsland'));
+    // One <blank-dim> per blank cell.
+    expect(leafElementCountOf(html, 'blank-dim')).toBe((html.match(/<li [^>]*data-bp=/g) ?? []).length);
+    expect(leafElementCountOf(html, 'blank-dim')).toBeGreaterThan(0);
   });
 });

@@ -1,16 +1,19 @@
 ---
-// `.astro` twin of the SafeAreaTint Server Component (markup mirrors ./index.tsx);
-// ScrollRangeSync is the only island. Rendered once, by the site layout's shell
-// backdrop: the root persists across ClientRouter navigations (ScrollRangeSync
-// re-observes the swapped <body> on `astro:after-swap`).
-import { ScrollRangeSyncIsland } from './island';
+// `.astro` twin of the SafeAreaTint Server Component (markup mirrors ./index.tsx). No
+// island: ScrollRangeSync is the empty `<scroll-range-sync>` custom element
+// (./element.ts, sharing ./bind-scroll-range with the React one). Rendered once, by the
+// site layout's shell backdrop: the root persists across ClientRouter navigations
+// (the element re-observes the swapped <body> on `astro:after-swap`).
 import * as styles from './styles.css';
-
-const pathname = Astro.url.pathname;
 ---
 
 <div class={styles.root} aria-hidden="true" data-testid="safe-area-tint" transition:persist="safe-area-tint">
   <div class={styles.strip} data-testid="safe-area-tint-strip"></div>
   <div class={styles.bottomClip}><div class={styles.stripBottom} data-testid="safe-area-tint-strip-bottom"></div></div>
-  <ScrollRangeSyncIsland client:load pathname={pathname} props={{}} />
+  <scroll-range-sync></scroll-range-sync>
 </div>
+<script>
+  import { defineScrollRangeSyncElement } from './element';
+
+  defineScrollRangeSyncElement();
+</script>

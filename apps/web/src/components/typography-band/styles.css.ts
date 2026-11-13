@@ -104,3 +104,8 @@ export const trackVertical = css({
   willChange: 'transform',
   flexDirection: 'column',
 });
+
+// The <typography-band> custom element (typography-band.astro) is a pure wrapper: no
+// box, so the four fixed bands stay direct layout children of <body> and keep painting
+// above the safe-area tint by DOM order. A class so it applies before the upgrade.
+export const element = css({ display: 'contents' });

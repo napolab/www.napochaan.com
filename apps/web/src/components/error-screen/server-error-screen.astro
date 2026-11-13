@@ -1,12 +1,10 @@
 ---
 // `.astro` twin of ServerErrorScreen (./screens.tsx): ErrorScreen renders server-side
-// with the actions slotted in; only the retry button and the home link's ScrambleText
-// label hydrate.
+// with the actions slotted in. Nothing hydrates: the retry button is the
+// `<retry-button>` element and the home link's label a `<scramble-text>` element.
 import HomeLink from './home-link.astro';
 import { ErrorScreen } from './index';
-import { RetryButtonIsland } from './retry-button/island';
-
-const pathname = Astro.url.pathname;
+import RetryButton from './retry-button/retry-button.astro';
 ---
 
-<ErrorScreen code="500" kind="runtime error" lead="予期しないエラーが発生しました。" tag="■ rec stopped"><RetryButtonIsland client:load pathname={pathname} props={{}} /><HomeLink /></ErrorScreen>
+<ErrorScreen code="500" kind="runtime error" lead="予期しないエラーが発生しました。" tag="■ rec stopped"><RetryButton /><HomeLink /></ErrorScreen>

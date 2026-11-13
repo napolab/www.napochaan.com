@@ -68,3 +68,8 @@ export const homeLink = css({
   fontSize: { base: 'xs', desktop: 'sm' },
   letterSpacing: 'wide',
 });
+
+// The <retry-button> custom element (retry-button/retry-button.astro) is a pure
+// wrapper: no box, so the button sits in the actions row exactly as the React
+// RetryButton did. A class so it applies before the element upgrades.
+export const retryElement = css({ display: 'contents' });

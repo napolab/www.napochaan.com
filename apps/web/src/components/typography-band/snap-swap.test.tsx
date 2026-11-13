@@ -1,24 +1,42 @@
 import { render } from 'vitest-browser-react';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { TYPOGRAPHY_BAND_TAG, defineTypographyBandElement } from './element';
 import { TypographyBand } from './index';
 
-// The band lives in a persisted island. Its scroll-rest grid snap must not drag the
-// page back down after ClientRouter scrolls the swapped-in page to the top.
+// The band persists across navigations. Its scroll-rest grid snap must not drag the
+// page back down after ClientRouter scrolls the swapped-in page to the top. Both the
+// React TypographyBand and the <typography-band> element drive ./bind-band.
 const spacer = document.createElement('div');
 
 afterEach(() => {
   spacer.remove();
+  document.body.replaceChildren();
   scrollTo(0, 0);
 });
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-describe('TypographyBand grid snap across a ClientRouter swap', () => {
+const mountReact = async () => {
+  await render(<TypographyBand />);
+};
+
+const mountElement = async () => {
+  defineTypographyBandElement();
+  const container = document.createElement('div');
+  const band = '<div aria-hidden="true"><div><span>NAPOCHAAN · </span><span>NAPOCHAAN · </span></div></div>';
+  container.innerHTML = `<${TYPOGRAPHY_BAND_TAG}>${band.repeat(4)}</${TYPOGRAPHY_BAND_TAG}>`;
+  document.body.appendChild(container);
+};
+
+describe.each([
+  { name: 'TypographyBand (React)', mount: mountReact },
+  { name: '<typography-band>', mount: mountElement },
+])('$name grid snap across a ClientRouter swap', ({ mount }) => {
   it('cancels an in-flight snap on astro:before-swap so the jump to top sticks', async () => {
     spacer.style.height = '5000px';
     document.body.appendChild(spacer);
-    await render(<TypographyBand />);
+    await mount();
     await wait(300); // gsap chunk + listeners
 
     scrollTo({ top: 1013, behavior: 'instant' }); // off the 24px grid → a snap is scheduled

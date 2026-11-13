@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { renderComponent } from '../../test-utils/astro-container';
-import { renderReactMarkup, stripIslands } from '../../test-utils/island-parity';
+import { islandExportsOf, leafElementsOf, renderReactMarkup, stripIslands } from '../../test-utils/island-parity';
 import Twin from './shell-backdrop.astro';
 import { ShellBackdrop } from './index';
 
@@ -13,9 +13,10 @@ describe('shell-backdrop.astro', () => {
     expect(stripIslands(html).replace(PERSIST, '')).toBe(renderReactMarkup(ShellBackdrop, {}));
   });
 
-  it('hydrates only the client leaves', async () => {
+  it('hydrates only GameOfLife; ScrollRangeSync and TypographyBand are custom elements', async () => {
     const html = await renderComponent(Twin);
-    expect([...html.matchAll(/component-export="([^"]+)"/g)].map((match) => match[1])).toEqual(['ScrollRangeSyncIsland', 'TypographyBandIsland', 'GameOfLifeIsland']);
+    expect(islandExportsOf(html)).toEqual(['GameOfLifeIsland']);
+    expect(leafElementsOf(html)).toEqual(['scroll-range-sync', 'typography-band']);
   });
 
   it('persists each backdrop piece once, without a wrapper element', async () => {

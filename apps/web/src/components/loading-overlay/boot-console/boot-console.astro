@@ -1,14 +1,13 @@
 ---
 // `.astro` twin of the BootConsole Server Component (markup mirrors ./index.tsx); the
-// typed boot question is the only client leaf.
-import { BootQuestionIsland } from '../boot-question/island';
+// typed boot question is the only client leaf — the `<boot-question>` custom element,
+// no island.
+import BootQuestion from '../boot-question/boot-question.astro';
 import * as styles from '../styles.css';
-
-const pathname = Astro.url.pathname;
 ---
 
 <div class={styles.consoleRoot}>
   <p class={styles.brand}><span class={styles.square}></span>napochaan</p>
-  <p class={styles.status}><span class={styles.quote}>{'>'}</span><BootQuestionIsland client:load pathname={pathname} props={{}} /></p>
+  <p class={styles.status}><span class={styles.quote}>{'>'}</span><BootQuestion /></p>
   <div class={styles.bar}><span class={styles.barFill}></span></div>
 </div>

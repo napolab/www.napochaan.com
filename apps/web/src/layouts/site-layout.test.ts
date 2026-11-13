@@ -1,3 +1,4 @@
+import { siteNavItems } from '@utils/nav-items';
 import { readFileSync } from 'node:fs';
 
 import { getContainerRenderer as reactContainerRenderer } from '@astrojs/react/container-renderer';
@@ -10,6 +11,7 @@ import { motionBootScriptHtml } from '@utils/motion-cookie';
 import { imageBlurScriptHtml } from '@components/image/blur-script';
 import { rootStateCarryScriptHTML } from '@utils/root-state-carry';
 
+import { leafElementsOf } from '../test-utils/island-parity';
 import SiteLayout from './site-layout.astro';
 
 const ORIGIN = 'http://localhost:8788';
@@ -86,17 +88,24 @@ describe('site-layout.astro', () => {
   // 'use client' modules of the Next app), never a server tree around them.
   it('hydrates only client leaves in the shell', () => {
     const islands = [...state.html.matchAll(/<astro-island [^>]*component-export="([^"]+)"/g)].map((match) => match[1]);
-    expect(islands).toEqual([
-      'BootQuestionIsland',
-      'ScrollRangeSyncIsland',
-      'TypographyBandIsland',
-      'GameOfLifeIsland',
-      'SysBarIsland',
-      'FooterNavIsland',
-      'ScrambleTextIsland',
-      'ScrambleTextIsland',
-      'CursorPresenceIsland',
-    ]);
+    expect(islands).toEqual(['GameOfLifeIsland', 'SysBarIsland', 'CursorPresenceIsland']);
+  });
+
+  // The boot question, the tint's scroll-range sync and the band ship as framework-free
+  // custom elements (no island), each with its registration script bundled once.
+  it('renders the small imperative shell leaves as custom elements', () => {
+    const elements = leafElementsOf(state.html).filter((tag) => tag !== 'scramble-text');
+    expect(elements).toEqual(['boot-question', 'scroll-range-sync', 'typography-band']);
+    for (const file of ['boot-question.astro', 'safe-area-tint.astro', 'typography-band.astro']) {
+      expect(count(state.html, `${file}?astro&type=script`)).toBe(1);
+    }
+  });
+
+  // The footer's labels (nav + colophon / sitemap) ship as the framework-free
+  // <scramble-text> element; its registration script is bundled once, however many render.
+  it('renders the footer ScrambleText labels as <scramble-text> with one element script', () => {
+    expect(count(state.html, '<scramble-text ')).toBe(siteNavItems.length + 2);
+    expect(count(state.html, 'scramble-text.astro?astro&type=script')).toBe(1);
   });
 
   it('feeds the page pathname to the islands', () => {

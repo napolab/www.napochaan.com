@@ -20,3 +20,7 @@ export const blankDim = css({
   userSelect: 'none',
   pointerEvents: 'none',
 });
+
+// The <blank-dim> custom element (blank-dim.astro) is a pure wrapper: no box, so the
+// callout span still positions against the blank cell. A class so it applies pre-upgrade.
+export const element = css({ display: 'contents' });

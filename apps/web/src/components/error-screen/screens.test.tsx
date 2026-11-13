@@ -5,7 +5,7 @@ import { page } from 'vitest/browser';
 
 import { AppProviders } from '@components/app-providers';
 
-import { RetryButtonIsland } from './retry-button/island';
+import { RetryButton } from './retry-button';
 import { NotFoundScreen, ServerErrorScreen } from './screens';
 
 afterEach(() => {
@@ -57,10 +57,10 @@ describe('ServerErrorScreen (port of (site)/error.tsx)', () => {
   });
 });
 
-describe('RetryButtonIsland', () => {
+describe('RetryButton', () => {
   it('reloads through the injected handler', async () => {
     const reload = vi.fn();
-    await render(<RetryButtonIsland pathname="/boom" props={{ reload }} />);
+    await render(<RetryButton reload={reload} />);
 
     await page.getByRole('button', { name: 'retry' }).click();
 

@@ -34,3 +34,9 @@ export const caret = css({
     animationPlayState: 'var(--motion-play, running)',
   },
 });
+
+// The <typewriter-text> custom element (typewriter-text.astro) is a pure wrapper: no
+// box, so the host's <p>/<blockquote> lays out exactly the spans the React
+// TypewriterText renders. A class (not a stylesheet on the element) so it applies
+// before the element upgrades.
+export const element = css({ display: 'contents' });

@@ -63,10 +63,23 @@ describe('/colophon', () => {
     expect(mainIslandsOf(html).filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
   });
 
-  it('loads the two gallery demos client-only, with the loading annotation as fallback', async () => {
+  it('loads the editorial Gallery demo client-only, with the loading annotation as fallback', async () => {
     const html = await render();
-    expect(html.match(/client="only"/g)).toHaveLength(2);
+    expect(html.match(/client="only"/g)).toHaveLength(1);
     // Astro writes the fallback once in place and once in its swap <template>.
-    expect(html.match(/<template data-astro-template="fallback"><span slot="fallback"[^>]*>\s*loading gallery…/g)).toHaveLength(2);
+    expect(html.match(/<template data-astro-template="fallback"><span slot="fallback"[^>]*>\s*loading gallery…/g)).toHaveLength(1);
+  });
+
+  it('server-renders the GalleryArchive demo through its .astro twin (only the lightboxes / blank labels hydrate)', async () => {
+    const stage = stageOf(await render(), 'GalleryArchive');
+    expect(stage).toMatch(/<ul [^>]*data-gallery/);
+    expect(stage).not.toContain('GalleryArchiveIsland');
+    expect(stage).toContain('component-export="LightboxIsland"');
+  });
+
+  it('renders the Divider demo as static separators (no island)', async () => {
+    const stage = stageOf(await render(), 'Divider');
+    expect(stage.match(/role="separator"/g)).toHaveLength(2);
+    expect(stage).not.toContain('<astro-island');
   });
 });

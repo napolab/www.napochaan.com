@@ -2,14 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { blankDimLabel, roundedSize } from './format';
 import * as styles from './styles.css';
+
+import type { BlankSize } from './format';
 
 type Props = {
   // 2-digit reference number for the blank.
   refLabel: string;
 };
-
-type Size = { width: number; height: number };
 
 // The masonry layout is fixed entirely by CSS, but a blank's on-screen pixel size is
 // only known at runtime. This tiny client island measures its own (already CSS-sized)
@@ -17,7 +18,7 @@ type Size = { width: number; height: number };
 // positioned and aria-hidden — so the runtime measurement never shifts the layout.
 export const BlankDim = ({ refLabel }: Props) => {
   const ref = useRef<HTMLSpanElement | null>(null);
-  const [size, setSize] = useState<Size | null>(null);
+  const [size, setSize] = useState<BlankSize | null>(null);
 
   useEffect(() => {
     // USEEFFECT_JUSTIFICATION: imperative ResizeObserver — reads the CSS-sized cell to
@@ -27,18 +28,16 @@ export const BlankDim = ({ refLabel }: Props) => {
 
     const observer = new ResizeObserver((entries) => {
       const rect = entries[0]?.contentRect;
-      if (rect !== undefined) setSize({ width: Math.round(rect.width), height: Math.round(rect.height) });
+      if (rect !== undefined) setSize(roundedSize(rect));
     });
     observer.observe(el);
 
     return () => observer.disconnect();
   }, []);
 
-  const measured = size !== null && size.width > 0;
-
   return (
     <span ref={ref} className={styles.blankDim} aria-hidden="true">
-      {measured ? `${size.width}×${size.height}\nNO.${refLabel}` : `NO.${refLabel}`}
+      {blankDimLabel(refLabel, size)}
     </span>
   );
 };

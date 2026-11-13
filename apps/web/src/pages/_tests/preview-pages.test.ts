@@ -12,7 +12,7 @@ import NewsPreviewPage from '../news/preview/[id].astro';
 import WorksPreviewPage from '../works/preview/[id].astro';
 import { createDraftCookieValue, DRAFT_COOKIE_NAME } from '../../lib/draft-mode';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
-import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
+import { CLIENT_LEAF_ISLANDS, mainIslandsOf, mainLeafElementsOf } from '../../test-utils/island-parity';
 
 import type { GalleryPhoto } from '@components/gallery-archive';
 import type { LogManualItem } from '../../features/log/log-manual-item';
@@ -123,7 +123,7 @@ describe('detail previews', () => {
   it('blog: plain body (no QuoteShare / ShareBar), TOC and published neighbours', async () => {
     const html = await (await render(cases[0] as Case, await draftCookie())).text();
     expect(mainIslandsOf(html)).not.toContain('QuoteShareIsland');
-    expect(mainIslandsOf(html)).not.toContain('ShareBarIsland');
+    expect(mainLeafElementsOf(html)).not.toContain('share-bar');
     expect(html).not.toContain('data-toc-scope');
     expect(html).toMatch(/<nav [^>]*aria-label="目次"/);
     expect(html).toContain('href="/blog/post-11"');
@@ -131,15 +131,15 @@ describe('detail previews', () => {
 
   it('news: the NewsDetail body with its share bar', async () => {
     const html = await (await render(cases[1] as Case, await draftCookie())).text();
-    expect(mainIslandsOf(html)).toContain('ShareBarIsland');
+    expect(mainLeafElementsOf(html).filter((tag) => tag === 'share-bar')).toHaveLength(1);
   });
 
   it('works: no ShareBar, related works and adjacent nav', async () => {
     const html = await (await render(cases[2] as Case, await draftCookie())).text();
     const islands = mainIslandsOf(html);
-    expect(islands).not.toContain('ShareBarIsland');
-    expect(islands).toContain('RelatedWorksIsland');
-    expect(islands).toContain('AdjacentNavIsland');
+    expect(mainLeafElementsOf(html)).not.toContain('share-bar');
+    expect(html).toContain('related / 関連');
+    expect(html).toMatch(/<nav [^>]*aria-label="works pagination"/);
   });
 
   it('log: the layout chrome (header, calendar from published logs, feed link) around the draft timeline', async () => {
