@@ -15,7 +15,7 @@
     "lint": "pnpm run lint:oxfmt && pnpm run lint:oxlint",
     "lint:oxfmt": "oxfmt --check .",
     "lint:oxlint": "oxlint --ignore-pattern .claude/worktrees .",
-    "typecheck": "tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p worker/tsconfig.json",
+    "typecheck": "astro sync && tsgo --noEmit -p tsconfig.json && tsgo --noEmit -p worker/tsconfig.json",
     "test": "vitest run",
     "cf:types": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts",
     "deploy:staging": "CLOUDFLARE_ENV=staging astro build && wrangler deploy --env staging",
