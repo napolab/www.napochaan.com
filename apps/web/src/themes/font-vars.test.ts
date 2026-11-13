@@ -19,8 +19,15 @@ describe('font CSS variables stay in sync with fonts.css', () => {
     expect(declared).toBe(TITLE_JP_VAR);
   });
 
-  it('fonts.css declares the body font variables the tokens read', () => {
+  it('fonts.css declares the body font variable the tokens read', () => {
     expect(fontsCSS).toMatch(/--font-mplus1:\s*'M PLUS 1';/);
-    expect(fontsCSS).toMatch(/--font-mplus1-en:\s*'M PLUS 1 En';/);
+  });
+
+  // Regression: next/font shipped every unicode-range slice (subsets only gated
+  // preload), so Japanese was painted by M PLUS 1 700. A Latin-only import makes
+  // Japanese fall through to the thinner system font.
+  it('loads M PLUS 1 700 with its Japanese slices, not Latin only', () => {
+    expect(fontsCSS).toMatch(/@import '@fontsource\/m-plus-1\/700\.css';/);
+    expect(fontsCSS).not.toMatch(/@fontsource\/m-plus-1\/latin-/);
   });
 });

@@ -1,14 +1,21 @@
 /*
  * Self-hosted web fonts (@fontsource), replacing apps/web's next/font/google.
- * Exposes the same CSS variables the tokens read (themes/tokens):
- *   --font-mplus1             M PLUS 1 400/500, Latin
- *   --font-mplus1-en          M PLUS 1 700 only, Latin (see below)
+ * Exposes the CSS variables the tokens read (themes/tokens):
+ *   --font-mplus1               M PLUS 1 700, Latin + Japanese
  *   --font-zen-kaku-gothic-new  Zen Kaku Gothic New 500 (TITLE_JP_VAR, themes/font-vars)
  * No <link rel="preload"> for any of them: @font-face rules are cheap CSS, and the
  * files only download where a glyph is actually painted.
  */
-@import '@fontsource/m-plus-1/latin-400.css';
-@import '@fontsource/m-plus-1/latin-500.css';
+
+/*
+ * M PLUS 1 at weight 700 ONLY, all unicode-range slices (Latin + Japanese). This
+ * reproduces the Next.js-era rendering: next/font emitted every slice (`subsets`
+ * only gated preload), and the 700-only instance led the body stack, so both Latin
+ * and Japanese painted as M PLUS 1 700 at any font-weight (a family with a single
+ * 700 face resolves every requested weight to it). Loading Latin only made Japanese
+ * fall through to the thinner system font. Slices are fetched per painted glyph.
+ */
+@import '@fontsource/m-plus-1/700.css';
 
 /*
  * Zen Kaku Gothic New (weight 500 only) — the Japanese gothic for long content
@@ -19,24 +26,7 @@
  */
 @import '@fontsource/zen-kaku-gothic-new/500.css';
 
-/*
- * Latin-only M PLUS 1 at a heavy weight, under its own family name. The base
- * M PLUS 1 only covers Latin (Japanese glyphs fall through to the system font),
- * and a shared `font-weight` would thicken the JP system font too. So Latin is
- * rendered by this 700-only face prepended to the body stack: Latin reads bold at
- * any font-weight, JP keeps its untouched system weight.
- */
-@font-face {
-  font-family: 'M PLUS 1 En';
-  font-style: normal;
-  font-display: swap;
-  font-weight: 700;
-  src: url('@fontsource/m-plus-1/files/m-plus-1-latin-700-normal.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
 .font-variables {
   --font-mplus1: 'M PLUS 1';
-  --font-mplus1-en: 'M PLUS 1 En';
   --font-zen-kaku-gothic-new: 'Zen Kaku Gothic New';
 }
