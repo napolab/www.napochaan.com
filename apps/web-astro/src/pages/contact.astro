@@ -1,0 +1,37 @@
+---
+// Port of apps/web/src/app/(site)/contact/{layout,page}.tsx. TURNSTILE_SITE_KEY is a
+// deploy-constant `[vars]` value read from the request context at render time (never
+// at build), so the GET is cached under the worker's `cms` policy and a deploy resets
+// it. The form is the only new island (the former 'use client' ContactForm); it posts
+// to the `submitContact` Astro Action (`/_actions/*`, never cached).
+import ContactList from '@components/contact-list/contact-list.astro';
+import PageHeader from '@components/page-header/page-header.astro';
+import { SectionHeading } from '@components/section-heading';
+import { getRequestContext } from '@lib/request-context';
+
+import { ContactFormIsland } from '../features/contact/components/contact-form/island';
+import { directContacts } from '../features/contact/contacts';
+import { contactMetadata } from '../features/contact/metadata';
+import * as s from '../features/contact/styles.css';
+import SiteLayout from '../layouts/site-layout.astro';
+
+const { TURNSTILE_SITE_KEY } = getRequestContext().env;
+const pathname = Astro.url.pathname;
+const crumbs = [{ href: '/', label: 'home' }, { label: 'contact' }];
+---
+
+<SiteLayout metadata={contactMetadata}>
+  <main id="main-content" class={s.main}>
+    <PageHeader title="contact" breadcrumbs={crumbs} kicker="// お問い合わせ" lead="お仕事のご依頼・ご相談はこちらから。" />
+    <div class={s.grid}>
+      <section class={s.formCell}>
+        <SectionHeading no="01" more="// メッセージ">message</SectionHeading>
+        <ContactFormIsland client:load pathname={pathname} props={{ turnstileSiteKey: TURNSTILE_SITE_KEY }} />
+      </section>
+      <aside class={s.directCell}>
+        <SectionHeading no="02">direct</SectionHeading>
+        <ContactList items={directContacts} />
+      </aside>
+    </div>
+  </main>
+</SiteLayout>

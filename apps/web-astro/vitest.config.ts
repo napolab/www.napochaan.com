@@ -28,6 +28,8 @@ export default defineConfig({
             '@lib/cms/client': path.resolve(import.meta.dirname, 'src/__mocks__/cms-client.ts'),
             // Astro's client router is only available inside an Astro build.
             'astro:transitions/client': path.resolve(import.meta.dirname, 'src/__mocks__/astro-transitions-client.ts'),
+            // Astro Actions' client proxy is likewise build-only (the contact form).
+            'astro:actions': path.resolve(import.meta.dirname, 'src/__mocks__/astro-actions.ts'),
           },
         },
         // Pre-bundle every browser-test dependency up front so Vite does not
@@ -70,6 +72,7 @@ export default defineConfig({
             'reconnecting-websocket',
             'fast-json-stable-stringify',
             'zod',
+            '@marsidev/react-turnstile',
           ],
         },
         test: {

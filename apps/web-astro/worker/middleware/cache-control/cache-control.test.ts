@@ -162,6 +162,18 @@ describe('cacheControlHeaders', () => {
     expect(res.headers.get('Set-Cookie')).toBe('__prerender_bypass=x');
   });
 
+  it('stamps the cms policy on GET /contact', async () => {
+    const app = build(() => new Response('html'));
+    const res = await app.request('/contact');
+    expect(res.headers.get('Cache-Control')).toBe(PAGE_CACHE_POLICIES.cms);
+  });
+
+  it('stamps no-store on an Astro Action POST (/_actions/submitContact)', async () => {
+    const app = build(() => new Response('{"status":"success"}', { headers: { 'Content-Type': 'application/json+devalue' } }));
+    const res = await app.request('/_actions/submitContact', { method: 'POST' });
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+  });
+
   it('leaves non-GET page responses (Server Actions) alone', async () => {
     const app = build(() => new Response('action', { headers: { 'Cache-Control': NEXT_DYNAMIC_POLICY } }));
     const res = await app.request('/contact', { method: 'POST' });

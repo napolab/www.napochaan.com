@@ -222,6 +222,29 @@ describe('createAstroHandler', () => {
     expect(res.headers.get('Cache-Control')).toBeNull();
   });
 
+  // A form POST to a page (e.g. `/contact?_action=submitContact`) renders a 200 page
+  // with the visitor's result in it: never shareable, whatever its path.
+  it.each(['/contact', '/contact?_action=submitContact'])('marks a non-GET page response no-store (POST %s)', async (path) => {
+    const app = build(async () => new Response('<html>result</html>', { headers: { 'Content-Type': 'text/html' } }));
+    const res = await app.request(
+      path,
+      { method: 'POST' },
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+  });
+
+  it('leaves a HEAD page response for the cache-control middleware to stamp', async () => {
+    const app = build(async () => new Response(null, { headers: { 'Content-Type': 'text/html' } }));
+    const res = await app.request(
+      '/contact',
+      { method: 'HEAD' },
+      cmsEnv(async () => new Response('ok')),
+    );
+    expect(res.headers.get('Cache-Control')).toBeNull();
+  });
+
   // Next sent `text/html; charset=utf-8`; Astro's adapter sends a bare `text/html`.
   it.each(['/blog', '/news/missing'])('declares utf-8 on HTML responses (%s)', async (path) => {
     const app = build(async () => new Response('<html>ok</html>', { status: path === '/blog' ? 200 : 404, headers: { 'Content-Type': 'text/html' } }));

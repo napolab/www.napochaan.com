@@ -66,6 +66,19 @@ const withErrorPolicy = (response: Response): Response => {
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 };
 
+// A non-GET/HEAD response (a form-mode Astro Action POST to a page renders that
+// visitor's result as a 200 page) is never shareable. The cache-control middleware only
+// stamps GET/HEAD page responses, so without this it would carry no Cache-Control at all.
+const isReadRequest = (request: Request): boolean => request.method === 'GET' || request.method === 'HEAD';
+
+const withWritePolicy = (request: Request, response: Response): Response => {
+  if (isReadRequest(request)) return response;
+  const headers = new Headers(response.headers);
+  headers.set('Cache-Control', PAGE_CACHE_POLICIES.uncacheable);
+
+  return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
+};
+
 // Next sent `text/html; charset=utf-8`; the Astro adapter sends a bare `text/html`.
 // Declare the charset on every HTML response (pages, 404, 500) so the bytes are never
 // sniffed. Other types (markdown, RSS, JSON) set their own and pass through.
@@ -90,5 +103,5 @@ export const createAstroHandler = (astroFetch: MountedFetch) => async (c: Contex
   const settled = await runWithRequestContext({ env, ctx, request: c.req.raw }, async () => settle(c, target, await astroFetch(c.req.raw, env, ctx)));
   if (health.isDegraded()) c.set('cmsDegraded', true);
 
-  return withHTMLCharset(withErrorPolicy(settled));
+  return withHTMLCharset(withWritePolicy(c.req.raw, withErrorPolicy(settled)));
 };

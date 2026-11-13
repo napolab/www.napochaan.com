@@ -13,5 +13,7 @@ export default getViteConfig(
       include: ['src/layouts/**/*.test.ts', 'src/pages/**/*.test.ts', 'src/**/*.astro.test.ts'],
     },
   },
-  { adapter: undefined, configFile: false, integrations: [] },
+  // `output: 'server'`: with src/actions present, Astro refuses a config that has no
+  // adapter and no on-demand route (ActionsWithoutServerOutputError).
+  { adapter: undefined, configFile: false, integrations: [], output: 'server' },
 );

@@ -29,6 +29,7 @@ export const CLIENT_LEAF_ISLANDS: ReadonlySet<string> = new Set([
   'BootQuestionIsland',
   'ButtonIsland',
   'CalendarIsland',
+  'ContactFormIsland',
   'CopyHashButtonIsland',
   'CursorPresenceDemoIsland',
   'DividerIsland',
