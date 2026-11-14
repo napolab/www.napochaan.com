@@ -42,5 +42,5 @@ export const workDetailMetadata = (work: WorkRow, slug: string): Metadata => {
   });
   if (metadata.openGraph === undefined) return metadata;
 
-  return { ...metadata, openGraph: { ...metadata.openGraph, images: [ogImageEntry('works', slug)] } };
+  return { ...metadata, structuredData: { type: 'creativeWork', name: work.title, dateCreated: work.date }, openGraph: { ...metadata.openGraph, images: [ogImageEntry('works', slug)] } };
 };

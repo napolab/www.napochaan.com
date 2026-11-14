@@ -7,9 +7,13 @@ import { loadWorksList } from '../../features/works/load-works-list';
 import { worksIndexMetadata } from '../../features/works/metadata';
 import * as s from '../../features/shared/styles.css';
 import SiteLayout from '../../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const page = await loadWorksList(1);
 if (page === undefined) return Astro.rewrite('/404');
+
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(worksIndexMetadata));
 ---
 
 <SiteLayout metadata={worksIndexMetadata}>

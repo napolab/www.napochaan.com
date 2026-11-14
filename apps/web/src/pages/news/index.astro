@@ -7,9 +7,13 @@ import { loadNewsList } from '../../features/news/load-news-list';
 import { newsIndexMetadata } from '../../features/news/metadata';
 import * as s from '../../features/shared/styles.css';
 import SiteLayout from '../../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const page = await loadNewsList(1);
 if (page === undefined) return Astro.rewrite('/404');
+
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(newsIndexMetadata));
 ---
 
 <SiteLayout metadata={newsIndexMetadata}>

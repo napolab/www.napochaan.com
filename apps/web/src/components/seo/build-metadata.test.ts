@@ -182,3 +182,34 @@ describe('buildMetadata — page metadata (resolveSectionMetadata / resolveDetai
     expect(resolved.openGraph.description).toBe('napochaan の個人サイト。');
   });
 });
+
+describe('buildMetadata — structured data (JSON-LD)', () => {
+  it('emits none unless the page asks for it', () => {
+    expect(buildMetadata({}, PROD).jsonLD).toBeUndefined();
+  });
+
+  it('resolves a detail descriptor against the resolved canonical, description and OG image', () => {
+    const page = resolveDetailMetadata({ docTitle: 'Post', path: '/blog/post', genericDescription: 'blog', defaultImage: '/og-default.png', descriptionCandidates: ['excerpt'] });
+    const og = page.openGraph;
+    if (og === undefined) throw new Error('expected openGraph');
+    const resolved = buildMetadata(
+      { ...page, openGraph: { ...og, images: [{ url: '/blog/post/opengraph-image' }] }, structuredData: { type: 'blogPosting', headline: 'Post', datePublished: '2026-01-02' } },
+      PROD,
+    );
+
+    expect(resolved.jsonLD).toMatchObject({
+      '@type': 'BlogPosting',
+      headline: 'Post',
+      description: 'excerpt',
+      url: 'https://www.napochaan.com/blog/post',
+      image: 'https://www.napochaan.com/blog/post/opengraph-image',
+      author: { '@type': 'Person', name: 'napochaan', url: 'https://www.napochaan.com' },
+    });
+  });
+
+  it('resolves the home descriptor against the bare origin', () => {
+    const resolved = buildMetadata({ description: 'home', alternates: { canonical: '/' }, structuredData: { type: 'home' } }, PROD);
+
+    expect(resolved.jsonLD).toMatchObject({ '@graph': [{ '@type': 'WebSite', url: 'https://www.napochaan.com', description: 'home' }, { '@type': 'Person' }] });
+  });
+});

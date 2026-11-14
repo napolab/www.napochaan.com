@@ -2,6 +2,8 @@
 // into <head> by the page layout. Mirrors the subset of Next's `Metadata` the
 // site uses, so the helpers port unchanged.
 
+import type { StructuredDataInput } from '../json-ld';
+
 type AlternateLink = { url: string; title: string };
 
 // `type` / `width` / `height` render as og:image:* (and twitter:image:* when the
@@ -31,4 +33,7 @@ export type Metadata = {
     description?: string;
     images?: string[];
   };
+  // schema.org JSON-LD descriptor, resolved by buildMetadata against the page's
+  // canonical / description / OG image (see ../json-ld).
+  structuredData?: StructuredDataInput;
 };

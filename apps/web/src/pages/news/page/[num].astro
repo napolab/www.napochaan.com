@@ -9,6 +9,7 @@ import { newsPageMetadata } from '../../../features/news/metadata';
 import { parsePageParam } from '../../../features/shared/lib/parse-page-param';
 import * as s from '../../../features/shared/styles.css';
 import SiteLayout from '../../../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const num = Astro.params.num ?? '';
 const pageNumber = parsePageParam(num);
@@ -17,9 +18,13 @@ if (pageNumber === 1) return Astro.redirect('/news', 308);
 
 const page = await loadNewsList(pageNumber);
 if (page === undefined) return Astro.rewrite('/404');
+
+const metadata = newsPageMetadata(num);
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(metadata));
 ---
 
-<SiteLayout metadata={newsPageMetadata(num)}>
+<SiteLayout metadata={metadata}>
   <main id="main-content" class={s.main}>
     <NewsList page={page} />
   </main>

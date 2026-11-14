@@ -7,9 +7,13 @@ import { loadBlogList } from '../../features/blog/load-blog-list';
 import { blogIndexMetadata } from '../../features/blog/metadata';
 import * as s from '../../features/blog/styles.css';
 import SiteLayout from '../../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const page = await loadBlogList(1);
 if (page === undefined) return Astro.rewrite('/404');
+
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(blogIndexMetadata));
 ---
 
 <SiteLayout metadata={blogIndexMetadata}>

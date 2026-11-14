@@ -1,5 +1,7 @@
 import { isProductionHost } from '@utils/is-production-host';
+import { buildJSONLD } from '@utils/seo/json-ld';
 
+import type { JSONLD } from '@utils/seo/json-ld';
 import type { Metadata } from '@utils/seo/metadata';
 
 // Port of the Next `(site)` root layout `generateMetadata` + `viewport`, plus the
@@ -62,6 +64,8 @@ export type ResolvedMetadata = {
     description?: string;
     images: ResolvedImage[];
   };
+  // schema.org JSON-LD, only for pages that pass `structuredData`.
+  jsonLD: JSONLD | undefined;
 };
 
 const ICONS: Icon[] = [
@@ -145,17 +149,25 @@ const resolveTwitter = (input: MetadataInput, origin: string, pageOgImages: Reso
   return { card: twitter.card, title: twitter.title, description: twitter.description, images };
 };
 
+const resolveJSONLD = (input: MetadataInput, origin: string, description: string, openGraph: ResolvedMetadata['openGraph']): JSONLD | undefined => {
+  if (input.structuredData === undefined) return undefined;
+
+  return buildJSONLD(input.structuredData, { origin, url: resolveCanonical(input, origin) ?? openGraph.url, description, image: openGraph.images[0]?.url });
+};
+
 export const buildMetadata = (input: MetadataInput, origin: string): ResolvedMetadata => {
   const openGraph = resolveOpenGraph(input, origin);
+  const description = input.description ?? SITE_DESCRIPTION;
 
   return {
     title: resolveTitle(input.title),
-    description: input.description ?? SITE_DESCRIPTION,
+    description,
     canonical: resolveCanonical(input, origin),
     robots: resolveRobots(input, origin),
     alternates: resolveAlternates(input, origin),
     icons: ICONS,
     openGraph,
     twitter: resolveTwitter(input, origin, input.openGraph === undefined ? [] : openGraph.images),
+    jsonLD: resolveJSONLD(input, origin, description, openGraph),
   };
 };

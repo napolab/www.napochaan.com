@@ -15,10 +15,14 @@ import { logMetadata } from '../features/log/metadata';
 import * as ls from '../features/log/styles.css';
 import * as s from '../features/shared/styles.css';
 import SiteLayout from '../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const { groups, calendar } = await loadLogPage();
 const pathname = Astro.url.pathname;
 const crumbs = [{ href: '/', label: 'home' }, { label: 'log' }];
+
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(logMetadata));
 ---
 
 <SiteLayout metadata={logMetadata}>

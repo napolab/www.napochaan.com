@@ -7,13 +7,18 @@ import { loadWorkDetail } from '../../features/works/load-work-detail';
 import { workDetailMetadata } from '../../features/works/metadata';
 import * as s from '../../features/shared/styles.css';
 import SiteLayout from '../../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const slug = Astro.params.slug ?? '';
 const detail = await loadWorkDetail(slug);
 if (detail === undefined) return Astro.rewrite('/404');
+
+const metadata = workDetailMetadata(detail.work, slug);
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(metadata));
 ---
 
-<SiteLayout metadata={workDetailMetadata(detail.work, slug)}>
+<SiteLayout metadata={metadata}>
   <main id="main-content" class={s.main}>
     <WorkDetailPage slug={slug} detail={detail} />
   </main>

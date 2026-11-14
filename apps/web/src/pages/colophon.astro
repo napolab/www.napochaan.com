@@ -14,8 +14,12 @@ import Demo from '../features/colophon/demos/demo.astro';
 import { colophonMetadata } from '../features/colophon/metadata';
 import * as s from '../features/colophon/styles.css';
 import SiteLayout from '../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const crumbs = [{ href: '/', label: 'home' }, { label: 'colophon' }];
+
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(colophonMetadata));
 ---
 
 <SiteLayout metadata={colophonMetadata}>

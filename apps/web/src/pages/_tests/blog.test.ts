@@ -37,6 +37,14 @@ describe('/blog', () => {
     expect(html).toContain('<link rel="alternate" type="text/markdown" href="http://localhost:8788/blog.md"');
   });
 
+  it('mirrors the feed and markdown alternates in the Link header', async () => {
+    findBlogList.mockResolvedValue(blogFeed);
+    const response = await renderPage(BlogIndexPage, '/blog');
+    expect(response.headers.get('link')).toBe(
+      '</blog/rss.xml>; rel="alternate"; type="application/rss+xml", </blog.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"',
+    );
+  });
+
   it('renders one h1 in main#main-content, the feed link and the newest 10 posts', async () => {
     const html = await renderIndex();
     expect(html).toMatch(/<main id="main-content" class="[^"]+">/);

@@ -5,6 +5,7 @@ import NotFoundPage from '../404.astro';
 import BlogDetailPage from '../blog/[slug].astro';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
 import { CLIENT_LEAF_ISLANDS, mainIslandsOf, mainLeafElementsOf } from '../../test-utils/island-parity';
+import { jsonLDOf } from '../../test-utils/json-ld';
 
 import type { Post } from '../../features/blog/post';
 
@@ -82,5 +83,26 @@ describe('/blog/[slug]', () => {
     const res = await render('x');
     expect(res.status).toBe(404);
     expect(await res.text()).toContain('お探しのページは存在しないか');
+  });
+
+  it('sends the markdown twin as a Link alternate, plus llms.txt and the sitemap', async () => {
+    const response = await render('a.b');
+    expect(response.headers.get('link')).toBe(
+      '</blog/a.b.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"',
+    );
+  });
+
+  it('describes the page as BlogPosting JSON-LD', async () => {
+    const [node] = jsonLDOf(await (await render('a.b')).text());
+    expect(node).toMatchObject({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: 'Dotted Post',
+      datePublished: '2026-01-20',
+      inLanguage: 'ja',
+      url: 'http://localhost:8788/blog/a.b',
+      image: 'http://localhost:8788/blog/a.b/opengraph-image-fx5gi7',
+      author: { '@type': 'Person', name: 'napochaan', url: 'http://localhost:8788' },
+    });
   });
 });

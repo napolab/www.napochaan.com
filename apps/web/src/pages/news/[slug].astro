@@ -7,13 +7,18 @@ import { loadNewsDetail } from '../../features/news/load-news-detail';
 import { newsDetailMetadata } from '../../features/news/metadata';
 import * as s from '../../features/shared/styles.css';
 import SiteLayout from '../../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const slug = Astro.params.slug ?? '';
 const detail = await loadNewsDetail(slug);
 if (detail === undefined) return Astro.rewrite('/404');
+
+const metadata = newsDetailMetadata(detail.item, slug);
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(metadata));
 ---
 
-<SiteLayout metadata={newsDetailMetadata(detail.item, slug)}>
+<SiteLayout metadata={metadata}>
   <main id="main-content" class={s.main}>
     <NewsDetail detail={detail} />
   </main>
