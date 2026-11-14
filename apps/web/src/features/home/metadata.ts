@@ -17,11 +17,13 @@ export const homeMetadata: MetadataInput = {
     url: '/',
     title: 'napochaan',
     description: homeDescription,
+    images: [{ url: '/og-default.png', type: 'image/png', width: 1280, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'napochaan',
     description: homeDescription,
+    images: ['/og-default.png'],
   },
   structuredData: { type: 'home' },
 };

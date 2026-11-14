@@ -79,6 +79,12 @@ describe('/ (home)', () => {
     expect(response.headers.get('link')).toBe('</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"');
   });
 
+  it('gives the home page the default OG card image (is-agentic flags a missing og:image)', async () => {
+    const html = await render();
+    expect(html).toContain('<meta property="og:image" content="http://localhost:8788/og-default.png">');
+    expect(html).toContain('<meta name="twitter:image" content="http://localhost:8788/og-default.png">');
+  });
+
   it('describes the site and its owner as WebSite + Person JSON-LD', async () => {
     const [graph] = jsonLDOf(await render());
     expect(graph).toMatchObject({
