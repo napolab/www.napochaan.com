@@ -5,6 +5,7 @@ import NotFoundPage from '../404.astro';
 import NewsDetailPage from '../news/[slug].astro';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
 import { CLIENT_LEAF_ISLANDS, mainIslandsOf, mainLeafElementsOf } from '../../test-utils/island-parity';
+import { jsonLDOf } from '../../test-utils/json-ld';
 
 vi.mock('@utils/request-url', () => ({ getRequestOrigin: async () => ORIGIN }));
 vi.mock('@lib/cms/news', () => ({ findNewsList: vi.fn(async () => newsFeed), findNewsBySlug: vi.fn(findNewsFixture) }));
@@ -61,5 +62,27 @@ describe('/news/[slug]', () => {
     const res = await render(slug);
     expect(res.status).toBe(404);
     expect(await res.text()).toContain('お探しのページは存在しないか');
+  });
+
+  it('sends the markdown twin as a Link alternate, plus llms.txt and the sitemap', async () => {
+    const response = await render('a.b');
+    expect(response.headers.get('link')).toBe(
+      '</news/a.b.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"',
+    );
+  });
+
+  it('describes the page as BlogPosting JSON-LD', async () => {
+    const [node] = jsonLDOf(await (await render('a.b')).text());
+    expect(node).toMatchObject({
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: 'Dotted News',
+      datePublished: '2026-04-10',
+      description: expect.stringContaining('lead paragraph'),
+      inLanguage: 'ja',
+      url: 'http://localhost:8788/news/a.b',
+      image: 'http://localhost:8788/news/a.b/opengraph-image-5nvrt4',
+      author: { '@type': 'Person', name: 'napochaan', url: 'http://localhost:8788' },
+    });
   });
 });

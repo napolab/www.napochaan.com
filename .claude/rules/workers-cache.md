@@ -46,6 +46,35 @@ Static assets never reach the Worker: Workers Static Assets serves `dist/client`
 `public/_headers` rules (`/_astro/*` → `public, max-age=31536000, immutable`, ETag dropped so the
 edge can compress).
 
+## Markdown content negotiation (`Accept: text/markdown`)
+
+Agents get Markdown at the **same URL** as the HTML page. The worker negotiates; pages never
+read `Accept` (that would be request data in a cacheable body).
+
+- **Negotiable** = `GET`/`HEAD`, no extension in the last path segment, and
+  `resolveCacheControl(path).kind === 'page'` (`isNegotiablePath`,
+  `worker/lib/markdown-negotiation/negotiable-path`). Drafts, `/api/*`, `/_actions`, feeds and
+  the `.md` twins themselves are never negotiated, nor the extension-less OG image routes
+  (`opengraph-image-<suffix>`, from `OG_IMAGE_ROUTE_SUFFIX`).
+- **Markdown is preferred** only when `Accept` lists `text/markdown` explicitly with `q > 0` and
+  `q >=` the q `text/html` gets from its most specific range (`text/html` → `text/*` → `*/*`).
+  Browsers' `*/*` / `text/*` never opt in (`acceptsMarkdown`).
+- **Target**: `/` → `/llms.txt` (served as `text/markdown; charset=utf-8`), else `<path>.md`
+  (trailing slash stripped, query kept). The twin renders through the same tracked-CMS request
+  context, so a degraded twin is `no-store` too (`worker/handlers/astro/negotiate`).
+- **Fallback**: twin 404 (or a 200 that is not markdown/plain) → render the HTML route; a 200 is
+  served as HTML (gallery, contact, colophon, `/blog/page/N` have no twin). HTML 404 too → a
+  Markdown 404 linking home, `/blog`, `/sitemap.xml`, `/llms.txt` (`BASE_URL`, else request
+  origin). Non-200 stays `no-store`. A page without a twin renders twice on a MISS.
+- **`Vary: Accept` on every negotiable response** — HTML, 404 and redirects included — or a
+  stored HTML entry would answer a Markdown request (Workers Cache keys variants on the verbatim
+  `Accept` value). `varyAccept()` is the **outermost** middleware in `worker/app.ts`, so it runs
+  last and no later rewrite drops it; it appends to an upstream `Vary` (`appendVary`), never
+  replaces it. `worker/app.test.ts` asserts the final header. Keep it outermost when adding
+  middleware, and never `c.header('Vary', …)` a fixed value elsewhere on page paths.
+- **A new page with a Markdown representation** → add `src/pages/<path>.md.ts` (it is picked up
+  automatically). A new negotiable path that must not vary (rare) → make it non-`page` kind.
+
 ## CMS failures are never cached
 
 The worker mounts the Astro adapter's handler through `worker/handlers/astro`, which wraps this

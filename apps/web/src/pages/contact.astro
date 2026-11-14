@@ -14,10 +14,14 @@ import { directContacts } from '../features/contact/contacts';
 import { contactMetadata } from '../features/contact/metadata';
 import * as s from '../features/contact/styles.css';
 import SiteLayout from '../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const { TURNSTILE_SITE_KEY } = getRequestContext().env;
 const pathname = Astro.url.pathname;
 const crumbs = [{ href: '/', label: 'home' }, { label: 'contact' }];
+
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(contactMetadata));
 ---
 
 <SiteLayout metadata={contactMetadata}>

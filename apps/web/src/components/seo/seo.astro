@@ -1,6 +1,8 @@
 ---
 // Renders a ResolvedMetadata (see ./build-metadata) as <head> tags, in the shape
 // Next's metadata API emitted them for the (site) routes.
+import { serializeJSONLD } from '@utils/seo/json-ld';
+
 import type { ResolvedMetadata } from './build-metadata';
 
 type Props = { metadata: ResolvedMetadata };
@@ -44,3 +46,4 @@ const { openGraph, twitter } = metadata;
   ))
 }
 {metadata.icons.map((icon) => <link rel={icon.rel} href={icon.href} type={icon.type} sizes={icon.sizes} />)}
+{metadata.jsonLD !== undefined && <script type="application/ld+json" set:html={serializeJSONLD(metadata.jsonLD)} />}

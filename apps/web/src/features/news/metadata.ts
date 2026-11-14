@@ -40,5 +40,5 @@ export const newsDetailMetadata = (item: NewsItem, slug: string): Metadata => {
   });
   if (metadata.openGraph === undefined) return metadata;
 
-  return { ...metadata, openGraph: { ...metadata.openGraph, images: [ogImageEntry('news', slug)] } };
+  return { ...metadata, structuredData: { type: 'blogPosting', headline: item.title, datePublished: item.date }, openGraph: { ...metadata.openGraph, images: [ogImageEntry('news', slug)] } };
 };

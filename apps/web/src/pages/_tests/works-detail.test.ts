@@ -5,6 +5,7 @@ import NotFoundPage from '../404.astro';
 import WorkDetailPage from '../works/[slug].astro';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
 import { CLIENT_LEAF_ISLANDS, mainIslandsOf, mainLeafElementsOf } from '../../test-utils/island-parity';
+import { jsonLDOf } from '../../test-utils/json-ld';
 
 vi.mock('@utils/request-url', () => ({ getRequestOrigin: async () => ORIGIN }));
 vi.mock('@lib/cms/works', () => ({ findWorksList: vi.fn(async () => worksFeed), findWorkBySlug: vi.fn(findWorkFixture) }));
@@ -64,5 +65,27 @@ describe('/works/[slug]', () => {
     const res = await render('x');
     expect(res.status).toBe(404);
     expect(await res.text()).toContain('お探しのページは存在しないか');
+  });
+
+  it('sends the markdown twin as a Link alternate, plus llms.txt and the sitemap', async () => {
+    const response = await render('a.b');
+    expect(response.headers.get('link')).toBe(
+      '</works/a.b.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"',
+    );
+  });
+
+  it('describes the page as CreativeWork JSON-LD', async () => {
+    const [node] = jsonLDOf(await (await render('a.b')).text());
+    expect(node).toMatchObject({
+      '@context': 'https://schema.org',
+      '@type': 'CreativeWork',
+      name: 'Dotted Work',
+      dateCreated: '2026-05-10',
+      description: 'a dotted work',
+      inLanguage: 'ja',
+      url: 'http://localhost:8788/works/a.b',
+      image: 'http://localhost:8788/works/a.b/opengraph-image-apsyht',
+      author: { '@type': 'Person', name: 'napochaan', url: 'http://localhost:8788' },
+    });
   });
 });

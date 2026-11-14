@@ -23,4 +23,5 @@ export const homeMetadata: MetadataInput = {
     title: 'napochaan',
     description: homeDescription,
   },
+  structuredData: { type: 'home' },
 };

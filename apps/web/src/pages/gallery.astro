@@ -11,9 +11,13 @@ import { findGalleryList } from '@lib/cms/gallery';
 import { galleryMetadata } from '../features/gallery/metadata';
 import * as s from '../features/shared/styles.css';
 import SiteLayout from '../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const photos = await findGalleryList();
 const crumbs = [{ href: '/', label: 'home' }, { label: 'gallery' }];
+
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(galleryMetadata));
 ---
 
 <SiteLayout metadata={galleryMetadata}>

@@ -5,6 +5,7 @@ import { createAstroHandler } from './handlers/astro';
 import { imageHandlers } from './handlers/images';
 import { cacheControlHeaders } from './middleware/cache-control';
 import { pathPolicy } from './middleware/path-policy';
+import { varyAccept } from './middleware/vary-accept';
 import { weakenETag } from './middleware/weaken-etag';
 import { cursorRoutes } from './routes/cursors';
 
@@ -20,6 +21,9 @@ export const createWorkerApp = (handlerFetch: MountedFetch) => {
   const app = factory.createApp();
 
   app
+    // Outermost, so it runs last on the way out: no later header rewrite can drop the
+    // `Vary: Accept` that keys the HTML / Markdown variants of a page in Workers Cache.
+    .use('*', varyAccept())
     .use('*', weakenETag())
     .use('*', cacheControlHeaders())
     // 上の 2 つより内側に置く。302 は status が 200 でないので cacheControlHeaders が public を付けず、

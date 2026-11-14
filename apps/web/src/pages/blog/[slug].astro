@@ -7,13 +7,18 @@ import { loadBlogDetail } from '../../features/blog/load-blog-detail';
 import { blogDetailMetadata } from '../../features/blog/metadata';
 import * as s from '../../features/blog/styles.css';
 import SiteLayout from '../../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const slug = Astro.params.slug ?? '';
 const detail = await loadBlogDetail(slug);
 if (detail === undefined) return Astro.rewrite('/404');
+
+const metadata = blogDetailMetadata(detail.post, slug);
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(metadata));
 ---
 
-<SiteLayout metadata={blogDetailMetadata(detail.post, slug)}>
+<SiteLayout metadata={metadata}>
   <main id="main-content" class={s.main}>
     <BlogDetail slug={slug} detail={detail} />
   </main>

@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import HomePage from '../index.astro';
 import { ORIGIN, renderPage } from '../../test-utils/astro-container';
 import { CLIENT_LEAF_ISLANDS, mainIslandsOf } from '../../test-utils/island-parity';
+import { jsonLDOf } from '../../test-utils/json-ld';
 
 vi.mock('@utils/request-url', () => ({ getRequestOrigin: async () => ORIGIN }));
 vi.mock('@lib/cms/news', () => ({
@@ -72,5 +73,20 @@ describe('/ (home)', () => {
     expect(islands.filter((name) => !CLIENT_LEAF_ISLANDS.has(name))).toEqual([]);
     const main = html.slice(html.indexOf('<main'), html.indexOf('</main>'));
     expect(main).not.toMatch(/<astro-island [^>]*>\s*<(section|header)[\s>]/);
+  });
+  it('sends Link headers pointing agents at llms.txt (describedby) and the sitemap', async () => {
+    const response = await renderPage(HomePage, '/');
+    expect(response.headers.get('link')).toBe('</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"');
+  });
+
+  it('describes the site and its owner as WebSite + Person JSON-LD', async () => {
+    const [graph] = jsonLDOf(await render());
+    expect(graph).toMatchObject({
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'WebSite', url: 'http://localhost:8788', name: 'napochaan', description: 'DJ・VJ・グラフィック・デジタル制作。napochaan の個人サイト。' },
+        { '@type': 'Person', name: 'napochaan', sameAs: ['https://x.com/naporin24690', 'https://github.com/naporin0624'] },
+      ],
+    });
   });
 });

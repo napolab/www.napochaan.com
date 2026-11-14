@@ -6,11 +6,16 @@ import AboutContent from '../features/about/about-content.astro';
 import { resolveAboutMetadata } from '../features/about/metadata';
 import SiteLayout from '../layouts/site-layout.astro';
 import { findProfile } from '@lib/cms/profile';
+import { buildLinkHeader } from '@utils/seo/link-header';
 
 const profile = await findProfile();
 if (profile === undefined) return Astro.rewrite('/404');
+
+const metadata = resolveAboutMetadata(profile);
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(metadata));
 ---
 
-<SiteLayout metadata={resolveAboutMetadata(profile)}>
+<SiteLayout metadata={metadata}>
   <AboutContent profile={profile} />
 </SiteLayout>

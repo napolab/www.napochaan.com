@@ -274,3 +274,155 @@ describe('createAstroHandler', () => {
     expect(rss.headers.get('Content-Type')).toBe('application/xml');
   });
 });
+
+describe('createAstroHandler markdown negotiation', () => {
+  const MARKDOWN = { Accept: 'text/markdown' };
+  const markdownHeaders = { 'Content-Type': 'text/markdown; charset=utf-8' };
+  const htmlHeaders = { 'Content-Type': 'text/html' };
+
+  type Route = (request: Request) => Response | Promise<Response>;
+
+  // Records every path the mounted Astro fetch rendered.
+  const routed = (route: Route) => {
+    const seen: string[] = [];
+    const handler: MountedFetch = async (request: Request) => {
+      const url = new URL(request.url);
+      seen.push(`${url.pathname}${url.search}`);
+      return route(request);
+    };
+    return { seen, handler };
+  };
+
+  const okEnv = (extra: Record<string, unknown> = {}) => ({ ...cmsEnv(async () => new Response('ok')), ...extra }) as unknown as Cloudflare.Env;
+
+  it('serves the `.md` twin at the page URL when markdown is preferred', async () => {
+    const { seen, handler } = routed(() => new Response('# about', { headers: markdownHeaders }));
+    const res = await build(handler).request('/about', { headers: MARKDOWN }, okEnv());
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(await res.text()).toBe('# about');
+    expect(seen).toEqual(['/about.md']);
+  });
+
+  it('serves /llms.txt as markdown for the home page', async () => {
+    const { seen, handler } = routed(() => new Response('# napochaan', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } }));
+    const res = await build(handler).request('/', { headers: MARKDOWN }, okEnv());
+    expect(res.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(await res.text()).toBe('# napochaan');
+    expect(seen).toEqual(['/llms.txt']);
+  });
+
+  it('maps a trailing-slash path and keeps the query string', async () => {
+    const { seen, handler } = routed(() => new Response('# blog', { headers: markdownHeaders }));
+    await build(handler).request('/blog/?x=1', { headers: MARKDOWN }, okEnv());
+    expect(seen).toEqual(['/blog.md?x=1']);
+  });
+
+  it('renders the twin inside a request context holding the twin request', async () => {
+    const urls: string[] = [];
+    const handler: MountedFetch = async () => {
+      urls.push(getRequestContext().request.url);
+      return new Response('# about', { headers: markdownHeaders });
+    };
+    await build(handler).request('/about', { headers: MARKDOWN }, okEnv());
+    expect(urls).toEqual(['http://localhost/about.md']);
+  });
+
+  it('renders HTML only when markdown is not preferred', async () => {
+    const { seen, handler } = routed(() => new Response('<html></html>', { headers: htmlHeaders }));
+    const res = await build(handler).request('/about', { headers: { Accept: 'text/html,*/*;q=0.8' } }, okEnv());
+    expect(res.headers.get('Content-Type')).toBe('text/html; charset=utf-8');
+    expect(seen).toEqual(['/about']);
+  });
+
+  it('never negotiates a POST', async () => {
+    const { seen, handler } = routed(() => new Response('<html></html>', { headers: htmlHeaders }));
+    await build(handler).request('/contact', { method: 'POST', headers: MARKDOWN }, okEnv());
+    expect(seen).toEqual(['/contact']);
+  });
+
+  it('never negotiates a path that already has an extension', async () => {
+    const { seen, handler } = routed(() => new Response('<rss/>', { headers: { 'Content-Type': 'application/xml' } }));
+    await build(handler).request('/blog/rss.xml', { headers: MARKDOWN }, okEnv());
+    expect(seen).toEqual(['/blog/rss.xml']);
+  });
+
+  // gallery / contact / colophon / /blog/page/N have no `.md` twin.
+  it('falls back to the HTML page when the twin is 404', async () => {
+    const { seen, handler } = routed((request) =>
+      new URL(request.url).pathname.endsWith('.md') ? new Response('<html>404</html>', { status: 404, headers: htmlHeaders }) : new Response('<html>gallery</html>', { headers: htmlHeaders }),
+    );
+    const res = await build(handler).request('/gallery', { headers: MARKDOWN }, okEnv());
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Type')).toBe('text/html; charset=utf-8');
+    expect(await res.text()).toBe('<html>gallery</html>');
+    expect(seen).toEqual(['/gallery.md', '/gallery']);
+  });
+
+  // e.g. a dynamic route that happens to accept `2.md` as a param renders HTML 200.
+  it('falls back when the twin answers 200 with a non-markdown type', async () => {
+    const { seen, handler } = routed(() => new Response('<html>page</html>', { headers: htmlHeaders }));
+    const res = await build(handler).request('/blog/page/2', { headers: MARKDOWN }, okEnv());
+    expect(await res.text()).toBe('<html>page</html>');
+    expect(seen).toEqual(['/blog/page/2.md', '/blog/page/2']);
+  });
+
+  it('answers a markdown 404 (no-store) when the HTML page is missing too', async () => {
+    const { seen, handler } = routed(() => new Response('<html>404</html>', { status: 404, headers: htmlHeaders }));
+    const res = await build(handler).request('/nope', { headers: MARKDOWN }, okEnv({ BASE_URL: 'https://napochaan.com' }));
+    expect(res.status).toBe(404);
+    expect(res.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+    const body = await res.text();
+    expect(body).toContain('(https://napochaan.com/llms.txt)');
+    expect(body).toContain('`/nope`');
+    expect(seen).toEqual(['/nope.md', '/nope']);
+  });
+
+  it('builds markdown 404 links from the request origin when BASE_URL is unset', async () => {
+    const { handler } = routed(() => new Response('<html>404</html>', { status: 404, headers: htmlHeaders }));
+    const res = await build(handler).request('https://stg.example.com/nope', { headers: MARKDOWN }, okEnv());
+    expect(await res.text()).toContain('(https://stg.example.com/sitemap.xml)');
+  });
+
+  it('passes a non-404 HTML fallback (e.g. a 308 redirect) through', async () => {
+    const { handler } = routed((request) =>
+      new URL(request.url).pathname.endsWith('.md') ? new Response(null, { status: 404 }) : new Response(null, { status: 308, headers: { Location: '/blog' } }),
+    );
+    const res = await build(handler).request('/blog/page/1', { headers: MARKDOWN }, okEnv());
+    expect(res.status).toBe(308);
+    expect(res.headers.get('Location')).toBe('/blog');
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+  });
+
+  it('serves a twin server error as is (no HTML fallback)', async () => {
+    const { seen, handler } = routed(() => new Response('boom', { status: 500, headers: { 'Content-Type': 'text/plain' } }));
+    const res = await build(handler).request('/about', { headers: MARKDOWN }, okEnv());
+    expect(res.status).toBe(500);
+    expect(res.headers.get('Cache-Control')).toBe('no-store');
+    expect(seen).toEqual(['/about.md']);
+  });
+
+  it('flags the request degraded when the twin render hits a CMS failure', async () => {
+    const handler: MountedFetch = async () => {
+      await getRequestContext()
+        .env.CMS?.fetch('https://cms.internal/profile')
+        .catch(() => undefined);
+      return new Response('# about', { headers: markdownHeaders });
+    };
+    const res = await build(handler).request(
+      '/about',
+      { headers: MARKDOWN },
+      cmsEnv(async () => new Response('boom', { status: 503 })),
+    );
+    expect(res.headers.get('X-Degraded')).toBe('1');
+  });
+
+  it('negotiates HEAD', async () => {
+    const { seen, handler } = routed(() => new Response(null, { headers: markdownHeaders }));
+    const res = await build(handler).request('/about', { method: 'HEAD', headers: MARKDOWN }, okEnv());
+    expect(res.status).toBe(200);
+    expect(res.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(seen).toEqual(['/about.md']);
+  });
+});
