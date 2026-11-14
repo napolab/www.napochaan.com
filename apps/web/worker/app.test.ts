@@ -86,3 +86,87 @@ describe('createWorkerApp', () => {
     expect(response.headers.get('Cache-Control')).toBe('no-store');
   });
 });
+
+describe('createWorkerApp markdown negotiation', () => {
+  const MARKDOWN = { Accept: 'text/markdown' };
+
+  // The bug the "Agent Ready" article hit: a framework layer overwrote Vary, so a cached
+  // HTML entry answered markdown requests. Assert on the final response of the full chain.
+  it('keeps Vary: Accept alongside the upstream Vary through every middleware', async () => {
+    const handlerFetch = vi.fn(
+      async () =>
+        new Response('html', {
+          headers: { ETag: '"abc"', Vary: 'Accept-Encoding', 'Cache-Control': 'private, no-cache, no-store, max-age=0, must-revalidate', 'Content-Type': 'text/html' },
+        }),
+    );
+    const response = await createWorkerApp(handlerFetch).request('/about');
+    expect(response.headers.get('Vary')).toBe('Accept-Encoding, Accept');
+    expect(response.headers.get('ETag')).toBe('W/"abc"');
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=31536000');
+  });
+
+  it.each([
+    ['/about', 200],
+    ['/missing', 404],
+    ['/blog/page/1', 308],
+  ])('varies %s (%i) on Accept even without a markdown request', async (path, status) => {
+    const handlerFetch = vi.fn(async () => new Response(status === 308 ? null : 'html', { status, headers: { 'Content-Type': 'text/html' } }));
+    const response = await createWorkerApp(handlerFetch).request(path);
+    expect(response.headers.get('Vary')).toBe('Accept');
+  });
+
+  it.each(['/about.md', '/api/media/file/a.png', '/blog/preview/1'])('does not vary %s', async (path) => {
+    const handlerFetch = vi.fn(async () => new Response('x'));
+    const response = await createWorkerApp(handlerFetch).request(path);
+    expect(response.headers.get('Vary')).toBeNull();
+  });
+
+  it('answers / with llms.txt as markdown under the time-sensitive policy', async () => {
+    const handlerFetch = vi.fn(async (request: Request) => {
+      if (new URL(request.url).pathname !== '/llms.txt') return new Response('html', { headers: { 'Content-Type': 'text/html' } });
+      return new Response('# napochaan', { headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+    });
+    const response = await createWorkerApp(handlerFetch).request('/', { headers: MARKDOWN });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=3600');
+    expect(response.headers.get('Vary')).toBe('Accept');
+    expect(await response.text()).toBe('# napochaan');
+  });
+
+  it('serves the markdown twin with the cms policy and Vary', async () => {
+    const handlerFetch = vi.fn(async () => new Response('# about', { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } }));
+    const response = await createWorkerApp(handlerFetch).request('/about', { headers: MARKDOWN });
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=31536000');
+    expect(response.headers.get('Vary')).toBe('Accept');
+  });
+
+  it('forces no-store on a twin rendered against a failing CMS', async () => {
+    const handlerFetch = vi.fn(async (_request: Request, ...args: unknown[]) => {
+      const [env] = args as [Cloudflare.Env];
+      await env.CMS?.fetch('https://cms.internal/profile').catch(() => undefined);
+      return new Response('# about', { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } });
+    });
+    const env = { CMS: { fetch: vi.fn(async () => new Response('boom', { status: 500 })), connect: vi.fn() } } as unknown as Cloudflare.Env;
+    const response = await createWorkerApp(handlerFetch).request('/about', { headers: MARKDOWN }, env);
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
+    expect(response.headers.get('Vary')).toBe('Accept');
+  });
+
+  it('answers a missing page with a markdown 404 that varies on Accept', async () => {
+    const handlerFetch = vi.fn(async () => new Response('<html>404</html>', { status: 404, headers: { 'Content-Type': 'text/html' } }));
+    const response = await createWorkerApp(handlerFetch).request('/nope', { headers: MARKDOWN }, { BASE_URL: 'https://napochaan.com' });
+    expect(response.status).toBe(404);
+    expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
+    expect(response.headers.get('Vary')).toBe('Accept');
+  });
+
+  it('negotiates HEAD through the full chain', async () => {
+    const handlerFetch = vi.fn(async () => new Response(null, { headers: { 'Content-Type': 'text/markdown; charset=utf-8' } }));
+    const response = await createWorkerApp(handlerFetch).request('/about', { method: 'HEAD', headers: MARKDOWN });
+    expect(response.status).toBe(200);
+    expect(response.headers.get('Content-Type')).toBe('text/markdown; charset=utf-8');
+    expect(response.headers.get('Vary')).toBe('Accept');
+  });
+});

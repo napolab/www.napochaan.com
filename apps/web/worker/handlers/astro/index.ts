@@ -1,10 +1,14 @@
 import { runWithRequestContext } from '../../../src/lib/request-context';
 import { PAGE_CACHE_POLICIES } from '../../../src/utils/cache-control';
 import { createCMSHealth, withTrackedCMS } from '../../lib/cms-health';
+import { acceptsMarkdown } from '../../lib/markdown-negotiation/accepts-markdown';
+import { isNegotiablePath } from '../../lib/markdown-negotiation/negotiable-path';
 import { resolveCacheControl } from '../../middleware/cache-control';
+import { renderMarkdownPreferred } from './negotiate';
 
 import type { MountedFetch } from '../../app';
 import type { CMSHealthVariables } from '../../lib/cms-health';
+import type { Render } from './negotiate';
 import type { Context } from 'hono';
 
 type AstroEnv = { Bindings: Cloudflare.Env; Variables: CMSHealthVariables };
@@ -19,11 +23,11 @@ const readExecutionCtx = (c: Context<AstroEnv>): ExecutionContext | undefined =>
   }
 };
 
-const isCacheablePage = (c: Context<AstroEnv>, response: Response): boolean => {
+const isCacheablePage = (request: Request, response: Response): boolean => {
   if (response.status !== 200 || response.body === null) return false;
-  if (c.req.method !== 'GET' && c.req.method !== 'HEAD') return false;
+  if (request.method !== 'GET' && request.method !== 'HEAD') return false;
 
-  return resolveCacheControl(new URL(c.req.url).pathname).kind === 'page';
+  return resolveCacheControl(new URL(request.url).pathname).kind === 'page';
 };
 
 type RenderTarget = { astroFetch: MountedFetch; request: Request; env: Cloudflare.Env; ctx: ExecutionContext | undefined };
@@ -41,8 +45,8 @@ const renderServerError = async ({ astroFetch, request, env, ctx }: RenderTarget
 // Astro streams the page body, so CMS reads in nested components resolve after the
 // adapter returns the Response. A cacheable page is read to the end before the
 // degraded flag is final. Only Workers Cache misses pay this (a HIT never runs the Worker).
-const settle = async (c: Context<AstroEnv>, target: RenderTarget, response: Response): Promise<Response> => {
-  if (!isCacheablePage(c, response)) return response;
+const settle = async (target: RenderTarget, response: Response): Promise<Response> => {
+  if (!isCacheablePage(target.request, response)) return response;
 
   try {
     return new Response(await response.arrayBuffer(), response);
@@ -90,18 +94,39 @@ const withHTMLCharset = (response: Response): Response => {
   return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 };
 
+// One render of `request` by the mounted Astro fetch, inside a request context holding
+// the wrapped env and that request (a negotiated render sees the twin URL). Settling
+// stays inside the scope so streamed reads see it too.
+const createRender =
+  (astroFetch: MountedFetch, env: Cloudflare.Env, ctx: ExecutionContext | undefined): Render =>
+  async (request) =>
+    runWithRequestContext({ env, ctx, request }, async () => settle({ astroFetch, request, env, ctx }, await astroFetch(request, env, ctx)));
+
+const prefersMarkdown = (request: Request): boolean => isNegotiablePath({ method: request.method, pathname: new URL(request.url).pathname }) && acceptsMarkdown(request.headers.get('Accept'));
+
+// Same convention as the `.md` endpoints (BASE_URL); `app.request()` without env (tests)
+// falls back to the request origin.
+const baseURLFor = (env: Cloudflare.Env | undefined, request: Request): string => env?.BASE_URL ?? new URL(request.url).origin;
+
+// Content negotiation happens here, never in page code (a cacheable page must not read
+// request headers). The `varyAccept` middleware keys the stored variants on Accept.
+const respond = (request: Request, render: Render, env: Cloudflare.Env | undefined): Promise<Response> => {
+  if (!prefersMarkdown(request)) return render(request);
+
+  return renderMarkdownPreferred({ request, render, baseURL: baseURLFor(env, request) });
+};
+
 // The mounted Astro fetch (`@astrojs/cloudflare/handler`), with this request's `CMS`
 // binding wrapped. The adapter never hands page code the env passed here (pages would
-// otherwise read the raw global `cloudflare:workers` env), so the render runs inside
+// otherwise read the raw global `cloudflare:workers` env), so every render runs inside
 // an AsyncLocalStorage request context holding the wrapped env, and `getCMSClient()`
-// reads that store. Settling stays inside the scope so streamed reads see it too.
+// reads that store. One health tracker covers every render of the request.
 export const createAstroHandler = (astroFetch: MountedFetch) => async (c: Context<AstroEnv>) => {
   const health = createCMSHealth();
   const env = withTrackedCMS(c.env, health);
-  const ctx = readExecutionCtx(c);
-  const target: RenderTarget = { astroFetch, request: c.req.raw, env, ctx };
-  const settled = await runWithRequestContext({ env, ctx, request: c.req.raw }, async () => settle(c, target, await astroFetch(c.req.raw, env, ctx)));
+  const render = createRender(astroFetch, env, readExecutionCtx(c));
+  const response = await respond(c.req.raw, render, env);
   if (health.isDegraded()) c.set('cmsDegraded', true);
 
-  return withHTMLCharset(withWritePolicy(c.req.raw, withErrorPolicy(settled)));
+  return withHTMLCharset(withWritePolicy(c.req.raw, withErrorPolicy(response)));
 };
