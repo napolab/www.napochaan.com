@@ -15,13 +15,49 @@
  * fallback occupies the exact same box as the web font. Placed before
  * ui-monospace in the `fonts.mono` token stack, it removes the swap reflow.
  * Both faces are 0.6em monospace, so size-adjust is ~100%.
+ *
+ * Liberation Mono / Cousine are metric-compatible Courier New clones (same advance,
+ * same vertical metrics) for Linux / ChromeOS, where no Courier New is installed and
+ * a fontconfig alias does not satisfy local(): without them the fixed typography
+ * band painted ui-monospace and jumped on swap.
  */
 @font-face {
   font-family: 'config-mono-vf Fallback';
-  src: local('Courier New'), local('CourierNewPSMT');
+  src: local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono'), local('LiberationMono'), local('Cousine');
   ascent-override: 89.6146%;
   descent-override: 23.0037%;
   size-adjust: 99.9837%;
+}
+
+/*
+ * Metric-matched fallback for the Typekit display face (digibop), same idea as the
+ * mono one above. Until the kit resolves, the hero wordmark (italic, 10rem — the
+ * LCP element) and the section headings paint in this face instead of system-ui.
+ *
+ * Values were tuned in the browser against digibop on the live home page: Arial at
+ * size-adjust 102% matches the italic wordmark's advance (digibop / Arial = 1.019),
+ * and the vertical overrides are digibop's ascent 0.89 / descent 0.20 divided by
+ * that 1.02 (overrides are applied before size-adjust scales the face). Simulated
+ * swap CLS on the home page drops from 0.0625 to 0.0001 with both fallbacks.
+ * Liberation Sans / Arimo are metric-compatible Arial clones (Linux / ChromeOS).
+ */
+@font-face {
+  font-family: 'digibop Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('LiberationSans'), local('Arimo');
+  size-adjust: 102%;
+  ascent-override: 87.2549%;
+  descent-override: 19.6078%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'digibop Fallback';
+  font-style: italic;
+  src: local('Arial Italic'), local('Arial-ItalicMT'), local('Liberation Sans Italic'), local('LiberationSans-Italic'), local('Arimo Italic');
+  size-adjust: 102%;
+  ascent-override: 87.2549%;
+  descent-override: 19.6078%;
+  line-gap-override: 0%;
 }
 
 /*

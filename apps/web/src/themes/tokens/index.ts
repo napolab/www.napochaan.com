@@ -150,7 +150,9 @@ export const tokens = defineTokens({
   },
 
   fonts: {
-    display: { value: '"digibop", system-ui, sans-serif' },
+    // "digibop Fallback" is a metric-matched Arial (see global.css @font-face) so the
+    // pre-swap wordmark / headings occupy digibop's box — kills the Typekit swap CLS.
+    display: { value: '"digibop", "digibop Fallback", system-ui, sans-serif' },
     body: { value: 'var(--font-mplus1), system-ui, -apple-system, sans-serif' },
     // "config-mono-vf Fallback" is a metric-matched Courier New (see global.css
     // @font-face) inserted before ui-monospace so the pre-swap fallback occupies
