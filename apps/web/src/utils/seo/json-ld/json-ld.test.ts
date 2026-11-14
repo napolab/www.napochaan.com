@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { directContacts } from '../../../features/contact/contacts';
+import { homeAbout } from '../../../features/home/about-sample';
 
 import { buildJSONLD, serializeJSONLD } from './index';
 
@@ -24,6 +25,11 @@ describe('buildJSONLD — home', () => {
         { '@type': 'Person', '@id': `${ORIGIN}/#person`, name: 'napochaan', url: ORIGIN, image: `${ORIGIN}/icon.png` },
       ],
     });
+  });
+
+  it('describes the Person (is-agentic flags a Person without description)', () => {
+    const person = '@graph' in graph ? graph['@graph'][1] : undefined;
+    expect(person).toMatchObject({ description: `${homeAbout.now}。${homeAbout.likes}` });
   });
 
   it('takes sameAs from the http(s) direct contacts (no mailto)', () => {

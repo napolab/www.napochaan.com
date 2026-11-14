@@ -35,6 +35,7 @@ type WebSiteNode = {
 
 type PersonNode = PersonRef & {
   '@id': string;
+  description: string;
   jobTitle: string;
   knowsAbout: readonly string[];
   image: string;
@@ -92,6 +93,7 @@ const buildHome = (page: StructuredDataPage): HomeGraph => ({
     {
       ...author(page.origin),
       '@id': personID(page.origin),
+      description: `${homeAbout.now}。${homeAbout.likes}`,
       jobTitle: homeAbout.now,
       knowsAbout: homeAbout.skills,
       image: `${page.origin}/icon.png`,
