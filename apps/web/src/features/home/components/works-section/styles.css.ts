@@ -1,9 +1,12 @@
 import { css } from '@styled/css';
 
+// Below the fold: rendering deferred until it nears the viewport (belowFold
+// utility; value = measured mobile 412 / desktop 1280 height).
 export const root = css({
   display: 'flex',
   flexDirection: 'column',
   gap: 'block',
+  belowFold: { base: '709px', desktop: '280px' },
 });
 
 // Thumbnail: full-colour image displayed at a fixed 40 × 40 square.

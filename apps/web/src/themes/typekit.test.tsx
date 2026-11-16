@@ -46,14 +46,25 @@ describe('typekit boot gate', () => {
     if (userAgentDescriptor !== undefined) Object.defineProperty(Navigator.prototype, 'userAgent', userAgentDescriptor);
   });
 
-  it('holds boot for the 1s floor on a first visit', async () => {
+  it('holds boot for the 300ms floor on a first visit', async () => {
     runLoader();
     html.classList.add('wf-active');
-    await vi.advanceTimersByTimeAsync(500);
+    await vi.advanceTimersByTimeAsync(250);
     expect(html.classList.contains('boot')).toBe(true);
-    await vi.advanceTimersByTimeAsync(600);
+    await vi.advanceTimersByTimeAsync(100);
     expect(html.classList.contains('boot')).toBe(false);
     expect(localStorage.getItem(BOOT_SEEN_KEY)).not.toBeNull();
+  });
+
+  it('lifts boot the moment fonts resolve once the floor has passed', async () => {
+    runLoader();
+    await vi.advanceTimersByTimeAsync(800);
+    expect(html.classList.contains('boot')).toBe(true);
+
+    html.classList.add('wf-active');
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(html.classList.contains('boot')).toBe(false);
   });
 
   it('drops boot as soon as fonts resolve on a return visit', async () => {
@@ -68,7 +79,7 @@ describe('typekit boot gate', () => {
     localStorage.setItem(BOOT_SEEN_KEY, `${Date.now() - BOOT_SEEN_TTL_MS - 1}`);
     runLoader();
     html.classList.add('wf-active');
-    await vi.advanceTimersByTimeAsync(500);
+    await vi.advanceTimersByTimeAsync(250);
     expect(html.classList.contains('boot')).toBe(true);
   });
 
@@ -78,9 +89,9 @@ describe('typekit boot gate', () => {
     });
     runLoader();
     html.classList.add('wf-active');
-    await vi.advanceTimersByTimeAsync(500);
+    await vi.advanceTimersByTimeAsync(250);
     expect(html.classList.contains('boot')).toBe(true);
-    await vi.advanceTimersByTimeAsync(600);
+    await vi.advanceTimersByTimeAsync(100);
     expect(html.classList.contains('boot')).toBe(false);
     getItem.mockRestore();
   });

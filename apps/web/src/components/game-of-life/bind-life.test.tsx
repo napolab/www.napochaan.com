@@ -14,18 +14,18 @@ const mountCanvas = () => {
   return canvas;
 };
 
-// A Resizer whose size and notifications the test controls.
+// A Resizer whose size and notifications the test controls. Like the ResizeObserver
+// behind the real one, it reports nothing until the first notification.
 const fakeResizer = (size: { width: number; height: number }) => {
-  const observers = new Set<() => void>();
+  const observers = new Set<(next: { width: number; height: number }) => void>();
   const resizer: Resizer = {
-    measure: () => size,
     observe: (_canvas, onResize) => {
       observers.add(onResize);
       return () => observers.delete(onResize);
     },
   };
   const notify = () => {
-    for (const observer of observers) observer();
+    for (const observer of observers) observer({ ...size });
   };
   return { resizer, notify, observers };
 };
@@ -37,11 +37,23 @@ afterEach(() => {
 });
 
 describe('bindLifeCanvas', () => {
-  it('sizes the canvas to its box and seeds the engine grid from it', () => {
+  it('leaves the grid alone until the first size observation', () => {
     const engine = placeholder();
     const { resizer } = fakeResizer({ width: 240, height: 120 });
     const unbind = bindLifeCanvas({ canvas: mountCanvas(), engine, resizer });
 
+    expect(engine.getState().cols).toBe(1);
+    unbind();
+  });
+
+  it('sizes the canvas to its box and seeds the engine grid from it', () => {
+    const engine = placeholder();
+    const { resizer, notify } = fakeResizer({ width: 240, height: 120 });
+    const canvas = mountCanvas();
+    const unbind = bindLifeCanvas({ canvas, engine, resizer });
+    notify();
+
+    expect(canvas.width).toBe(240 * Math.min(devicePixelRatio, 2));
     // CELL 24 → ceil(240/24)+1 × ceil(120/24)+1
     expect(engine.getState().cols).toBe(11);
     expect(engine.getState().rows).toBe(6);
@@ -55,6 +67,7 @@ describe('bindLifeCanvas', () => {
     const engine = placeholder();
     const { resizer, notify } = fakeResizer({ width: 240, height: 120 });
     const unbind = bindLifeCanvas({ canvas: mountCanvas(), engine, resizer });
+    notify();
     engine.tick();
     engine.tick();
 
@@ -68,6 +81,7 @@ describe('bindLifeCanvas', () => {
     const engine = placeholder();
     const { resizer, notify, observers } = fakeResizer(size);
     const unbind = bindLifeCanvas({ canvas: mountCanvas(), engine, resizer });
+    notify();
     engine.tick();
 
     size.width = 480;

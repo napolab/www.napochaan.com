@@ -1,11 +1,12 @@
-import { bindScrollRange } from './bind-scroll-range';
+import { SCROLL_RANGE_HOST_ATTRIBUTE, bindScrollRange } from './bind-scroll-range';
 
 // `<scroll-range-sync>` — the framework-free driver inside ./safe-area-tint.astro (no
 // React island). Client-only: imported solely from the component's bundled `<script>`.
-// An empty element (the React ScrollRangeSync renders nothing): it binds
-// ./bind-scroll-range while connected. The tint root persists across navigations; a
-// persist move (disconnect + connect) just re-measures, and astro:after-swap moves
-// the body observer to the swapped-in <body>.
+// An empty element (the React ScrollRangeSync renders nothing): while connected it
+// binds ./bind-scroll-range to its host — the tint root, marked explicitly with
+// SCROLL_RANGE_HOST_ATTRIBUTE. The tint root persists across navigations; a persist
+// move (disconnect + connect) just re-measures, and astro:after-swap moves the body
+// observer to the swapped-in <body>.
 export const SCROLL_RANGE_SYNC_TAG = 'scroll-range-sync';
 
 export class ScrollRangeSyncElement extends HTMLElement {
@@ -13,7 +14,10 @@ export class ScrollRangeSyncElement extends HTMLElement {
 
   connectedCallback() {
     this.#dispose?.();
-    this.#dispose = bindScrollRange();
+    this.#dispose = undefined;
+    const host = this.closest<HTMLElement>(`[${SCROLL_RANGE_HOST_ATTRIBUTE}]`);
+    if (host === null) return;
+    this.#dispose = bindScrollRange(host);
   }
 
   disconnectedCallback() {

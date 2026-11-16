@@ -19,8 +19,26 @@ const mount = (attributes = '') => {
   return { container, element, canvas };
 };
 
-// The element binds in a microtask after connect (persist reconcile).
-const settle = () => new Promise<void>((resolve) => setTimeout(resolve, 0));
+// Resolves on the canvas's next ResizeObserver delivery. Observers are notified in
+// creation order, so the element's own observer (created at bind) has sized the canvas
+// by then. These helper observers are tracked so observer-count assertions skip them.
+const helperObservers = new WeakSet<ResizeObserver>();
+const observed = (canvas: HTMLCanvasElement) =>
+  new Promise<void>((resolve) => {
+    const observer = new ResizeObserver(() => {
+      observer.disconnect();
+      resolve();
+    });
+    helperObservers.add(observer);
+    observer.observe(canvas);
+  });
+
+// The element binds in a microtask after connect (persist reconcile) and sizes its
+// canvas from the first ResizeObserver entry.
+const settle = async () => {
+  await new Promise<void>((resolve) => setTimeout(resolve, 0));
+  await Promise.all([...document.querySelectorAll('canvas')].map(observed));
+};
 const generation = () => sharedLifeEngine.getState().generation;
 const frames = (ms: number) => vi.advanceTimersByTime(ms);
 const pixels = (canvas: HTMLCanvasElement) => {
@@ -117,7 +135,7 @@ describe('<game-of-life>', () => {
 
     expect(generation()).toBeGreaterThan(before);
     expect(generation() - before).toBeLessThanOrEqual(7);
-    expect(observe).toHaveBeenCalledTimes(1);
+    expect(observe.mock.contexts.filter((observer) => !(observer instanceof ResizeObserver && helperObservers.has(observer)))).toHaveLength(1);
   });
 
   it('stops its loop when it is really removed', async () => {

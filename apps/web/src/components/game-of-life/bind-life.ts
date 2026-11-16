@@ -1,4 +1,4 @@
-import type { Resizer } from '@components/canvas-resize/container-resizer';
+import type { CanvasSize, Resizer } from '@components/canvas-resize/container-resizer';
 import type { LifeEngine, LifeState } from './engine';
 
 // Framework-free core of the GameOfLife canvas, shared by the React GameOfLife
@@ -34,14 +34,14 @@ type CanvasBinding = {
 // observing later layout changes. The engine is re-seeded only when the grid actually
 // changes: resize() zeroes the generation the SysBar shows, and a ResizeObserver can
 // report an unchanged box (a transition:persist move detaches and re-attaches the
-// canvas). Returns the unobserve.
+// canvas). The first size comes from the resizer's first observation (right after the
+// next layout), never from a synchronous measure at bind. Returns the unobserve.
 export const bindLifeCanvas = ({ canvas, engine, resizer }: CanvasBinding): (() => void) => {
-  const resize = () => {
+  const resize = ({ width, height }: CanvasSize) => {
     const ctx = contextOf(canvas);
     if (ctx === null) return;
 
     const dpr = Math.min(devicePixelRatio ?? 1, 2);
-    const { width, height } = resizer.measure(canvas);
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -53,7 +53,6 @@ export const bindLifeCanvas = ({ canvas, engine, resizer }: CanvasBinding): (() 
     drawCells(ctx, engine.getState());
   };
 
-  resize();
   return resizer.observe(canvas, resize);
 };
 

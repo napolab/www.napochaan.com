@@ -91,3 +91,31 @@ describe('home sections (.astro)', () => {
     expect(scrambleTextCountOf(html)).toBe(2);
   });
 });
+
+// The first full layout of the home page landed inside the TBT window. Every section
+// below the hero + about block defers its rendering (the `belowFold` utility:
+// content-visibility: auto + a reserved height); the first screen never does — it is
+// the LCP and must paint on the first frame.
+describe('home sections: deferred rendering below the fold', () => {
+  const BELOW_FOLD = 'below-fold';
+  // The utility's atomic classes (`below-fold_481px`, `desktop:below-fold_310px`),
+  // reduced to their utility name.
+  const rootClassOf = (html: string): string[] => (/^<(?:section|header)\b[^>]*\bclass="([^"]*)"/.exec(html)?.[1] ?? '').split(' ').map((name) => name.replace(/^(?:\w+:)?([\w-]+)_.*$/, '$1'));
+
+  it.each([
+    ['NewsSection', () => renderComponent(NewsSection, { props: { items: [] } })],
+    ['WorksSection', () => renderComponent(WorksSection, { props: { id: 'works', works: [] } })],
+    ['LogSection', () => renderComponent(LogSection, { props: { id: 'log', entries: [] } })],
+    ['GallerySection', () => renderComponent(GallerySection, { props: { id: 'gallery', photos: [] } })],
+    ['BlogIndex', () => renderComponent(BlogIndex, { props: { id: 'blog', posts: [] } })],
+  ])('%s opts into deferred rendering', async (_name, render) => {
+    expect(rootClassOf(await render())).toContain(BELOW_FOLD);
+  });
+
+  it.each([
+    ['Hero', () => renderComponent(Hero)],
+    ['AboutWhoami', () => renderComponent(AboutWhoami, { props: { id: 'about', skills: [], now: 'n', likes: 'l', wants: 'w' } })],
+  ])('%s (first screen) renders eagerly', async (_name, render) => {
+    expect(rootClassOf(await render())).not.toContain(BELOW_FOLD);
+  });
+});

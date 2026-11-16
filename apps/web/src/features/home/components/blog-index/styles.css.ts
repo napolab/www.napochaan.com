@@ -1,9 +1,12 @@
 import { css } from '@styled/css';
 
+// Below the fold: rendering deferred until it nears the viewport (belowFold
+// utility; value = measured mobile 412 / desktop 1280 height).
 export const root = css({
   display: 'flex',
   flexDirection: 'column',
   gap: 'block',
+  belowFold: { base: '1053px', desktop: '671px' },
 });
 
 export const list = css({

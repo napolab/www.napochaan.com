@@ -27,7 +27,8 @@ describe('Image', () => {
     await render(<Image src="/media/a b.jpg" alt="srcset" width={100} height={100} />);
 
     const srcset = page.getByRole('img', { name: 'srcset' }).element().getAttribute('srcset') ?? '';
-    const expected = [640, 750, 828, 1080, 1200, 1920, 2048].map((w) => `${optimizedURL('/media/a b.jpg', w, 75)} ${w}w`).join(', ');
+    // 256 / 384 cover small slots (40px thumbs, archive cells on phones) without a 640w fetch.
+    const expected = [256, 384, 640, 750, 828, 1080, 1200, 1920, 2048].map((w) => `${optimizedURL('/media/a b.jpg', w, 75)} ${w}w`).join(', ');
     expect(srcset).toBe(expected);
   });
 

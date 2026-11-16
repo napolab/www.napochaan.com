@@ -7,7 +7,7 @@ import { LightboxIsland } from '@components/gallery/lightbox/island';
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
-import { ARCHIVE_BLUR_OPTIONS, ARCHIVE_IMAGE_SIZES, galleryArchiveLayout } from './archive-layout';
+import { ARCHIVE_BLUR_OPTIONS, galleryArchiveLayout } from './archive-layout';
 import BlankCell from './blank-cell/blank-cell.astro';
 import * as styles from './styles.css';
 
@@ -24,14 +24,14 @@ const { rootStyle, cells, blanks } = galleryArchiveLayout(photos);
 
 <ul class={styles.root} data-gallery="true" style={rootStyle}>
   {
-    cells.map(({ photo, style }) => (
+    cells.map(({ photo, style, sizes }) => (
       <li class={styles.cell} data-photo="true" style={style}>
         <LightboxIsland client:load pathname={pathname} props={{ src: photo.src, alt: photo.alt, width: photo.width, height: photo.height, triggerClassName: styles.trigger }}>
           <Image
             src={photo.src}
             alt={photo.alt}
             fill
-            sizes={ARCHIVE_IMAGE_SIZES}
+            sizes={sizes}
             className={styles.image}
             placeholder="blur"
             blurDataURL={formatBlurURL(photo.src, ARCHIVE_BLUR_OPTIONS)}

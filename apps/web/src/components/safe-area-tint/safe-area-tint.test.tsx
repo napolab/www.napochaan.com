@@ -12,8 +12,10 @@ describe('SafeAreaTint', () => {
     await expect.element(page.getByTestId('safe-area-tint-strip')).toBeInTheDocument();
   });
 
-  it('publishes --scroll-range as a px value after mount', async () => {
+  it('publishes --scroll-range as a px value onto its own root after mount', async () => {
     await render(<SafeAreaTint />);
-    await expect.poll(() => document.documentElement.style.getPropertyValue('--scroll-range')).toMatch(/^-?\d+(\.\d+)?px$/);
+    const root = page.getByTestId('safe-area-tint').element();
+    if (!(root instanceof HTMLElement)) throw new Error('tint root not found');
+    await expect.poll(() => root.style.getPropertyValue('--scroll-range')).toMatch(/^-?\d+(\.\d+)?px$/);
   });
 });

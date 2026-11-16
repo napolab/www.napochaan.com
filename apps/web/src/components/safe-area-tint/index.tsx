@@ -17,7 +17,7 @@ import * as styles from './styles.css';
 // bottom strip's anchor).
 export const SafeAreaTint = () => {
   return (
-    <div className={styles.root} aria-hidden="true" data-testid="safe-area-tint">
+    <div className={styles.root} aria-hidden="true" data-testid="safe-area-tint" data-scroll-range-host="">
       <div className={styles.strip} data-testid="safe-area-tint-strip" />
       <div className={styles.bottomClip}>
         <div className={styles.stripBottom} data-testid="safe-area-tint-strip-bottom" />

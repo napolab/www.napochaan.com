@@ -57,6 +57,25 @@ describe('bindCursorLayer', () => {
     document.body.replaceChildren();
   });
 
+  // The canvas is sized from the resizer's first ResizeObserver observation (never a
+  // synchronous clientWidth read at bind): the bitmap is the box × devicePixelRatio.
+  it('sizes the bitmap to its box from the first observation, not at bind', async () => {
+    const canvas = mountCanvas();
+    const dispose = bind(canvas, stubApp([visitor]).app);
+    expect(canvas.width).toBe(300); // the default bitmap: nothing measured yet
+
+    await new Promise<void>((resolve) => {
+      const observer = new ResizeObserver(() => {
+        observer.disconnect();
+        resolve();
+      });
+      observer.observe(canvas);
+    });
+
+    expect([canvas.width, canvas.height]).toEqual([200 * devicePixelRatio, 100 * devicePixelRatio]);
+    dispose();
+  });
+
   it('draws positioned visitors every frame', () => {
     const canvas = mountCanvas();
     const dispose = bind(canvas, stubApp([visitor]).app);

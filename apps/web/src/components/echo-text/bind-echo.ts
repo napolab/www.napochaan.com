@@ -28,8 +28,10 @@ const decodeWith = ({ gsap }: GsapKits['scramble'], el: HTMLElement, text: strin
   // source). Pin the box to the settled wordmark width for the tween's lifetime so the
   // jitter stays inside; the momentary overflow of a wide glyph reads as part of the
   // glitch. `overwrite` kills a still-running decode on hover re-entry so its
-  // clearProps can't unlock the box mid-scramble.
-  gsap.set(el, { display: 'inline-block', width: el.offsetWidth });
+  // clearProps can't unlock the box mid-scramble. The span is already inline-block
+  // (styles.scramble, server markup) so the width applies without a display switch —
+  // flipping inline → inline-block here made a late, larger LCP candidate.
+  gsap.set(el, { width: el.offsetWidth });
   // revealDelay holds the full scramble before decoding; low speed keeps the glyph
   // refresh chunky (digital) rather than a 60fps blur; tweenLength off since the word
   // length never changes.
@@ -39,7 +41,7 @@ const decodeWith = ({ gsap }: GsapKits['scramble'], el: HTMLElement, text: strin
     overwrite: true,
     scrambleText: { text, chars: CHARS, speed: 0.45, revealDelay: 0.35, tweenLength: false },
     onComplete: () => {
-      gsap.set(el, { clearProps: 'display,width' });
+      gsap.set(el, { clearProps: 'width' });
     },
   });
 };
@@ -50,7 +52,6 @@ const decodeWith = ({ gsap }: GsapKits['scramble'], el: HTMLElement, text: strin
 // so heal both.
 export const healEcho = ({ fill, text }: EchoBinding): void => {
   fill.textContent = text;
-  fill.style.removeProperty('display');
   fill.style.removeProperty('width');
 };
 

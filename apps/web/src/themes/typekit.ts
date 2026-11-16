@@ -33,12 +33,15 @@
 // shared by every document root that loads the kit (site layout + global-error
 // fallback) so the two cannot drift.
 //
-// To tune the floor, change the BOOT_MIN_MS literal (1000) below — the minimum the
+// To tune the floor, change the BOOT_MIN_MS literal (300) below — the minimum the
 // boot sequence lingers on screen. It is purely aesthetic pacing: the SSR boot class
 // already prevents any bare-content flash, so the floor only decides how long the
-// human boot shows. The BootQuestion typewriter only starts after hydration, so at a
-// short floor the prompt reads as a quick glitch-flash rather than a full sentence —
-// a deliberate trade. Bots skip the overlay, so this never affects audit first paint.
+// human boot shows; past the floor, boot lifts the moment fonts resolve. The
+// BootQuestion typewriter only starts after hydration, so at this short floor the
+// prompt reads as a quick glitch-flash rather than a full sentence — a deliberate
+// trade. It was 1000 ms until Lighthouse 13 stopped matching the BOT regex below:
+// audits now sit through the human boot, so the floor feeds straight into their
+// LCP / Speed Index.
 //
 // Returning visitors skip the aesthetic floor entirely: every successful human boot
 // stamps `localStorage[BOOT_SEEN_KEY]` with the current time, and a load within
@@ -48,14 +51,17 @@
 // first paint (it is SSR'd, see above), so this never reintroduces FOUT — it only
 // shortens how long an already-cached, already-fonted repeat load keeps showing the
 // overlay. Storage access is wrapped in try/catch: private mode or disabled storage
-// silently falls back to the normal 1 s floor instead of throwing.
+// silently falls back to the normal 300 ms floor instead of throwing.
 //
-// Bots (crawlers, Lighthouse, PageSpeed, headless) get boot REMOVED synchronously
-// here, before first paint. boot is SSR'd for everyone (UA-independent, to keep the
-// markup ISR/statically cacheable — a per-UA server branch would force dynamic
-// rendering), so the bot exemption has to happen client-side, but synchronously in
-// <head> it still lands before paint: an auditor/crawler never sees the overlay and
-// measures the real content's first paint. The branded boot is for humans only.
+// UAs matching the BOT regex (crawlers, PageSpeed, older Lighthouse / desktop
+// headless) get boot REMOVED synchronously here, before first paint. boot is SSR'd
+// for everyone (UA-independent, so the HTML stays cacheable — see
+// .claude/rules/workers-cache.md, which forbids UA branching), so the exemption has
+// to happen client-side, but synchronously in <head> it still lands before paint.
+// It is NOT a Lighthouse exemption any more: Lighthouse 13's mobile emulation sends a
+// plain Android Chrome UA (no "Lighthouse" / "HeadlessChrome" token), so mobile audits
+// take the human path and measure the boot overlay. Do not widen the regex to chase
+// auditors — keep the human boot short instead (BOOT_MIN_MS above).
 export const BOOT_SEEN_KEY = 'napochaan:boot-seen';
 export const BOOT_SEEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -65,7 +71,7 @@ const script = `(function(d) {
       SEEN_KEY = '${BOOT_SEEN_KEY}',
       SEEN_TTL = ${BOOT_SEEN_TTL_MS},
       seen = false,
-      BOOT_MIN_MS = 1000,
+      BOOT_MIN_MS = 300,
       BOT = /bot|crawl|spider|lighthouse|headlesschrome|pagespeed|gtmetrix|slurp/i.test(navigator.userAgent),
       t0 = Date.now(),
       t = setTimeout(function () { h.className = h.className.replace(/\\bwf-loading\\b/g, "") + " wf-inactive"; }, config.scriptTimeout),

@@ -6,7 +6,7 @@
 // the cacheable SSR markup, still `class="… wf-loading boot"` with no inline style.
 // The Typekit loader and motion boot script do NOT run again (Astro dedupes inline
 // scripts), so without this the boot overlay would come back and never lift, the
-// `wf-active` font classes would be lost, and `--motion-play` / `--scroll-range`
+// `wf-active` font classes would be lost, and `--motion-play`
 // would be wiped. `swapHeadElements` likewise drops head nodes the incoming head
 // lacks, which includes whatever the Typekit kit injected at runtime.
 //

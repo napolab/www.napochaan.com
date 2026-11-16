@@ -26,6 +26,15 @@ export const fill = css({
   WebkitTextStroke: '[1.5px token(colors.fg.default)]',
 });
 
+// The `[data-scramble]` span the decode churns. inline-block from the server markup:
+// the decode pins its width (CLS guard, see bind-echo), which needs a block-ish box,
+// and switching inline → inline-block only at decode time made the wordmark a new,
+// larger LCP candidate seconds after first paint. Laid out like the inline span it
+// replaced (one nowrap line, same baseline), so nothing moves.
+export const scramble = css({
+  display: 'inline-block',
+});
+
 export const echoBlue = css({
   position: 'absolute',
   inset: '0',

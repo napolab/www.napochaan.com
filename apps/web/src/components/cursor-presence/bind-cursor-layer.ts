@@ -2,7 +2,7 @@ import { prefersReducedMotion, subscribeReducedMotion } from '@utils/prefers-red
 
 import { stepCursorRender, type CursorRender } from './step-cursor-render';
 
-import type { Resizer } from '@components/canvas-resize/container-resizer';
+import type { CanvasSize, Resizer } from '@components/canvas-resize/container-resizer';
 import type { CursorColor } from '@lib/cursor/identity';
 import type { VisitorPointerApp } from '@lib/cursor/visitor-pointer-app';
 import type { Placement } from './placement';
@@ -72,17 +72,17 @@ export const bindCursorLayer = ({ canvas, app, enabled, getColor, placement, res
     live.visitors = state.visitors;
   });
 
-  // The canvas fills its container; the injected Resizer measures + observes the box.
-  const resize = (): void => {
+  // The canvas fills its container; the injected Resizer reports the box — first on
+  // its initial observation, right after the next layout (never a synchronous measure
+  // at bind). Until then the size is 0 × 0 and nothing is drawn.
+  const resize = (measured: CanvasSize): void => {
     const dpr = window.devicePixelRatio;
-    const measured = resizer.measure(canvas);
     size.width = measured.width;
     size.height = measured.height;
     canvas.width = size.width * dpr;
     canvas.height = size.height * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
-  resize();
   const unobserve = resizer.observe(canvas, resize);
 
   const drawVisitors = (): void => {
