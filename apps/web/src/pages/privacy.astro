@@ -1,0 +1,79 @@
+---
+// The privacy policy. Content comes from the repo, not the CMS, so it only changes on
+// deploy (Workers Cache keys entries by Worker version). Still SSR, like every page.
+// Its Markdown twin is /privacy.md (same content source).
+import { Link } from '@components/link';
+import PageHeader from '@components/page-header/page-header.astro';
+import { SectionHeading } from '@components/section-heading';
+
+import { privacy } from '../features/privacy/content';
+import { privacyMetadata } from '../features/privacy/metadata';
+import * as s from '../features/privacy/styles.css';
+import SiteLayout from '../layouts/site-layout.astro';
+import { buildLinkHeader } from '@utils/seo/link-header';
+
+const crumbs = [{ href: '/', label: 'home' }, { label: 'privacy' }];
+
+// RFC 8288 discovery links; set here, not in the layout (see @utils/seo/link-header).
+Astro.response.headers.set('Link', buildLinkHeader(privacyMetadata));
+---
+
+<SiteLayout metadata={privacyMetadata}>
+  <main id="main-content" class={s.main}>
+    <PageHeader title={privacy.title} breadcrumbs={crumbs} kicker={privacy.kicker} lead={privacy.lead} />
+
+    {
+      privacy.sections.map((section) => (
+        <section class={s.cell}>
+          <SectionHeading no={section.no} more={section.question}>
+            {section.heading}
+          </SectionHeading>
+          {section.blocks.map((block) => (
+            <>
+              {block.kind === 'paragraph' && <p class={s.paragraph}>{block.text}</p>}
+              {block.kind === 'list' && (
+                <ul class={s.list}>
+                  {block.items.map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              )}
+              {block.kind === 'table' && (
+                <div class={s.tableRoot}>
+                  <table role="table" class={s.table}>
+                    <caption class={s.caption}>{block.caption}</caption>
+                    <thead role="rowgroup" class={s.head}>
+                      <tr role="row">
+                        <th role="columnheader" scope="col" class={s.columnHeader}>{block.columns.service}</th>
+                        <th role="columnheader" scope="col" class={s.columnHeader}>{block.columns.purpose}</th>
+                        <th role="columnheader" scope="col" class={s.columnHeader}>{block.columns.data}</th>
+                      </tr>
+                    </thead>
+                    <tbody role="rowgroup" class={s.body}>
+                      {block.rows.map((row) => (
+                        <tr role="row" class={s.row}>
+                          <th role="rowheader" scope="row" class={s.rowHeader}>{row.service}</th>
+                          <td role="cell" class={s.dataCell} data-label={block.columns.purpose}>{row.purpose}</td>
+                          <td role="cell" class={s.dataCell} data-label={block.columns.data}>{row.data}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+              {block.kind === 'mail' && (
+                <p class={s.paragraph}>
+                  {block.before}
+                  <Link href={`mailto:${block.address}`}>{block.address}</Link>
+                  {block.after}
+                </p>
+              )}
+            </>
+          ))}
+        </section>
+      ))
+    }
+
+    <p class={s.updated}>{privacy.lastUpdatedLabel}: <time datetime={privacy.lastUpdated}>{privacy.lastUpdated}</time></p>
+  </main>
+</SiteLayout>

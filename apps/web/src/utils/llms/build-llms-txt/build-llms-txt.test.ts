@@ -53,6 +53,12 @@ describe('buildLLMsTxt', () => {
     expect(text).toContain(`- [Work Headline](${baseUrl}/works/work-headline)`);
   });
 
+  it('links the privacy policy in the About section', () => {
+    const text = buildLLMsTxt({ baseUrl, news, blog, works, profile });
+    const about = text.slice(text.indexOf('## About'), text.indexOf('## Works'));
+    expect(about).toContain(`- [privacy policy](${baseUrl}/privacy): このサイトで受け取る情報と、その使いみち。`);
+  });
+
   it('links the three rss feeds in the Feeds section', () => {
     const text = buildLLMsTxt({ baseUrl, news, blog, works, profile });
     expect(text).toContain(`${baseUrl}/news/rss.xml`);

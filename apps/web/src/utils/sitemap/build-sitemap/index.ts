@@ -14,7 +14,7 @@ type BuildSitemapArgs = {
 
 // Every public static page. Preview/admin/api routes are never listed here.
 // The home page sorts first with the highest priority.
-const STATIC_PATHS = ['', '/about', '/works', '/news', '/blog', '/log', '/gallery', '/contact', '/colophon'] as const;
+const STATIC_PATHS = ['', '/about', '/works', '/news', '/blog', '/log', '/gallery', '/contact', '/colophon', '/privacy'] as const;
 
 // Normalizes an ISO `YYYY-MM-DD` date (Asia/Tokyo) to the `lastModified` string,
 // returning undefined when the source has no date so the entry omits the field.
