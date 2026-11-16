@@ -27,7 +27,7 @@ type Props = {
   groups: readonly ArchiveGroup[];
 };
 
-// The full announcement archive grouped by year-month, newest first. A Server
+// The full announcement archive grouped by year, newest first. A Server
 // Component — each row's title link is the only client island (a ScrambleText
 // that decodes on hover). The row layout itself lives in the shared NewsRow.
 export const NewsArchive = ({ groups }: Props) => {
@@ -35,7 +35,7 @@ export const NewsArchive = ({ groups }: Props) => {
     <div className={s.root}>
       {groups.map((group) => (
         <section key={group.key} className={s.group} aria-labelledby={`news-${group.key}`}>
-          <h2 id={`news-${group.key}`} className={s.month}>
+          <h2 id={`news-${group.key}`} className={s.year}>
             {group.label}
           </h2>
           <ol className={s.rows}>

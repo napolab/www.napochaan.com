@@ -7,17 +7,17 @@ import { NewsArchive } from './index';
 
 const groups = [
   {
-    key: '2026-06',
-    label: '2026 / 06',
+    key: '2026',
+    label: '2026',
     items: [
       { id: '1', slug: 'site-renewal', date: '2026-06-05', category: 'site', title: 'サイトを全面リニューアル' },
       { id: '2', slug: 'ext', date: '2026-06-01', category: 'live', title: 'Booth²Booth 出演決定', url: 'https://x.com/status/1' },
     ],
   },
   {
-    key: '2026-05',
-    label: '2026 / 05',
-    items: [{ id: '3', slug: 'works-page', date: '2026-05-23', category: 'release', title: 'works ページ公開', url: '/works' }],
+    key: '2025',
+    label: '2025',
+    items: [{ id: '3', slug: 'works-page', date: '2025-05-23', category: 'release', title: 'works ページ公開', url: '/works' }],
   },
 ];
 

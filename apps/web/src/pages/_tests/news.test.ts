@@ -24,14 +24,15 @@ describe('/news', () => {
     expect(html).toContain('<link rel="alternate" type="text/markdown" href="http://localhost:8788/news.md"');
   });
 
-  it('renders one h1 in main#main-content, the feed link and the first 10 items grouped by month', async () => {
+  it('renders one h1 in main#main-content, the feed link and the first 10 items grouped by year', async () => {
     const html = await renderIndex();
     expect(html).toMatch(/<main id="main-content" class="[^"]+">/);
     expect(html.match(/<h1[\s>]/g)).toHaveLength(1);
     expect(html).toContain('近況すぎ〜↑');
     expect(html).toContain('href="/news/rss.xml"');
-    expect(html).toMatch(/<h2 id="news-2026-06" class="[^"]+">2026 \/ 06<\/h2>/);
-    expect(html).toMatch(/<h2 id="news-2026-04" class="[^"]+">2026 \/ 04<\/h2>/);
+    // Page 1 is all 2026 (April–June), so its months merge into a single year group.
+    expect(html).toMatch(/<h2 id="news-2026" class="[^"]+">2026<\/h2>/);
+    expect(html).not.toContain('id="news-2026-');
     expect(html).toContain('href="/news/a.b"');
     expect(html).toContain('06.18');
     expect(html).toContain('href="/news/page/2"');

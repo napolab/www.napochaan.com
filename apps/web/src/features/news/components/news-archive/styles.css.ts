@@ -2,7 +2,7 @@ import { css } from '@styled/css';
 
 // Three shared columns — date · category · title — defined once on the root and
 // inherited down through every level (root → group → ol → row) via `subgrid`, so
-// each cell lines up across all rows and all month groups, not just within a row.
+// each cell lines up across all rows and all year groups, not just within a row.
 // The per-row layout lives in the shared NewsRow component.
 export const root = css({
   display: 'grid',
@@ -18,8 +18,8 @@ export const group = css({
   rowGap: 'element',
 });
 
-// Year-month heading — spans all three columns.
-export const month = css({
+// Year heading — spans all three columns.
+export const year = css({
   gridColumn: '[1 / -1]',
   fontFamily: 'mono',
   fontVariationSettings: '"wght" 600',
