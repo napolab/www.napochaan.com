@@ -124,6 +124,15 @@ describe('site-layout.astro', () => {
     expect(count(state.html, 'scramble-text.astro?astro&type=script')).toBe(1);
   });
 
+  // WebMCP tools (src/utils/webmcp) register from one bundled module script: a deferred
+  // module, so it never blocks render, and Astro runs it once per document (ClientRouter
+  // soft navigations do not re-run it), so each tool registers exactly once.
+  it('bundles the WebMCP registration script once', () => {
+    expect(count(state.html, 'site-layout.astro?astro&type=script')).toBe(1);
+    const source = readFileSync(new URL('./site-layout.astro', import.meta.url), 'utf8');
+    expect(source).toContain('registerWebMCPTools(');
+  });
+
   // The persisted SysBar is rendered for the request path: the server marks the
   // active section (the element follows later soft navigations).
   it('marks the page section active in the SysBar from the request pathname', () => {
