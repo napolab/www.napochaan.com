@@ -66,7 +66,13 @@ describe('text endpoints (bodies equal the Next builders for the same data)', ()
   it('/robots.txt on production allows the site and points at the sitemap', async () => {
     const res = await render(robotsTxt, '/robots.txt');
     expect(res.headers.get('content-type')).toBe('text/plain; charset=utf-8');
-    expect(await res.text()).toBe(serializeRobots(buildRobots({ baseUrl: 'https://napochaan.com', isProduction: true })));
+    const body = await res.text();
+    expect(body).toBe(serializeRobots(buildRobots({ baseUrl: 'https://napochaan.com', isProduction: true })));
+    expect(body).toMatch(/^User-Agent: \*\nContent-Signal: search=yes,ai-train=no,use=reference\nAllow: \/\n/);
+    expect(body).toContain('User-Agent: OAI-SearchBot\nContent-Signal: search=yes,ai-train=no,use=reference\nAllow: /\nDisallow: /admin\n');
+    expect(body).toContain('User-Agent: GPTBot\n');
+    expect(body).toContain('User-Agent: CitibotSiteCrawler\nDisallow: /\n');
+    expect(body).toContain('Sitemap: https://napochaan.com/sitemap.xml\n');
   });
 
   it('/robots.txt on a non-production BASE_URL blocks everything', async () => {
