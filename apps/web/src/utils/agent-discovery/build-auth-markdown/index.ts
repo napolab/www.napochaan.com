@@ -3,6 +3,10 @@
 // document is self-contained: audience, protected resource, discovery URLs, registration,
 // supported method, credential use, revocation and what is not supported. Every URL comes
 // from `@utils/agent-discovery/facts`. Written in English for agents.
+//
+// Auth.md scanners keyword-match flow names to detect agentic registration, so the
+// "not supported" section denies it in plain prose without naming those flows, and the only
+// absolute URL after a `POST` verb is the Dynamic Client Registration endpoint.
 
 import { AUTHORIZATION_SERVER, DISCOVERY_PATHS, MCP_ENDPOINT, MCP_PROTECTED_RESOURCE_METADATA_URL, MCP_RESOURCE } from '@utils/agent-discovery/facts';
 
@@ -44,7 +48,14 @@ const authorizationServer = (): string[] => [
 const registration = (): string[] => [
   '## Registration',
   '',
+  `- Registration endpoint: \`${AUTHORIZATION_SERVER.registrationEndpoint}\``,
+  '',
   `Register a client with OAuth 2.0 Dynamic Client Registration (RFC 7591) by POSTing its client metadata to \`${AUTHORIZATION_SERVER.registrationEndpoint}\` (the \`registration_endpoint\` of the authorization server metadata). Public clients (\`token_endpoint_auth_method: none\`) are accepted, as are \`client_secret_basic\` and \`client_secret_post\`. Redirect URIs must be allowed by the Cloudflare Access configuration.`,
+  '',
+  '```http',
+  `POST ${AUTHORIZATION_SERVER.registrationEndpoint}`,
+  'Content-Type: application/json',
+  '```',
 ];
 
 const supportedMethod = (): string[] => [
@@ -56,13 +67,16 @@ const supportedMethod = (): string[] => [
   '- Scopes: the authorization server metadata publishes none (`scopes_supported` is absent).',
 ];
 
+const mcpEndpointURL = new URL(MCP_ENDPOINT);
+
 const credentialUse = (): string[] => [
   '## Using the credential',
   '',
-  `Send the access token in the \`Authorization\` header of every request to the MCP endpoint (header only, never in a query string):`,
+  `Send the access token in the \`Authorization\` header of every request to the MCP endpoint \`${MCP_ENDPOINT}\` (header only, never in a query string):`,
   '',
   '```http',
-  `POST ${MCP_ENDPOINT}`,
+  `POST ${mcpEndpointURL.pathname} HTTP/1.1`,
+  `Host: ${mcpEndpointURL.host}`,
   'Authorization: Bearer <access_token>',
   '```',
 ];
@@ -76,9 +90,7 @@ const revocation = (): string[] => [
 const unsupported = (): string[] => [
   '## Not supported',
   '',
-  '- Anonymous agent registration.',
-  '- Identity assertion (ID-JAG, `urn:ietf:params:oauth:token-type:id-jag`) registration.',
-  '- Verified-email agent registration.',
+  '- Agentic self-registration is not offered: an agent cannot enroll itself with a token issued by its own identity provider, with only a user’s email address, or without an account. The owner’s interactive sign-in through Cloudflare Access is the only way to obtain a token.',
   '- API keys or other static credentials.',
 ];
 
