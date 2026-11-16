@@ -4,8 +4,9 @@ import { PAGE_CACHE_POLICIES } from '../../../../../src/utils/cache-control';
 import { timeSensitivePlugin } from './index';
 
 describe('timeSensitivePlugin', () => {
-  // External RSS posts + `dayjs()` now: a CMS purge cannot refresh these.
-  it.each(['/', '/log', '/log.md', '/log/rss.xml', '/.well-known/security.txt', '/%6Cog'])('applies the time-sensitive policy to %s', (pathname) => {
+  // External RSS posts, `dayjs()` now, and the proxied Cloudflare Access metadata: a CMS
+  // purge cannot refresh these.
+  it.each(['/', '/log', '/log.md', '/log/rss.xml', '/.well-known/security.txt', '/.well-known/oauth-authorization-server', '/%6Cog'])('applies the time-sensitive policy to %s', (pathname) => {
     expect(timeSensitivePlugin.run(pathname)._unsafeUnwrap()).toEqual({ kind: 'page', policy: PAGE_CACHE_POLICIES.timeSensitive });
   });
 

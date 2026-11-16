@@ -1,7 +1,8 @@
 // Candidate widths for the responsive srcset. Every image sits in the ≤1180px
 // content column, so the largest 2× candidate is 2048 (apps/web next.config
-// `images.deviceSizes`).
-export const IMAGE_WIDTHS = [640, 750, 828, 1080, 1200, 1920, 2048] as const;
+// `images.deviceSizes`). 256 / 384 serve the small slots — 40px work thumbnails and
+// gallery archive cells on phones — which would otherwise fetch the 640w candidate.
+export const IMAGE_WIDTHS = [256, 384, 640, 750, 828, 1080, 1200, 1920, 2048] as const;
 
 export const DEFAULT_IMAGE_QUALITY = 75;
 

@@ -88,3 +88,25 @@ const initialTime = formatClock();
     <CursorPresence />
   </body>
 </html>
+
+<script>
+  // WebMCP: expose read-only / navigation tools to in-browser agents
+  // (src/utils/webmcp; spec: WebMCP Draft CG Report, 13 November 2026). A bundled
+  // module script is deferred (off the critical path) and Astro runs it once per
+  // document — ClientRouter swaps never re-run it — so each tool registers exactly
+  // once; the tools read location at call time. Nothing ever aborts the signal: the
+  // registrations live as long as the document.
+  import { registerWebMCPTools, resolveModelContext } from '@utils/webmcp/register';
+  import { createWebMCPTools } from '@utils/webmcp/tools';
+
+  const modelContext = resolveModelContext(document, navigator);
+  if (modelContext !== undefined) {
+    const tools = createWebMCPTools({
+      fetch: async (input, init) => fetch(input, init),
+      navigate: (path) => location.assign(path),
+      getPathname: () => location.pathname,
+      origin: location.origin,
+    });
+    void registerWebMCPTools(modelContext, tools, new AbortController().signal);
+  }
+</script>

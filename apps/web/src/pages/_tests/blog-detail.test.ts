@@ -88,7 +88,7 @@ describe('/blog/[slug]', () => {
   it('sends the markdown twin as a Link alternate, plus llms.txt and the sitemap', async () => {
     const response = await render('a.b');
     expect(response.headers.get('link')).toBe(
-      '</blog/a.b.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
+      '</blog/a.b.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json", </.well-known/ard.json>; rel="ard"; type="application/ai-catalog+json", </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
     );
   });
 

@@ -58,6 +58,19 @@ describe('buildAICatalog', () => {
     expect(onlyEntry().data._meta).toEqual({ 'com.napochaan/authorization': { required: true, type: 'oauth2' } });
   });
 
+  it('gives the entry 2 to 5 representative queries so ARD registries can index it (Lighthouse ard-schema warns outside that range)', () => {
+    const queries = onlyEntry().representativeQueries;
+    expect(queries.length).toBeGreaterThanOrEqual(2);
+    expect(queries.length).toBeLessThanOrEqual(5);
+    for (const query of queries) {
+      expect(query.trim()).not.toBe('');
+    }
+  });
+
+  it('gives the server card the site icon (absolute URL, PNG, real pixel size)', () => {
+    expect(onlyEntry().data.icons).toEqual([{ src: 'https://napochaan.com/icon.png', mimeType: 'image/png', sizes: ['512x512'] }]);
+  });
+
   it('round-trips through JSON unchanged', () => {
     expect(JSON.parse(JSON.stringify(catalog))).toEqual(catalog);
   });

@@ -1,6 +1,6 @@
 import { wrap } from './band-scroll';
 import { startFrameLoop } from './frame-loop';
-import { createScrollVelocity } from './scroll-velocity';
+import { createScrollVelocity, type ScrollVelocity } from './scroll-velocity';
 
 // Framework-free core of the TypographyBand drift + grid snap, shared by the React
 // TypographyBand (./index.tsx) and the `<typography-band>` custom element
@@ -46,17 +46,54 @@ const setTranslate = (element: HTMLElement, x: number, y: number) => {
 // power2.out
 const easeOut = (progress: number) => 1 - (1 - progress) ** 2;
 
+// Runs `fn` just after the next frame has rendered (rAF → task), when layout is clean
+// and a layout read is free. Returns the cancel.
+const afterNextFrame = (fn: () => void): (() => void) => {
+  const handle: { raf: number; timer: ReturnType<typeof setTimeout> | undefined } = { raf: 0, timer: undefined };
+  handle.raf = requestAnimationFrame(() => {
+    handle.timer = setTimeout(fn, 0);
+  });
+
+  return () => {
+    cancelAnimationFrame(handle.raf);
+    clearTimeout(handle.timer);
+  };
+};
+
 // The scroll-velocity boost: ScrollTrigger.create({ onUpdate: (self) => boost =
 // self.getVelocity() * VELOCITY_SCALE }) without the plugin. `update` is what
 // ScrollTrigger.update() did (the old scrollTo tween called it on every render).
+//
+// Layout reads: reading scrollY flushes a pending layout, and the band binds while the
+// page's first layout is still pending. So the baseline is seeded just after the first
+// frame (or by an earlier scroll event), and the 250ms idle sample — which only keeps
+// the velocity baseline fresh — reuses the last position a scroll event (or a snap
+// write) read: with no scroll event since, the position cannot have changed. Only
+// scroll events and snap writes read scrollY.
 const bindBoost = () => {
-  const velocity = createScrollVelocity(window.scrollY, performance.now());
-  const state = { boost: 0, lastScrollEvent: Number.NEGATIVE_INFINITY };
+  const state: { boost: number; lastScrollEvent: number; scroll: number; velocity: ScrollVelocity | undefined } = {
+    boost: 0,
+    lastScrollEvent: Number.NEGATIVE_INFINITY,
+    scroll: 0,
+    velocity: undefined,
+  };
 
-  const update = () => {
-    const value = velocity.sample(window.scrollY, performance.now());
+  const sampleAt = (scroll: number) => {
+    state.scroll = scroll;
+    const now = performance.now();
+    if (state.velocity === undefined) {
+      state.velocity = createScrollVelocity(scroll, now);
+      return;
+    }
+    const value = state.velocity.sample(scroll, now);
     if (value === undefined) return;
     state.boost = value * VELOCITY_SCALE;
+  };
+
+  const update = () => sampleAt(window.scrollY);
+
+  const seed = () => {
+    if (state.velocity === undefined) update();
   };
 
   const onScroll = () => {
@@ -65,20 +102,42 @@ const bindBoost = () => {
   };
 
   const onIdle = () => {
+    if (state.velocity === undefined) return;
     if (performance.now() - state.lastScrollEvent <= IDLE_AFTER_MS) return;
-    update();
+    sampleAt(state.scroll);
   };
 
   window.addEventListener('scroll', onScroll, { passive: true });
   const interval = setInterval(onIdle, IDLE_SYNC_MS);
+  const cancelSeed = afterNextFrame(seed);
 
   return {
     state,
     update,
     dispose: () => {
+      cancelSeed();
       window.removeEventListener('scroll', onScroll);
       clearInterval(interval);
     },
+  };
+};
+
+type Halves = { top: number | undefined; left: number | undefined };
+
+// The halves of the duplicated tracks, measured from a ResizeObserver: its callback
+// runs right after a layout, so scrollWidth / scrollHeight there are free (on the first
+// frame they forced a layout), and a later size change — the Typekit face swapping in
+// — re-measures. Returns the unobserve.
+const observeHalves = (tracks: BandTracks, halves: Halves): (() => void) => {
+  const observer = new ResizeObserver(() => {
+    halves.top = tracks.top.scrollWidth / 2;
+    halves.left = tracks.left.scrollHeight / 2;
+  });
+  observer.observe(tracks.top);
+  observer.observe(tracks.left);
+
+  return () => {
+    observer.disconnect();
   };
 };
 
@@ -87,16 +146,16 @@ type Boost = ReturnType<typeof bindBoost>;
 // The drift: pos accumulates a constant drift plus a decaying scroll-velocity boost.
 // We write the transform + wrap each frame (instant) so the duplicated track loops
 // seamlessly — no smoothing across the wrap boundary, so the text never scrolls out
-// and shows a blank gap before looping. The halves are measured on the first frame.
+// and shows a blank gap before looping. The tracks hold still until the halves are
+// measured (the first observation lands before the first frame paints).
 const bindDrift = (tracks: BandTracks, boost: Boost['state']) => {
   const pos = { top: 0, bottom: 0, left: 0, right: 0 };
-  const size: { top: number | undefined; left: number | undefined } = { top: undefined, left: undefined };
+  const halves: Halves = { top: undefined, left: undefined };
+  const unobserve = observeHalves(tracks, halves);
 
   const tick = (deltaMs: number) => {
-    const topHalf = size.top ?? tracks.top.scrollWidth / 2;
-    const leftHalf = size.left ?? tracks.left.scrollHeight / 2;
-    size.top = topHalf;
-    size.left = leftHalf;
+    const { top: topHalf, left: leftHalf } = halves;
+    if (topHalf === undefined || leftHalf === undefined) return;
     const step = (BASE_DRIFT + boost.boost) * (deltaMs / FRAME_MS);
     boost.boost *= VEL_DECAY;
     // Clockwise rotation around the frame: top ← / right ↑ / bottom → / left ↓
@@ -110,7 +169,12 @@ const bindDrift = (tracks: BandTracks, boost: Boost['state']) => {
     setTranslate(tracks.right, 0, pos.right);
   };
 
-  return startFrameLoop(tick);
+  const stopLoop = startFrameLoop(tick);
+
+  return () => {
+    stopLoop();
+    unobserve();
+  };
 };
 
 // gsap.to(window, { duration: 0.3, ease: 'power2.out', scrollTo: target }) — ScrollToPlugin

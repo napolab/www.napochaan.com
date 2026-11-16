@@ -43,6 +43,15 @@ describe('resolveCacheControl', () => {
     ['/robots.txt', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
     ['/.well-known/security.txt', { kind: 'page', policy: PAGE_CACHE_POLICIES.timeSensitive }],
     ['/.well-known/ai-catalog.json', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
+    ['/.well-known/ard.json', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
+    ['/.well-known/mcp/server-card.json', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
+    ['/.well-known/api-catalog', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
+    ['/.well-known/oauth-protected-resource', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
+    ['/.well-known/oauth-authorization-server', { kind: 'page', policy: PAGE_CACHE_POLICIES.timeSensitive }],
+    ['/.well-known/agent-skills/index.json', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
+    ['/.well-known/agent-skills/read-napochaan-com/SKILL.md', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
+    ['/.well-known/poppy.json', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
+    ['/auth.md', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
   ])('%s → %o', (path, expected) => {
     expect(resolveCacheControl(path)).toEqual(expected);
   });

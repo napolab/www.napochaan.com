@@ -48,7 +48,7 @@ export const EchoText = ({ children, size = 'hero' }: Props) => {
         {children}
       </span>
       <span aria-hidden className={styles.fill}>
-        <span ref={fillRef} data-scramble>
+        <span ref={fillRef} data-scramble className={styles.scramble}>
           {children}
         </span>
         <span className={styles.red}>.</span>

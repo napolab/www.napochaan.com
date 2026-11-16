@@ -17,7 +17,7 @@ type Props = {
 const { text, size = 'hero' } = Astro.props;
 ---
 
-<echo-text class={styles.element}><span data-size={size} class={styles.root} role="img" aria-label={text}><span aria-hidden="true" data-size={size} class={styles.echoOut}>{text}</span><span aria-hidden="true" data-size={size} class={styles.echoBlue}>{text}</span><span aria-hidden="true" class={styles.fill}><span data-scramble="true">{text}</span><span class={styles.red}>.</span></span></span></echo-text><script>
+<echo-text class={styles.element}><span data-size={size} class={styles.root} role="img" aria-label={text}><span aria-hidden="true" data-size={size} class={styles.echoOut}>{text}</span><span aria-hidden="true" data-size={size} class={styles.echoBlue}>{text}</span><span aria-hidden="true" class={styles.fill}><span data-scramble="true" class={styles.scramble}>{text}</span><span class={styles.red}>.</span></span></span></echo-text><script>
   import { defineEchoTextElement } from './element';
 
   defineEchoTextElement();

@@ -1,5 +1,9 @@
 import { OG_IMAGE_ROUTE_SUFFIX } from '../../../../src/utils/og/og-image-route';
 import { resolveCacheControl } from '../../../middleware/cache-control';
+import { orDecoded } from '../../../middleware/cache-control/predicates';
+import { isWithinPath } from '../../path-predicate';
+
+import type { Predicate } from '../../predicate';
 
 type NegotiableRequest = { method: string; pathname: string };
 
@@ -15,9 +19,15 @@ const OG_IMAGE_SEGMENTS: readonly string[] = Object.values(OG_IMAGE_ROUTE_SUFFIX
 
 const isOGImagePath = (pathname: string): boolean => OG_IMAGE_SEGMENTS.includes(pathname.split('/').at(-1) ?? '');
 
+// `/.well-known/*` holds machine-readable discovery documents (RFC 8615), some of them
+// extension-less (`api-catalog`, `oauth-protected-resource`, …). None has a Markdown twin,
+// and varying them on Accept would only split their cache entries.
+const isWellKnownPath: Predicate<string> = orDecoded(isWithinPath('/.well-known'));
+
 // Only `page`-kind paths (cacheable HTML pages): drafts / api / internals are left alone.
 const isPagePath = (pathname: string): boolean => resolveCacheControl(pathname).kind === 'page';
 
 // Shared by the Astro handler (which representation to render) and the `varyAccept`
 // middleware (which responses vary on Accept), so the two can never drift.
-export const isNegotiablePath = ({ method, pathname }: NegotiableRequest): boolean => isReadMethod(method) && !hasExtension(pathname) && !isOGImagePath(pathname) && isPagePath(pathname);
+export const isNegotiablePath = ({ method, pathname }: NegotiableRequest): boolean =>
+  isReadMethod(method) && !hasExtension(pathname) && !isOGImagePath(pathname) && !isWellKnownPath(pathname) && isPagePath(pathname);

@@ -20,6 +20,37 @@ export default defineConfig({
       link: ['*'],
     },
   },
+  utilities: {
+    extend: {
+      // `belowFold: '<height>'` — a below-the-fold block (home sections after the about
+      // block, the site footer): the browser skips its style / layout / paint until it
+      // nears the viewport, so the page's first full layout — which landed inside the
+      // TBT window — only lays out the first screen. The value is the block's measured
+      // height, reserved while skipped; `auto` swaps in the real size once it has
+      // rendered, so the scrollbar and #anchor jumps stay close and settle after the
+      // first pass. Responsive like any property ({ base, desktop }).
+      // content-visibility also applies paint containment: descendants are clipped at the
+      // block's padding box, which would cut the focus ring (focusRing: 3px offset + 2px)
+      // of a link flush with the edge. Inline axis: an 8px padding cancelled by an 8px
+      // negative margin moves the clip edge out without moving the content (works in
+      // every engine; the blocks have no inline padding / margin of their own). Block
+      // axis: overflow-clip-margin extends the clip in Chromium / Firefox (WebKit ignores
+      // it — a block whose first / last focusable sits within 5px of its top / bottom
+      // also needs a block inset; see the home log / gallery sections). Never put this on
+      // a block whose decoration overflows further (EchoText echoes, a bleed).
+      belowFold: {
+        className: 'below-fold',
+        values: { type: 'string' },
+        transform: (value: string) => ({
+          contentVisibility: 'auto',
+          containIntrinsicBlockSize: `auto ${value}`,
+          overflowClipMargin: '8px',
+          paddingInline: '8px',
+          marginInline: '-8px',
+        }),
+      },
+    },
+  },
   theme: {
     breakpoints,
     extend: {

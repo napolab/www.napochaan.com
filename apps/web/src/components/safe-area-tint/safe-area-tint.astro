@@ -7,7 +7,7 @@
 import * as styles from './styles.css';
 ---
 
-<div class={styles.root} aria-hidden="true" data-testid="safe-area-tint" transition:persist="safe-area-tint">
+<div class={styles.root} aria-hidden="true" data-testid="safe-area-tint" data-scroll-range-host transition:persist="safe-area-tint">
   <div class={styles.strip} data-testid="safe-area-tint-strip"></div>
   <div class={styles.bottomClip}><div class={styles.stripBottom} data-testid="safe-area-tint-strip-bottom"></div></div>
   <scroll-range-sync></scroll-range-sync>

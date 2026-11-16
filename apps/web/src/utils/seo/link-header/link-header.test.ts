@@ -6,10 +6,10 @@ import { resolveSectionMetadata } from '@utils/seo/resolve-section-metadata';
 import { buildLinkHeader } from './index';
 
 const SITE_LINKS =
-  '</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"';
+  '</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json", </.well-known/ard.json>; rel="ard"; type="application/ai-catalog+json", </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"';
 
 describe('buildLinkHeader', () => {
-  it('points a page without alternates (home) at llms.txt, the sitemap and the AI Catalog only', () => {
+  it('points a page without alternates (home) at llms.txt, the sitemap, the ARD manifest and the API Catalog only', () => {
     expect(buildLinkHeader({ alternates: { canonical: '/' } })).toBe(SITE_LINKS);
     expect(buildLinkHeader({})).toBe(SITE_LINKS);
   });

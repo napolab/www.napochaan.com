@@ -36,6 +36,15 @@ describe('isNegotiablePath', () => {
     expect(isNegotiablePath({ method: 'GET', pathname: `/${section}/hello/opengraph-image-${suffix}` })).toBe(false);
   });
 
+  // Extension-less discovery documents (RFC 9727 / 9728 / 8414) are JSON, never pages with
+  // a Markdown twin: no wasted twin render, no `Vary: Accept` splitting their cache.
+  it.each(['/.well-known/api-catalog', '/.well-known/oauth-protected-resource', '/.well-known/oauth-authorization-server', '/.%77ell-known/api-catalog'])(
+    'leaves the discovery document %s alone',
+    (pathname) => {
+      expect(isNegotiablePath({ method: 'GET', pathname })).toBe(false);
+    },
+  );
+
   it('still negotiates a slug that merely starts like an OG route', () => {
     expect(isNegotiablePath({ method: 'GET', pathname: '/blog/opengraph-image-notes' })).toBe(true);
   });

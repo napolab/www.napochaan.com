@@ -45,6 +45,36 @@ describe('EchoText', () => {
     expect(container.querySelector('[data-size="compact"]')).not.toBeNull();
   });
 
+  // The decode pins the box width, which needs a block-ish box. If the span were inline
+  // at rest, switching it to inline-block mid-decode would create a new, larger LCP
+  // candidate seconds after first paint. So it is inline-block from the server markup
+  // and the decode never touches `display`.
+  it('renders the scramble span as inline-block before any decode runs', async () => {
+    const { container } = await render(<EchoText>napochaan</EchoText>);
+    const scramble = container.querySelector('[data-scramble]');
+    if (!(scramble instanceof HTMLElement)) throw new Error('scramble span not found');
+
+    // Browser tests load no Panda stylesheet, so assert the atomic class itself.
+    expect(scramble.className.split(' ')).toContain('d_inline-block');
+    expect(scramble.style.display).toBe('');
+  });
+
+  it('never writes an inline display while decoding', async () => {
+    const target = makeBootTarget();
+    const { container } = await render(
+      <BootStatusProvider target={target}>
+        <EchoText>napochaan</EchoText>
+      </BootStatusProvider>,
+    );
+    const scramble = container.querySelector('[data-scramble]');
+    if (!(scramble instanceof HTMLElement)) throw new Error('scramble span not found');
+
+    target.classList.remove('boot');
+
+    await expect.poll(() => scramble.style.width, { timeout: 3000 }).toMatch(/px$/);
+    expect(scramble.style.display).toBe('');
+  });
+
   it('locks the scramble box width during decode and releases it afterwards', async () => {
     // The scramble glyphs vary in advance width, so without a locked box every
     // refresh would push the trailing red dot (and the centered line) around —

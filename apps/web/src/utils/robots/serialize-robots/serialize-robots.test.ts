@@ -3,22 +3,64 @@ import { describe, expect, it } from 'vitest';
 import { buildRobots } from '../build-robots';
 import { serializeRobots } from './index';
 
-// Expected strings are Next's `resolveRobots` (next/dist/build/webpack/loaders/metadata/
-// resolve-route-data.js) applied to the same buildRobots output.
+const PRIVATE_PATH_LINES = [
+  'Disallow: /admin',
+  'Disallow: /api',
+  'Disallow: /next/',
+  'Disallow: /news/preview/',
+  'Disallow: /blog/preview/',
+  'Disallow: /works/preview/',
+  'Disallow: /gallery/preview',
+  'Disallow: /log/preview',
+];
+
+const allowedGroup = (userAgent: string): string[] => [`User-Agent: ${userAgent}`, 'Content-Signal: search=yes,ai-train=no,use=reference', 'Allow: /', ...PRIVATE_PATH_LINES, ''];
+
+const TRAINING_CRAWLERS = [
+  'Amazonbot',
+  'Applebot-Extended',
+  'Bytespider',
+  'CCBot',
+  'ClaudeBot',
+  'Diffbot',
+  'Google-Extended',
+  'GPTBot',
+  'omgili',
+  'anthropic-ai',
+  'Claude-Web',
+  'cohere-ai',
+  'MistralAI-Training',
+  'meta-externalagent',
+  'GoogleOther',
+  'Baiduspider',
+  'PetalBot',
+  'AwarioSmartBot',
+  'AwarioRssBot',
+  'Google-CloudVertexBot',
+  'QualifiedBot',
+  'Cotoyogi',
+  'ICC-Crawler',
+  'atlassian-bot',
+  'FishBot',
+  'BorderxBot',
+  'NavuBot',
+  'SemrushBot-SWA',
+  'WARDBot',
+  'magpie-crawler',
+  'KimiBot',
+  'CitibotSiteCrawler',
+];
+
 describe('serializeRobots', () => {
-  it('serializes the production rules and sitemap like Next', () => {
+  it('serializes the production groups (site, AI search, AI training) and the sitemap', () => {
     expect(serializeRobots(buildRobots({ baseUrl: 'https://napochaan.com', isProduction: true }))).toBe(
       [
-        'User-Agent: *',
-        'Allow: /',
-        'Disallow: /admin',
-        'Disallow: /api',
-        'Disallow: /next/',
-        'Disallow: /news/preview/',
-        'Disallow: /blog/preview/',
-        'Disallow: /works/preview/',
-        'Disallow: /gallery/preview',
-        'Disallow: /log/preview',
+        ...allowedGroup('*'),
+        ...allowedGroup('OAI-SearchBot'),
+        ...allowedGroup('Claude-SearchBot'),
+        ...allowedGroup('PerplexityBot'),
+        ...TRAINING_CRAWLERS.map((agent) => `User-Agent: ${agent}`),
+        'Disallow: /',
         '',
         'Sitemap: https://napochaan.com/sitemap.xml',
         '',
@@ -39,5 +81,13 @@ describe('serializeRobots', () => {
         ],
       }),
     ).toBe('User-Agent: a\nDisallow: /x\n\nUser-Agent: *\nAllow: /y\nAllow: /z\n\n');
+  });
+
+  it('writes one User-Agent line per agent when a group lists several', () => {
+    expect(serializeRobots({ rules: { userAgent: ['a', 'b'], disallow: '/' } })).toBe('User-Agent: a\nUser-Agent: b\nDisallow: /\n\n');
+  });
+
+  it('puts Content-Signal right after the User-Agent lines, before Allow / Disallow', () => {
+    expect(serializeRobots({ rules: { userAgent: '*', contentSignal: 'search=yes', allow: '/', disallow: '/x' } })).toBe('User-Agent: *\nContent-Signal: search=yes\nAllow: /\nDisallow: /x\n\n');
   });
 });

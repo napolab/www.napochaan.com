@@ -13,6 +13,28 @@ const VELOCITY_SCALE = 0.04;
 
 const scroll = { y: 0 };
 const writes: { y: number; time: number }[] = [];
+// When (fake clock) bindBand read window.scrollY — each read can force a layout.
+const scrollReads: number[] = [];
+
+// Resolves once the tracks' halves are measured: the band sizes them from a
+// ResizeObserver it creates at bind, and observers are notified in creation order, so
+// by the time this one fires the band's has too. ResizeObserver runs on the real
+// rendering loop, untouched by the fake clock. It resolves from a fresh (real) task so
+// the test body never runs inside the observer delivery loop.
+const measured = (tracks: BandTracks) =>
+  new Promise<void>((resolve) => {
+    const observer = new ResizeObserver(() => {
+      observer.disconnect();
+      const channel = new MessageChannel();
+      channel.port1.onmessage = () => {
+        channel.port1.close();
+        resolve();
+      };
+      channel.port2.postMessage(null);
+    });
+    observer.observe(tracks.top);
+    observer.observe(tracks.left);
+  });
 
 // Tracks whose duplicated halves measure `half` px (scrollWidth / scrollHeight = 2·half).
 const mountTracks = (half: number): BandTracks => {
@@ -61,7 +83,11 @@ beforeEach(() => {
   });
   scroll.y = 0;
   writes.length = 0;
-  vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => scroll.y);
+  scrollReads.length = 0;
+  vi.spyOn(window, 'scrollY', 'get').mockImplementation(() => {
+    scrollReads.push(performance.now());
+    return scroll.y;
+  });
   vi.spyOn(window, 'scrollX', 'get').mockImplementation(() => 0);
   vi.spyOn(window, 'scrollTo').mockImplementation((_x: number, y: number) => {
     writes.push({ y, time: performance.now() });
@@ -75,10 +101,59 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
-describe('bindBand drift', () => {
-  it('advances the tracks clockwise by the base drift per 60fps frame, as gsap.set did', () => {
+describe('bindBand layout reads', () => {
+  // The band binds on every page while the document's first layout is still pending;
+  // a synchronous scrollY / scrollWidth read there forced that layout inside the bind.
+  it('reads neither the scroll position nor the track sizes synchronously at bind', () => {
+    const tracks = mountTracks(1000);
+    const scrollWidth = vi.spyOn(Element.prototype, 'scrollWidth', 'get');
+    const scrollHeight = vi.spyOn(Element.prototype, 'scrollHeight', 'get');
+
+    const dispose = bindBand(tracks);
+
+    expect(scrollReads).toEqual([]);
+    expect(scrollWidth).not.toHaveBeenCalled();
+    expect(scrollHeight).not.toHaveBeenCalled();
+    dispose();
+  });
+
+  it('holds the tracks still until their halves are measured', () => {
     const tracks = mountTracks(1000);
     const dispose = bindBand(tracks);
+
+    vi.advanceTimersByTime(100);
+
+    expect(tracks.top.style.transform).toBe('');
+    dispose();
+  });
+
+  it('seeds the scroll baseline once, after the first frame', () => {
+    const dispose = bindBand(mountTracks(1000));
+
+    vi.advanceTimersToNextFrame();
+    vi.advanceTimersByTime(1);
+    expect(scrollReads).toHaveLength(1);
+    dispose();
+  });
+
+  // ScrollTrigger's idle sync re-sampled scrollY every 250ms forever (one 25ms forced
+  // layout was traced to it). With no scroll event since, the position cannot have
+  // changed, so the idle sample reuses the last known one.
+  it('never reads scrollY on idle samples while nothing scrolls', () => {
+    const dispose = bindBand(mountTracks(1000));
+
+    vi.advanceTimersByTime(3000);
+
+    expect(scrollReads).toHaveLength(1); // the post-first-frame seed only
+    dispose();
+  });
+});
+
+describe('bindBand drift', () => {
+  it('advances the tracks clockwise by the base drift per 60fps frame, as gsap.set did', async () => {
+    const tracks = mountTracks(1000);
+    const dispose = bindBand(tracks);
+    await measured(tracks);
 
     vi.advanceTimersByTime(1000);
     const drift = BASE_DRIFT * (1000 / FRAME_MS); // ≈ 21px
@@ -93,9 +168,10 @@ describe('bindBand drift', () => {
     dispose();
   });
 
-  it('writes 2D translate() with px units rounded like gsap (4 decimals)', () => {
+  it('writes 2D translate() with px units rounded like gsap (4 decimals)', async () => {
     const tracks = mountTracks(1000);
     const dispose = bindBand(tracks);
+    await measured(tracks);
 
     vi.advanceTimersByTime(100);
 
@@ -104,9 +180,10 @@ describe('bindBand drift', () => {
     dispose();
   });
 
-  it('wraps seamlessly at half the duplicated track', () => {
+  it('wraps seamlessly at half the duplicated track', async () => {
     const tracks = mountTracks(100);
     const dispose = bindBand(tracks);
+    await measured(tracks);
 
     vi.advanceTimersByTime(6000);
     const drift = BASE_DRIFT * (6000 / FRAME_MS); // ≈ 126px → one wrap
@@ -132,14 +209,16 @@ describe('bindBand velocity boost', () => {
     return unwrap(before - translate(tracks.top).x);
   };
 
-  it('scales a downward scroll velocity (px/s) into a forward boost', () => {
+  it('scales a downward scroll velocity (px/s) into a forward boost', async () => {
     const tracks = mountTracks(HALF);
-    const start = performance.now();
     const dispose = bindBand(tracks);
+    await measured(tracks);
     for (const _ of [0, 1, 2, 3, 4, 5]) vi.advanceTimersToNextFrame();
+    // The baseline is the position seeded after the first frame.
+    const [seededAt = 0] = scrollReads;
 
     scrollTo(100);
-    const velocity = (100 / (performance.now() - start)) * 1000;
+    const velocity = (100 / (performance.now() - seededAt)) * 1000;
     const boost = velocity * VELOCITY_SCALE;
 
     expect(topStep(tracks)).toBeCloseTo((BASE_DRIFT + boost) * (16 / FRAME_MS), 3);
@@ -148,10 +227,11 @@ describe('bindBand velocity boost', () => {
     dispose();
   });
 
-  it('reverses the drift while scrolling up', () => {
+  it('reverses the drift while scrolling up', async () => {
     scroll.y = 1000;
     const tracks = mountTracks(HALF);
     const dispose = bindBand(tracks);
+    await measured(tracks);
     for (const _ of [0, 1, 2, 3, 4, 5]) vi.advanceTimersToNextFrame();
 
     scrollTo(900);
@@ -160,9 +240,10 @@ describe('bindBand velocity boost', () => {
     dispose();
   });
 
-  it('ignores a scroll event that did not change the position', () => {
+  it('ignores a scroll event that did not change the position', async () => {
     const tracks = mountTracks(HALF);
     const dispose = bindBand(tracks);
+    await measured(tracks);
     for (const _ of [0, 1, 2, 3, 4, 5]) vi.advanceTimersToNextFrame();
 
     scrollTo(0);
@@ -173,9 +254,10 @@ describe('bindBand velocity boost', () => {
 
   // ScrollTrigger re-samples the idle position every 250ms (its _sync interval), so the
   // first scroll after a long rest is measured over the last ~250ms, not since bind.
-  it('measures the first scroll after a rest against a recent idle sample', () => {
+  it('measures the first scroll after a rest against a recent idle sample', async () => {
     const tracks = mountTracks(HALF);
     const dispose = bindBand(tracks);
+    await measured(tracks);
     vi.advanceTimersByTime(2000);
 
     scrollTo(60);

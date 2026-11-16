@@ -41,7 +41,7 @@ describe('/blog', () => {
     findBlogList.mockResolvedValue(blogFeed);
     const response = await renderPage(BlogIndexPage, '/blog');
     expect(response.headers.get('link')).toBe(
-      '</blog/rss.xml>; rel="alternate"; type="application/rss+xml", </blog.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
+      '</blog/rss.xml>; rel="alternate"; type="application/rss+xml", </blog.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json", </.well-known/ard.json>; rel="ard"; type="application/ai-catalog+json", </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
     );
   });
 

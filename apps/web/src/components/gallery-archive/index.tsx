@@ -2,7 +2,7 @@ import { Lightbox } from '@components/gallery/lightbox';
 import { Image } from '@components/image';
 import { formatBlurURL } from '@components/image/helper';
 
-import { ARCHIVE_BLUR_OPTIONS, ARCHIVE_IMAGE_SIZES, galleryArchiveLayout } from './archive-layout';
+import { ARCHIVE_BLUR_OPTIONS, galleryArchiveLayout } from './archive-layout';
 import { BlankCell } from './blank-cell';
 import * as styles from './styles.css';
 
@@ -29,10 +29,10 @@ export const GalleryArchive = ({ photos }: Props) => {
 
   return (
     <ul className={styles.root} data-gallery style={rootStyle}>
-      {cells.map(({ photo, style }) => (
+      {cells.map(({ photo, style, sizes }) => (
         <li key={photo.id} className={styles.cell} data-photo style={style}>
           <Lightbox src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} triggerClassName={styles.trigger}>
-            <Image src={photo.src} alt={photo.alt} fill sizes={ARCHIVE_IMAGE_SIZES} className={styles.image} placeholder="blur" blurDataURL={formatBlurURL(photo.src, ARCHIVE_BLUR_OPTIONS)} />
+            <Image src={photo.src} alt={photo.alt} fill sizes={sizes} className={styles.image} placeholder="blur" blurDataURL={formatBlurURL(photo.src, ARCHIVE_BLUR_OPTIONS)} />
           </Lightbox>
           {photo.caption !== undefined ? <span className={styles.caption}>{photo.caption}</span> : null}
         </li>
