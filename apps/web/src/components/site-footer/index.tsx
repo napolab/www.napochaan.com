@@ -20,6 +20,10 @@ export const SiteFooter = ({ buildId }: Props) => {
             <ScrambleText>colophon</ScrambleText>
           </Link>{' '}
           ·{' '}
+          <Link href="/privacy" tone="muted">
+            <ScrambleText>privacy</ScrambleText>
+          </Link>{' '}
+          ·{' '}
           <a className={styles.sitemap} href="/sitemap.xml">
             <ScrambleText>sitemap</ScrambleText>
           </a>

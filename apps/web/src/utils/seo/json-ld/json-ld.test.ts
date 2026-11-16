@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 
-import { directContacts } from '../../../features/contact/contacts';
 import { homeAbout } from '../../../features/home/about-sample';
 
 import { buildJSONLD, serializeJSONLD } from './index';
@@ -32,11 +31,11 @@ describe('buildJSONLD — home', () => {
     expect(person).toMatchObject({ description: `${homeAbout.now}。${homeAbout.likes}` });
   });
 
-  it('takes sameAs from the http(s) direct contacts (no mailto)', () => {
+  it('lists the owner profiles as sameAs, independent of the /contact direct list', () => {
     const person = '@graph' in graph ? graph['@graph'][1] : undefined;
-    const expected = directContacts.map((contact) => contact.href).filter((href) => href.startsWith('https://'));
-    expect(person).toMatchObject({ sameAs: expected });
-    expect(expected.length).toBeGreaterThan(0);
+    expect(person).toMatchObject({
+      sameAs: ['https://x.com/naporin24690', 'https://github.com/naporin0624', 'https://zenn.dev/naporin24690', 'https://booth2booth.com'],
+    });
     expect(JSON.stringify(graph)).not.toContain('mailto:');
   });
 });

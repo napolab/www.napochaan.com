@@ -19,6 +19,11 @@ describe('SiteFooter', () => {
     await expect.element(page.getByRole('link', { name: 'colophon' })).toHaveAttribute('href', '/colophon');
   });
 
+  it('links to the privacy policy', async () => {
+    await render(<SiteFooter />);
+    await expect.element(page.getByRole('link', { name: 'privacy' })).toHaveAttribute('href', '/privacy');
+  });
+
   it('links to the sitemap.xml resource', async () => {
     await render(<SiteFooter />);
     // Plain anchor (full navigation) — sitemap.xml is an XML metadata route, not a

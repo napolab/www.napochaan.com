@@ -7,6 +7,7 @@ describe('resolveMarkdownTwinPath', () => {
     ['/', '/llms.txt'],
     ['//', '/llms.txt'],
     ['/about', '/about.md'],
+    ['/privacy', '/privacy.md'],
     ['/about/', '/about.md'],
     ['/blog/hello-world', '/blog/hello-world.md'],
     ['/blog/hello-world/', '/blog/hello-world.md'],

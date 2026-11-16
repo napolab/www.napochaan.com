@@ -16,8 +16,8 @@ describe('site-footer.astro', () => {
   it('hydrates nothing: FooterNav is static and every label is a <scramble-text> element', async () => {
     const html = await renderComponent(Twin);
     expect(html).not.toContain('<astro-island');
-    // One per nav item plus the colophon / sitemap labels.
-    expect(scrambleTextCountOf(html)).toBe(siteNavItems.length + 2);
+    // One per nav item plus the colophon / privacy / sitemap labels.
+    expect(scrambleTextCountOf(html)).toBe(siteNavItems.length + 3);
   });
 
   it('is not persisted (it re-renders with each page)', async () => {

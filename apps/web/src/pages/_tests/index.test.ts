@@ -76,7 +76,9 @@ describe('/ (home)', () => {
   });
   it('sends Link headers pointing agents at llms.txt (describedby) and the sitemap', async () => {
     const response = await renderPage(HomePage, '/');
-    expect(response.headers.get('link')).toBe('</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"');
+    expect(response.headers.get('link')).toBe(
+      '</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
+    );
   });
 
   it('gives the home page the default OG card image (is-agentic flags a missing og:image)', async () => {
@@ -91,7 +93,7 @@ describe('/ (home)', () => {
       '@context': 'https://schema.org',
       '@graph': [
         { '@type': 'WebSite', url: 'http://localhost:8788', name: 'napochaan', description: 'DJ・VJ・グラフィック・デジタル制作。napochaan の個人サイト。' },
-        { '@type': 'Person', name: 'napochaan', sameAs: ['https://x.com/naporin24690', 'https://github.com/naporin0624'] },
+        { '@type': 'Person', name: 'napochaan', sameAs: ['https://x.com/naporin24690', 'https://github.com/naporin0624', 'https://zenn.dev/naporin24690', 'https://booth2booth.com'] },
       ],
     });
   });

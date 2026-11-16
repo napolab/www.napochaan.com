@@ -20,6 +20,6 @@ const pathname = Astro.url.pathname;
   <FooterNav />
   <div class={styles.meta}>
     <span>© 2026 napochaan — graphic / digital</span>
-    <span class={styles.status}>build {buildId ?? 'dev'} · <span class={styles.live}>life: running</span> · <Link href="/colophon" tone="muted"><ScrambleText text="colophon" /></Link> · <a class={styles.sitemap} href="/sitemap.xml"><ScrambleText text="sitemap" /></a></span>
+    <span class={styles.status}>build {buildId ?? 'dev'} · <span class={styles.live}>life: running</span> · <Link href="/colophon" tone="muted"><ScrambleText text="colophon" /></Link> · <Link href="/privacy" tone="muted"><ScrambleText text="privacy" /></Link> · <a class={styles.sitemap} href="/sitemap.xml"><ScrambleText text="sitemap" /></a></span>
   </div>
 </footer>

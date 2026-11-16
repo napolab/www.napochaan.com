@@ -116,11 +116,11 @@ describe('site-layout.astro', () => {
     }
   });
 
-  // The SysBar and footer labels (both navs + colophon / sitemap) ship as the
+  // The SysBar and footer labels (both navs + colophon / privacy / sitemap) ship as the
   // framework-free <scramble-text> element; its registration script is bundled once,
   // however many render.
   it('renders the SysBar and footer ScrambleText labels as <scramble-text> with one element script', () => {
-    expect(count(state.html, '<scramble-text ')).toBe(2 * siteNavItems.length + 2);
+    expect(count(state.html, '<scramble-text ')).toBe(2 * siteNavItems.length + 3);
     expect(count(state.html, 'scramble-text.astro?astro&type=script')).toBe(1);
   });
 

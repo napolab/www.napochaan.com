@@ -5,7 +5,7 @@ import { OG_IMAGE_ROUTE_SUFFIX } from '../../../../src/utils/og/og-image-route';
 import { isNegotiablePath } from './index';
 
 describe('isNegotiablePath', () => {
-  it.each(['/', '/about', '/about/', '/blog', '/blog/hello', '/blog/page/2', '/gallery', '/contact', '/log', '/colophon'])('negotiates GET %s', (pathname) => {
+  it.each(['/', '/about', '/about/', '/blog', '/blog/hello', '/blog/page/2', '/gallery', '/contact', '/log', '/colophon', '/privacy'])('negotiates GET %s', (pathname) => {
     expect(isNegotiablePath({ method: 'GET', pathname })).toBe(true);
   });
 

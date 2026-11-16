@@ -1,3 +1,5 @@
+import { privacy } from '../../../features/privacy/content';
+
 import type { Profile } from '../../../features/about/profile';
 import type { Post } from '../../../features/blog/post';
 import type { NewsItem } from '../../../features/news/news-item';
@@ -31,7 +33,7 @@ const bulletLink = (title: string, url: string, note?: string): string => {
 const aboutSection = (baseUrl: string, profile?: Profile): string => {
   const note = profile === undefined ? undefined : `${profile.now} / ${profile.team}`;
 
-  return ['## About', bulletLink('about napochaan', `${baseUrl}/about`, note)].join('\n');
+  return ['## About', bulletLink('about napochaan', `${baseUrl}/about`, note), bulletLink('privacy policy', `${baseUrl}/privacy`, privacy.description)].join('\n');
 };
 
 const linkSection = (heading: string, lines: readonly string[]): string => [`## ${heading}`, ...lines].join('\n');

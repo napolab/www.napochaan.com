@@ -1,5 +1,5 @@
-import { directContacts } from '../../../features/contact/contacts';
 import { homeAbout } from '../../../features/home/about-sample';
+import { profileLinks } from '../../../features/home/profile-links';
 
 // schema.org JSON-LD for the pages that describe an entity: the home page (WebSite +
 // the site owner Person) and the detail pages (BlogPosting / CreativeWork). Pages pass
@@ -39,7 +39,7 @@ type PersonNode = PersonRef & {
   jobTitle: string;
   knowsAbout: readonly string[];
   image: string;
-  sameAs: string[];
+  sameAs: readonly string[];
 };
 
 type HomeGraph = { '@context': string; '@graph': [WebSiteNode, PersonNode] };
@@ -73,9 +73,6 @@ export type JSONLD = HomeGraph | BlogPostingNode | CreativeWorkNode;
 
 const personID = (origin: string): string => `${origin}/#person`;
 
-// Profile URLs only: the mailto contact is not an identity page.
-const sameAs = (): string[] => directContacts.map((contact) => contact.href).filter((href) => href.startsWith('https://'));
-
 const author = (origin: string): PersonRef => ({ '@type': 'Person', name: SITE_NAME, url: origin });
 
 const buildHome = (page: StructuredDataPage): HomeGraph => ({
@@ -97,7 +94,7 @@ const buildHome = (page: StructuredDataPage): HomeGraph => ({
       jobTitle: homeAbout.now,
       knowsAbout: homeAbout.skills,
       image: `${page.origin}/icon.png`,
-      sameAs: sameAs(),
+      sameAs: profileLinks,
     },
   ],
 });

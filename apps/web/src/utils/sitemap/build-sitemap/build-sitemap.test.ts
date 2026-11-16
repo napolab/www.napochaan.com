@@ -34,6 +34,7 @@ describe('buildSitemap', () => {
     expect(urls).toContain(`${baseUrl}/gallery`);
     expect(urls).toContain(`${baseUrl}/contact`);
     expect(urls).toContain(`${baseUrl}/colophon`);
+    expect(urls).toContain(`${baseUrl}/privacy`);
   });
 
   it('includes dynamic detail pages for news, blog, and works', () => {
@@ -80,7 +81,7 @@ describe('buildSitemap', () => {
 
   it('emits only the static pages when data is empty', () => {
     const entries = buildSitemap({ baseUrl, news: [], blog: [], works: [] });
-    expect(entries).toHaveLength(9);
+    expect(entries).toHaveLength(10);
     expect(entries.map((entry) => entry.url)).toContain(baseUrl);
   });
 });

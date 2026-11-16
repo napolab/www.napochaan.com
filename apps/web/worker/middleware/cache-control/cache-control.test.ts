@@ -42,6 +42,7 @@ describe('resolveCacheControl', () => {
     ['/sitemap.xml', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
     ['/robots.txt', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
     ['/.well-known/security.txt', { kind: 'page', policy: PAGE_CACHE_POLICIES.timeSensitive }],
+    ['/.well-known/ai-catalog.json', { kind: 'page', policy: PAGE_CACHE_POLICIES.cms }],
   ])('%s → %o', (path, expected) => {
     expect(resolveCacheControl(path)).toEqual(expected);
   });
