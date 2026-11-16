@@ -7,5 +7,5 @@ import { dayjs } from '@utils/dayjs';
 // `YYYY.MM.DD` — the detail kicker and the OG card meta line.
 export const formatNewsDate = (date: string): string => dayjs(date).tz('Asia/Tokyo').format('YYYY.MM.DD');
 
-// `MM.DD` — an archive row (the year-month lives in the group heading).
+// `MM.DD` — an archive row (the year lives in the group heading).
 export const formatNewsMonthDay = (date: string): string => dayjs(date).tz('Asia/Tokyo').format('MM.DD');

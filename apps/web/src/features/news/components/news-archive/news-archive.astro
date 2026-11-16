@@ -34,7 +34,7 @@ const { groups } = Astro.props;
   {
     groups.map((group) => (
       <section class={styles.group} aria-labelledby={`news-${group.key}`}>
-        <h2 id={`news-${group.key}`} class={styles.month}>
+        <h2 id={`news-${group.key}`} class={styles.year}>
           {group.label}
         </h2>
         <ol class={styles.rows}>

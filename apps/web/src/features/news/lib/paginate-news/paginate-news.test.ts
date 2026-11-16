@@ -10,13 +10,14 @@ const item = (n: number, date: string): NewsItem => ({ id: `${n}`, slug: `news-$
 const feed: readonly NewsItem[] = [item(0, '2026-01-05'), ...Array.from({ length: 12 }, (_, i) => item(i + 1, `2026-06-${`${20 - i}`.padStart(2, '0')}`))];
 
 describe('paginateNews', () => {
-  it('slices PAGE_SIZE items in the CMS order (pinned first) and groups them by year-month', () => {
+  it('slices PAGE_SIZE items in the CMS order (pinned first) and groups them by year', () => {
     const first = paginateNews(feed, 1);
     expect(first?.totalPages).toBe(2);
     expect(first?.current).toBe(1);
-    expect(first?.groups.map((group) => group.key)).toEqual(['2026-06', '2026-01']);
+    expect(first?.groups.map((group) => group.key)).toEqual(['2026']);
     expect(first?.groups.flatMap((group) => group.items).length).toBe(PAGE_SIZE);
-    expect(first?.groups.at(-1)?.items.map((news) => news.slug)).toEqual(['news-0']);
+    // The pinned (older) news-0 stays on page 1 and sorts by date within its year.
+    expect(first?.groups.at(-1)?.items.map((news) => news.slug)).toEqual([...Array.from({ length: 9 }, (_, i) => `news-${i + 1}`), 'news-0']);
   });
 
   it('serves the rest on page 2', () => {

@@ -6,26 +6,26 @@ import { NewsArchive } from './index';
 
 const groups = [
   {
-    key: '2026-06',
-    label: '2026 / 06',
+    key: '2026',
+    label: '2026',
     items: [
       { id: '1', slug: 'site-renewal', date: '2026-06-05', category: 'site', title: 'サイトを全面リニューアル' },
       { id: '2', slug: 'booth2booth-live', date: '2026-06-01', category: 'live', title: 'Booth²Booth 出演決定' },
     ],
   },
   {
-    key: '2026-05',
-    label: '2026 / 05',
-    items: [{ id: '3', slug: 'works-page', date: '2026-05-23', category: 'release', title: 'works ページ公開' }],
+    key: '2025',
+    label: '2025',
+    items: [{ id: '3', slug: 'works-page', date: '2025-05-23', category: 'release', title: 'works ページ公開' }],
   },
 ];
 
 describe('NewsArchive', () => {
-  it('renders an h2 per distinct year-month label', async () => {
+  it('renders an h2 per distinct year label', async () => {
     await render(<NewsArchive groups={groups} />);
 
-    await expect.element(page.getByRole('heading', { level: 2, name: '2026 / 06' })).toBeInTheDocument();
-    await expect.element(page.getByRole('heading', { level: 2, name: '2026 / 05' })).toBeInTheDocument();
+    await expect.element(page.getByRole('heading', { level: 2, name: '2026' })).toBeInTheDocument();
+    await expect.element(page.getByRole('heading', { level: 2, name: '2025' })).toBeInTheDocument();
   });
 
   it('renders each item as a link to /news/{slug} containing the title', async () => {
