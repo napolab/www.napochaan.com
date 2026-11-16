@@ -85,6 +85,20 @@ describe('createWorkerApp', () => {
     const response = await app.request('/contact', { method: 'POST' });
     expect(response.headers.get('Cache-Control')).toBe('no-store');
   });
+
+  // The route proxies Cloudflare Access's live metadata, which no CMS purge reaches.
+  it('keeps the proxied authorization server metadata at the edge for an hour only', async () => {
+    const handlerFetch = vi.fn(async () => Response.json({ issuer: 'https://napochaan.cloudflareaccess.com' }));
+    const response = await createWorkerApp(handlerFetch).request('/.well-known/oauth-authorization-server');
+    expect(response.headers.get('Cache-Control')).toBe('public, max-age=0, s-maxage=3600');
+  });
+
+  it('never stores the 502 the authorization server proxy answers when upstream fails', async () => {
+    const handlerFetch = vi.fn(async () => Response.json({ error: 'upstream_unavailable' }, { status: 502 }));
+    const response = await createWorkerApp(handlerFetch).request('/.well-known/oauth-authorization-server');
+    expect(response.status).toBe(502);
+    expect(response.headers.get('Cache-Control')).toBe('no-store');
+  });
 });
 
 describe('createWorkerApp markdown negotiation', () => {
@@ -115,7 +129,7 @@ describe('createWorkerApp markdown negotiation', () => {
     expect(response.headers.get('Vary')).toBe('Accept');
   });
 
-  it.each(['/about.md', '/api/media/file/a.png', '/blog/preview/1'])('does not vary %s', async (path) => {
+  it.each(['/about.md', '/api/media/file/a.png', '/blog/preview/1', '/.well-known/api-catalog', '/.well-known/oauth-protected-resource', '/auth.md'])('does not vary %s', async (path) => {
     const handlerFetch = vi.fn(async () => new Response('x'));
     const response = await createWorkerApp(handlerFetch).request(path);
     expect(response.headers.get('Vary')).toBeNull();

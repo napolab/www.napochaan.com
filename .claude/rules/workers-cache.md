@@ -30,8 +30,8 @@ cache-control middleware (`apps/web/worker/middleware/cache-control`, first-matc
 | Class | Paths | Policy | Freshness |
 | --- | --- | --- | --- |
 | `uncacheable` (deny) | `/{blog,news,works,gallery,log}/preview*`, `/next/*`, `/admin*`, any other `/api/*` (api plugin, after media), and **any request whose CMS read failed** | `no-store` — always, any status / method / cookie | never stored |
-| `timeSensitive` (page) | `/`, `/log`, `/log.md`, `/log/rss.xml`, `/.well-known/security.txt` | `public, max-age=0, s-maxage=3600` | 1h at the edge + purge |
-| `cms` (page, catch-all) | every other page, feed, `.md`, llms, sitemap, robots, OG image, `/contact` | `public, max-age=0, s-maxage=31536000` | purge / deploy only |
+| `timeSensitive` (page) | `/`, `/log`, `/log.md`, `/log/rss.xml`, `/.well-known/security.txt`, `/.well-known/oauth-authorization-server` (proxied Cloudflare Access metadata; an upstream failure is a `502`, hence `no-store`) | `public, max-age=0, s-maxage=3600` | 1h at the edge + purge |
+| `cms` (page, catch-all) | every other page, feed, `.md`, llms, sitemap, robots, OG image, `/contact`, the deploy-constant discovery documents (`/auth.md`, `/.well-known/{ard.json,ai-catalog.json,api-catalog,mcp/server-card.json,oauth-protected-resource,agent-skills/**,poppy.json}`) | `public, max-age=0, s-maxage=31536000` | purge / deploy only |
 | keep | `/_astro/*` (content-hashed, `immutable` via `public/_headers`), `/_next/image` (the worker image transformer sets its own policy), `/_image` | upstream | — |
 | fill | `/api/media/file/*` media | only when upstream sent none | — |
 
@@ -55,7 +55,8 @@ read `Accept` (that would be request data in a cacheable body).
   `resolveCacheControl(path).kind === 'page'` (`isNegotiablePath`,
   `worker/lib/markdown-negotiation/negotiable-path`). Drafts, `/api/*`, `/_actions`, feeds and
   the `.md` twins themselves are never negotiated, nor the extension-less OG image routes
-  (`opengraph-image-<suffix>`, from `OG_IMAGE_ROUTE_SUFFIX`).
+  (`opengraph-image-<suffix>`, from `OG_IMAGE_ROUTE_SUFFIX`), nor anything under
+  `/.well-known/` (extension-less JSON documents such as `api-catalog`).
 - **Markdown is preferred** only when `Accept` lists `text/markdown` explicitly with `q > 0` and
   `q >=` the q `text/html` gets from its most specific range (`text/html` → `text/*` → `*/*`).
   Browsers' `*/*` / `text/*` never opt in (`acceptsMarkdown`).

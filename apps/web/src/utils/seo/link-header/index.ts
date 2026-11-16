@@ -1,3 +1,5 @@
+import { LINKSET_MEDIA_TYPE } from '@utils/agent-discovery/build-api-catalog';
+import { DISCOVERY_PATHS } from '@utils/agent-discovery/facts';
 import { AI_CATALOG_MEDIA_TYPE } from '@utils/ai-catalog/build-ai-catalog';
 
 import type { Metadata } from '../metadata';
@@ -20,10 +22,16 @@ type LinkTarget = { url: string; rel: string; type: string };
 
 // Site-wide discovery targets, on every page (the homepage has no markdown twin).
 const SITE_LINKS: readonly LinkTarget[] = [
-  { url: '/llms.txt', rel: 'describedby', type: 'text/plain' },
-  { url: '/sitemap.xml', rel: 'sitemap', type: 'application/xml' },
-  // Agentic Resource Discovery: `rel="ai-catalog"` points at the AI Catalog.
-  { url: '/.well-known/ai-catalog.json', rel: 'ai-catalog', type: AI_CATALOG_MEDIA_TYPE },
+  { url: DISCOVERY_PATHS.llmsTxt, rel: 'describedby', type: 'text/plain' },
+  { url: DISCOVERY_PATHS.sitemap, rel: 'sitemap', type: 'application/xml' },
+  // Agentic Resource Discovery: `rel="ard"` is the relation ARD consumers look for
+  // (Lighthouse `ard-schema` flags a manifest found only via the predecessor
+  // `rel="ai-catalog"` as legacy); the predecessor link stays for older consumers.
+  // Separate links, not `rel="ai-catalog ard"`: consumers compare rel values exactly.
+  { url: DISCOVERY_PATHS.aiCatalog, rel: 'ai-catalog', type: AI_CATALOG_MEDIA_TYPE },
+  { url: DISCOVERY_PATHS.ard, rel: 'ard', type: AI_CATALOG_MEDIA_TYPE },
+  // RFC 9727 §3: `rel="api-catalog"` points at the API Catalog linkset.
+  { url: DISCOVERY_PATHS.apiCatalog, rel: 'api-catalog', type: LINKSET_MEDIA_TYPE },
 ];
 
 const alternateLinks = (metadata: Partial<Pick<Metadata, 'alternates'>>): LinkTarget[] =>

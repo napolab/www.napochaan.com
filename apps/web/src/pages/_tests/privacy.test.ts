@@ -30,7 +30,7 @@ describe('/privacy', () => {
   it('advertises the markdown twin in the Link header', async () => {
     const response = await renderPage(PrivacyPage, '/privacy');
     expect(response.headers.get('link')).toBe(
-      '</privacy.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
+      '</privacy.md>; rel="alternate"; type="text/markdown", </llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json", </.well-known/ard.json>; rel="ard"; type="application/ai-catalog+json", </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
     );
   });
 

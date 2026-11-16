@@ -77,7 +77,7 @@ describe('/ (home)', () => {
   it('sends Link headers pointing agents at llms.txt (describedby) and the sitemap', async () => {
     const response = await renderPage(HomePage, '/');
     expect(response.headers.get('link')).toBe(
-      '</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
+      '</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json", </.well-known/ard.json>; rel="ard"; type="application/ai-catalog+json", </.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"',
     );
   });
 
