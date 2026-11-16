@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { blogFeed } from './blog-fixtures';
 import { newsFeed } from './news-fixtures';
 import { worksFeed } from './works-fixtures';
+import * as aiCatalogJSON from '../.well-known/ai-catalog.json';
 import * as securityTxt from '../.well-known/security.txt';
 import * as mediaFile from '../api/media/file/[filename]';
 import * as llmsFullTxt from '../llms-full.txt';
@@ -11,6 +12,7 @@ import * as robotsTxt from '../robots.txt';
 import * as sitemapXML from '../sitemap.xml';
 import { createFakeCMSBinding, createFakeCMSServices } from '../../__mocks__/cms-services';
 import { renderEndpoint } from '../../test-utils/astro-container';
+import { buildAICatalog } from '@utils/ai-catalog/build-ai-catalog';
 import { buildLLMsFullTxt } from '@utils/llms/build-llms-full-txt';
 import { buildLLMsTxt } from '@utils/llms/build-llms-txt';
 import { buildRobots } from '@utils/robots/build-robots';
@@ -79,6 +81,13 @@ describe('text endpoints (bodies equal the Next builders for the same data)', ()
     const body = await res.text();
     expect(body).toContain('Contact: mailto:contact@napochaan.com');
     expect(body).toMatch(/Expires: \d{4}-\d{2}-\d{2}T/);
+  });
+
+  it('/.well-known/ai-catalog.json advertises the MCP server card as application/ai-catalog+json', async () => {
+    const res = await render(aiCatalogJSON, '/.well-known/ai-catalog.json');
+    expect(res.headers.get('content-type')).toBe('application/ai-catalog+json');
+    expect(res.headers.get('access-control-allow-origin')).toBe('*');
+    expect(await res.json()).toEqual(buildAICatalog({ baseUrl: 'https://napochaan.com' }));
   });
 });
 

@@ -76,7 +76,9 @@ describe('/ (home)', () => {
   });
   it('sends Link headers pointing agents at llms.txt (describedby) and the sitemap', async () => {
     const response = await renderPage(HomePage, '/');
-    expect(response.headers.get('link')).toBe('</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml"');
+    expect(response.headers.get('link')).toBe(
+      '</llms.txt>; rel="describedby"; type="text/plain", </sitemap.xml>; rel="sitemap"; type="application/xml", </.well-known/ai-catalog.json>; rel="ai-catalog"; type="application/ai-catalog+json"',
+    );
   });
 
   it('gives the home page the default OG card image (is-agentic flags a missing og:image)', async () => {

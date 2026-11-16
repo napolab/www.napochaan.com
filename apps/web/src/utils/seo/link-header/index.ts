@@ -1,3 +1,5 @@
+import { AI_CATALOG_MEDIA_TYPE } from '@utils/ai-catalog/build-ai-catalog';
+
 import type { Metadata } from '../metadata';
 
 // RFC 8288 `Link` response header for an HTML page, so agents can discover the
@@ -20,6 +22,8 @@ type LinkTarget = { url: string; rel: string; type: string };
 const SITE_LINKS: readonly LinkTarget[] = [
   { url: '/llms.txt', rel: 'describedby', type: 'text/plain' },
   { url: '/sitemap.xml', rel: 'sitemap', type: 'application/xml' },
+  // Agentic Resource Discovery: `rel="ai-catalog"` points at the AI Catalog.
+  { url: '/.well-known/ai-catalog.json', rel: 'ai-catalog', type: AI_CATALOG_MEDIA_TYPE },
 ];
 
 const alternateLinks = (metadata: Partial<Pick<Metadata, 'alternates'>>): LinkTarget[] =>
