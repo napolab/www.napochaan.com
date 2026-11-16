@@ -93,7 +93,7 @@ describe('/ (home)', () => {
       '@context': 'https://schema.org',
       '@graph': [
         { '@type': 'WebSite', url: 'http://localhost:8788', name: 'napochaan', description: 'DJ・VJ・グラフィック・デジタル制作。napochaan の個人サイト。' },
-        { '@type': 'Person', name: 'napochaan', sameAs: ['https://x.com/naporin24690', 'https://github.com/naporin0624'] },
+        { '@type': 'Person', name: 'napochaan', sameAs: ['https://x.com/naporin24690', 'https://github.com/naporin0624', 'https://zenn.dev/naporin24690', 'https://booth2booth.com'] },
       ],
     });
   });
